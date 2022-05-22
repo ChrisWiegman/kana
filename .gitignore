@@ -47,3 +47,6 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Ignore .vscode build files
+.vscode/*.log
