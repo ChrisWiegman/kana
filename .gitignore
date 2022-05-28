@@ -50,3 +50,6 @@ Temporary Items
 
 # Ignore .vscode build files
 .vscode/*.log
+
+# Ignore Go vendor assets
+vendor/
