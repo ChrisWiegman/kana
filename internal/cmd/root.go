@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/ChrisWiegman/kana/m/pkg/docker"
+
 	"github.com/spf13/cobra"
 )
 
@@ -11,7 +13,18 @@ var rootCmd = &cobra.Command{
 	Use:   "kana",
 	Short: "Kana is a simple WordPress development tool designed for plugin and theme developers.",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("This is Kana.")
+		var controller, _ = docker.NewController()
+
+		controller.EnsureImage("alpine")
+		statusCode, body, err := controller.ContainerRunAndClean("alpine", []string{"echo", "hello world"}, []docker.VolumeMount{})
+
+		if err != nil {
+			fmt.Errorf("There was an error: %s", err)
+		}
+
+		fmt.Println(statusCode)
+		fmt.Println(body)
+
 	},
 }
 
