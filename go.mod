@@ -1,4 +1,4 @@
-module github.com/ChrisWiegman/kana/m
+module github.com/ChrisWiegman/kana
 
 go 1.18
 
