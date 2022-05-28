@@ -19,7 +19,7 @@ var rootCmd = &cobra.Command{
 		statusCode, body, err := controller.ContainerRunAndClean("alpine", []string{"echo", "hello world"}, []docker.VolumeMount{})
 
 		if err != nil {
-			fmt.Errorf("There was an error: %s", err)
+			fmt.Fprintln(os.Stderr, err)
 		}
 
 		fmt.Println(statusCode)
