@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/docker/docker/api/types"
 )
@@ -18,4 +19,22 @@ func (c *Controller) EnsureImage(image string) (err error) {
 	defer reader.Close()
 	io.Copy(os.Stdout, reader)
 	return nil
+}
+
+func (c *Controller) RemoveImage(image string) (removed bool, err error) {
+
+	removedResponse, err := c.cli.ImageRemove(context.Background(), image, types.ImageRemoveOptions{})
+
+	if err != nil {
+		if !strings.Contains(err.Error(), "No such image:") {
+			return false, err
+		}
+	}
+
+	if len(removedResponse) > 0 {
+		return true, nil
+	}
+
+	return false, nil
+
 }

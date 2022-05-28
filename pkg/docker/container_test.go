@@ -11,6 +11,11 @@ func TestContainerRun(t *testing.T) {
 		t.Error(err)
 	}
 
+	err = c.EnsureImage("alpine")
+	if err != nil {
+		t.Error(err)
+	}
+
 	statusCode, body, err := c.ContainerRunAndClean("alpine", []string{"echo", "hello world"}, []VolumeMount{})
 
 	if err != nil {
@@ -24,5 +29,10 @@ func TestContainerRun(t *testing.T) {
 
 	if statusCode != 0 {
 		t.Errorf("Expect status to be 0; received %q\n", statusCode)
+	}
+
+	_, err = c.RemoveImage("alpine")
+	if err != nil {
+		t.Error(err)
 	}
 }
