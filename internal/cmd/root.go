@@ -15,15 +15,21 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		var controller, _ = docker.NewController()
 
-		controller.EnsureImage("alpine")
-		statusCode, body, err := controller.ContainerRunAndClean("alpine", []string{"echo", "hello world"}, []docker.VolumeMount{})
+		controller.EnsureImage("wordpress")
+		statusCode, err := controller.ContainerRun("wordpress", []string{}, []docker.VolumeMount{})
+		hasNetwork, network, _ := controller.EnsureNetwork("kana")
+
+		if hasNetwork {
+			fmt.Println(network.Name)
+		} else {
+			fmt.Println("Network doesn't exist")
+		}
 
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 		}
 
 		fmt.Println(statusCode)
-		fmt.Println(body)
 
 	},
 }
