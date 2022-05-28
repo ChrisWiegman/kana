@@ -14,8 +14,6 @@ import (
 func (c *Controller) ContainerRun(image string, command []string, volumes []VolumeMount) (id string, err error) {
 	hostConfig := container.HostConfig{}
 
-	//	hostConfig.Mounts = make([]mount.Mount,0);
-
 	var mounts []mount.Mount
 
 	for _, volume := range volumes {
@@ -48,11 +46,11 @@ func (c *Controller) ContainerRun(image string, command []string, volumes []Volu
 }
 
 func (c *Controller) ContainerWait(id string) (state int64, err error) {
-	resultC, errC := c.cli.ContainerWait(context.Background(), id, "")
+	containerResult, errorCode := c.cli.ContainerWait(context.Background(), id, "")
 	select {
-	case err := <-errC:
+	case err := <-errorCode:
 		return 0, err
-	case result := <-resultC:
+	case result := <-containerResult:
 		return result.StatusCode, nil
 	}
 }
@@ -79,6 +77,7 @@ func (c *Controller) ContainerLog(id string) (result string, err error) {
 }
 
 func (c *Controller) ContainerRunAndClean(image string, command []string, volumes []VolumeMount) (statusCode int64, body string, err error) {
+
 	// Start the container
 	id, err := c.ContainerRun(image, command, volumes)
 	if err != nil {
