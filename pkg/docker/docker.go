@@ -1,5 +1,9 @@
 package docker
 
+/**
+ * Docker code examples currently from https://willschenk.com/articles/2021/controlling_docker_in_golang/
+ **/
+
 import (
 	"github.com/docker/docker/client"
 )
