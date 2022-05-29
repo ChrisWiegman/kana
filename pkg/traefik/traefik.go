@@ -36,5 +36,4 @@ func NewTraefik() {
 	if err != nil {
 		panic(err)
 	}
-
 }
