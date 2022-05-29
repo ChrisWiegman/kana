@@ -16,7 +16,7 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	out.Write([]byte("// nolint\npackage templates \n\nconst (\n"))
+	out.Write([]byte("// nolint\npackage setup \n\nconst (\n"))
 	for _, f := range fs {
 		if strings.HasPrefix(f.Name(), ".") {
 			// Don't include hidden files

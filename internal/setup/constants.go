@@ -1,8 +1,8 @@
 // nolint
-package templates 
+package setup
 
 const (
-DYNAMIC_TOML = `[tls.options]
+	DYNAMIC_TOML = `[tls.options]
 
 [tls.options.default]
 minVersion = "VersionTLS12"
@@ -12,7 +12,7 @@ sniStrict = true
 certFile = "/var/certs/cert.pem"
 keyFile = "/var/certs/key.pem"
 `
-TRAEFIK_TOML = `[log]
+	TRAEFIK_TOML = `[log]
 level = "INFO"
 
 [providers]
