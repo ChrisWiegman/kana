@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/mitchellh/go-homedir"
+	"github.com/ChrisWiegman/kana/internal/config"
 )
 
 type File struct {
@@ -39,23 +39,11 @@ var configFiles = []File{
 	},
 }
 
-// GetConfigRoot Return the path for the global config.
-func GetConfigRoot() (string, error) {
-
-	home, err := homedir.Dir()
-	if err != nil {
-		return "", err
-	}
-
-	return filepath.Join(home, ".kana"), nil
-
-}
-
 // WriteConfigFiles Write config files to an install's .wpengine-conf directory
 func WriteConfigFiles() error {
 
 	// Get global config root.
-	configRoot, err := GetConfigRoot()
+	configRoot, err := config.GetConfigRoot()
 	if err != nil {
 		return err
 	}

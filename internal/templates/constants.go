@@ -17,9 +17,9 @@ level = "DEBUG"
 
 [providers]
 [providers.docker]
-endpoint = "tcp://wpe_dockerproxy:2375"
+endpoint = "tcp://dockerproxy:2375"
 exposedByDefault = false
-network = "traefik-proxy"
+network = "traefik"
 [providers.file]
 filename = "/etc/traefik/dynamic.toml"
 
@@ -33,7 +33,7 @@ insecure = true
 address = ":80"
 [entryPoints.web-secure]
 address = ":443"
-[entryPoints.mysql]
-address = ":3306"
+[entryPoints.dashboard]
+address = ":8080"
 `
 )
