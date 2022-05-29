@@ -19,12 +19,20 @@ func NewTraefik() {
 		panic(err)
 	}
 
-	traefikPorts := []docker.PortList{
+	traefikPorts := []docker.ExposedPorts{
 		{Port: "80", Protocol: "tcp"},
 		{Port: "443", Protocol: "tcp"},
 	}
 
-	_, err = controller.ContainerRun("traefik", traefikPorts, "kana", []docker.VolumeMount{}, []string{})
+	config := docker.ContainerConfig{
+		Image:       "traefik",
+		Ports:       traefikPorts,
+		NetworkName: "kana",
+		Volumes:     []docker.VolumeMount{},
+		Command:     []string{},
+	}
+
+	_, err = controller.ContainerRun(config)
 	if err != nil {
 		panic(err)
 	}

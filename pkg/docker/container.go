@@ -12,9 +12,17 @@ import (
 	"github.com/docker/docker/api/types/network"
 )
 
-func (c *Controller) ContainerRun(image string, ports []PortList, networkName string, volumes []VolumeMount, command []string) (id string, err error) {
+type ContainerConfig struct {
+	Image       string
+	Ports       []ExposedPorts
+	NetworkName string
+	Volumes     []VolumeMount
+	Command     []string
+}
+
+func (c *Controller) ContainerRun(config ContainerConfig) (id string, err error) {
 	hostConfig := container.HostConfig{}
-	containerPorts := c.getNetworkConfig(ports)
+	containerPorts := c.getNetworkConfig(config.Ports)
 
 	if len(containerPorts.PortBindings) > 0 {
 		hostConfig.PortBindings = containerPorts.PortBindings
@@ -22,15 +30,15 @@ func (c *Controller) ContainerRun(image string, ports []PortList, networkName st
 
 	networkConfig := network.NetworkingConfig{}
 
-	if len(networkName) > 0 {
+	if len(config.NetworkName) > 0 {
 		networkConfig.EndpointsConfig = map[string]*network.EndpointSettings{
-			networkName: {},
+			config.NetworkName: {},
 		}
 	}
 
 	var mounts []mount.Mount
 
-	for _, volume := range volumes {
+	for _, volume := range config.Volumes {
 		mount := mount.Mount{
 			Type:   mount.TypeVolume,
 			Source: volume.Volume.Name,
@@ -41,13 +49,11 @@ func (c *Controller) ContainerRun(image string, ports []PortList, networkName st
 
 	hostConfig.Mounts = mounts
 
-	fmt.Println(containerPorts.PortSet)
-
 	resp, err := c.cli.ContainerCreate(context.Background(), &container.Config{
 		Tty:          true,
-		Image:        image,
+		Image:        config.Image,
 		ExposedPorts: containerPorts.PortSet,
-		Cmd:          command,
+		Cmd:          config.Command,
 	}, &hostConfig, &networkConfig, nil, "")
 
 	if err != nil {
@@ -93,10 +99,10 @@ func (c *Controller) ContainerLog(id string) (result string, err error) {
 	return string(buffer), nil
 }
 
-func (c *Controller) ContainerRunAndClean(image string, ports []PortList, networkName string, volumes []VolumeMount, command []string) (statusCode int64, body string, err error) {
+func (c *Controller) ContainerRunAndClean(config ContainerConfig) (statusCode int64, body string, err error) {
 
 	// Start the container
-	id, err := c.ContainerRun(image, ports, networkName, volumes, command)
+	id, err := c.ContainerRun(config)
 	if err != nil {
 		return statusCode, body, err
 	}

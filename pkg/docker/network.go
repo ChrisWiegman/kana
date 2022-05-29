@@ -8,7 +8,7 @@ import (
 	"github.com/docker/go-connections/nat"
 )
 
-type PortList struct {
+type ExposedPorts struct {
 	Port     string
 	Protocol string
 }
@@ -18,13 +18,17 @@ type portConfig struct {
 	PortSet      nat.PortSet
 }
 
-func (c *Controller) getNetworkConfig(ports []PortList) portConfig {
+func (c *Controller) getNetworkConfig(ports []ExposedPorts) portConfig {
 
 	portBindings := make(nat.PortMap)
+	portSet := make(nat.PortSet)
 
 	for _, port := range ports {
 
-		portName := nat.Port(port.Port + "/" + port.Protocol)
+		portName, err := nat.NewPort(port.Protocol, port.Port)
+		if err != nil {
+			panic(err)
+		}
 
 		portBindings[portName] = []nat.PortBinding{
 			{
@@ -32,9 +36,9 @@ func (c *Controller) getNetworkConfig(ports []PortList) portConfig {
 			},
 		}
 
-	}
+		portSet[portName] = struct{}{}
 
-	portSet := make(nat.PortSet)
+	}
 
 	return portConfig{
 		PortBindings: portBindings,
