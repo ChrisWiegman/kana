@@ -9,10 +9,34 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
+	"github.com/docker/docker/api/types/network"
+	"github.com/docker/go-connections/nat"
 )
 
 func (c *Controller) ContainerRun(image string, command []string, volumes []VolumeMount) (id string, err error) {
-	hostConfig := container.HostConfig{}
+	hostConfig := container.HostConfig{
+		PortBindings: nat.PortMap{
+			"80/tcp": {
+				nat.PortBinding{
+					HostIP:   "127.0.0.1",
+					HostPort: "80",
+				},
+			},
+			"443/tcp": {
+				nat.PortBinding{
+					HostIP:   "127.0.0.1",
+					HostPort: "443",
+				},
+			},
+		},
+	}
+	name := "kana"
+	ports := make(nat.PortSet)
+	networkConfig := network.NetworkingConfig{
+		EndpointsConfig: map[string]*network.EndpointSettings{
+			name: {},
+		},
+	}
 
 	var mounts []mount.Mount
 
@@ -28,10 +52,11 @@ func (c *Controller) ContainerRun(image string, command []string, volumes []Volu
 	hostConfig.Mounts = mounts
 
 	resp, err := c.cli.ContainerCreate(context.Background(), &container.Config{
-		Tty:   true,
-		Image: image,
-		Cmd:   command,
-	}, &hostConfig, nil, nil, "")
+		Tty:          true,
+		Image:        image,
+		Cmd:          command,
+		ExposedPorts: ports,
+	}, &hostConfig, &networkConfig, nil, "")
 
 	if err != nil {
 		return "", err
