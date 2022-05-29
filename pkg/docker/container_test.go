@@ -16,7 +16,12 @@ func TestContainerRun(t *testing.T) {
 		t.Error(err)
 	}
 
-	statusCode, body, err := c.ContainerRunAndClean("alpine", []PortList{}, "", []VolumeMount{}, []string{"echo", "hello world"})
+	config := ContainerConfig{
+		Image:   "alpine",
+		Command: []string{"echo", "hello world"},
+	}
+
+	statusCode, body, err := c.ContainerRunAndClean(config)
 
 	if err != nil {
 		t.Error(err)
