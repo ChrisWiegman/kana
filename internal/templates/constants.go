@@ -13,11 +13,11 @@ certFile = "/var/certs/cert.pem"
 keyFile = "/var/certs/key.pem"
 `
 TRAEFIK_TOML = `[log]
-level = "DEBUG"
+level = "INFO"
 
 [providers]
 [providers.docker]
-endpoint = "tcp://dockerproxy:2375"
+endpoint = "tcp://localhost:2375"
 exposedByDefault = false
 network = "traefik"
 [providers.file]
@@ -33,7 +33,5 @@ insecure = true
 address = ":80"
 [entryPoints.web-secure]
 address = ":443"
-[entryPoints.dashboard]
-address = ":8080"
 `
 )

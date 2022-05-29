@@ -8,11 +8,6 @@ import (
 	volumetypes "github.com/docker/docker/api/types/volume"
 )
 
-type VolumeMount struct {
-	HostPath string
-	Volume   *types.Volume
-}
-
 func (c *Controller) FindVolume(name string) (volume *types.Volume, err error) {
 	volumes, err := c.cli.VolumeList(context.Background(), filters.NewArgs())
 

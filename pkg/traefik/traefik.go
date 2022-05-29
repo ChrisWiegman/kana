@@ -5,7 +5,7 @@ import (
 
 	"github.com/ChrisWiegman/kana/internal/config"
 	"github.com/ChrisWiegman/kana/pkg/docker"
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/mount"
 )
 
 func NewTraefik() {
@@ -33,11 +33,11 @@ func NewTraefik() {
 	traefikPorts := []docker.ExposedPorts{
 		{Port: "80", Protocol: "tcp"},
 		{Port: "443", Protocol: "tcp"},
+		{Port: "8080", Protocol: "tcp"},
 	}
 
 	dockerProxyPorts := []docker.ExposedPorts{
 		{Port: "2375", Protocol: "tcp"},
-		{Port: "8080", Protocol: "tcp"},
 	}
 
 	configRoot, _ := config.GetConfigRoot()
@@ -46,12 +46,11 @@ func NewTraefik() {
 		Image:       "tecnativa/docker-socket-proxy",
 		Ports:       dockerProxyPorts,
 		NetworkName: "kana",
-		Volumes: []docker.VolumeMount{
+		Volumes: []mount.Mount{
 			{
-				HostPath: "/var/run/docker.sock",
-				Volume: &types.Volume{
-					Mountpoint: "/var/run/docker.sock",
-				},
+				Type:   mount.TypeBind,
+				Source: "/var/run/docker.sock",
+				Target: "/var/run/docker.sock",
 			},
 		},
 		Command: []string{},
@@ -61,18 +60,16 @@ func NewTraefik() {
 		Image:       "traefik",
 		Ports:       traefikPorts,
 		NetworkName: "kana",
-		Volumes: []docker.VolumeMount{
+		Volumes: []mount.Mount{
 			{
-				HostPath: path.Join(configRoot, ".kana", "conf", "traefik", "traefik.toml"),
-				Volume: &types.Volume{
-					Mountpoint: "/etc/traefik/traefik.toml",
-				},
+				Type:   mount.TypeBind,
+				Source: path.Join(configRoot, "conf", "traefik", "traefik.toml"),
+				Target: "/etc/traefik/traefik.toml",
 			},
 			{
-				HostPath: path.Join(configRoot, ".kana", "conf", "traefik", "dynamic.toml"),
-				Volume: &types.Volume{
-					Mountpoint: "/etc/traefik/traefik.toml",
-				},
+				Type:   mount.TypeBind,
+				Source: path.Join(configRoot, "conf", "traefik", "dynamic.toml"),
+				Target: "/etc/traefik/dynamic.toml",
 			},
 		},
 		Command: []string{},

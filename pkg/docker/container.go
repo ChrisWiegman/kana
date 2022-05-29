@@ -16,7 +16,7 @@ type ContainerConfig struct {
 	Image       string
 	Ports       []ExposedPorts
 	NetworkName string
-	Volumes     []VolumeMount
+	Volumes     []mount.Mount
 	Command     []string
 }
 
@@ -36,18 +36,7 @@ func (c *Controller) ContainerRun(config ContainerConfig) (id string, err error)
 		}
 	}
 
-	var mounts []mount.Mount
-
-	for _, volume := range config.Volumes {
-		mount := mount.Mount{
-			Type:   mount.TypeVolume,
-			Source: volume.Volume.Name,
-			Target: volume.HostPath,
-		}
-		mounts = append(mounts, mount)
-	}
-
-	hostConfig.Mounts = mounts
+	hostConfig.Mounts = config.Volumes
 
 	resp, err := c.cli.ContainerCreate(context.Background(), &container.Config{
 		Tty:          true,
