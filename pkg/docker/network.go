@@ -5,7 +5,43 @@ import (
 	"fmt"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/go-connections/nat"
 )
+
+type PortList struct {
+	Port     string
+	Protocol string
+}
+
+type portConfig struct {
+	PortBindings nat.PortMap
+	PortSet      nat.PortSet
+}
+
+func (c *Controller) getNetworkConfig(ports []PortList) portConfig {
+
+	portBindings := make(nat.PortMap)
+
+	for _, port := range ports {
+
+		portName := nat.Port(port.Port + "/" + port.Protocol)
+
+		portBindings[portName] = []nat.PortBinding{
+			{
+				HostPort: port.Port,
+			},
+		}
+
+	}
+
+	portSet := make(nat.PortSet)
+
+	return portConfig{
+		PortBindings: portBindings,
+		PortSet:      portSet,
+	}
+
+}
 
 func (c *Controller) EnsureNetwork(name string) (created bool, network types.NetworkResource, err error) {
 

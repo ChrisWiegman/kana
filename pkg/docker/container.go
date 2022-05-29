@@ -10,32 +10,22 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
-	"github.com/docker/go-connections/nat"
 )
 
-func (c *Controller) ContainerRun(image string, command []string, volumes []VolumeMount) (id string, err error) {
-	hostConfig := container.HostConfig{
-		PortBindings: nat.PortMap{
-			"80/tcp": {
-				nat.PortBinding{
-					HostIP:   "127.0.0.1",
-					HostPort: "80",
-				},
-			},
-			"443/tcp": {
-				nat.PortBinding{
-					HostIP:   "127.0.0.1",
-					HostPort: "443",
-				},
-			},
-		},
+func (c *Controller) ContainerRun(image string, ports []PortList, networkName string, volumes []VolumeMount, command []string) (id string, err error) {
+	hostConfig := container.HostConfig{}
+	containerPorts := c.getNetworkConfig(ports)
+
+	if len(containerPorts.PortBindings) > 0 {
+		hostConfig.PortBindings = containerPorts.PortBindings
 	}
-	name := "kana"
-	ports := make(nat.PortSet)
-	networkConfig := network.NetworkingConfig{
-		EndpointsConfig: map[string]*network.EndpointSettings{
-			name: {},
-		},
+
+	networkConfig := network.NetworkingConfig{}
+
+	if len(networkName) > 0 {
+		networkConfig.EndpointsConfig = map[string]*network.EndpointSettings{
+			networkName: {},
+		}
 	}
 
 	var mounts []mount.Mount
@@ -51,11 +41,13 @@ func (c *Controller) ContainerRun(image string, command []string, volumes []Volu
 
 	hostConfig.Mounts = mounts
 
+	fmt.Println(containerPorts.PortSet)
+
 	resp, err := c.cli.ContainerCreate(context.Background(), &container.Config{
 		Tty:          true,
 		Image:        image,
+		ExposedPorts: containerPorts.PortSet,
 		Cmd:          command,
-		ExposedPorts: ports,
 	}, &hostConfig, &networkConfig, nil, "")
 
 	if err != nil {
@@ -101,10 +93,10 @@ func (c *Controller) ContainerLog(id string) (result string, err error) {
 	return string(buffer), nil
 }
 
-func (c *Controller) ContainerRunAndClean(image string, command []string, volumes []VolumeMount) (statusCode int64, body string, err error) {
+func (c *Controller) ContainerRunAndClean(image string, ports []PortList, networkName string, volumes []VolumeMount, command []string) (statusCode int64, body string, err error) {
 
 	// Start the container
-	id, err := c.ContainerRun(image, command, volumes)
+	id, err := c.ContainerRun(image, ports, networkName, volumes, command)
 	if err != nil {
 		return statusCode, body, err
 	}
