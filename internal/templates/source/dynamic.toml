@@ -1,0 +1,9 @@
+[tls.options]
+
+[tls.options.default]
+minVersion = "VersionTLS12"
+sniStrict = true
+
+[[tls.certificates]]
+certFile = "/var/certs/cert.pem"
+keyFile = "/var/certs/key.pem"

@@ -12,6 +12,7 @@ var rootCmd = &cobra.Command{
 	Use:   "kana",
 	Short: "Kana is a simple WordPress development tool designed for plugin and theme developers.",
 	Run: func(cmd *cobra.Command, args []string) {
+
 		traefik.NewTraefik()
 	},
 }
