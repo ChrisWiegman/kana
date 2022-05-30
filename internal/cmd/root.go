@@ -5,8 +5,6 @@ import (
 	"os"
 
 	"github.com/ChrisWiegman/kana/internal/setup"
-	"github.com/ChrisWiegman/kana/internal/traefik"
-	"github.com/ChrisWiegman/kana/internal/wordpress"
 
 	"github.com/spf13/cobra"
 )
@@ -18,8 +16,8 @@ var rootCmd = &cobra.Command{
 
 		setup.EnsureCA()
 		setup.EnsureAppConfig()
-		traefik.NewTraefik()
-		wordpress.NewWordPress()
+		//traefik.NewTraefik()
+		//wordpress.NewWordPress()
 	},
 }
 
