@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ChrisWiegman/kana/internal/setup"
+	"github.com/ChrisWiegman/kana/pkg/minica"
 
 	"github.com/spf13/cobra"
 )
@@ -14,10 +14,7 @@ var rootCmd = &cobra.Command{
 	Short: "Kana is a simple WordPress development tool designed for plugin and theme developers.",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		setup.EnsureCA()
-		setup.EnsureAppConfig()
-		//traefik.NewTraefik()
-		//wordpress.NewWordPress()
+		minica.GenCerts("/Users/chriswiegman/.kana/certs/kana.key", "/Users/chriswiegman/.kana/certs/kana.pem", []string{"wordpress.local.dev"}, []string{})
 	},
 }
 

@@ -11,10 +11,8 @@ import (
 	"encoding/asn1"
 	"encoding/hex"
 	"encoding/pem"
-	"flag"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"math"
 	"math/big"
 	"net"
@@ -23,13 +21,6 @@ import (
 	"strings"
 	"time"
 )
-
-func Minica() {
-	err := main2()
-	if err != nil {
-		log.Fatal(err)
-	}
-}
 
 type issuer struct {
 	key  crypto.Signer
@@ -227,7 +218,7 @@ func sign(iss *issuer, domains []string, ipAddresses []string) (*x509.Certificat
 	if err != nil && !os.IsExist(err) {
 		return nil, err
 	}
-	key, err := makeKey(fmt.Sprintf("%s/key.pem", cnFolder))
+	key, err := makeKey("/Users/chriswiegman/.kana/certs/key.pem")
 	if err != nil {
 		return nil, err
 	}
@@ -262,7 +253,7 @@ func sign(iss *issuer, domains []string, ipAddresses []string) (*x509.Certificat
 	if err != nil {
 		return nil, err
 	}
-	file, err := os.OpenFile(fmt.Sprintf("%s/cert.pem", cnFolder), os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	file, err := os.OpenFile("/Users/chriswiegman/.kana/certs/cert.pem", os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
 	if err != nil {
 		return nil, err
 	}
@@ -277,69 +268,26 @@ func sign(iss *issuer, domains []string, ipAddresses []string) (*x509.Certificat
 	return x509.ParseCertificate(der)
 }
 
-func split(s string) (results []string) {
-	if len(s) > 0 {
-		return strings.Split(s, ",")
-	}
-	return nil
-}
+func GenCerts(caKey, caCert string, domains, ipAddresses []string) error {
 
-func main2() error {
-	var caKey = flag.String("ca-key", "minica-key.pem", "Root private key filename, PEM encoded.")
-	var caCert = flag.String("ca-cert", "minica.pem", "Root certificate filename, PEM encoded.")
-	var domains = flag.String("domains", "", "Comma separated domain names to include as Server Alternative Names.")
-	var ipAddresses = flag.String("ip-addresses", "", "Comma separated IP addresses to include as Server Alternative Names.")
-	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-		fmt.Fprintf(os.Stderr, `
-Minica is a simple CA intended for use in situations where the CA operator
-also operates each host where a certificate will be used. It automatically
-generates both a key and a certificate when asked to produce a certificate.
-It does not offer OCSP or CRL services. Minica is appropriate, for instance,
-for generating certificates for RPC systems or microservices.
-
-On first run, minica will generate a keypair and a root certificate in the
-current directory, and will reuse that same keypair and root certificate
-unless they are deleted.
-
-On each run, minica will generate a new keypair and sign an end-entity (leaf)
-certificate for that keypair. The certificate will contain a list of DNS names
-and/or IP addresses from the command line flags. The key and certificate are
-placed in a new directory whose name is chosen as the first domain name from
-the certificate, or the first IP address if no domain names are present. It
-will not overwrite existing keys or certificates.
-
-`)
-		flag.PrintDefaults()
-	}
-	flag.Parse()
-	if *domains == "" && *ipAddresses == "" {
-		flag.Usage()
-		os.Exit(1)
-	}
-	if len(flag.Args()) > 0 {
-		fmt.Printf("Extra arguments: %s (maybe there are spaces in your domain list?)\n", flag.Args())
-		os.Exit(1)
-	}
-	domainSlice := split(*domains)
 	domainRe := regexp.MustCompile("^[A-Za-z0-9.*-]+$")
-	for _, d := range domainSlice {
+	for _, d := range domains {
 		if !domainRe.MatchString(d) {
 			fmt.Printf("Invalid domain name %q\n", d)
 			os.Exit(1)
 		}
 	}
-	ipSlice := split(*ipAddresses)
-	for _, ip := range ipSlice {
+
+	for _, ip := range ipAddresses {
 		if net.ParseIP(ip) == nil {
 			fmt.Printf("Invalid IP address %q\n", ip)
 			os.Exit(1)
 		}
 	}
-	issuer, err := getIssuer(*caKey, *caCert)
+	issuer, err := getIssuer(caKey, caCert)
 	if err != nil {
 		return err
 	}
-	_, err = sign(issuer, domainSlice, ipSlice)
+	_, err = sign(issuer, domains, ipAddresses)
 	return err
 }
