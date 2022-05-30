@@ -9,15 +9,13 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/asn1"
-	"encoding/hex"
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
 	"math"
 	"math/big"
-	"net"
 	"os"
-	"regexp"
+	"path"
 	"strings"
 	"time"
 )
@@ -27,20 +25,46 @@ type issuer struct {
 	cert *x509.Certificate
 }
 
+func GenCerts(certPath string) error {
+
+	caKey := path.Join(certPath, "root.key")
+	caCert := path.Join(certPath, "root.pem")
+	domains := []string{"*.local.dev"}
+
+	issuer, err := getIssuer(caKey, caCert)
+	if err != nil {
+		return err
+	}
+
+	_, err = sign(issuer, domains, certPath)
+	return err
+
+}
+
 func getIssuer(keyFile, certFile string) (*issuer, error) {
+
 	keyContents, keyErr := ioutil.ReadFile(keyFile)
 	certContents, certErr := ioutil.ReadFile(certFile)
+
 	if os.IsNotExist(keyErr) && os.IsNotExist(certErr) {
+
 		err := makeIssuer(keyFile, certFile)
 		if err != nil {
 			return nil, err
 		}
+
 		return getIssuer(keyFile, certFile)
+
 	} else if keyErr != nil {
+
 		return nil, fmt.Errorf("%s (but %s exists)", keyErr, certFile)
+
 	} else if certErr != nil {
+
 		return nil, fmt.Errorf("%s (but %s exists)", certErr, keyFile)
+
 	}
+
 	key, err := readPrivateKey(keyContents)
 	if err != nil {
 		return nil, fmt.Errorf("reading private key from %s: %s", keyFile, err)
@@ -55,80 +79,109 @@ func getIssuer(keyFile, certFile string) (*issuer, error) {
 	if err != nil {
 		return nil, fmt.Errorf("comparing public keys: %s", err)
 	} else if !equal {
+
 		return nil, fmt.Errorf("public key in CA certificate %s doesn't match private key in %s",
 			certFile, keyFile)
 	}
+
 	return &issuer{key, cert}, nil
+
 }
 
 func readPrivateKey(keyContents []byte) (crypto.Signer, error) {
+
 	block, _ := pem.Decode(keyContents)
 	if block == nil {
 		return nil, fmt.Errorf("no PEM found")
 	} else if block.Type != "RSA PRIVATE KEY" && block.Type != "ECDSA PRIVATE KEY" {
+
 		return nil, fmt.Errorf("incorrect PEM type %s", block.Type)
+
 	}
+
 	return x509.ParsePKCS1PrivateKey(block.Bytes)
+
 }
 
 func readCert(certContents []byte) (*x509.Certificate, error) {
+
 	block, _ := pem.Decode(certContents)
 	if block == nil {
 		return nil, fmt.Errorf("no PEM found")
 	} else if block.Type != "CERTIFICATE" {
+
 		return nil, fmt.Errorf("incorrect PEM type %s", block.Type)
+
 	}
+
 	return x509.ParseCertificate(block.Bytes)
+
 }
 
 func makeIssuer(keyFile, certFile string) error {
+
 	key, err := makeKey(keyFile)
 	if err != nil {
 		return err
 	}
+
 	_, err = makeRootCert(key, certFile)
 	if err != nil {
 		return err
 	}
+
 	return nil
+
 }
 
 func makeKey(filename string) (*rsa.PrivateKey, error) {
+
 	key, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		return nil, err
 	}
+
 	der := x509.MarshalPKCS1PrivateKey(key)
 	if err != nil {
 		return nil, err
 	}
+
 	file, err := os.OpenFile(filename, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
 	if err != nil {
 		return nil, err
 	}
+
 	defer file.Close()
+
 	err = pem.Encode(file, &pem.Block{
 		Type:  "RSA PRIVATE KEY",
 		Bytes: der,
 	})
+
 	if err != nil {
 		return nil, err
 	}
+
 	return key, nil
+
 }
 
 func makeRootCert(key crypto.Signer, filename string) (*x509.Certificate, error) {
+
 	serial, err := rand.Int(rand.Reader, big.NewInt(math.MaxInt64))
+
 	if err != nil {
 		return nil, err
 	}
+
 	skid, err := calculateSKID(key.Public())
 	if err != nil {
 		return nil, err
 	}
+
 	template := &x509.Certificate{
 		Subject: pkix.Name{
-			CommonName: "minica root ca " + hex.EncodeToString(serial.Bytes()[:3]),
+			CommonName: "Kana Development CA",
 		},
 		SerialNumber: serial,
 		NotBefore:    time.Now(),
@@ -147,11 +200,14 @@ func makeRootCert(key crypto.Signer, filename string) (*x509.Certificate, error)
 	if err != nil {
 		return nil, err
 	}
+
 	file, err := os.OpenFile(filename, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
 	if err != nil {
 		return nil, err
 	}
+
 	defer file.Close()
+
 	err = pem.Encode(file, &pem.Block{
 		Type:  "CERTIFICATE",
 		Bytes: der,
@@ -159,34 +215,29 @@ func makeRootCert(key crypto.Signer, filename string) (*x509.Certificate, error)
 	if err != nil {
 		return nil, err
 	}
-	return x509.ParseCertificate(der)
-}
 
-func parseIPs(ipAddresses []string) ([]net.IP, error) {
-	var parsed []net.IP
-	for _, s := range ipAddresses {
-		p := net.ParseIP(s)
-		if p == nil {
-			return nil, fmt.Errorf("invalid IP address %s", s)
-		}
-		parsed = append(parsed, p)
-	}
-	return parsed, nil
+	return x509.ParseCertificate(der)
+
 }
 
 func publicKeysEqual(a, b interface{}) (bool, error) {
+
 	aBytes, err := x509.MarshalPKIXPublicKey(a)
 	if err != nil {
 		return false, err
 	}
+
 	bBytes, err := x509.MarshalPKIXPublicKey(b)
 	if err != nil {
 		return false, err
 	}
-	return bytes.Compare(aBytes, bBytes) == 0, nil
+
+	return bytes.Equal(aBytes, bBytes), nil
+
 }
 
 func calculateSKID(pubKey crypto.PublicKey) ([]byte, error) {
+
 	spkiASN1, err := x509.MarshalPKIXPublicKey(pubKey)
 	if err != nil {
 		return nil, err
@@ -196,43 +247,40 @@ func calculateSKID(pubKey crypto.PublicKey) ([]byte, error) {
 		Algorithm        pkix.AlgorithmIdentifier
 		SubjectPublicKey asn1.BitString
 	}
+
 	_, err = asn1.Unmarshal(spkiASN1, &spki)
 	if err != nil {
 		return nil, err
 	}
+
 	skid := sha1.Sum(spki.SubjectPublicKey.Bytes)
 	return skid[:], nil
+
 }
 
-func sign(iss *issuer, domains []string, ipAddresses []string) (*x509.Certificate, error) {
-	var cn string
-	if len(domains) > 0 {
-		cn = domains[0]
-	} else if len(ipAddresses) > 0 {
-		cn = ipAddresses[0]
-	} else {
-		return nil, fmt.Errorf("must specify at least one domain name or IP address")
-	}
+func sign(iss *issuer, domains []string, certPath string) (*x509.Certificate, error) {
+
+	cn := domains[0]
+
 	var cnFolder = strings.Replace(cn, "*", "_", -1)
+
 	err := os.Mkdir(cnFolder, 0700)
 	if err != nil && !os.IsExist(err) {
 		return nil, err
 	}
-	key, err := makeKey("/Users/chriswiegman/.kana/certs/key.pem")
+
+	key, err := makeKey(path.Join(certPath, "key.pem"))
 	if err != nil {
 		return nil, err
 	}
-	parsedIPs, err := parseIPs(ipAddresses)
-	if err != nil {
-		return nil, err
-	}
+
 	serial, err := rand.Int(rand.Reader, big.NewInt(math.MaxInt64))
 	if err != nil {
 		return nil, err
 	}
+
 	template := &x509.Certificate{
-		DNSNames:    domains,
-		IPAddresses: parsedIPs,
+		DNSNames: domains,
 		Subject: pkix.Name{
 			CommonName: cn,
 		},
@@ -249,45 +297,28 @@ func sign(iss *issuer, domains []string, ipAddresses []string) (*x509.Certificat
 		BasicConstraintsValid: true,
 		IsCA:                  false,
 	}
+
 	der, err := x509.CreateCertificate(rand.Reader, template, iss.cert, key.Public(), iss.key)
 	if err != nil {
 		return nil, err
 	}
-	file, err := os.OpenFile("/Users/chriswiegman/.kana/certs/cert.pem", os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+
+	file, err := os.OpenFile(path.Join(certPath, "cert.pem"), os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
 	if err != nil {
 		return nil, err
 	}
+
 	defer file.Close()
+
 	err = pem.Encode(file, &pem.Block{
 		Type:  "CERTIFICATE",
 		Bytes: der,
 	})
+
 	if err != nil {
 		return nil, err
 	}
+
 	return x509.ParseCertificate(der)
-}
 
-func GenCerts(caKey, caCert string, domains, ipAddresses []string) error {
-
-	domainRe := regexp.MustCompile("^[A-Za-z0-9.*-]+$")
-	for _, d := range domains {
-		if !domainRe.MatchString(d) {
-			fmt.Printf("Invalid domain name %q\n", d)
-			os.Exit(1)
-		}
-	}
-
-	for _, ip := range ipAddresses {
-		if net.ParseIP(ip) == nil {
-			fmt.Printf("Invalid IP address %q\n", ip)
-			os.Exit(1)
-		}
-	}
-	issuer, err := getIssuer(caKey, caCert)
-	if err != nil {
-		return err
-	}
-	_, err = sign(issuer, domains, ipAddresses)
-	return err
 }
