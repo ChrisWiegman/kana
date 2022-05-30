@@ -1,4 +1,4 @@
-package main
+package minica
 
 import (
 	"bytes"
@@ -24,7 +24,7 @@ import (
 	"time"
 )
 
-func main() {
+func Minica() {
 	err := main2()
 	if err != nil {
 		log.Fatal(err)
