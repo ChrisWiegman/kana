@@ -40,7 +40,7 @@ var configFiles = []File{
 }
 
 // WriteConfigFiles Write config files to an install's .wpengine-conf directory
-func WriteConfigFiles() error {
+func EnsureAppConfig() error {
 
 	// Get global config root.
 	configRoot, err := config.GetConfigRoot()

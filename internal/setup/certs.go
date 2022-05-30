@@ -12,7 +12,7 @@ import (
 var caCert = "certs/kana.ca.pem"
 var caKey = "certs/kana.ca.key"
 
-func GenerateCA() {
+func EnsureCA() {
 
 	fmt.Println("Checking for Root CA...")
 
