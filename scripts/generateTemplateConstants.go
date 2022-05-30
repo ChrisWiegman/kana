@@ -11,8 +11,8 @@ import (
 // Reads all files from the templates directory
 // and encodes them as strings literals in templates.go
 func main() {
-	fs, _ := ioutil.ReadDir("./internal/templates/source/")
-	out, err := os.Create("./internal/templates/constants.go")
+	fs, _ := ioutil.ReadDir("./internal/setup/source/")
+	out, err := os.Create("./internal/setup/constants.go")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -24,7 +24,7 @@ func main() {
 		}
 		cname := normalize(f.Name())
 		out.Write([]byte(cname + " = `"))
-		f, err := os.Open("./internal/templates/source/" + f.Name())
+		f, err := os.Open("./internal/setup/source/" + f.Name())
 		if err != nil {
 			fmt.Println(err)
 		}

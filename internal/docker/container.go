@@ -18,6 +18,8 @@ type ContainerConfig struct {
 	NetworkName string
 	Volumes     []mount.Mount
 	Command     []string
+	ENV         []string
+	Labels      map[string]string
 }
 
 func (c *Controller) ContainerRun(config ContainerConfig) (id string, err error) {

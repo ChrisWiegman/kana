@@ -5,7 +5,7 @@ level = "INFO"
 [providers.docker]
 endpoint = "tcp://localhost:2375"
 exposedByDefault = false
-network = "traefik"
+network = "kana"
 [providers.file]
 filename = "/etc/traefik/dynamic.toml"
 

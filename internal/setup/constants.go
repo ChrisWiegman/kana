@@ -1,8 +1,8 @@
 // nolint
-package setup
+package setup 
 
 const (
-	DYNAMIC_TOML = `[tls.options]
+DYNAMIC_TOML = `[tls.options]
 
 [tls.options.default]
 minVersion = "VersionTLS12"
@@ -12,14 +12,14 @@ sniStrict = true
 certFile = "/var/certs/cert.pem"
 keyFile = "/var/certs/key.pem"
 `
-	TRAEFIK_TOML = `[log]
+TRAEFIK_TOML = `[log]
 level = "INFO"
 
 [providers]
 [providers.docker]
 endpoint = "tcp://localhost:2375"
 exposedByDefault = false
-network = "traefik"
+network = "kana"
 [providers.file]
 filename = "/etc/traefik/dynamic.toml"
 

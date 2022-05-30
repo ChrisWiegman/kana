@@ -54,7 +54,6 @@ func NewTraefik() {
 				Target: "/var/run/docker.sock",
 			},
 		},
-		Command: []string{},
 	}
 
 	traefikConfig := docker.ContainerConfig{
@@ -73,7 +72,6 @@ func NewTraefik() {
 				Target: "/etc/traefik/dynamic.toml",
 			},
 		},
-		Command: []string{},
 	}
 
 	_, err = controller.ContainerRun(dockerProxyConfig)
