@@ -53,3 +53,6 @@ Temporary Items
 
 # Ignore Go vendor assets
 vendor/
+
+# Ignore the generated binary
+kana
