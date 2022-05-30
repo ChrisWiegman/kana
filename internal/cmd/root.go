@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/ChrisWiegman/kana/internal/setup"
-	"github.com/ChrisWiegman/kana/pkg/traefik"
 
 	"github.com/spf13/cobra"
 )
@@ -15,8 +14,7 @@ var rootCmd = &cobra.Command{
 	Short: "Kana is a simple WordPress development tool designed for plugin and theme developers.",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		setup.WriteConfigFiles()
-		traefik.NewTraefik()
+		setup.GenerateCA()
 	},
 }
 
