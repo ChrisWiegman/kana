@@ -26,40 +26,19 @@ func NewTraefik() {
 		panic(err)
 	}
 
-	err = controller.EnsureImage("tecnativa/docker-socket-proxy")
-	if err != nil {
-		panic(err)
-	}
-
 	traefikPorts := []docker.ExposedPorts{
 		{Port: "80", Protocol: "tcp"},
 		{Port: "443", Protocol: "tcp"},
 		{Port: "8080", Protocol: "tcp"},
 	}
 
-	dockerProxyPorts := []docker.ExposedPorts{
-		{Port: "2375", Protocol: "tcp"},
-	}
-
 	configRoot, _ := config.GetConfigRoot()
-
-	dockerProxyConfig := docker.ContainerConfig{
-		Image:       "tecnativa/docker-socket-proxy",
-		Ports:       dockerProxyPorts,
-		NetworkName: "kana",
-		Volumes: []mount.Mount{
-			{
-				Type:   mount.TypeBind,
-				Source: "/var/run/docker.sock",
-				Target: "/var/run/docker.sock",
-			},
-		},
-	}
 
 	traefikConfig := docker.ContainerConfig{
 		Image:       "traefik",
 		Ports:       traefikPorts,
 		NetworkName: "kana",
+		HostName:    "kanatraefik",
 		Volumes: []mount.Mount{
 			{
 				Type:   mount.TypeBind,
@@ -71,12 +50,12 @@ func NewTraefik() {
 				Source: path.Join(configRoot, "conf", "traefik", "dynamic.toml"),
 				Target: "/etc/traefik/dynamic.toml",
 			},
+			{
+				Type:   mount.TypeBind,
+				Source: "/var/run/docker.sock",
+				Target: "/var/run/docker.sock",
+			},
 		},
-	}
-
-	_, err = controller.ContainerRun(dockerProxyConfig)
-	if err != nil {
-		panic(err)
 	}
 
 	_, err = controller.ContainerRun(traefikConfig)

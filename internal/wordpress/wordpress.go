@@ -24,9 +24,11 @@ func NewWordPress() {
 	wordPressConfig := docker.ContainerConfig{
 		Image:       "wordpress",
 		NetworkName: "kana",
+		HostName:    "kanawordpress",
 		Labels: map[string]string{
 			"traefik.enable": "true",
 			"traefik.http.routers.wordpress.entrypoints": "web",
+			"traefik.http.routers.wordpress.rule":        "Host(`wordpress.local.dev`)",
 		},
 	}
 

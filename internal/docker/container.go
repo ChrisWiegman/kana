@@ -15,10 +15,11 @@ import (
 type ContainerConfig struct {
 	Image       string
 	Ports       []ExposedPorts
+	HostName    string
 	NetworkName string
 	Volumes     []mount.Mount
 	Command     []string
-	ENV         []string
+	Env         []string
 	Labels      map[string]string
 }
 
@@ -45,6 +46,9 @@ func (c *Controller) ContainerRun(config ContainerConfig) (id string, err error)
 		Image:        config.Image,
 		ExposedPorts: containerPorts.PortSet,
 		Cmd:          config.Command,
+		Hostname:     config.HostName,
+		Env:          config.Env,
+		Labels:       config.Labels,
 	}, &hostConfig, &networkConfig, nil, "")
 
 	if err != nil {

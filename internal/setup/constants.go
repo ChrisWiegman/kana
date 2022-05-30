@@ -17,11 +17,9 @@ level = "INFO"
 
 [providers]
 [providers.docker]
-endpoint = "tcp://localhost:2375"
+endpoint = "unix:///var/run/docker.sock"
 exposedByDefault = false
 network = "kana"
-[providers.file]
-filename = "/etc/traefik/dynamic.toml"
 
 [api]
 dashboard = true
