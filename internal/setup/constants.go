@@ -9,8 +9,8 @@ minVersion = "VersionTLS12"
 sniStrict = true
 
 [[tls.certificates]]
-certFile = "/var/certs/cert.pem"
-keyFile = "/var/certs/key.pem"
+certFile = "/var/certs/kana.ca.pem"
+keyFile = "/var/certs/kana.ca.key"
 `
 TRAEFIK_TOML = `[log]
 level = "INFO"
@@ -20,6 +20,8 @@ level = "INFO"
 endpoint = "unix:///var/run/docker.sock"
 exposedByDefault = false
 network = "kana"
+[providers.file]
+filename = "/etc/traefik/dynamic.toml"
 
 [api]
 dashboard = true

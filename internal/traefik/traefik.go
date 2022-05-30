@@ -52,6 +52,11 @@ func NewTraefik() {
 			},
 			{
 				Type:   mount.TypeBind,
+				Source: path.Join(configRoot, "certs"),
+				Target: "/var/certs",
+			},
+			{
+				Type:   mount.TypeBind,
 				Source: "/var/run/docker.sock",
 				Target: "/var/run/docker.sock",
 			},

@@ -5,5 +5,5 @@ minVersion = "VersionTLS12"
 sniStrict = true
 
 [[tls.certificates]]
-certFile = "/var/certs/cert.pem"
-keyFile = "/var/certs/key.pem"
+certFile = "/var/certs/kana.ca.pem"
+keyFile = "/var/certs/kana.ca.key"
