@@ -4,7 +4,8 @@ import (
 	"path"
 
 	"github.com/ChrisWiegman/kana/internal/config"
-	"github.com/ChrisWiegman/kana/pkg/docker"
+	"github.com/ChrisWiegman/kana/internal/docker"
+
 	"github.com/docker/docker/api/types/mount"
 )
 

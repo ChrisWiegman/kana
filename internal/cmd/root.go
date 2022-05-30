@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/ChrisWiegman/kana/internal/setup"
-	"github.com/ChrisWiegman/kana/pkg/traefik"
+	"github.com/ChrisWiegman/kana/internal/traefik"
 
 	"github.com/spf13/cobra"
 )

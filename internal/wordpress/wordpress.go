@@ -1,0 +1,5 @@
+package wordpress
+
+func NewWordPress() {
+
+}
