@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/ChrisWiegman/kana/internal/docker"
 	"github.com/ChrisWiegman/kana/internal/setup"
@@ -30,8 +32,13 @@ var rootCmd = &cobra.Command{
 		setup.EnsureAppConfig()
 		setup.EnsureCerts()
 		traefik.NewTraefik(controller)
-		wordpress.NewWordPress("test", controller)
-		wordpress.NewWordPress("kana", controller)
+
+		path, err := os.Getwd()
+		if err != nil {
+			log.Println(err)
+		}
+
+		wordpress.NewWordPress(filepath.Base(path), controller)
 	},
 }
 
