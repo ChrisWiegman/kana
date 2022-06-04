@@ -10,6 +10,7 @@ func NewWordPress(siteName string, controller *docker.Controller) {
 
 	wordPressContainers := []docker.ContainerConfig{
 		{
+			Name:        fmt.Sprintf("kana_%s_mariadb", siteName),
 			Image:       "mariadb",
 			NetworkName: "kana",
 			HostName:    fmt.Sprintf("kana_%s_mariadb", siteName),
@@ -21,6 +22,7 @@ func NewWordPress(siteName string, controller *docker.Controller) {
 			},
 		},
 		{
+			Name:        fmt.Sprintf("kana_%s_wordpress", siteName),
 			Image:       "wordpress",
 			NetworkName: "kana",
 			HostName:    fmt.Sprintf("kana_%s_wordpress", siteName),

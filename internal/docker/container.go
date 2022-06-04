@@ -13,6 +13,7 @@ import (
 )
 
 type ContainerConfig struct {
+	Name        string
 	Image       string
 	Ports       []ExposedPorts
 	HostName    string
@@ -49,7 +50,7 @@ func (c *Controller) ContainerRun(config ContainerConfig) (id string, err error)
 		Hostname:     config.HostName,
 		Env:          config.Env,
 		Labels:       config.Labels,
-	}, &hostConfig, &networkConfig, nil, "")
+	}, &hostConfig, &networkConfig, nil, config.Name)
 
 	if err != nil {
 		return "", err

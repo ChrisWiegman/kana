@@ -25,6 +25,7 @@ func NewTraefik(controller *docker.Controller) {
 	configRoot, _ := config.GetConfigRoot()
 
 	traefikConfig := docker.ContainerConfig{
+		Name:        "kana_traefik",
 		Image:       "traefik",
 		Ports:       traefikPorts,
 		NetworkName: "kana",
