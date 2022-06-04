@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/ChrisWiegman/kana/internal/docker"
 	"github.com/ChrisWiegman/kana/internal/setup"
 	"github.com/ChrisWiegman/kana/internal/traefik"
 	"github.com/ChrisWiegman/kana/internal/wordpress"
@@ -16,11 +17,21 @@ var rootCmd = &cobra.Command{
 	Short: "Kana is a simple WordPress development tool designed for plugin and theme developers.",
 	Run: func(cmd *cobra.Command, args []string) {
 
+		controller, err := docker.NewController()
+		if err != nil {
+			panic(err)
+		}
+
+		_, _, err = controller.EnsureNetwork("kana")
+		if err != nil {
+			panic(err)
+		}
+
 		setup.EnsureAppConfig()
 		setup.EnsureCerts()
-		traefik.NewTraefik()
-		wordpress.NewWordPress("test")
-		wordpress.NewWordPress("kana")
+		traefik.NewTraefik(controller)
+		wordpress.NewWordPress("test", controller)
+		wordpress.NewWordPress("kana", controller)
 	},
 }
 

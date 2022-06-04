@@ -9,19 +9,9 @@ import (
 	"github.com/docker/docker/api/types/mount"
 )
 
-func NewTraefik() {
+func NewTraefik(controller *docker.Controller) {
 
-	controller, err := docker.NewController()
-	if err != nil {
-		panic(err)
-	}
-
-	_, _, err = controller.EnsureNetwork("kana")
-	if err != nil {
-		panic(err)
-	}
-
-	err = controller.EnsureImage("traefik")
+	err := controller.EnsureImage("traefik")
 	if err != nil {
 		panic(err)
 	}
