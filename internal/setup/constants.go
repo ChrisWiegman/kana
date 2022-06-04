@@ -31,7 +31,13 @@ insecure = true
 [entryPoints]
 [entryPoints.web]
 address = ":80"
-[entryPoints.web-secure]
+[entryPoints.web.http]
+[entryPoints.web.http.redirections]
+[entryPoints.web.http.redirections.entryPoint]
+scheme = "https"
+to = "websecure"
+
+[entryPoints.websecure]
 address = ":443"
 `
 )
