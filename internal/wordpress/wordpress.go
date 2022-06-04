@@ -6,7 +6,7 @@ import (
 	"github.com/ChrisWiegman/kana/internal/docker"
 )
 
-func NewWordPress(siteName string, controller *docker.Controller) {
+func NewWordPress(siteName string, controller *docker.Controller) error {
 
 	wordPressContainers := []docker.ContainerConfig{
 		{
@@ -44,14 +44,18 @@ func NewWordPress(siteName string, controller *docker.Controller) {
 	}
 
 	for _, container := range wordPressContainers {
+
 		err := controller.EnsureImage(container.Image)
 		if err != nil {
-			panic(err)
+			return err
 		}
 
 		_, err = controller.ContainerRun(container)
 		if err != nil {
-			panic(err)
+			return err
 		}
 	}
+
+	return nil
+
 }

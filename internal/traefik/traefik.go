@@ -9,11 +9,11 @@ import (
 	"github.com/docker/docker/api/types/mount"
 )
 
-func NewTraefik(controller *docker.Controller) {
+func NewTraefik(controller *docker.Controller) error {
 
 	err := controller.EnsureImage("traefik")
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	traefikPorts := []docker.ExposedPorts{
@@ -22,7 +22,10 @@ func NewTraefik(controller *docker.Controller) {
 		{Port: "8080", Protocol: "tcp"},
 	}
 
-	configRoot, _ := config.GetConfigRoot()
+	configRoot, err := config.GetConfigRoot()
+	if err != nil {
+		return err
+	}
 
 	traefikConfig := docker.ContainerConfig{
 		Name:        "kana_traefik",
@@ -55,7 +58,7 @@ func NewTraefik(controller *docker.Controller) {
 	}
 
 	_, err = controller.ContainerRun(traefikConfig)
-	if err != nil {
-		panic(err)
-	}
+
+	return err
+
 }

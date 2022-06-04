@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 
@@ -31,14 +30,20 @@ var rootCmd = &cobra.Command{
 
 		setup.EnsureAppConfig()
 		setup.EnsureCerts()
-		traefik.NewTraefik(controller)
+		err = traefik.NewTraefik(controller)
+		if err != nil {
+			panic(err)
+		}
 
 		path, err := os.Getwd()
 		if err != nil {
-			log.Println(err)
+			panic(err)
 		}
 
 		wordpress.NewWordPress(filepath.Base(path), controller)
+		if err != nil {
+			panic(err)
+		}
 	},
 }
 

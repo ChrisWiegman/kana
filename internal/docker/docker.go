@@ -24,23 +24,28 @@ func NewController() (c *Controller, err error) {
 
 	c.cli, err = client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
-		fmt.Println("Here is the error")
 		return nil, err
 	}
 
-	ensureDockerIsAvailable(c)
+	err = ensureDockerIsAvailable(c)
+	if err != nil {
+		return nil, err
+	}
 
 	return c, nil
 }
 
-func ensureDockerIsAvailable(c *Controller) {
+func ensureDockerIsAvailable(c *Controller) error {
 
 	_, err := c.cli.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
 		if runtime.GOOS == "darwin" {
 
 			fmt.Println("Docker doesn't appear to be running. Trying to start Docker.")
-			exec.Command("open", "-a", "Docker").Run()
+			err = exec.Command("open", "-a", "Docker").Run()
+			if err != nil {
+				return fmt.Errorf("error: unable to start Docker for Mac")
+			}
 
 			retries := 0
 
@@ -50,16 +55,19 @@ func ensureDockerIsAvailable(c *Controller) {
 
 				if retries == 12 {
 					fmt.Println("Restarting Docker is taking too long. We seem to have hit an error")
-					return
+					return fmt.Errorf("error: unable to start Docker for Mac")
 				}
 
 				time.Sleep(5 * time.Second)
 
 				_, err = c.cli.ContainerList(context.Background(), types.ContainerListOptions{})
 				if err == nil {
-					break
+					return err
 				}
 			}
 		}
 	}
+
+	return err
+
 }
