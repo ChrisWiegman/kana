@@ -69,5 +69,4 @@ func NewWordPress(siteName string) {
 	if err != nil {
 		panic(err)
 	}
-
 }
