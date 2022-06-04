@@ -29,7 +29,7 @@ func GenCerts(certPath string) error {
 
 	caKey := path.Join(certPath, "root.key")
 	caCert := path.Join(certPath, "root.pem")
-	domains := []string{"*.dev.local"}
+	domains := []string{"*.sites.cfw.li"}
 
 	issuer, err := getIssuer(caKey, caCert)
 	if err != nil {
