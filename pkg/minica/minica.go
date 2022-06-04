@@ -29,7 +29,7 @@ func GenCerts(certPath string) error {
 
 	caKey := path.Join(certPath, "root.key")
 	caCert := path.Join(certPath, "root.pem")
-	domains := []string{"*.local.dev"}
+	domains := []string{"*.dev.local"}
 
 	issuer, err := getIssuer(caKey, caCert)
 	if err != nil {
@@ -181,7 +181,12 @@ func makeRootCert(key crypto.Signer, filename string) (*x509.Certificate, error)
 
 	template := &x509.Certificate{
 		Subject: pkix.Name{
-			CommonName: "Kana Development CA",
+			CommonName:         "Kana Development CA",
+			Country:            []string{"US"},
+			Province:           []string{"Florida"},
+			Locality:           []string{"Sarasota"},
+			Organization:       []string{"Kana"},
+			OrganizationalUnit: []string{"Development"},
 		},
 		SerialNumber: serial,
 		NotBefore:    time.Now(),
