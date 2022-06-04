@@ -1,10 +1,12 @@
 package wordpress
 
 import (
+	"fmt"
+
 	"github.com/ChrisWiegman/kana/internal/docker"
 )
 
-func NewWordPress() {
+func NewWordPress(siteName string) {
 
 	controller, err := docker.NewController()
 	if err != nil {
@@ -29,7 +31,7 @@ func NewWordPress() {
 	databaseConfig := docker.ContainerConfig{
 		Image:       "mariadb",
 		NetworkName: "kana",
-		HostName:    "kanamariadb",
+		HostName:    fmt.Sprintf("kana_%s_mariadb", siteName),
 		Env: []string{
 			"MARIADB_ROOT_PASSWORD=password",
 			"MARIADB_DATABASE=wordpress",
@@ -46,20 +48,20 @@ func NewWordPress() {
 	wordPressConfig := docker.ContainerConfig{
 		Image:       "wordpress",
 		NetworkName: "kana",
-		HostName:    "kanawordpress",
+		HostName:    fmt.Sprintf("kana_%s_wordpress", siteName),
 		Env: []string{
-			"WORDPRESS_DB_HOST=kanamariadb",
+			fmt.Sprintf("WORDPRESS_DB_HOST=kana_%s_mariadb", siteName),
 			"WORDPRESS_DB_USER=wordpress",
 			"WORDPRESS_DB_PASSWORD=wordpress",
 			"WORDPRESS_DB_NAME=wordpress",
 		},
 		Labels: map[string]string{
 			"traefik.enable": "true",
-			"traefik.http.routers.wordpress-http.entrypoints": "web",
-			"traefik.http.routers.wordpress-http.rule":        "Host(`wordpress.dev.local`)",
-			"traefik.http.routers.wordpress.entrypoints":      "websecure",
-			"traefik.http.routers.wordpress.rule":             "Host(`wordpress.dev.local`)",
-			"traefik.http.routers.wordpress.tls":              "true",
+			fmt.Sprintf("traefik.http.routers.wordpress-%s-http.entrypoints", siteName): "web",
+			fmt.Sprintf("traefik.http.routers.wordpress-%s-http.rule", siteName):        fmt.Sprintf("Host(`%s.sites.cfw.li`)", siteName),
+			fmt.Sprintf("traefik.http.routers.wordpress-%s.entrypoints", siteName):      "websecure",
+			fmt.Sprintf("traefik.http.routers.wordpress-%s.rule", siteName):             fmt.Sprintf("Host(`%s.sites.cfw.li`)", siteName),
+			fmt.Sprintf("traefik.http.routers.wordpress-%s.tls", siteName):              "true",
 		},
 	}
 

@@ -19,7 +19,8 @@ var rootCmd = &cobra.Command{
 		setup.EnsureAppConfig()
 		setup.EnsureCerts()
 		traefik.NewTraefik()
-		wordpress.NewWordPress()
+		wordpress.NewWordPress("test")
+		wordpress.NewWordPress("kana")
 	},
 }
 
