@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"strings"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -24,7 +25,32 @@ type ContainerConfig struct {
 	Labels      map[string]string
 }
 
+func (c *Controller) IsContainerRunning(containerName string) (id string, isRunning bool) {
+
+	containers, err := c.cli.ContainerList(context.Background(), types.ContainerListOptions{})
+	if err != nil {
+		return "", false
+	}
+
+	for _, container := range containers {
+		for _, name := range container.Names {
+			if containerName == strings.Trim(name, "/") {
+				return container.ID, true
+			}
+		}
+	}
+
+	return "", false
+
+}
+
 func (c *Controller) ContainerRun(config ContainerConfig) (id string, err error) {
+
+	containerID, isRunning := c.IsContainerRunning(config.Name)
+	if isRunning {
+		return containerID, nil
+	}
+
 	hostConfig := container.HostConfig{}
 	containerPorts := c.getNetworkConfig(config.Ports)
 
