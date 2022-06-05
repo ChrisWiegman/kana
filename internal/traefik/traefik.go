@@ -9,7 +9,7 @@ import (
 	"github.com/docker/docker/api/types/mount"
 )
 
-func NewTraefik(controller *docker.Controller) error {
+func StartTraefik(controller *docker.Controller) error {
 
 	_, _, err := controller.EnsureNetwork("kana")
 	if err != nil {

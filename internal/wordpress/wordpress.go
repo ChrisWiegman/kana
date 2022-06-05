@@ -12,7 +12,7 @@ func StopWordPress(controller *docker.Controller) error {
 
 }
 
-func NewWordPress(controller *docker.Controller) error {
+func StartWordPress(controller *docker.Controller) error {
 
 	_, _, err := controller.EnsureNetwork("kana")
 	if err != nil {

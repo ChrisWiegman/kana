@@ -31,12 +31,12 @@ func runStart(cmd *cobra.Command, args []string, controller *docker.Controller) 
 
 	fmt.Printf("Starting development site: %s\n", siteURL)
 
-	err := traefik.NewTraefik(controller)
+	err := traefik.StartTraefik(controller)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	err = wordpress.NewWordPress(controller)
+	err = wordpress.StartWordPress(controller)
 	if err != nil {
 		fmt.Println(err)
 	}
