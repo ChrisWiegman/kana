@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/ChrisWiegman/kana/internal/docker"
+	"github.com/ChrisWiegman/kana/internal/traefik"
 )
 
 func StopWordPress(controller *docker.Controller) error {
@@ -20,7 +21,7 @@ func StopWordPress(controller *docker.Controller) error {
 		}
 	}
 
-	return nil
+	return traefik.MaybeStopTraefik(controller)
 
 }
 

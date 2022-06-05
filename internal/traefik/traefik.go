@@ -70,3 +70,26 @@ func StartTraefik(controller *docker.Controller) error {
 	return err
 
 }
+
+func MaybeStopTraefik(controller *docker.Controller) error {
+
+	containers, err := controller.ListContainers("")
+	if err != nil {
+		return err
+	}
+
+	if len(containers) == 0 {
+		return StopTraefik(controller)
+	}
+
+	return nil
+
+}
+
+func StopTraefik(controller *docker.Controller) error {
+
+	_, err := controller.ContainerStop("kana_traefik")
+
+	return err
+
+}
