@@ -8,6 +8,18 @@ import (
 
 func StopWordPress(controller *docker.Controller) error {
 
+	wordPressContainers := []string{
+		fmt.Sprintf("kana_%s_database", controller.Config.CurrentDirectory),
+		fmt.Sprintf("kana_%s_wordpress", controller.Config.CurrentDirectory),
+	}
+
+	for _, wordPressContainer := range wordPressContainers {
+		_, err := controller.ContainerStop(wordPressContainer)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 
 }

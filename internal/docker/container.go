@@ -146,3 +146,24 @@ func (c *Controller) ContainerRunAndClean(config ContainerConfig) (statusCode in
 
 	return statusCode, body, err
 }
+
+func (c *Controller) ContainerStop(containerName string) (bool, error) {
+
+	containerID, isRunning := c.IsContainerRunning(containerName)
+	if !isRunning {
+		return true, nil
+	}
+
+	err := c.client.ContainerStop(context.Background(), containerID, nil)
+	if err != nil {
+		return false, err
+	}
+
+	err = c.client.ContainerRemove(context.Background(), containerID, types.ContainerRemoveOptions{})
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+
+}

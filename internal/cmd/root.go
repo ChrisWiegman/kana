@@ -37,7 +37,10 @@ func Execute() {
 
 	cmd, controller := newRootCommand()
 
-	cmd.AddCommand(newStartCommand(controller))
+	cmd.AddCommand(
+		newStartCommand(controller),
+		newStopCommand(controller),
+	)
 
 	if err := cmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
