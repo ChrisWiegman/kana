@@ -9,6 +9,9 @@ import (
 func TestContainerRun(t *testing.T) {
 
 	kanaConfig, err := config.GetKanaConfig()
+	if err != nil {
+		t.Error(err)
+	}
 
 	c, err := NewController(kanaConfig)
 
