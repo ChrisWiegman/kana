@@ -24,9 +24,26 @@ type pullEvent struct {
 
 //https://gist.github.com/miguelmota/4980b18d750fb3b1eb571c3e207b1b92
 //https://riptutorial.com/docker/example/31980/image-pulling-with-progress-bars--written-in-go
-func (c *Controller) EnsureImage(image string) (err error) {
+func (c *Controller) EnsureImage(imageName string) (err error) {
 
-	events, err := c.cli.ImagePull(context.Background(), image, types.ImagePullOptions{})
+	if !strings.Contains(imageName, ":") {
+		imageName = fmt.Sprintf("%s:latest", imageName)
+	}
+
+	images, err := c.cli.ImageList(context.Background(), types.ImageListOptions{})
+	if err != nil {
+		return err
+	}
+
+	for _, image := range images {
+		for _, imageTag := range image.RepoTags {
+			if imageTag == imageName {
+				return nil
+			}
+		}
+	}
+
+	events, err := c.cli.ImagePull(context.Background(), imageName, types.ImagePullOptions{})
 	if err != nil {
 		return err
 	}
@@ -40,7 +57,6 @@ func (c *Controller) EnsureImage(image string) (err error) {
 	var event *pullEvent
 	decoder := json.NewDecoder(events)
 
-	fmt.Printf("\n")
 	cursor.Hide()
 
 	for {
