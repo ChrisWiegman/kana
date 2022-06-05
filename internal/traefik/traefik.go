@@ -9,6 +9,8 @@ import (
 	"github.com/docker/docker/api/types/mount"
 )
 
+var traefikContainerName = "kana_traefik"
+
 func StartTraefik(controller *docker.Controller) error {
 
 	_, _, err := controller.EnsureNetwork("kana")
@@ -33,7 +35,7 @@ func StartTraefik(controller *docker.Controller) error {
 	}
 
 	traefikConfig := docker.ContainerConfig{
-		Name:        "kana_traefik",
+		Name:        traefikContainerName,
 		Image:       "traefik",
 		Ports:       traefikPorts,
 		NetworkName: "kana",
@@ -88,7 +90,7 @@ func MaybeStopTraefik(controller *docker.Controller) error {
 
 func StopTraefik(controller *docker.Controller) error {
 
-	_, err := controller.ContainerStop("kana_traefik")
+	_, err := controller.ContainerStop(traefikContainerName)
 
 	return err
 
