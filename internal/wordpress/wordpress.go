@@ -6,6 +6,12 @@ import (
 	"github.com/ChrisWiegman/kana/internal/docker"
 )
 
+func StopWordPress(controller *docker.Controller) error {
+
+	return nil
+
+}
+
 func NewWordPress(controller *docker.Controller) error {
 
 	_, _, err := controller.EnsureNetwork("kana")
