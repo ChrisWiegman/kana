@@ -27,10 +27,10 @@ type issuer struct {
 	cert *x509.Certificate
 }
 
-func GenCerts(certPath string, kanaConfig config.KanaConfig) error {
+func GenCerts(certPath, rootKey, rootCert, siteCert, siteKey string, kanaConfig config.KanaConfig) error {
 
-	caKey := path.Join(certPath, kanaConfig.RootKey)
-	caCert := path.Join(certPath, kanaConfig.RootCert)
+	caKey := path.Join(certPath, rootKey)
+	caCert := path.Join(certPath, rootCert)
 	domains := []string{
 		fmt.Sprintf("*.%s", kanaConfig.SiteDomain),
 	}
@@ -40,7 +40,7 @@ func GenCerts(certPath string, kanaConfig config.KanaConfig) error {
 		return err
 	}
 
-	_, err = sign(issuer, domains, certPath, kanaConfig)
+	_, err = sign(issuer, domains, certPath, siteCert, siteKey)
 	return err
 
 }
@@ -267,7 +267,7 @@ func calculateSKID(pubKey crypto.PublicKey) ([]byte, error) {
 
 }
 
-func sign(iss *issuer, domains []string, certPath string, kanaConfig config.KanaConfig) (*x509.Certificate, error) {
+func sign(iss *issuer, domains []string, certPath, siteCert, siteKey string) (*x509.Certificate, error) {
 
 	cn := domains[0]
 
@@ -278,7 +278,7 @@ func sign(iss *issuer, domains []string, certPath string, kanaConfig config.Kana
 		return nil, err
 	}
 
-	key, err := makeKey(path.Join(certPath, kanaConfig.SiteKey))
+	key, err := makeKey(path.Join(certPath, siteKey))
 	if err != nil {
 		return nil, err
 	}
@@ -312,7 +312,7 @@ func sign(iss *issuer, domains []string, certPath string, kanaConfig config.Kana
 		return nil, err
 	}
 
-	file, err := os.OpenFile(path.Join(certPath, kanaConfig.SiteCert), os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	file, err := os.OpenFile(path.Join(certPath, siteCert), os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
 	if err != nil {
 		return nil, err
 	}

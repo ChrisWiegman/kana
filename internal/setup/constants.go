@@ -9,8 +9,8 @@ minVersion = "VersionTLS12"
 sniStrict = true
 
 [[tls.certificates]]
-certFile = "/var/certs/cert.pem"
-keyFile = "/var/certs/key.pem"
+certFile = "/var/certs/kana.site.pem"
+keyFile = "/var/certs/kana.site.key"
 `
 TRAEFIK_TOML = `[log]
 level = "INFO"
