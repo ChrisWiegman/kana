@@ -5,3 +5,7 @@ build:
 .PHONY: run
 run:
 	go run ./cmd/...
+
+.PHONY: install
+install:
+	go install ./cmd/...
