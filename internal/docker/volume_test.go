@@ -2,10 +2,18 @@ package docker
 
 import (
 	"testing"
+
+	"github.com/ChrisWiegman/kana/internal/config"
 )
 
 func TestSingleCreate(t *testing.T) {
-	c, err := NewController()
+
+	kanaConfig, err := config.GetKanaConfig()
+	if err != nil {
+		t.Error(err)
+	}
+
+	c, err := NewController(kanaConfig)
 
 	if err != nil {
 		t.Error(err)
@@ -28,7 +36,13 @@ func TestSingleCreate(t *testing.T) {
 }
 
 func TestEnsureVolume(t *testing.T) {
-	c, err := NewController()
+
+	kanaConfig, err := config.GetKanaConfig()
+	if err != nil {
+		t.Error(err)
+	}
+
+	c, err := NewController(kanaConfig)
 
 	if err != nil {
 		t.Error(err)

@@ -10,10 +10,10 @@ func NewWordPress(siteName string, controller *docker.Controller) error {
 
 	wordPressContainers := []docker.ContainerConfig{
 		{
-			Name:        fmt.Sprintf("kana_%s_mariadb", siteName),
+			Name:        fmt.Sprintf("kana_%s_database", siteName),
 			Image:       "mariadb",
 			NetworkName: "kana",
-			HostName:    fmt.Sprintf("kana_%s_mariadb", siteName),
+			HostName:    fmt.Sprintf("kana_%s_database", siteName),
 			Env: []string{
 				"MARIADB_ROOT_PASSWORD=password",
 				"MARIADB_DATABASE=wordpress",
@@ -27,7 +27,7 @@ func NewWordPress(siteName string, controller *docker.Controller) error {
 			NetworkName: "kana",
 			HostName:    fmt.Sprintf("kana_%s_wordpress", siteName),
 			Env: []string{
-				fmt.Sprintf("WORDPRESS_DB_HOST=kana_%s_mariadb", siteName),
+				fmt.Sprintf("WORDPRESS_DB_HOST=kana_%s_database", siteName),
 				"WORDPRESS_DB_USER=wordpress",
 				"WORDPRESS_DB_PASSWORD=wordpress",
 				"WORDPRESS_DB_NAME=wordpress",
@@ -35,9 +35,9 @@ func NewWordPress(siteName string, controller *docker.Controller) error {
 			Labels: map[string]string{
 				"traefik.enable": "true",
 				fmt.Sprintf("traefik.http.routers.wordpress-%s-http.entrypoints", siteName): "web",
-				fmt.Sprintf("traefik.http.routers.wordpress-%s-http.rule", siteName):        fmt.Sprintf("Host(`%s.sites.cfw.li`)", siteName),
+				fmt.Sprintf("traefik.http.routers.wordpress-%s-http.rule", siteName):        fmt.Sprintf("Host(`%s.%s`)", siteName, controller.Config.SiteDomain),
 				fmt.Sprintf("traefik.http.routers.wordpress-%s.entrypoints", siteName):      "websecure",
-				fmt.Sprintf("traefik.http.routers.wordpress-%s.rule", siteName):             fmt.Sprintf("Host(`%s.sites.cfw.li`)", siteName),
+				fmt.Sprintf("traefik.http.routers.wordpress-%s.rule", siteName):             fmt.Sprintf("Host(`%s.%s`)", siteName, controller.Config.SiteDomain),
 				fmt.Sprintf("traefik.http.routers.wordpress-%s.tls", siteName):              "true",
 			},
 		},

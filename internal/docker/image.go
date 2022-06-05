@@ -30,7 +30,7 @@ func (c *Controller) EnsureImage(imageName string) (err error) {
 		imageName = fmt.Sprintf("%s:latest", imageName)
 	}
 
-	images, err := c.cli.ImageList(context.Background(), types.ImageListOptions{})
+	images, err := c.client.ImageList(context.Background(), types.ImageListOptions{})
 	if err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func (c *Controller) EnsureImage(imageName string) (err error) {
 		}
 	}
 
-	events, err := c.cli.ImagePull(context.Background(), imageName, types.ImagePullOptions{})
+	events, err := c.client.ImagePull(context.Background(), imageName, types.ImagePullOptions{})
 	if err != nil {
 		return err
 	}
@@ -129,7 +129,7 @@ func (c *Controller) EnsureImage(imageName string) (err error) {
 
 func (c *Controller) RemoveImage(image string) (removed bool, err error) {
 
-	removedResponse, err := c.cli.ImageRemove(context.Background(), image, types.ImageRemoveOptions{})
+	removedResponse, err := c.client.ImageRemove(context.Background(), image, types.ImageRemoveOptions{})
 
 	if err != nil {
 		if !strings.Contains(err.Error(), "No such image:") {

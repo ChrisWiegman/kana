@@ -59,7 +59,7 @@ func (c *Controller) EnsureNetwork(name string) (created bool, network types.Net
 		return false, network, nil
 	}
 
-	networkCreateResults, err := c.cli.NetworkCreate(context.Background(), name, types.NetworkCreate{
+	networkCreateResults, err := c.client.NetworkCreate(context.Background(), name, types.NetworkCreate{
 		Driver: "bridge",
 	})
 
@@ -93,13 +93,13 @@ func (c *Controller) RemoveNetwork(name string) (removed bool, err error) {
 		return false, nil
 	}
 
-	return true, c.cli.NetworkRemove(context.Background(), network.ID)
+	return true, c.client.NetworkRemove(context.Background(), network.ID)
 
 }
 
 func (c *Controller) findNetworkByName(name string) (found bool, network types.NetworkResource, err error) {
 
-	networks, err := c.cli.NetworkList(context.Background(), types.NetworkListOptions{})
+	networks, err := c.client.NetworkList(context.Background(), types.NetworkListOptions{})
 
 	if err != nil {
 		return false, types.NetworkResource{}, err
@@ -117,7 +117,7 @@ func (c *Controller) findNetworkByName(name string) (found bool, network types.N
 
 func (c *Controller) findNetworkById(ID string) (found bool, network types.NetworkResource, err error) {
 
-	networks, err := c.cli.NetworkList(context.Background(), types.NetworkListOptions{})
+	networks, err := c.client.NetworkList(context.Background(), types.NetworkListOptions{})
 
 	if err != nil {
 		return false, types.NetworkResource{}, err

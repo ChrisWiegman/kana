@@ -9,7 +9,7 @@ import (
 )
 
 func (c *Controller) FindVolume(name string) (volume *types.Volume, err error) {
-	volumes, err := c.cli.VolumeList(context.Background(), filters.NewArgs())
+	volumes, err := c.client.VolumeList(context.Background(), filters.NewArgs())
 
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func (c *Controller) EnsureVolume(name string) (created bool, volume *types.Volu
 		return false, volume, nil
 	}
 
-	vol, err := c.cli.VolumeCreate(context.Background(), volumetypes.VolumeCreateBody{
+	vol, err := c.client.VolumeCreate(context.Background(), volumetypes.VolumeCreateBody{
 		Driver: "local",
 		//		DriverOpts: map[string]string{},
 		//		Labels:     map[string]string{},
@@ -55,7 +55,7 @@ func (c *Controller) RemoveVolume(name string) (removed bool, err error) {
 		return false, nil
 	}
 
-	err = c.cli.VolumeRemove(context.Background(), name, true)
+	err = c.client.VolumeRemove(context.Background(), name, true)
 
 	if err != nil {
 		return false, err

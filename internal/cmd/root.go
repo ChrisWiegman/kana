@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/ChrisWiegman/kana/internal/config"
 	"github.com/ChrisWiegman/kana/internal/docker"
 	"github.com/ChrisWiegman/kana/internal/setup"
 	"github.com/ChrisWiegman/kana/internal/traefik"
@@ -18,7 +19,12 @@ var rootCmd = &cobra.Command{
 	Short: "Kana is a simple WordPress development tool designed for plugin and theme developers.",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		controller, err := docker.NewController()
+		kanaConfig, err := config.GetKanaConfig()
+		if err != nil {
+			panic(err)
+		}
+
+		controller, err := docker.NewController(kanaConfig)
 		if err != nil {
 			panic(err)
 		}
@@ -28,8 +34,8 @@ var rootCmd = &cobra.Command{
 			panic(err)
 		}
 
-		setup.EnsureAppConfig()
-		setup.EnsureCerts()
+		setup.EnsureAppConfig(kanaConfig)
+		setup.EnsureCerts(kanaConfig)
 		err = traefik.NewTraefik(controller)
 		if err != nil {
 			panic(err)

@@ -40,15 +40,9 @@ var configFiles = []File{
 }
 
 // WriteConfigFiles Write config files to an install's .wpengine-conf directory
-func EnsureAppConfig() error {
+func EnsureAppConfig(kanaConfig config.KanaConfig) error {
 
-	// Get global config root.
-	configRoot, err := config.GetConfigRoot()
-	if err != nil {
-		return err
-	}
-
-	return writeFileArrayToDisk(configFiles, configRoot)
+	return writeFileArrayToDisk(configFiles, kanaConfig.ConfigRoot)
 
 }
 

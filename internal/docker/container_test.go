@@ -2,10 +2,15 @@ package docker
 
 import (
 	"testing"
+
+	"github.com/ChrisWiegman/kana/internal/config"
 )
 
 func TestContainerRun(t *testing.T) {
-	c, err := NewController()
+
+	kanaConfig, err := config.GetKanaConfig()
+
+	c, err := NewController(kanaConfig)
 
 	if err != nil {
 		t.Error(err)

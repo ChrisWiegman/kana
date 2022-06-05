@@ -9,23 +9,15 @@ import (
 	"github.com/ChrisWiegman/kana/pkg/minica"
 )
 
-var caCert = "certs/kana.ca.pem"
-var caKey = "certs/kana.ca.key"
-
-func EnsureCerts() {
+func EnsureCerts(kanaConfig config.KanaConfig) {
 
 	fmt.Println("Checking for Root CA...")
 
-	appConfigPath, err := config.GetConfigRoot()
-	if err != nil {
-		panic(err)
-	}
-
-	certDir := path.Join(appConfigPath, "certs")
+	certDir := path.Join(kanaConfig.ConfigRoot, "certs")
 
 	if err := os.MkdirAll(certDir, 0750); err != nil {
 		panic(err)
 	}
 
-	minica.GenCerts(certDir)
+	minica.GenCerts(certDir, kanaConfig)
 }

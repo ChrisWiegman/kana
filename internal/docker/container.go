@@ -27,7 +27,7 @@ type ContainerConfig struct {
 
 func (c *Controller) IsContainerRunning(containerName string) (id string, isRunning bool) {
 
-	containers, err := c.cli.ContainerList(context.Background(), types.ContainerListOptions{})
+	containers, err := c.client.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
 		return "", false
 	}
@@ -68,7 +68,7 @@ func (c *Controller) ContainerRun(config ContainerConfig) (id string, err error)
 
 	hostConfig.Mounts = config.Volumes
 
-	resp, err := c.cli.ContainerCreate(context.Background(), &container.Config{
+	resp, err := c.client.ContainerCreate(context.Background(), &container.Config{
 		Tty:          true,
 		Image:        config.Image,
 		ExposedPorts: containerPorts.PortSet,
@@ -82,7 +82,7 @@ func (c *Controller) ContainerRun(config ContainerConfig) (id string, err error)
 		return "", err
 	}
 
-	err = c.cli.ContainerStart(context.Background(), resp.ID, types.ContainerStartOptions{})
+	err = c.client.ContainerStart(context.Background(), resp.ID, types.ContainerStartOptions{})
 	if err != nil {
 		return "", err
 	}
@@ -91,7 +91,7 @@ func (c *Controller) ContainerRun(config ContainerConfig) (id string, err error)
 }
 
 func (c *Controller) ContainerWait(id string) (state int64, err error) {
-	containerResult, errorCode := c.cli.ContainerWait(context.Background(), id, "")
+	containerResult, errorCode := c.client.ContainerWait(context.Background(), id, "")
 	select {
 	case err := <-errorCode:
 		return 0, err
@@ -104,7 +104,7 @@ func (c *Controller) ContainerLog(id string) (result string, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	reader, err := c.cli.ContainerLogs(ctx, id, types.ContainerLogsOptions{
+	reader, err := c.client.ContainerLogs(ctx, id, types.ContainerLogsOptions{
 		ShowStdout: true,
 		ShowStderr: true})
 
@@ -138,7 +138,7 @@ func (c *Controller) ContainerRunAndClean(config ContainerConfig) (statusCode in
 	// Get the log
 	body, _ = c.ContainerLog(id)
 
-	err = c.cli.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{})
+	err = c.client.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{})
 
 	if err != nil {
 		fmt.Printf("Unable to remove container %q: %q\n", id, err)

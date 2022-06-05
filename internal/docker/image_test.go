@@ -1,9 +1,19 @@
 package docker
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/ChrisWiegman/kana/internal/config"
+)
 
 func TestEnsureImage(t *testing.T) {
-	c, err := NewController()
+
+	kanaConfig, err := config.GetKanaConfig()
+	if err != nil {
+		t.Error(err)
+	}
+
+	c, err := NewController(kanaConfig)
 
 	if err != nil {
 		t.Error(err)
@@ -18,7 +28,13 @@ func TestEnsureImage(t *testing.T) {
 }
 
 func TestRemoveImage(t *testing.T) {
-	c, err := NewController()
+
+	kanaConfig, err := config.GetKanaConfig()
+	if err != nil {
+		t.Error(err)
+	}
+
+	c, err := NewController(kanaConfig)
 
 	if err != nil {
 		t.Error(err)

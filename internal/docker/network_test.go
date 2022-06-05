@@ -2,10 +2,18 @@ package docker
 
 import (
 	"testing"
+
+	"github.com/ChrisWiegman/kana/internal/config"
 )
 
 func TestNetworkCreate(t *testing.T) {
-	c, err := NewController()
+
+	kanaConfig, err := config.GetKanaConfig()
+	if err != nil {
+		t.Error(err)
+	}
+
+	c, err := NewController(kanaConfig)
 
 	if err != nil {
 		t.Error(err)
@@ -28,7 +36,13 @@ func TestNetworkCreate(t *testing.T) {
 }
 
 func TestEnsureNetwork(t *testing.T) {
-	c, err := NewController()
+
+	kanaConfig, err := config.GetKanaConfig()
+	if err != nil {
+		t.Error(err)
+	}
+
+	c, err := NewController(kanaConfig)
 
 	if err != nil {
 		t.Error(err)
