@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/ChrisWiegman/kana/internal/config"
 	"github.com/ChrisWiegman/kana/internal/docker"
@@ -41,12 +40,7 @@ var rootCmd = &cobra.Command{
 			panic(err)
 		}
 
-		path, err := os.Getwd()
-		if err != nil {
-			panic(err)
-		}
-
-		wordpress.NewWordPress(filepath.Base(path), controller)
+		wordpress.NewWordPress(controller)
 		if err != nil {
 			panic(err)
 		}

@@ -6,14 +6,14 @@ import (
 	"github.com/ChrisWiegman/kana/internal/docker"
 )
 
-func NewWordPress(siteName string, controller *docker.Controller) error {
+func NewWordPress(controller *docker.Controller) error {
 
 	wordPressContainers := []docker.ContainerConfig{
 		{
-			Name:        fmt.Sprintf("kana_%s_database", siteName),
+			Name:        fmt.Sprintf("kana_%s_database", controller.Config.CurrentDirectory),
 			Image:       "mariadb",
 			NetworkName: "kana",
-			HostName:    fmt.Sprintf("kana_%s_database", siteName),
+			HostName:    fmt.Sprintf("kana_%s_database", controller.Config.CurrentDirectory),
 			Env: []string{
 				"MARIADB_ROOT_PASSWORD=password",
 				"MARIADB_DATABASE=wordpress",
@@ -22,23 +22,23 @@ func NewWordPress(siteName string, controller *docker.Controller) error {
 			},
 		},
 		{
-			Name:        fmt.Sprintf("kana_%s_wordpress", siteName),
+			Name:        fmt.Sprintf("kana_%s_wordpress", controller.Config.CurrentDirectory),
 			Image:       "wordpress",
 			NetworkName: "kana",
-			HostName:    fmt.Sprintf("kana_%s_wordpress", siteName),
+			HostName:    fmt.Sprintf("kana_%s_wordpress", controller.Config.CurrentDirectory),
 			Env: []string{
-				fmt.Sprintf("WORDPRESS_DB_HOST=kana_%s_database", siteName),
+				fmt.Sprintf("WORDPRESS_DB_HOST=kana_%s_database", controller.Config.CurrentDirectory),
 				"WORDPRESS_DB_USER=wordpress",
 				"WORDPRESS_DB_PASSWORD=wordpress",
 				"WORDPRESS_DB_NAME=wordpress",
 			},
 			Labels: map[string]string{
 				"traefik.enable": "true",
-				fmt.Sprintf("traefik.http.routers.wordpress-%s-http.entrypoints", siteName): "web",
-				fmt.Sprintf("traefik.http.routers.wordpress-%s-http.rule", siteName):        fmt.Sprintf("Host(`%s.%s`)", siteName, controller.Config.SiteDomain),
-				fmt.Sprintf("traefik.http.routers.wordpress-%s.entrypoints", siteName):      "websecure",
-				fmt.Sprintf("traefik.http.routers.wordpress-%s.rule", siteName):             fmt.Sprintf("Host(`%s.%s`)", siteName, controller.Config.SiteDomain),
-				fmt.Sprintf("traefik.http.routers.wordpress-%s.tls", siteName):              "true",
+				fmt.Sprintf("traefik.http.routers.wordpress-%s-http.entrypoints", controller.Config.CurrentDirectory): "web",
+				fmt.Sprintf("traefik.http.routers.wordpress-%s-http.rule", controller.Config.CurrentDirectory):        fmt.Sprintf("Host(`%s.%s`)", controller.Config.CurrentDirectory, controller.Config.SiteDomain),
+				fmt.Sprintf("traefik.http.routers.wordpress-%s.entrypoints", controller.Config.CurrentDirectory):      "websecure",
+				fmt.Sprintf("traefik.http.routers.wordpress-%s.rule", controller.Config.CurrentDirectory):             fmt.Sprintf("Host(`%s.%s`)", controller.Config.CurrentDirectory, controller.Config.SiteDomain),
+				fmt.Sprintf("traefik.http.routers.wordpress-%s.tls", controller.Config.CurrentDirectory):              "true",
 			},
 		},
 	}
