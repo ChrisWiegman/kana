@@ -8,6 +8,11 @@ import (
 
 func NewWordPress(controller *docker.Controller) error {
 
+	_, _, err := controller.EnsureNetwork("kana")
+	if err != nil {
+		return err
+	}
+
 	wordPressContainers := []docker.ContainerConfig{
 		{
 			Name:        fmt.Sprintf("kana_%s_database", controller.Config.CurrentDirectory),

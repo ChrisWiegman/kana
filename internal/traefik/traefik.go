@@ -11,7 +11,12 @@ import (
 
 func NewTraefik(controller *docker.Controller) error {
 
-	err := controller.EnsureImage("traefik")
+	_, _, err := controller.EnsureNetwork("kana")
+	if err != nil {
+		return err
+	}
+
+	err = controller.EnsureImage("traefik")
 	if err != nil {
 		return err
 	}

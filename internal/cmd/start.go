@@ -4,6 +4,9 @@ import (
 	"fmt"
 
 	"github.com/ChrisWiegman/kana/internal/docker"
+	"github.com/ChrisWiegman/kana/internal/traefik"
+	"github.com/ChrisWiegman/kana/internal/utilities"
+	"github.com/ChrisWiegman/kana/internal/wordpress"
 	"github.com/spf13/cobra"
 )
 
@@ -23,6 +26,20 @@ func newStartCommand(controller *docker.Controller) *cobra.Command {
 
 func runStart(cmd *cobra.Command, args []string, controller *docker.Controller) {
 
-	fmt.Println("This is where we start the container.")
+	siteURL := fmt.Sprintf("https://%s.%s/", controller.Config.CurrentDirectory, controller.Config.SiteDomain)
+
+	fmt.Printf("Starting development site: %s\n", siteURL)
+
+	err := traefik.NewTraefik(controller)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	err = wordpress.NewWordPress(controller)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	utilities.OpenURL(siteURL)
 
 }
