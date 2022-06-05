@@ -38,6 +38,9 @@ func StartTraefik(controller *docker.Controller) error {
 		Ports:       traefikPorts,
 		NetworkName: "kana",
 		HostName:    "kanatraefik",
+		Labels: map[string]string{
+			"kana.global": "true",
+		},
 		Volumes: []mount.Mount{
 			{
 				Type:   mount.TypeBind,

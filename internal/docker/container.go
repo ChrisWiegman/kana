@@ -9,6 +9,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
 )
@@ -23,6 +24,43 @@ type ContainerConfig struct {
 	Command     []string
 	Env         []string
 	Labels      map[string]string
+}
+
+func (c *Controller) ListContainers(site string) ([]string, error) {
+
+	f := filters.NewArgs()
+
+	if len(site) == 0 {
+
+		f.Add("label", "kana.site")
+
+	} else {
+
+		f.Add("label", fmt.Sprintf("kana.site=%s", site))
+
+	}
+
+	options := types.ContainerListOptions{
+		All:     true,
+		Filters: f,
+	}
+
+	containers, err := c.client.ContainerList(
+		context.Background(),
+		options)
+
+	if err != nil {
+		return []string{}, err
+	}
+
+	containerIds := make([]string, len(containers))
+
+	for i, container := range containers {
+		containerIds[i] = container.ID
+	}
+
+	return containerIds, nil
+
 }
 
 func (c *Controller) IsContainerRunning(containerName string) (id string, isRunning bool) {

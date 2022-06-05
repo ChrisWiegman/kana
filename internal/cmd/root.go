@@ -27,6 +27,9 @@ func newRootCommand() (*cobra.Command, *docker.Controller) {
 	cmd := &cobra.Command{
 		Use:   "kana",
 		Short: "Kana is a simple WordPress development tool designed for plugin and theme developers.",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("")
+		},
 	}
 
 	return cmd, controller
@@ -36,6 +39,10 @@ func newRootCommand() (*cobra.Command, *docker.Controller) {
 func Execute() {
 
 	cmd, controller := newRootCommand()
+
+	controller.ListContainers("")
+	fmt.Println("")
+	controller.ListContainers("kana")
 
 	cmd.AddCommand(
 		newStartCommand(controller),

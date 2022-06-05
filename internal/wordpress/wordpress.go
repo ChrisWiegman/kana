@@ -43,6 +43,9 @@ func StartWordPress(controller *docker.Controller) error {
 				"MARIADB_USER=wordpress",
 				"MARIADB_PASSWORD=wordpress",
 			},
+			Labels: map[string]string{
+				"kana.site": controller.Config.CurrentDirectory,
+			},
 		},
 		{
 			Name:        fmt.Sprintf("kana_%s_wordpress", controller.Config.CurrentDirectory),
@@ -62,6 +65,7 @@ func StartWordPress(controller *docker.Controller) error {
 				fmt.Sprintf("traefik.http.routers.wordpress-%s.entrypoints", controller.Config.CurrentDirectory):      "websecure",
 				fmt.Sprintf("traefik.http.routers.wordpress-%s.rule", controller.Config.CurrentDirectory):             fmt.Sprintf("Host(`%s.%s`)", controller.Config.CurrentDirectory, controller.Config.SiteDomain),
 				fmt.Sprintf("traefik.http.routers.wordpress-%s.tls", controller.Config.CurrentDirectory):              "true",
+				"kana.site": controller.Config.CurrentDirectory,
 			},
 		},
 	}
