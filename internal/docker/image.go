@@ -7,7 +7,8 @@ import (
 	"io"
 	"strings"
 
-	"github.com/ChrisWiegman/kana/internal/cursor"
+	"github.com/ChrisWiegman/kana/internal/console"
+
 	"github.com/docker/docker/api/types"
 )
 
@@ -50,7 +51,7 @@ func (c *Controller) EnsureImage(imageName string) (err error) {
 
 	defer events.Close()
 
-	cursor := cursor.Cursor{}
+	cursor := console.Cursor{}
 	layers := make([]string, 0)
 	oldIndex := len(layers)
 
