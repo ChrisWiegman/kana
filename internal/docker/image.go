@@ -2,23 +2,113 @@ package docker
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"io"
-	"os"
 	"strings"
 
+	"github.com/ChrisWiegman/kana/internal/cursor"
 	"github.com/docker/docker/api/types"
 )
 
-//https://gist.github.com/miguelmota/4980b18d750fb3b1eb571c3e207b1b92
-func (c *Controller) EnsureImage(image string) (err error) {
-	reader, err := c.cli.ImagePull(context.Background(), image, types.ImagePullOptions{})
+type pullEvent struct {
+	ID             string `json:"id"`
+	Status         string `json:"status"`
+	Error          string `json:"error,omitempty"`
+	Progress       string `json:"progress,omitempty"`
+	ProgressDetail struct {
+		Current int `json:"current"`
+		Total   int `json:"total"`
+	} `json:"progressDetail"`
+}
 
+//https://gist.github.com/miguelmota/4980b18d750fb3b1eb571c3e207b1b92
+//https://riptutorial.com/docker/example/31980/image-pulling-with-progress-bars--written-in-go
+func (c *Controller) EnsureImage(image string) (err error) {
+
+	events, err := c.cli.ImagePull(context.Background(), image, types.ImagePullOptions{})
 	if err != nil {
 		return err
 	}
-	defer reader.Close()
-	io.Copy(os.Stdout, reader)
+
+	defer events.Close()
+
+	cursor := cursor.Cursor{}
+	layers := make([]string, 0)
+	oldIndex := len(layers)
+
+	var event *pullEvent
+	decoder := json.NewDecoder(events)
+
+	fmt.Printf("\n")
+	cursor.Hide()
+
+	for {
+
+		err := decoder.Decode(&event)
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+
+			return err
+
+		}
+
+		imageID := event.ID
+
+		// Check if the line is one of the final two ones
+		if strings.HasPrefix(event.Status, "Digest:") || strings.HasPrefix(event.Status, "Status:") {
+			fmt.Printf("%s\n", event.Status)
+			continue
+		}
+
+		// Check if ID has already passed once
+		index := 0
+		for i, v := range layers {
+			if v == imageID {
+				index = i + 1
+				break
+			}
+		}
+
+		// Move the cursor
+		if index > 0 {
+			diff := index - oldIndex
+
+			if diff > 1 {
+				down := diff - 1
+				cursor.MoveDown(down)
+			} else if diff < 1 {
+				up := diff*(-1) + 1
+				cursor.MoveUp(up)
+			}
+
+			oldIndex = index
+		} else {
+			layers = append(layers, event.ID)
+			diff := len(layers) - oldIndex
+
+			if diff > 1 {
+				cursor.MoveDown(diff) // Return to the last row
+			}
+
+			oldIndex = len(layers)
+		}
+
+		cursor.ClearLine()
+
+		if event.Status == "Pull complete" {
+			fmt.Printf("%s: %s\n", event.ID, event.Status)
+		} else {
+			fmt.Printf("%s: %s %s\n", event.ID, event.Status, event.Progress)
+		}
+	}
+
+	cursor.Show()
+
 	return nil
+
 }
 
 func (c *Controller) RemoveImage(image string) (removed bool, err error) {
