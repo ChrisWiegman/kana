@@ -3,7 +3,6 @@ package traefik
 import (
 	"path"
 
-	"github.com/ChrisWiegman/kana/internal/config"
 	"github.com/ChrisWiegman/kana/internal/docker"
 
 	"github.com/docker/docker/api/types/mount"
@@ -29,11 +28,6 @@ func StartTraefik(controller *docker.Controller) error {
 		{Port: "8080", Protocol: "tcp"},
 	}
 
-	configRoot, err := config.GetConfigRoot()
-	if err != nil {
-		return err
-	}
-
 	traefikConfig := docker.ContainerConfig{
 		Name:        traefikContainerName,
 		Image:       "traefik",
@@ -46,17 +40,17 @@ func StartTraefik(controller *docker.Controller) error {
 		Volumes: []mount.Mount{
 			{
 				Type:   mount.TypeBind,
-				Source: path.Join(configRoot, "conf", "traefik", "traefik.toml"),
+				Source: path.Join(controller.Config.ConfigRoot, "conf", "traefik", "traefik.toml"),
 				Target: "/etc/traefik/traefik.toml",
 			},
 			{
 				Type:   mount.TypeBind,
-				Source: path.Join(configRoot, "conf", "traefik", "dynamic.toml"),
+				Source: path.Join(controller.Config.ConfigRoot, "conf", "traefik", "dynamic.toml"),
 				Target: "/etc/traefik/dynamic.toml",
 			},
 			{
 				Type:   mount.TypeBind,
-				Source: path.Join(configRoot, "certs"),
+				Source: path.Join(controller.Config.ConfigRoot, "certs"),
 				Target: "/var/certs",
 			},
 			{
