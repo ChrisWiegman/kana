@@ -114,6 +114,12 @@ func StartWordPress(controller *docker.Controller) error {
 		}
 	}
 
+	return nil
+
+}
+
+func InstallWordPress(controller *docker.Controller) error {
+
 	site := site.NewSite(controller.Config).GetURL(false)
 
 	setupCommand := []string{

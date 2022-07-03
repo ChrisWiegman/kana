@@ -48,6 +48,18 @@ func runStart(cmd *cobra.Command, args []string, controller *docker.Controller) 
 		os.Exit(1)
 	}
 
+	_, err = site.VerifySite()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	err = wordpress.InstallWordPress(controller)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
 	err = site.OpenSite()
 	if err != nil {
 		fmt.Println(err)

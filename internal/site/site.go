@@ -44,11 +44,11 @@ func (s *KanaSite) GetURL(insecure bool) string {
 
 }
 
-func (s *KanaSite) OpenSite() error {
+func (s *KanaSite) VerifySite() (bool, error) {
 
 	caCert, err := ioutil.ReadFile(s.rootCert)
 	if err != nil {
-		return err
+		return false, err
 	}
 	caCertPool := x509.NewCertPool()
 	caCertPool.AppendCertsFromPEM(caCert)
@@ -63,7 +63,7 @@ func (s *KanaSite) OpenSite() error {
 
 	resp, err := client.Get(s.secureURL)
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	tries := 0
@@ -72,7 +72,7 @@ func (s *KanaSite) OpenSite() error {
 
 		resp, err = client.Get(s.secureURL)
 		if err != nil {
-			return err
+			return false, err
 		}
 
 		if resp.StatusCode == 200 {
@@ -80,12 +80,23 @@ func (s *KanaSite) OpenSite() error {
 		}
 
 		if tries == 30 {
-			return fmt.Errorf("timeout reached. unable to open site")
+			return false, fmt.Errorf("timeout reached. unable to open site")
 		}
 
 		tries++
 		time.Sleep(1 * time.Second)
 
+	}
+
+	return true, nil
+
+}
+
+func (s *KanaSite) OpenSite() error {
+
+	_, err := s.VerifySite()
+	if err != nil {
+		return err
 	}
 
 	openURL(s.secureURL)
