@@ -8,8 +8,8 @@ import (
 
 var ConfigFolderName = ".kana"
 
-// GetConfigRoot Return the path for the global config.
-func GetConfigRoot() (string, error) {
+// GetAppDirectory Return the path for the global config.
+func GetAppDirectory() (string, error) {
 
 	home, err := homedir.Dir()
 	if err != nil {

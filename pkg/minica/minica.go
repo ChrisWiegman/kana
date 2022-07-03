@@ -29,10 +29,10 @@ type issuer struct {
 
 func GenCerts(kanaConfig config.KanaConfig) error {
 
-	caKey := path.Join(kanaConfig.SSLCerts.CertDirectory, kanaConfig.SSLCerts.RootKey)
-	caCert := path.Join(kanaConfig.SSLCerts.CertDirectory, kanaConfig.SSLCerts.RootCert)
+	caKey := path.Join(kanaConfig.AppDirectory, "certs", kanaConfig.RootKey)
+	caCert := path.Join(kanaConfig.AppDirectory, "certs", kanaConfig.RootCert)
 	domains := []string{
-		fmt.Sprintf("*.%s", kanaConfig.SiteDomain),
+		fmt.Sprintf("*.%s", kanaConfig.AppDomain),
 	}
 
 	issuer, err := getIssuer(caKey, caCert)
@@ -40,7 +40,7 @@ func GenCerts(kanaConfig config.KanaConfig) error {
 		return err
 	}
 
-	_, err = sign(issuer, domains, kanaConfig.SSLCerts.CertDirectory, kanaConfig.SSLCerts.SiteCert, kanaConfig.SSLCerts.SiteKey)
+	_, err = sign(issuer, domains, path.Join(kanaConfig.AppDirectory, "certs"), kanaConfig.SiteCert, kanaConfig.SiteKey)
 	return err
 
 }

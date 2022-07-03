@@ -40,17 +40,17 @@ func StartTraefik(controller *docker.Controller) error {
 		Volumes: []mount.Mount{
 			{
 				Type:   mount.TypeBind,
-				Source: path.Join(controller.Config.ConfigRoot, "conf", "traefik", "traefik.toml"),
+				Source: path.Join(controller.Config.AppDirectory, "conf", "traefik", "traefik.toml"),
 				Target: "/etc/traefik/traefik.toml",
 			},
 			{
 				Type:   mount.TypeBind,
-				Source: path.Join(controller.Config.ConfigRoot, "conf", "traefik", "dynamic.toml"),
+				Source: path.Join(controller.Config.AppDirectory, "conf", "traefik", "dynamic.toml"),
 				Target: "/etc/traefik/dynamic.toml",
 			},
 			{
 				Type:   mount.TypeBind,
-				Source: path.Join(controller.Config.ConfigRoot, "certs"),
+				Source: path.Join(controller.Config.AppDirectory, "certs"),
 				Target: "/var/certs",
 			},
 			{

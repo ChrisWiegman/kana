@@ -26,8 +26,8 @@ func NewSite(config config.KanaConfig) *KanaSite {
 
 	site := new(KanaSite)
 
-	site.rootCert = path.Join(config.SSLCerts.CertDirectory, config.SSLCerts.RootCert)
-	site.siteDomain = fmt.Sprintf("%s.%s", config.CurrentDirectory, config.SiteDomain)
+	site.rootCert = path.Join(config.AppDirectory, "certs", config.RootCert)
+	site.siteDomain = fmt.Sprintf("%s.%s", config.SiteDirectory, config.AppDomain)
 	site.secureURL = fmt.Sprintf("https://%s/", site.siteDomain)
 	site.url = fmt.Sprintf("http://%s/", site.siteDomain)
 
