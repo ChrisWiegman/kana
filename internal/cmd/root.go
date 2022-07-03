@@ -43,6 +43,7 @@ func Execute() {
 	cmd.AddCommand(
 		newStartCommand(controller),
 		newStopCommand(controller),
+		newOpenCommand(controller),
 	)
 
 	if err := cmd.Execute(); err != nil {
