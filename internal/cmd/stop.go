@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/ChrisWiegman/kana/internal/docker"
 	"github.com/ChrisWiegman/kana/internal/wordpress"
@@ -28,6 +29,6 @@ func runStop(cmd *cobra.Command, args []string, controller *docker.Controller) {
 	err := wordpress.StopWordPress(controller)
 	if err != nil {
 		fmt.Println(err)
+		os.Exit(1)
 	}
-
 }

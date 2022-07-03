@@ -2,11 +2,12 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/ChrisWiegman/kana/internal/docker"
 	"github.com/ChrisWiegman/kana/internal/setup"
+	"github.com/ChrisWiegman/kana/internal/site"
 	"github.com/ChrisWiegman/kana/internal/traefik"
-	"github.com/ChrisWiegman/kana/internal/utilities"
 	"github.com/ChrisWiegman/kana/internal/wordpress"
 
 	"github.com/spf13/cobra"
@@ -31,20 +32,25 @@ func newStartCommand(controller *docker.Controller) *cobra.Command {
 
 func runStart(cmd *cobra.Command, args []string, controller *docker.Controller) {
 
-	siteURL := fmt.Sprintf("https://%s.%s/", controller.Config.CurrentDirectory, controller.Config.SiteDomain)
+	site := site.NewSite(controller.Config)
 
-	fmt.Printf("Starting development site: %s\n", siteURL)
+	fmt.Printf("Starting development site: %s\n", site.GetURL(false))
 
 	err := traefik.StartTraefik(controller)
 	if err != nil {
 		fmt.Println(err)
+		os.Exit(1)
 	}
 
 	err = wordpress.StartWordPress(controller)
 	if err != nil {
 		fmt.Println(err)
+		os.Exit(1)
 	}
 
-	utilities.OpenURL(siteURL)
-
+	err = site.OpenSite()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }

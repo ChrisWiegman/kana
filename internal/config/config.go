@@ -1,11 +1,6 @@
 package config
 
 import (
-	"crypto/tls"
-	"crypto/x509"
-	"io/ioutil"
-	"log"
-	"net/http"
 	"os"
 	"path"
 	"path/filepath"
@@ -16,7 +11,6 @@ type KanaConfig struct {
 	CurrentDirectory string
 	ConfigRoot       string
 	SSLCerts         KanaSSLCerts
-	HTTPClient       http.Client
 }
 
 type KanaSSLCerts struct {
@@ -59,29 +53,8 @@ func GetKanaConfig() (KanaConfig, error) {
 		CurrentDirectory: filepath.Base(cwd),
 		ConfigRoot:       configRoot,
 		SSLCerts:         certs,
-		HTTPClient:       getSecureHTTPClient(certs),
 	}
 
 	return kanaConfig, nil
 
-}
-
-func getSecureHTTPClient(certs KanaSSLCerts) http.Client {
-
-	caCert, err := ioutil.ReadFile(certs.RootCert)
-	if err != nil {
-		log.Fatal(err)
-	}
-	caCertPool := x509.NewCertPool()
-	caCertPool.AppendCertsFromPEM(caCert)
-
-	client := http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				RootCAs: caCertPool,
-			},
-		},
-	}
-
-	return client
 }
