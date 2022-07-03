@@ -40,10 +40,6 @@ func Execute() {
 
 	cmd, controller := newRootCommand()
 
-	controller.ListContainers("")
-	fmt.Println("")
-	controller.ListContainers("kana")
-
 	cmd.AddCommand(
 		newStartCommand(controller),
 		newStopCommand(controller),
