@@ -26,7 +26,7 @@ type ContainerConfig struct {
 	Labels      map[string]string
 }
 
-func (c *Controller) ListContainers(site string) ([]string, error) {
+func (d *DockerClient) ListContainers(site string) ([]string, error) {
 
 	f := filters.NewArgs()
 
@@ -45,7 +45,7 @@ func (c *Controller) ListContainers(site string) ([]string, error) {
 		Filters: f,
 	}
 
-	containers, err := c.client.ContainerList(
+	containers, err := d.client.ContainerList(
 		context.Background(),
 		options)
 
@@ -63,9 +63,9 @@ func (c *Controller) ListContainers(site string) ([]string, error) {
 
 }
 
-func (c *Controller) IsContainerRunning(containerName string) (id string, isRunning bool) {
+func (d *DockerClient) IsContainerRunning(containerName string) (id string, isRunning bool) {
 
-	containers, err := c.client.ContainerList(context.Background(), types.ContainerListOptions{})
+	containers, err := d.client.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
 		return "", false
 	}
@@ -82,15 +82,15 @@ func (c *Controller) IsContainerRunning(containerName string) (id string, isRunn
 
 }
 
-func (c *Controller) ContainerRun(config ContainerConfig) (id string, err error) {
+func (d *DockerClient) ContainerRun(config ContainerConfig) (id string, err error) {
 
-	containerID, isRunning := c.IsContainerRunning(config.Name)
+	containerID, isRunning := d.IsContainerRunning(config.Name)
 	if isRunning {
 		return containerID, nil
 	}
 
 	hostConfig := container.HostConfig{}
-	containerPorts := c.getNetworkConfig(config.Ports)
+	containerPorts := d.getNetworkConfig(config.Ports)
 
 	if len(containerPorts.PortBindings) > 0 {
 		hostConfig.PortBindings = containerPorts.PortBindings
@@ -106,7 +106,7 @@ func (c *Controller) ContainerRun(config ContainerConfig) (id string, err error)
 
 	hostConfig.Mounts = config.Volumes
 
-	resp, err := c.client.ContainerCreate(context.Background(), &container.Config{
+	resp, err := d.client.ContainerCreate(context.Background(), &container.Config{
 		Tty:          true,
 		Image:        config.Image,
 		ExposedPorts: containerPorts.PortSet,
@@ -120,7 +120,7 @@ func (c *Controller) ContainerRun(config ContainerConfig) (id string, err error)
 		return "", err
 	}
 
-	err = c.client.ContainerStart(context.Background(), resp.ID, types.ContainerStartOptions{})
+	err = d.client.ContainerStart(context.Background(), resp.ID, types.ContainerStartOptions{})
 	if err != nil {
 		return "", err
 	}
@@ -128,8 +128,8 @@ func (c *Controller) ContainerRun(config ContainerConfig) (id string, err error)
 	return resp.ID, nil
 }
 
-func (c *Controller) ContainerWait(id string) (state int64, err error) {
-	containerResult, errorCode := c.client.ContainerWait(context.Background(), id, "")
+func (d *DockerClient) ContainerWait(id string) (state int64, err error) {
+	containerResult, errorCode := d.client.ContainerWait(context.Background(), id, "")
 	select {
 	case err := <-errorCode:
 		return 0, err
@@ -138,11 +138,11 @@ func (c *Controller) ContainerWait(id string) (state int64, err error) {
 	}
 }
 
-func (c *Controller) ContainerLog(id string) (result string, err error) {
+func (d *DockerClient) ContainerLog(id string) (result string, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	reader, err := c.client.ContainerLogs(ctx, id, types.ContainerLogsOptions{
+	reader, err := d.client.ContainerLogs(ctx, id, types.ContainerLogsOptions{
 		ShowStdout: true,
 		ShowStderr: true})
 
@@ -159,24 +159,24 @@ func (c *Controller) ContainerLog(id string) (result string, err error) {
 	return string(buffer), nil
 }
 
-func (c *Controller) ContainerRunAndClean(config ContainerConfig) (statusCode int64, body string, err error) {
+func (d *DockerClient) ContainerRunAndClean(config ContainerConfig) (statusCode int64, body string, err error) {
 
 	// Start the container
-	id, err := c.ContainerRun(config)
+	id, err := d.ContainerRun(config)
 	if err != nil {
 		return statusCode, body, err
 	}
 
 	// Wait for it to finish
-	statusCode, err = c.ContainerWait(id)
+	statusCode, err = d.ContainerWait(id)
 	if err != nil {
 		return statusCode, body, err
 	}
 
 	// Get the log
-	body, _ = c.ContainerLog(id)
+	body, _ = d.ContainerLog(id)
 
-	err = c.client.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{})
+	err = d.client.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{})
 
 	if err != nil {
 		fmt.Printf("Unable to remove container %q: %q\n", id, err)
@@ -185,19 +185,19 @@ func (c *Controller) ContainerRunAndClean(config ContainerConfig) (statusCode in
 	return statusCode, body, err
 }
 
-func (c *Controller) ContainerStop(containerName string) (bool, error) {
+func (d *DockerClient) ContainerStop(containerName string) (bool, error) {
 
-	containerID, isRunning := c.IsContainerRunning(containerName)
+	containerID, isRunning := d.IsContainerRunning(containerName)
 	if !isRunning {
 		return true, nil
 	}
 
-	err := c.client.ContainerStop(context.Background(), containerID, nil)
+	err := d.client.ContainerStop(context.Background(), containerID, nil)
 	if err != nil {
 		return false, err
 	}
 
-	err = c.client.ContainerRemove(context.Background(), containerID, types.ContainerRemoveOptions{})
+	err = d.client.ContainerRemove(context.Background(), containerID, types.ContainerRemoveOptions{})
 	if err != nil {
 		return false, err
 	}

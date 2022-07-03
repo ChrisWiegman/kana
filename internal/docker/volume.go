@@ -8,8 +8,8 @@ import (
 	volumetypes "github.com/docker/docker/api/types/volume"
 )
 
-func (c *Controller) FindVolume(name string) (volume *types.Volume, err error) {
-	volumes, err := c.client.VolumeList(context.Background(), filters.NewArgs())
+func (d *DockerClient) FindVolume(name string) (volume *types.Volume, err error) {
+	volumes, err := d.client.VolumeList(context.Background(), filters.NewArgs())
 
 	if err != nil {
 		return nil, err
@@ -23,8 +23,9 @@ func (c *Controller) FindVolume(name string) (volume *types.Volume, err error) {
 	return nil, nil
 }
 
-func (c *Controller) EnsureVolume(name string) (created bool, volume *types.Volume, err error) {
-	volume, err = c.FindVolume(name)
+func (d *DockerClient) EnsureVolume(name string) (created bool, volume *types.Volume, err error) {
+
+	volume, err = d.FindVolume(name)
 
 	if err != nil {
 		return false, nil, err
@@ -34,7 +35,7 @@ func (c *Controller) EnsureVolume(name string) (created bool, volume *types.Volu
 		return false, volume, nil
 	}
 
-	vol, err := c.client.VolumeCreate(context.Background(), volumetypes.VolumeCreateBody{
+	vol, err := d.client.VolumeCreate(context.Background(), volumetypes.VolumeCreateBody{
 		Driver: "local",
 		//		DriverOpts: map[string]string{},
 		//		Labels:     map[string]string{},
@@ -44,8 +45,9 @@ func (c *Controller) EnsureVolume(name string) (created bool, volume *types.Volu
 	return true, &vol, err
 }
 
-func (c *Controller) RemoveVolume(name string) (removed bool, err error) {
-	vol, err := c.FindVolume(name)
+func (d *DockerClient) RemoveVolume(name string) (removed bool, err error) {
+
+	vol, err := d.FindVolume(name)
 
 	if err != nil {
 		return false, err
@@ -55,7 +57,7 @@ func (c *Controller) RemoveVolume(name string) (removed bool, err error) {
 		return false, nil
 	}
 
-	err = c.client.VolumeRemove(context.Background(), name, true)
+	err = d.client.VolumeRemove(context.Background(), name, true)
 
 	if err != nil {
 		return false, err

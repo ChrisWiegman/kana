@@ -11,22 +11,17 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/ChrisWiegman/kana/internal/config"
-
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 )
 
-type Controller struct {
+type DockerClient struct {
 	client *client.Client
-	Config config.KanaConfig
 }
 
-func NewController(kanaConfig config.KanaConfig) (c *Controller, err error) {
+func NewController() (c *DockerClient, err error) {
 
-	c = new(Controller)
-
-	c.Config = kanaConfig
+	c = new(DockerClient)
 
 	c.client, err = client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
@@ -41,9 +36,9 @@ func NewController(kanaConfig config.KanaConfig) (c *Controller, err error) {
 	return c, nil
 }
 
-func (c *Controller) ensureDockerIsAvailable() error {
+func (d *DockerClient) ensureDockerIsAvailable() error {
 
-	_, err := c.client.ContainerList(context.Background(), types.ContainerListOptions{})
+	_, err := d.client.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
 		if runtime.GOOS == "darwin" {
 
@@ -66,7 +61,7 @@ func (c *Controller) ensureDockerIsAvailable() error {
 
 				time.Sleep(5 * time.Second)
 
-				_, err = c.client.ContainerList(context.Background(), types.ContainerListOptions{})
+				_, err = d.client.ContainerList(context.Background(), types.ContainerListOptions{})
 				if err == nil {
 					return err
 				}

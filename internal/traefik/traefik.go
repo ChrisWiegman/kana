@@ -3,6 +3,7 @@ package traefik
 import (
 	"path"
 
+	"github.com/ChrisWiegman/kana/internal/config"
 	"github.com/ChrisWiegman/kana/internal/docker"
 
 	"github.com/docker/docker/api/types/mount"
@@ -10,14 +11,35 @@ import (
 
 var traefikContainerName = "kana_traefik"
 
-func StartTraefik(controller *docker.Controller) error {
+type Traefik struct {
+	dockerClient docker.DockerClient
+	appDirectory string
+}
 
-	_, _, err := controller.EnsureNetwork("kana")
+func NewTraefik(appConfig config.AppConfig) (*Traefik, error) {
+
+	t := new(Traefik)
+
+	dockerClient, err := docker.NewController()
+	if err != nil {
+		return t, err
+	}
+
+	t.appDirectory = appConfig.AppDirectory
+	t.dockerClient = *dockerClient
+
+	return t, nil
+
+}
+
+func (t *Traefik) StartTraefik() error {
+
+	_, _, err := t.dockerClient.EnsureNetwork("kana")
 	if err != nil {
 		return err
 	}
 
-	err = controller.EnsureImage("traefik")
+	err = t.dockerClient.EnsureImage("traefik")
 	if err != nil {
 		return err
 	}
@@ -40,17 +62,17 @@ func StartTraefik(controller *docker.Controller) error {
 		Volumes: []mount.Mount{
 			{
 				Type:   mount.TypeBind,
-				Source: path.Join(controller.Config.AppDirectory, "conf", "traefik", "traefik.toml"),
+				Source: path.Join(t.appDirectory, "conf", "traefik", "traefik.toml"),
 				Target: "/etc/traefik/traefik.toml",
 			},
 			{
 				Type:   mount.TypeBind,
-				Source: path.Join(controller.Config.AppDirectory, "conf", "traefik", "dynamic.toml"),
+				Source: path.Join(t.appDirectory, "conf", "traefik", "dynamic.toml"),
 				Target: "/etc/traefik/dynamic.toml",
 			},
 			{
 				Type:   mount.TypeBind,
-				Source: path.Join(controller.Config.AppDirectory, "certs"),
+				Source: path.Join(t.appDirectory, "certs"),
 				Target: "/var/certs",
 			},
 			{
@@ -61,30 +83,30 @@ func StartTraefik(controller *docker.Controller) error {
 		},
 	}
 
-	_, err = controller.ContainerRun(traefikConfig)
+	_, err = t.dockerClient.ContainerRun(traefikConfig)
 
 	return err
 
 }
 
-func MaybeStopTraefik(controller *docker.Controller) error {
+func (t *Traefik) MaybeStopTraefik() error {
 
-	containers, err := controller.ListContainers("")
+	containers, err := t.dockerClient.ListContainers("")
 	if err != nil {
 		return err
 	}
 
 	if len(containers) == 0 {
-		return StopTraefik(controller)
+		return t.StopTraefik()
 	}
 
 	return nil
 
 }
 
-func StopTraefik(controller *docker.Controller) error {
+func (t *Traefik) StopTraefik() error {
 
-	_, err := controller.ContainerStop(traefikContainerName)
+	_, err := t.dockerClient.ContainerStop(traefikContainerName)
 
 	return err
 

@@ -4,23 +4,23 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ChrisWiegman/kana/internal/docker"
+	"github.com/ChrisWiegman/kana/internal/config"
 	"github.com/ChrisWiegman/kana/internal/setup"
-	"github.com/ChrisWiegman/kana/internal/wordpress"
+	"github.com/ChrisWiegman/kana/internal/site"
 
 	"github.com/spf13/cobra"
 )
 
-func newOpenCommand(controller *docker.Controller) *cobra.Command {
+func newOpenCommand(appConfig config.AppConfig) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "open",
 		Short: "Open the current site in your browser.",
 		Run: func(cmd *cobra.Command, args []string) {
-			runOpen(cmd, args, controller)
+			runOpen(cmd, args, appConfig)
 		},
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			setup.SetupApp(controller)
+			setup.SetupApp(appConfig)
 		},
 	}
 
@@ -28,11 +28,15 @@ func newOpenCommand(controller *docker.Controller) *cobra.Command {
 
 }
 
-func runOpen(cmd *cobra.Command, args []string, controller *docker.Controller) {
+func runOpen(cmd *cobra.Command, args []string, appConfig config.AppConfig) {
 
-	site := wordpress.NewSite(controller)
+	site, err := site.NewSite(appConfig)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
-	err := site.OpenSite()
+	err = site.OpenSite()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

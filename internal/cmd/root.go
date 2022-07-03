@@ -5,20 +5,13 @@ import (
 	"os"
 
 	"github.com/ChrisWiegman/kana/internal/config"
-	"github.com/ChrisWiegman/kana/internal/docker"
 
 	"github.com/spf13/cobra"
 )
 
-func newRootCommand() (*cobra.Command, *docker.Controller) {
+func newRootCommand() (*cobra.Command, config.AppConfig) {
 
-	kanaConfig, err := config.GetKanaConfig()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-
-	controller, err := docker.NewController(kanaConfig)
+	appConfig, err := config.GetAppConfig()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -32,19 +25,19 @@ func newRootCommand() (*cobra.Command, *docker.Controller) {
 		},
 	}
 
-	return cmd, controller
+	return cmd, appConfig
 
 }
 
 func Execute() {
 
-	cmd, controller := newRootCommand()
+	cmd, appConfig := newRootCommand()
 
 	cmd.AddCommand(
-		newStartCommand(controller),
-		newStopCommand(controller),
-		newOpenCommand(controller),
-		newWPCommand(controller),
+		newStartCommand(appConfig),
+		newStopCommand(appConfig),
+		newOpenCommand(appConfig),
+		newWPCommand(appConfig),
 	)
 
 	if err := cmd.Execute(); err != nil {

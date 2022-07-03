@@ -2,24 +2,17 @@ package docker
 
 import (
 	"testing"
-
-	"github.com/ChrisWiegman/kana/internal/config"
 )
 
 func TestContainerRun(t *testing.T) {
 
-	kanaConfig, err := config.GetKanaConfig()
-	if err != nil {
-		t.Error(err)
-	}
-
-	c, err := NewController(kanaConfig)
+	d, err := NewController()
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	err = c.EnsureImage("alpine")
+	err = d.EnsureImage("alpine")
 	if err != nil {
 		t.Error(err)
 	}
@@ -29,7 +22,7 @@ func TestContainerRun(t *testing.T) {
 		Command: []string{"echo", "hello world"},
 	}
 
-	statusCode, body, err := c.ContainerRunAndClean(config)
+	statusCode, body, err := d.ContainerRunAndClean(config)
 
 	if err != nil {
 		t.Error(err)
@@ -44,7 +37,7 @@ func TestContainerRun(t *testing.T) {
 		t.Errorf("Expect status to be 0; received %q\n", statusCode)
 	}
 
-	_, err = c.RemoveImage("alpine")
+	_, err = d.RemoveImage("alpine")
 	if err != nil {
 		t.Error(err)
 	}

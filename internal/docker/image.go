@@ -25,13 +25,13 @@ type pullEvent struct {
 
 //https://gist.github.com/miguelmota/4980b18d750fb3b1eb571c3e207b1b92
 //https://riptutorial.com/docker/example/31980/image-pulling-with-progress-bars--written-in-go
-func (c *Controller) EnsureImage(imageName string) (err error) {
+func (d *DockerClient) EnsureImage(imageName string) (err error) {
 
 	if !strings.Contains(imageName, ":") {
 		imageName = fmt.Sprintf("%s:latest", imageName)
 	}
 
-	images, err := c.client.ImageList(context.Background(), types.ImageListOptions{})
+	images, err := d.client.ImageList(context.Background(), types.ImageListOptions{})
 	if err != nil {
 		return err
 	}
@@ -44,7 +44,7 @@ func (c *Controller) EnsureImage(imageName string) (err error) {
 		}
 	}
 
-	events, err := c.client.ImagePull(context.Background(), imageName, types.ImagePullOptions{})
+	events, err := d.client.ImagePull(context.Background(), imageName, types.ImagePullOptions{})
 	if err != nil {
 		return err
 	}
@@ -128,9 +128,9 @@ func (c *Controller) EnsureImage(imageName string) (err error) {
 
 }
 
-func (c *Controller) RemoveImage(image string) (removed bool, err error) {
+func (d *DockerClient) RemoveImage(image string) (removed bool, err error) {
 
-	removedResponse, err := c.client.ImageRemove(context.Background(), image, types.ImageRemoveOptions{})
+	removedResponse, err := d.client.ImageRemove(context.Background(), image, types.ImageRemoveOptions{})
 
 	if err != nil {
 		if !strings.Contains(err.Error(), "No such image:") {

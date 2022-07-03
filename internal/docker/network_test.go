@@ -2,34 +2,27 @@ package docker
 
 import (
 	"testing"
-
-	"github.com/ChrisWiegman/kana/internal/config"
 )
 
 func TestNetworkCreate(t *testing.T) {
 
-	kanaConfig, err := config.GetKanaConfig()
-	if err != nil {
-		t.Error(err)
-	}
-
-	c, err := NewController(kanaConfig)
+	d, err := NewController()
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	created, _, _ := c.EnsureNetwork("mynetwork")
+	created, _, _ := d.EnsureNetwork("mynetwork")
 	if created != true {
 		t.Errorf("Should have created the network the first time")
 	}
 
-	created, _, _ = c.EnsureNetwork("mynetwork")
+	created, _, _ = d.EnsureNetwork("mynetwork")
 	if created != false {
 		t.Errorf("Should not have created the network the second time")
 	}
 
-	removed, _ := c.RemoveNetwork("mynetwork")
+	removed, _ := d.RemoveNetwork("mynetwork")
 	if removed != true {
 		t.Errorf("Should have removed the network")
 	}
@@ -37,18 +30,13 @@ func TestNetworkCreate(t *testing.T) {
 
 func TestEnsureNetwork(t *testing.T) {
 
-	kanaConfig, err := config.GetKanaConfig()
-	if err != nil {
-		t.Error(err)
-	}
-
-	c, err := NewController(kanaConfig)
+	d, err := NewController()
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	_, network, err := c.EnsureNetwork("mynetwork")
+	_, network, err := d.EnsureNetwork("mynetwork")
 
 	if err != nil {
 		t.Error(err)
@@ -59,7 +47,7 @@ func TestEnsureNetwork(t *testing.T) {
 		t.FailNow()
 	}
 
-	removed, err := c.RemoveNetwork("mynetwork")
+	removed, err := d.RemoveNetwork("mynetwork")
 
 	if err != nil {
 		t.Error(err)

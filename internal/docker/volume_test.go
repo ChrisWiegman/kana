@@ -2,34 +2,27 @@ package docker
 
 import (
 	"testing"
-
-	"github.com/ChrisWiegman/kana/internal/config"
 )
 
 func TestSingleCreate(t *testing.T) {
 
-	kanaConfig, err := config.GetKanaConfig()
-	if err != nil {
-		t.Error(err)
-	}
-
-	c, err := NewController(kanaConfig)
+	d, err := NewController()
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	created, _, _ := c.EnsureVolume("myvolume")
+	created, _, _ := d.EnsureVolume("myvolume")
 	if created != true {
 		t.Errorf("Should have created the volume the first time")
 	}
 
-	created, _, _ = c.EnsureVolume("myvolume")
+	created, _, _ = d.EnsureVolume("myvolume")
 	if created != false {
 		t.Errorf("Should not have created the volume the second time")
 	}
 
-	removed, _ := c.RemoveVolume("myvolume")
+	removed, _ := d.RemoveVolume("myvolume")
 	if removed != true {
 		t.Errorf("Should have removed the volume")
 	}
@@ -37,18 +30,13 @@ func TestSingleCreate(t *testing.T) {
 
 func TestEnsureVolume(t *testing.T) {
 
-	kanaConfig, err := config.GetKanaConfig()
-	if err != nil {
-		t.Error(err)
-	}
-
-	c, err := NewController(kanaConfig)
+	d, err := NewController()
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	_, volume, err := c.EnsureVolume("myvolume")
+	_, volume, err := d.EnsureVolume("myvolume")
 
 	if err != nil {
 		t.Error(err)
@@ -59,7 +47,7 @@ func TestEnsureVolume(t *testing.T) {
 		t.FailNow()
 	}
 
-	removed, err := c.RemoveVolume("myvolume")
+	removed, err := d.RemoveVolume("myvolume")
 
 	if err != nil {
 		t.Error(err)

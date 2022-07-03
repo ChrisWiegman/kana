@@ -27,7 +27,7 @@ type issuer struct {
 	cert *x509.Certificate
 }
 
-func GenCerts(kanaConfig config.KanaConfig) error {
+func GenCerts(kanaConfig config.AppConfig) error {
 
 	caKey := path.Join(kanaConfig.AppDirectory, "certs", kanaConfig.RootKey)
 	caCert := path.Join(kanaConfig.AppDirectory, "certs", kanaConfig.RootCert)

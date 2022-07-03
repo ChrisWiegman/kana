@@ -2,25 +2,18 @@ package docker
 
 import (
 	"testing"
-
-	"github.com/ChrisWiegman/kana/internal/config"
 )
 
 func TestEnsureImage(t *testing.T) {
 
-	kanaConfig, err := config.GetKanaConfig()
-	if err != nil {
-		t.Error(err)
-	}
-
-	c, err := NewController(kanaConfig)
+	d, err := NewController()
 
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
 	}
 
-	err = c.EnsureImage("alpine")
+	err = d.EnsureImage("alpine")
 
 	if err != nil {
 		t.Error(err)
@@ -29,25 +22,20 @@ func TestEnsureImage(t *testing.T) {
 
 func TestRemoveImage(t *testing.T) {
 
-	kanaConfig, err := config.GetKanaConfig()
-	if err != nil {
-		t.Error(err)
-	}
-
-	c, err := NewController(kanaConfig)
+	d, err := NewController()
 
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
 	}
 
-	err = c.EnsureImage("alpine")
+	err = d.EnsureImage("alpine")
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	removed, err := c.RemoveImage("alpine")
+	removed, err := d.RemoveImage("alpine")
 	if err != nil {
 		t.Error(err)
 	}
@@ -56,7 +44,7 @@ func TestRemoveImage(t *testing.T) {
 		t.Errorf("Image should have been removed but wasn't")
 	}
 
-	removed, err = c.RemoveImage("alpine")
+	removed, err = d.RemoveImage("alpine")
 	if err != nil {
 		t.Error(err)
 	}

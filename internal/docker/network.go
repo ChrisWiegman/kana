@@ -18,7 +18,7 @@ type portConfig struct {
 	PortSet      nat.PortSet
 }
 
-func (c *Controller) getNetworkConfig(ports []ExposedPorts) portConfig {
+func (d *DockerClient) getNetworkConfig(ports []ExposedPorts) portConfig {
 
 	portBindings := make(nat.PortMap)
 	portSet := make(nat.PortSet)
@@ -47,9 +47,9 @@ func (c *Controller) getNetworkConfig(ports []ExposedPorts) portConfig {
 
 }
 
-func (c *Controller) EnsureNetwork(name string) (created bool, network types.NetworkResource, err error) {
+func (d *DockerClient) EnsureNetwork(name string) (created bool, network types.NetworkResource, err error) {
 
-	hasNetwork, network, err := c.findNetworkByName(name)
+	hasNetwork, network, err := d.findNetworkByName(name)
 
 	if err != nil {
 		return false, types.NetworkResource{}, err
@@ -59,7 +59,7 @@ func (c *Controller) EnsureNetwork(name string) (created bool, network types.Net
 		return false, network, nil
 	}
 
-	networkCreateResults, err := c.client.NetworkCreate(context.Background(), name, types.NetworkCreate{
+	networkCreateResults, err := d.client.NetworkCreate(context.Background(), name, types.NetworkCreate{
 		Driver: "bridge",
 	})
 
@@ -67,7 +67,7 @@ func (c *Controller) EnsureNetwork(name string) (created bool, network types.Net
 		return false, types.NetworkResource{}, err
 	}
 
-	hasNetwork, network, err = c.findNetworkById(networkCreateResults.ID)
+	hasNetwork, network, err = d.findNetworkById(networkCreateResults.ID)
 
 	if err != nil {
 		return false, types.NetworkResource{}, err
@@ -81,9 +81,9 @@ func (c *Controller) EnsureNetwork(name string) (created bool, network types.Net
 
 }
 
-func (c *Controller) RemoveNetwork(name string) (removed bool, err error) {
+func (d *DockerClient) RemoveNetwork(name string) (removed bool, err error) {
 
-	hasNetwork, network, err := c.findNetworkByName(name)
+	hasNetwork, network, err := d.findNetworkByName(name)
 
 	if err != nil {
 		return false, err
@@ -93,13 +93,13 @@ func (c *Controller) RemoveNetwork(name string) (removed bool, err error) {
 		return false, nil
 	}
 
-	return true, c.client.NetworkRemove(context.Background(), network.ID)
+	return true, d.client.NetworkRemove(context.Background(), network.ID)
 
 }
 
-func (c *Controller) findNetworkByName(name string) (found bool, network types.NetworkResource, err error) {
+func (d *DockerClient) findNetworkByName(name string) (found bool, network types.NetworkResource, err error) {
 
-	networks, err := c.client.NetworkList(context.Background(), types.NetworkListOptions{})
+	networks, err := d.client.NetworkList(context.Background(), types.NetworkListOptions{})
 
 	if err != nil {
 		return false, types.NetworkResource{}, err
@@ -115,9 +115,9 @@ func (c *Controller) findNetworkByName(name string) (found bool, network types.N
 
 }
 
-func (c *Controller) findNetworkById(ID string) (found bool, network types.NetworkResource, err error) {
+func (d *DockerClient) findNetworkById(ID string) (found bool, network types.NetworkResource, err error) {
 
-	networks, err := c.client.NetworkList(context.Background(), types.NetworkListOptions{})
+	networks, err := d.client.NetworkList(context.Background(), types.NetworkListOptions{})
 
 	if err != nil {
 		return false, types.NetworkResource{}, err

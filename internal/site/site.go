@@ -1,4 +1,4 @@
-package wordpress
+package site
 
 import (
 	"crypto/tls"
@@ -11,32 +11,40 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/ChrisWiegman/kana/internal/config"
 	"github.com/ChrisWiegman/kana/internal/docker"
 	"github.com/pkg/browser"
 )
 
-type KanaSite struct {
-	controller *docker.Controller
-	rootCert   string
-	siteDomain string
-	secureURL  string
-	url        string
+type Site struct {
+	dockerClient *docker.DockerClient
+	appConfig    config.AppConfig
+	rootCert     string
+	siteDomain   string
+	secureURL    string
+	url          string
 }
 
-func NewSite(controller *docker.Controller) *KanaSite {
+func NewSite(appConfig config.AppConfig) (*Site, error) {
 
-	site := new(KanaSite)
+	site := new(Site)
 
-	site.controller = controller
-	site.rootCert = path.Join(controller.Config.AppDirectory, "certs", controller.Config.RootCert)
-	site.siteDomain = fmt.Sprintf("%s.%s", controller.Config.SiteDirectory, controller.Config.AppDomain)
+	dockerClient, err := docker.NewController()
+	if err != nil {
+		return site, err
+	}
+
+	site.appConfig = appConfig
+	site.dockerClient = dockerClient
+	site.rootCert = path.Join(appConfig.AppDirectory, "certs", appConfig.RootCert)
+	site.siteDomain = fmt.Sprintf("%s.%s", appConfig.SiteDirectory, appConfig.AppDomain)
 	site.secureURL = fmt.Sprintf("https://%s/", site.siteDomain)
 	site.url = fmt.Sprintf("http://%s/", site.siteDomain)
 
-	return site
+	return site, nil
 }
 
-func (s *KanaSite) GetURL(insecure bool) string {
+func (s *Site) GetURL(insecure bool) string {
 
 	if insecure {
 		return s.url
@@ -46,7 +54,7 @@ func (s *KanaSite) GetURL(insecure bool) string {
 
 }
 
-func (s *KanaSite) VerifySite() (bool, error) {
+func (s *Site) VerifySite() (bool, error) {
 
 	caCert, err := ioutil.ReadFile(s.rootCert)
 	if err != nil {
@@ -94,7 +102,7 @@ func (s *KanaSite) VerifySite() (bool, error) {
 
 }
 
-func (s *KanaSite) OpenSite() error {
+func (s *Site) OpenSite() error {
 
 	_, err := s.VerifySite()
 	if err != nil {
