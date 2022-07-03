@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newRootCommand() (*cobra.Command, config.AppConfig) {
+func Execute() {
 
 	appConfig, err := config.GetAppConfig()
 	if err != nil {
@@ -21,14 +21,6 @@ func newRootCommand() (*cobra.Command, config.AppConfig) {
 		Use:   "kana",
 		Short: "Kana is a simple WordPress development tool designed for plugin and theme developers.",
 	}
-
-	return cmd, appConfig
-
-}
-
-func Execute() {
-
-	cmd, appConfig := newRootCommand()
 
 	cmd.AddCommand(
 		newStartCommand(appConfig),
