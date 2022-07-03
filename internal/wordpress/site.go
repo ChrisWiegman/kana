@@ -1,4 +1,4 @@
-package site
+package wordpress
 
 import (
 	"crypto/tls"
@@ -11,23 +11,25 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/ChrisWiegman/kana/internal/config"
+	"github.com/ChrisWiegman/kana/internal/docker"
 	"github.com/pkg/browser"
 )
 
 type KanaSite struct {
+	controller *docker.Controller
 	rootCert   string
 	siteDomain string
 	secureURL  string
 	url        string
 }
 
-func NewSite(config config.KanaConfig) *KanaSite {
+func NewSite(controller *docker.Controller) *KanaSite {
 
 	site := new(KanaSite)
 
-	site.rootCert = path.Join(config.AppDirectory, "certs", config.RootCert)
-	site.siteDomain = fmt.Sprintf("%s.%s", config.SiteDirectory, config.AppDomain)
+	site.controller = controller
+	site.rootCert = path.Join(controller.Config.AppDirectory, "certs", controller.Config.RootCert)
+	site.siteDomain = fmt.Sprintf("%s.%s", controller.Config.SiteDirectory, controller.Config.AppDomain)
 	site.secureURL = fmt.Sprintf("https://%s/", site.siteDomain)
 	site.url = fmt.Sprintf("http://%s/", site.siteDomain)
 

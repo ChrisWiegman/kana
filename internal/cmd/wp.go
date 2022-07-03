@@ -32,7 +32,9 @@ func newWPCommand(controller *docker.Controller) *cobra.Command {
 
 func runWP(cmd *cobra.Command, args []string, controller *docker.Controller) {
 
-	err := wordpress.RunCli(args, controller)
+	site := wordpress.NewSite(controller)
+
+	err := site.RunCli(args)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

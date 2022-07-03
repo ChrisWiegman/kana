@@ -26,7 +26,9 @@ func newStopCommand(controller *docker.Controller) *cobra.Command {
 
 func runStop(cmd *cobra.Command, args []string, controller *docker.Controller) {
 
-	err := wordpress.StopWordPress(controller)
+	site := wordpress.NewSite(controller)
+
+	err := site.StopWordPress()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

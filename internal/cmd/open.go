@@ -6,7 +6,7 @@ import (
 
 	"github.com/ChrisWiegman/kana/internal/docker"
 	"github.com/ChrisWiegman/kana/internal/setup"
-	"github.com/ChrisWiegman/kana/internal/site"
+	"github.com/ChrisWiegman/kana/internal/wordpress"
 
 	"github.com/spf13/cobra"
 )
@@ -30,7 +30,7 @@ func newOpenCommand(controller *docker.Controller) *cobra.Command {
 
 func runOpen(cmd *cobra.Command, args []string, controller *docker.Controller) {
 
-	site := site.NewSite(controller.Config)
+	site := wordpress.NewSite(controller)
 
 	err := site.OpenSite()
 	if err != nil {

@@ -33,7 +33,7 @@ func NewController(kanaConfig config.KanaConfig) (c *Controller, err error) {
 		return nil, err
 	}
 
-	err = ensureDockerIsAvailable(c)
+	err = c.ensureDockerIsAvailable()
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func NewController(kanaConfig config.KanaConfig) (c *Controller, err error) {
 	return c, nil
 }
 
-func ensureDockerIsAvailable(c *Controller) error {
+func (c *Controller) ensureDockerIsAvailable() error {
 
 	_, err := c.client.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {

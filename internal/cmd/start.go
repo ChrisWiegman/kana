@@ -6,7 +6,6 @@ import (
 
 	"github.com/ChrisWiegman/kana/internal/docker"
 	"github.com/ChrisWiegman/kana/internal/setup"
-	"github.com/ChrisWiegman/kana/internal/site"
 	"github.com/ChrisWiegman/kana/internal/traefik"
 	"github.com/ChrisWiegman/kana/internal/wordpress"
 
@@ -32,7 +31,7 @@ func newStartCommand(controller *docker.Controller) *cobra.Command {
 
 func runStart(cmd *cobra.Command, args []string, controller *docker.Controller) {
 
-	site := site.NewSite(controller.Config)
+	site := wordpress.NewSite(controller)
 
 	fmt.Printf("Starting development site: %s\n", site.GetURL(false))
 
@@ -42,7 +41,7 @@ func runStart(cmd *cobra.Command, args []string, controller *docker.Controller) 
 		os.Exit(1)
 	}
 
-	err = wordpress.StartWordPress(controller)
+	err = site.StartWordPress()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -54,7 +53,7 @@ func runStart(cmd *cobra.Command, args []string, controller *docker.Controller) 
 		os.Exit(1)
 	}
 
-	err = wordpress.InstallWordPress(controller)
+	err = site.InstallWordPress()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

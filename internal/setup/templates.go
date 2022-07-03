@@ -5,8 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-
-	"github.com/ChrisWiegman/kana/internal/config"
 )
 
 type File struct {
@@ -37,13 +35,6 @@ var configFiles = []File{
 		Permissions: 0644,
 		Overwrite:   true,
 	},
-}
-
-// WriteConfigFiles Write config files to an install's .wpengine-conf directory
-func EnsureAppConfig(kanaConfig config.KanaConfig) error {
-
-	return writeFileArrayToDisk(configFiles, kanaConfig.AppDirectory)
-
 }
 
 func writeFileArrayToDisk(files []File, installPath string) error {
