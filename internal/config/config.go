@@ -42,10 +42,10 @@ func GetKanaConfig() (KanaConfig, error) {
 
 	certs := KanaSSLCerts{
 		CertDirectory: certDir,
-		RootKey:       path.Join(certDir, rootKey),
-		RootCert:      path.Join(certDir, rootCert),
-		SiteCert:      path.Join(certDir, siteCert),
-		SiteKey:       path.Join(certDir, siteKey),
+		RootKey:       rootKey,
+		RootCert:      rootCert,
+		SiteCert:      siteCert,
+		SiteKey:       siteKey,
 	}
 
 	kanaConfig := KanaConfig{

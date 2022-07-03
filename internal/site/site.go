@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os/exec"
+	"path"
 	"runtime"
 	"time"
 
@@ -25,7 +26,7 @@ func NewSite(config config.KanaConfig) *KanaSite {
 
 	site := new(KanaSite)
 
-	site.rootCert = config.SSLCerts.RootCert
+	site.rootCert = path.Join(config.SSLCerts.CertDirectory, config.SSLCerts.RootCert)
 	site.siteDomain = fmt.Sprintf("%s.%s", config.CurrentDirectory, config.SiteDomain)
 	site.secureURL = fmt.Sprintf("https://%s/", site.siteDomain)
 	site.url = fmt.Sprintf("http://%s/", site.siteDomain)

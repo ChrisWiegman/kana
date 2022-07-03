@@ -1,8 +1,8 @@
 package setup
 
 import (
+	"fmt"
 	"os"
-	"path"
 
 	"github.com/ChrisWiegman/kana/internal/config"
 	"github.com/ChrisWiegman/kana/pkg/minica"
@@ -10,9 +10,9 @@ import (
 
 func EnsureCerts(kanaConfig config.KanaConfig) {
 
-	certDir := path.Join(kanaConfig.ConfigRoot, "certs")
+	fmt.Println(kanaConfig.SSLCerts.CertDirectory)
 
-	if err := os.MkdirAll(certDir, 0750); err != nil {
+	if err := os.MkdirAll(kanaConfig.SSLCerts.CertDirectory, 0750); err != nil {
 		panic(err)
 	}
 

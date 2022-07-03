@@ -6,6 +6,7 @@ import (
 	"path"
 
 	"github.com/ChrisWiegman/kana/internal/docker"
+	"github.com/ChrisWiegman/kana/internal/site"
 	"github.com/ChrisWiegman/kana/internal/traefik"
 	"github.com/docker/docker/api/types/mount"
 )
@@ -113,7 +114,19 @@ func StartWordPress(controller *docker.Controller) error {
 		}
 	}
 
-	return nil
+	site := site.NewSite(controller.Config).GetURL(false)
+
+	setupCommand := []string{
+		"core",
+		"install",
+		fmt.Sprintf("--url=%s", site),
+		"--title='Chris Wiegman Theme Development'",
+		"--admin_user=admin",
+		"--admin_password=password",
+		"--admin_email=contact@chriswiegman.com",
+	}
+
+	return RunCli(setupCommand, controller)
 
 }
 
