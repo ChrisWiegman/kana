@@ -8,11 +8,6 @@ import (
 	"github.com/ChrisWiegman/kana/pkg/minica"
 )
 
-var rootKey = "kana.root.key"
-var rootCert = "kana.root.pem"
-var siteCert = "kana.site.pem"
-var siteKey = "kana.site.key"
-
 func EnsureCerts(kanaConfig config.KanaConfig) {
 
 	certDir := path.Join(kanaConfig.ConfigRoot, "certs")
@@ -21,5 +16,5 @@ func EnsureCerts(kanaConfig config.KanaConfig) {
 		panic(err)
 	}
 
-	minica.GenCerts(certDir, rootKey, rootCert, siteCert, siteKey, kanaConfig)
+	minica.GenCerts(kanaConfig)
 }
