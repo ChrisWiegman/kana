@@ -44,6 +44,7 @@ func Execute() {
 		newStartCommand(controller),
 		newStopCommand(controller),
 		newOpenCommand(controller),
+		newWPCommand(controller),
 	)
 
 	if err := cmd.Execute(); err != nil {

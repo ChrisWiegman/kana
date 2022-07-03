@@ -98,28 +98,6 @@ func StartWordPress(controller *docker.Controller) error {
 				},
 			},
 		},
-		{
-			Name:        fmt.Sprintf("kana_%s_wordpress_cli", controller.Config.CurrentDirectory),
-			Image:       "wordpress:cli",
-			NetworkName: "kana",
-			HostName:    fmt.Sprintf("kana_%s_wordpress_cli", controller.Config.CurrentDirectory),
-			Env: []string{
-				fmt.Sprintf("WORDPRESS_DB_HOST=kana_%s_database", controller.Config.CurrentDirectory),
-				"WORDPRESS_DB_USER=wordpress",
-				"WORDPRESS_DB_PASSWORD=wordpress",
-				"WORDPRESS_DB_NAME=wordpress",
-			},
-			Labels: map[string]string{
-				"kana.site": controller.Config.CurrentDirectory,
-			},
-			Volumes: []mount.Mount{
-				{
-					Type:   mount.TypeBind,
-					Source: siteDir,
-					Target: "/var/www/html",
-				},
-			},
-		},
 	}
 
 	for _, container := range wordPressContainers {
@@ -134,6 +112,63 @@ func StartWordPress(controller *docker.Controller) error {
 			return err
 		}
 	}
+
+	return nil
+
+}
+
+func RunCli(command []string, controller *docker.Controller) error {
+
+	_, _, err := controller.EnsureNetwork("kana")
+	if err != nil {
+		return err
+	}
+
+	siteDir := path.Join(controller.Config.ConfigRoot, "sites", controller.Config.CurrentDirectory)
+	appDir := path.Join(siteDir, "app")
+
+	fullCommand := []string{
+		"wp",
+		"--path=/var/www/html",
+	}
+
+	fullCommand = append(fullCommand, command...)
+
+	container := docker.ContainerConfig{
+		Name:        fmt.Sprintf("kana_%s_wordpress_cli", controller.Config.CurrentDirectory),
+		Image:       "wordpress:cli",
+		NetworkName: "kana",
+		HostName:    fmt.Sprintf("kana_%s_wordpress_cli", controller.Config.CurrentDirectory),
+		Command:     fullCommand,
+		Env: []string{
+			fmt.Sprintf("WORDPRESS_DB_HOST=kana_%s_database", controller.Config.CurrentDirectory),
+			"WORDPRESS_DB_USER=wordpress",
+			"WORDPRESS_DB_PASSWORD=wordpress",
+			"WORDPRESS_DB_NAME=wordpress",
+		},
+		Labels: map[string]string{
+			"kana.site": controller.Config.CurrentDirectory,
+		},
+		Volumes: []mount.Mount{
+			{
+				Type:   mount.TypeBind,
+				Source: appDir,
+				Target: "/var/www/html",
+			},
+		},
+	}
+
+	err = controller.EnsureImage(container.Image)
+	if err != nil {
+		return err
+	}
+
+	_, output, err := controller.ContainerRunAndClean(container)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(output)
 
 	return nil
 
