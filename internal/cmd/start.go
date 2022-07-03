@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/ChrisWiegman/kana/internal/docker"
+	"github.com/ChrisWiegman/kana/internal/setup"
 	"github.com/ChrisWiegman/kana/internal/traefik"
 	"github.com/ChrisWiegman/kana/internal/utilities"
 	"github.com/ChrisWiegman/kana/internal/wordpress"
@@ -18,6 +19,9 @@ func newStartCommand(controller *docker.Controller) *cobra.Command {
 		Short: "Starts a new environment in the local folder.",
 		Run: func(cmd *cobra.Command, args []string) {
 			runStart(cmd, args, controller)
+		},
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			setup.SetupApp(controller)
 		},
 	}
 
