@@ -1,7 +1,6 @@
 package setup
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/ChrisWiegman/kana/internal/config"
@@ -9,8 +8,6 @@ import (
 )
 
 func EnsureCerts(kanaConfig config.KanaConfig) {
-
-	fmt.Println(kanaConfig.SSLCerts.CertDirectory)
 
 	if err := os.MkdirAll(kanaConfig.SSLCerts.CertDirectory, 0750); err != nil {
 		panic(err)
