@@ -134,11 +134,11 @@ func (s *Site) InstallWordPress() error {
 		"--admin_email=contact@chriswiegman.com",
 	}
 
-	return s.RunCli(setupCommand)
+	return s.RunWPCli(setupCommand)
 
 }
 
-func (s *Site) RunCli(command []string) error {
+func (s *Site) RunWPCli(command []string) error {
 
 	_, _, err := s.dockerClient.EnsureNetwork("kana")
 	if err != nil {

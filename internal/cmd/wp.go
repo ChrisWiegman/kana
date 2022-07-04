@@ -38,7 +38,7 @@ func runWP(cmd *cobra.Command, args []string, appConfig config.AppConfig) {
 		os.Exit(1)
 	}
 
-	err = site.RunCli(args)
+	err = site.RunWPCli(args)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
