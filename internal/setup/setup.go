@@ -2,6 +2,7 @@ package setup
 
 import (
 	"os"
+	"os/exec"
 	"path"
 
 	"github.com/ChrisWiegman/kana/internal/config"
@@ -29,11 +30,31 @@ func ensureAppConfig(kanaConfig config.AppConfig) error {
 // ensureCerts Ensures SSL certificates have been generated and are where they need to be
 func ensureCerts(kanaConfig config.AppConfig) error {
 
-	err := os.MkdirAll(path.Join(kanaConfig.AppDirectory, "certs"), 0750)
-	if err != nil {
-		return err
+	createCert := false
+	rootCert := path.Join(kanaConfig.AppDirectory, "certs", kanaConfig.RootCert)
+
+	_, err := os.Stat(rootCert)
+	if err != nil && os.IsNotExist(err) {
+		createCert = true
 	}
 
-	return minica.GenCerts(kanaConfig)
+	if createCert {
+
+		err = os.MkdirAll(path.Join(kanaConfig.AppDirectory, "certs"), 0750)
+		if err != nil {
+			return err
+		}
+
+		err = minica.GenCerts(kanaConfig)
+		if err != nil {
+			return err
+		}
+
+		installCertCommand := exec.Command("sudo", "security", "add-trusted-cert", "-d", "-r", "trustRoot", "-k", "/Library/Keychains/System.keychain", rootCert)
+		return installCertCommand.Run()
+
+	}
+
+	return nil
 
 }
