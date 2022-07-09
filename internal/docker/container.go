@@ -1,6 +1,7 @@
 package docker
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -12,6 +13,8 @@ import (
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
+	"github.com/docker/docker/api/types/strslice"
+	"github.com/docker/docker/pkg/stdcopy"
 )
 
 type ContainerConfig struct {
@@ -24,6 +27,12 @@ type ContainerConfig struct {
 	Command     []string
 	Env         []string
 	Labels      map[string]string
+}
+
+type ExecResult struct {
+	StdOut   string
+	StdErr   string
+	ExitCode int
 }
 
 func (d *DockerClient) ListContainers(site string) ([]string, error) {
@@ -203,5 +212,98 @@ func (d *DockerClient) ContainerStop(containerName string) (bool, error) {
 	}
 
 	return true, nil
+
+}
+
+func (d *DockerClient) ContainerRestart(containerName string) (bool, error) {
+
+	containerID, isRunning := d.IsContainerRunning(containerName)
+	if !isRunning {
+		return true, nil
+	}
+
+	err := d.client.ContainerStop(context.Background(), containerID, nil)
+	if err != nil {
+		return false, err
+	}
+
+	err = d.client.ContainerStart(context.Background(), containerID, types.ContainerStartOptions{})
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+
+}
+
+func (d *DockerClient) ContainerExec(containerName string, command []string) (ExecResult, error) {
+
+	containerID, isRunning := d.IsContainerRunning(containerName)
+	if !isRunning {
+		return ExecResult{}, nil
+	}
+
+	fullCommand := []string{
+		"sh",
+		"-c",
+	}
+
+	fullCommand = append(fullCommand, command...)
+
+	// prepare exec
+	execConfig := types.ExecConfig{
+		AttachStdout: true,
+		AttachStderr: true,
+		Cmd:          strslice.StrSlice(fullCommand),
+	}
+
+	cresp, err := d.client.ContainerExecCreate(context.Background(), containerID, execConfig)
+	if err != nil {
+		return ExecResult{}, err
+	}
+
+	execID := cresp.ID
+
+	// run it, with stdout/stderr attached
+	aresp, err := d.client.ContainerExecAttach(context.Background(), execID, types.ExecStartCheck{})
+	if err != nil {
+		return ExecResult{}, err
+	}
+
+	defer aresp.Close()
+
+	// read the output
+	var outBuf, errBuf bytes.Buffer
+	outputDone := make(chan error)
+
+	go func() {
+		// StdCopy demultiplexes the stream into two buffers
+		_, err = stdcopy.StdCopy(&outBuf, &errBuf, aresp.Reader)
+		outputDone <- err
+	}()
+
+	select {
+	case err := <-outputDone:
+		if err != nil {
+			return ExecResult{}, err
+		}
+		break
+
+	case <-context.Background().Done():
+		return ExecResult{}, context.Background().Err()
+	}
+
+	// get the exit code
+	iresp, err := d.client.ContainerExecInspect(context.Background(), execID)
+	if err != nil {
+		return ExecResult{}, err
+	}
+
+	return ExecResult{
+			ExitCode: iresp.ExitCode,
+			StdOut:   outBuf.String(),
+			StdErr:   errBuf.String(),
+		},
+		nil
 
 }

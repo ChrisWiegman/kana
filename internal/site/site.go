@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/ChrisWiegman/kana/internal/config"
@@ -112,6 +113,57 @@ func (s *Site) OpenSite() error {
 	openURL(s.secureURL)
 
 	return nil
+
+}
+
+func (s *Site) InstallXdebug() (bool, error) {
+
+	commands := []string{
+		"pecl list | grep xdebug",
+		"pecl install xdebug",
+		"docker-php-ext-enable xdebug",
+		"echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini",
+		"xdebug.mode=debug' >> /usr/local/etc/php/php.ini",
+	}
+
+	for i, command := range commands {
+
+		restart := false
+
+		if i+1 == len(commands) {
+			restart = true
+		}
+
+		output, err := s.runCli(command, restart)
+		if err != nil {
+			return false, err
+		}
+
+		if i == 0 && strings.Contains(output.StdOut, "xdebug") {
+			return false, nil
+		}
+	}
+
+	return true, nil
+
+}
+
+// runCli Runs an arbitrary CLI command against the site's WordPress container
+func (s *Site) runCli(command string, restart bool) (docker.ExecResult, error) {
+
+	container := fmt.Sprintf("kana_%s_wordpress", s.appConfig.SiteDirectory)
+
+	output, err := s.dockerClient.ContainerExec(container, []string{command})
+	if err != nil {
+		return docker.ExecResult{}, err
+	}
+
+	if restart {
+		_, err = s.dockerClient.ContainerRestart(container)
+		return output, err
+	}
+
+	return output, nil
 
 }
 
