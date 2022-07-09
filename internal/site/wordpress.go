@@ -51,7 +51,7 @@ func getLocalAppDir() (string, error) {
 
 }
 
-func (s *Site) StartWordPress(local bool) error {
+func (s *Site) StartWordPress(local, isPlugin, isTheme bool) error {
 
 	_, _, err := s.dockerClient.EnsureNetwork("kana")
 	if err != nil {
@@ -75,6 +75,35 @@ func (s *Site) StartWordPress(local bool) error {
 
 	if err := os.MkdirAll(databaseDir, 0750); err != nil {
 		return err
+	}
+
+	appVolumes := []mount.Mount{
+		{
+			Type:   mount.TypeBind,
+			Source: appDir,
+			Target: "/var/www/html",
+		},
+	}
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	if isPlugin {
+		appVolumes = append(appVolumes, mount.Mount{
+			Type:   mount.TypeBind,
+			Source: cwd,
+			Target: path.Join("/var/www/html", "wp-content", "plugins", s.appConfig.SiteDirectory),
+		})
+	}
+
+	if isTheme {
+		appVolumes = append(appVolumes, mount.Mount{
+			Type:   mount.TypeBind,
+			Source: cwd,
+			Target: path.Join("/var/www/html", "wp-content", "themes", s.appConfig.SiteDirectory),
+		})
 	}
 
 	wordPressContainers := []docker.ContainerConfig{
@@ -120,13 +149,7 @@ func (s *Site) StartWordPress(local bool) error {
 				fmt.Sprintf("traefik.http.routers.wordpress-%s.tls", s.appConfig.SiteDirectory):              "true",
 				"kana.site": s.appConfig.SiteDirectory,
 			},
-			Volumes: []mount.Mount{
-				{
-					Type:   mount.TypeBind,
-					Source: appDir,
-					Target: "/var/www/html",
-				},
-			},
+			Volumes: appVolumes,
 		},
 	}
 
