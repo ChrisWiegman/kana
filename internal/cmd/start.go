@@ -73,6 +73,7 @@ func runStart(cmd *cobra.Command, args []string, appConfig config.AppConfig) {
 		os.Exit(1)
 	}
 
+	fmt.Println("Finishing WordPress setup...")
 	err = site.InstallWordPress()
 	if err != nil {
 		fmt.Println(err)
@@ -80,6 +81,7 @@ func runStart(cmd *cobra.Command, args []string, appConfig config.AppConfig) {
 	}
 
 	if flagXdebug {
+		fmt.Println("Installing Xdebug...")
 		_, err = site.InstallXdebug()
 		if err != nil {
 			fmt.Println(err)
