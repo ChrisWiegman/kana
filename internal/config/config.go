@@ -12,7 +12,7 @@ var rootCert = "kana.root.pem"
 var siteCert = "kana.site.pem"
 var siteKey = "kana.site.key"
 var appDomain = "sites.cfw.li"
-var configFolderName = ".kana"
+var configFolderName = ".config/kana"
 
 type AppConfig struct {
 	AppDomain     string
