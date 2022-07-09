@@ -12,6 +12,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var FlagXdebug bool
+
 func newStartCommand(appConfig config.AppConfig) *cobra.Command {
 
 	cmd := &cobra.Command{
@@ -24,6 +26,8 @@ func newStartCommand(appConfig config.AppConfig) *cobra.Command {
 			setup.SetupApp(appConfig)
 		},
 	}
+
+	cmd.Flags().BoolVar(&FlagXdebug, "xdebug", false, "Enable Xdebug when starting the container.")
 
 	return cmd
 
@@ -67,6 +71,14 @@ func runStart(cmd *cobra.Command, args []string, appConfig config.AppConfig) {
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
+	}
+
+	if FlagXdebug {
+		_, err = site.InstallXdebug()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 	}
 
 	err = site.OpenSite()
