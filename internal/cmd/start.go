@@ -23,7 +23,11 @@ func newStartCommand(appConfig config.AppConfig) *cobra.Command {
 			runStart(cmd, args, appConfig)
 		},
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			setup.SetupApp(appConfig)
+			err := setup.SetupApp(appConfig)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
 		},
 	}
 

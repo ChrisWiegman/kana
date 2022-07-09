@@ -8,10 +8,14 @@ import (
 	"github.com/ChrisWiegman/kana/pkg/minica"
 )
 
-func SetupApp(appConfig config.AppConfig) {
+func SetupApp(appConfig config.AppConfig) error {
 
-	ensureAppConfig(appConfig)
-	ensureCerts(appConfig)
+	err := ensureAppConfig(appConfig)
+	if err != nil {
+		return err
+	}
+
+	return ensureCerts(appConfig)
 
 }
 
@@ -23,11 +27,13 @@ func ensureAppConfig(kanaConfig config.AppConfig) error {
 }
 
 // ensureCerts Ensures SSL certificates have been generated and are where they need to be
-func ensureCerts(kanaConfig config.AppConfig) {
+func ensureCerts(kanaConfig config.AppConfig) error {
 
-	if err := os.MkdirAll(path.Join(kanaConfig.AppDirectory, "certs"), 0750); err != nil {
-		panic(err)
+	err := os.MkdirAll(path.Join(kanaConfig.AppDirectory, "certs"), 0750)
+	if err != nil {
+		return err
 	}
 
-	minica.GenCerts(kanaConfig)
+	return minica.GenCerts(kanaConfig)
+
 }
