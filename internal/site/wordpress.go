@@ -33,7 +33,25 @@ func (s *Site) StopWordPress() error {
 
 }
 
-func (s *Site) StartWordPress() error {
+func getLocalAppDir() (string, error) {
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+
+	localAppDir := path.Join(cwd, "wordpress")
+
+	err = os.MkdirAll(localAppDir, 0750)
+	if err != nil {
+		return "", err
+	}
+
+	return localAppDir, nil
+
+}
+
+func (s *Site) StartWordPress(local bool) error {
 
 	_, _, err := s.dockerClient.EnsureNetwork("kana")
 	if err != nil {
@@ -43,6 +61,13 @@ func (s *Site) StartWordPress() error {
 	siteDir := path.Join(s.appConfig.AppDirectory, "sites", s.appConfig.SiteDirectory)
 	appDir := path.Join(siteDir, "app")
 	databaseDir := path.Join(siteDir, "database")
+
+	if local {
+		appDir, err = getLocalAppDir()
+		if err != nil {
+			return err
+		}
+	}
 
 	if err := os.MkdirAll(appDir, 0750); err != nil {
 		return err

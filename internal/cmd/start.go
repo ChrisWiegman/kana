@@ -12,7 +12,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var FlagXdebug bool
+var flagXdebug bool
+var flagLocal bool
 
 func newStartCommand(appConfig config.AppConfig) *cobra.Command {
 
@@ -31,7 +32,8 @@ func newStartCommand(appConfig config.AppConfig) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().BoolVar(&FlagXdebug, "xdebug", false, "Enable Xdebug when starting the container.")
+	cmd.Flags().BoolVar(&flagXdebug, "xdebug", false, "Enable Xdebug when starting the container.")
+	cmd.Flags().BoolVar(&flagLocal, "local", false, "Installs the WordPress files in your current path at ./wordpress instead of the global app path.")
 
 	return cmd
 
@@ -59,7 +61,7 @@ func runStart(cmd *cobra.Command, args []string, appConfig config.AppConfig) {
 		os.Exit(1)
 	}
 
-	err = site.StartWordPress()
+	err = site.StartWordPress(flagLocal)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -77,7 +79,7 @@ func runStart(cmd *cobra.Command, args []string, appConfig config.AppConfig) {
 		os.Exit(1)
 	}
 
-	if FlagXdebug {
+	if flagXdebug {
 		_, err = site.InstallXdebug()
 		if err != nil {
 			fmt.Println(err)
