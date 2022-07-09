@@ -134,15 +134,16 @@ func (s *Site) InstallWordPress() error {
 		"--admin_email=contact@chriswiegman.com",
 	}
 
-	return s.RunWPCli(setupCommand)
+	_, err := s.RunWPCli(setupCommand)
+	return err
 
 }
 
-func (s *Site) RunWPCli(command []string) error {
+func (s *Site) RunWPCli(command []string) (string, error) {
 
 	_, _, err := s.dockerClient.EnsureNetwork("kana")
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	siteDir := path.Join(s.appConfig.AppDirectory, "sites", s.appConfig.SiteDirectory)
@@ -181,16 +182,14 @@ func (s *Site) RunWPCli(command []string) error {
 
 	err = s.dockerClient.EnsureImage(container.Image)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	_, output, err := s.dockerClient.ContainerRunAndClean(container)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	fmt.Println(output)
-
-	return nil
+	return output, nil
 
 }
