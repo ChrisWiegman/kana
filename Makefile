@@ -15,3 +15,7 @@ install:
 	go mod vendor
 	go run ./scripts/generateTemplateConstants.go
 	go install ./cmd/...
+
+.PHONY: update
+update:
+	go get -u ./...
