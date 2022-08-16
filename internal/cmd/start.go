@@ -48,6 +48,11 @@ func runStart(cmd *cobra.Command, args []string, appConfig config.AppConfig) {
 		os.Exit(1)
 	}
 
+	if kanaSite.IsSiteRunning() {
+		fmt.Println("Site is already running. Please stop your site before running the start command")
+		os.Exit(1)
+	}
+
 	startFlags := site.StartFlags{
 		Xdebug:   flagXdebug,
 		IsTheme:  flagIsTheme,

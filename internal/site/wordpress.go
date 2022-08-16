@@ -11,12 +11,25 @@ import (
 	"github.com/docker/docker/api/types/mount"
 )
 
-func (s *Site) StopWordPress() error {
+func (s *Site) GetSiteContainers() []string {
 
-	wordPressContainers := []string{
+	return []string{
 		fmt.Sprintf("kana_%s_database", s.appConfig.SiteName),
 		fmt.Sprintf("kana_%s_wordpress", s.appConfig.SiteName),
 	}
+}
+
+func (s *Site) IsSiteRunning() bool {
+
+	containers, _ := s.dockerClient.ListContainers(s.appConfig.SiteName)
+
+	return len(containers) != 0
+
+}
+
+func (s *Site) StopWordPress() error {
+
+	wordPressContainers := s.GetSiteContainers()
 
 	for _, wordPressContainer := range wordPressContainers {
 		_, err := s.dockerClient.ContainerStop(wordPressContainer)
