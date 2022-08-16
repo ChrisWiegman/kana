@@ -2,7 +2,6 @@ package setup
 
 import (
 	"bytes"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -78,6 +77,6 @@ func writeFileFromTemplate(installPath string, file File) error {
 		}
 	}
 
-	return ioutil.WriteFile(destFile, finalTemplate, file.Permissions)
+	return os.WriteFile(destFile, finalTemplate, file.Permissions)
 
 }
