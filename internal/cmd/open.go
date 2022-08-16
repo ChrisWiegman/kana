@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/ChrisWiegman/kana/internal/config"
-	"github.com/ChrisWiegman/kana/internal/setup"
 	"github.com/ChrisWiegman/kana/internal/site"
 
 	"github.com/spf13/cobra"
@@ -18,9 +17,6 @@ func newOpenCommand(appConfig config.AppConfig) *cobra.Command {
 		Short: "Open the current site in your browser.",
 		Run: func(cmd *cobra.Command, args []string) {
 			runOpen(cmd, args, appConfig)
-		},
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			setup.SetupApp(appConfig)
 		},
 	}
 

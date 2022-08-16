@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/ChrisWiegman/kana/internal/config"
+	"github.com/ChrisWiegman/kana/internal/setup"
 
 	"github.com/spf13/cobra"
 )
@@ -12,6 +13,12 @@ import (
 func Execute() {
 
 	appConfig, err := config.GetAppConfig()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	err = setup.SetupApp(appConfig)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

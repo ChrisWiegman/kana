@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/ChrisWiegman/kana/internal/config"
-	"github.com/ChrisWiegman/kana/internal/setup"
 	"github.com/ChrisWiegman/kana/internal/site"
 	"github.com/ChrisWiegman/kana/internal/traefik"
 
@@ -24,13 +23,6 @@ func newStartCommand(appConfig config.AppConfig) *cobra.Command {
 		Short: "Starts a new environment in the local folder.",
 		Run: func(cmd *cobra.Command, args []string) {
 			runStart(cmd, args, appConfig)
-		},
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			err := setup.SetupApp(appConfig)
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
 		},
 	}
 
