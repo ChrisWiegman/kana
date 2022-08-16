@@ -38,5 +38,9 @@ func runDestroy(cmd *cobra.Command, args []string, appConfig config.AppConfig) {
 		os.Exit(1)
 	}
 
-	fmt.Println("Destroy the environment here.")
+	err = os.RemoveAll(appConfig.SiteDirectory)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }
