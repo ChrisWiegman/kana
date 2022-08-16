@@ -16,13 +16,13 @@ var siteKey = "kana.site.key"
 var appDomain = "sites.kana.li"
 var configFolderName = ".config/kana"
 
-var validPHPVersions = []string{
+var ValidPHPVersions = []string{
 	"site",
 	"plugin",
 	"theme",
 }
 
-var validTypes = []string{
+var ValidTypes = []string{
 	"site",
 	"plugin",
 	"theme",
@@ -44,6 +44,7 @@ type AppConfig struct {
 	DefaultAdminUsername string
 	DefaultAdminPassword string
 	DefaultAdminEmail    string
+	WorkingDirectory     string
 }
 
 func GetAppConfig() (AppConfig, error) {
@@ -81,6 +82,7 @@ func GetAppConfig() (AppConfig, error) {
 		DefaultAdminUsername: viperConfig.GetString("adminUser"),
 		DefaultAdminPassword: viperConfig.GetString("adminPassword"),
 		DefaultAdminEmail:    viperConfig.GetString("adminEmail"),
+		WorkingDirectory:     cwd,
 	}
 
 	return kanaConfig, nil
@@ -121,13 +123,13 @@ func getViperConfig(appDirectory string) (*viper.Viper, error) {
 	changeConfig := false
 
 	// Reset default "site" type if there's an invalid type in the config file
-	if !checkString(defaultConfig.GetString("type"), validTypes) {
+	if !CheckString(defaultConfig.GetString("type"), ValidTypes) {
 		changeConfig = true
 		defaultConfig.Set("type", "site")
 	}
 
 	// Reset default php version if there's an invalid version in the config file
-	if !checkString(defaultConfig.GetString("php"), validPHPVersions) {
+	if !CheckString(defaultConfig.GetString("php"), ValidPHPVersions) {
 		changeConfig = true
 		defaultConfig.Set("php", "7.4")
 	}
@@ -143,7 +145,7 @@ func getViperConfig(appDirectory string) (*viper.Viper, error) {
 
 }
 
-func checkString(stringToCheck string, validStrings []string) bool {
+func CheckString(stringToCheck string, validStrings []string) bool {
 
 	for _, validString := range validStrings {
 		if validString == stringToCheck {

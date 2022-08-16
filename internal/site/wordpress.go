@@ -52,7 +52,7 @@ func getLocalAppDir() (string, error) {
 
 }
 
-func (s *Site) StartWordPress(local, isPlugin, isTheme bool) error {
+func (s *Site) StartWordPress() error {
 
 	_, _, err := s.dockerClient.EnsureNetwork("kana")
 	if err != nil {
@@ -62,7 +62,7 @@ func (s *Site) StartWordPress(local, isPlugin, isTheme bool) error {
 	appDir := path.Join(s.appConfig.SiteDirectory, "app")
 	databaseDir := path.Join(s.appConfig.SiteDirectory, "database")
 
-	if local {
+	if s.siteConfig.Local {
 		appDir, err = getLocalAppDir()
 		if err != nil {
 			return err
@@ -90,7 +90,7 @@ func (s *Site) StartWordPress(local, isPlugin, isTheme bool) error {
 		return err
 	}
 
-	if isPlugin {
+	if s.siteConfig.Type == "plugin" {
 		appVolumes = append(appVolumes, mount.Mount{
 			Type:   mount.TypeBind,
 			Source: cwd,
@@ -98,7 +98,7 @@ func (s *Site) StartWordPress(local, isPlugin, isTheme bool) error {
 		})
 	}
 
-	if isTheme {
+	if s.siteConfig.Type == "theme" {
 		appVolumes = append(appVolumes, mount.Mount{
 			Type:   mount.TypeBind,
 			Source: cwd,
@@ -131,7 +131,7 @@ func (s *Site) StartWordPress(local, isPlugin, isTheme bool) error {
 		},
 		{
 			Name:        fmt.Sprintf("kana_%s_wordpress", s.appConfig.SiteName),
-			Image:       fmt.Sprintf("wordpress:php%s", s.appConfig.DefaultPHPVersion),
+			Image:       fmt.Sprintf("wordpress:php%s", s.siteConfig.PHPVersion),
 			NetworkName: "kana",
 			HostName:    fmt.Sprintf("kana_%s_wordpress", s.appConfig.SiteName),
 			Env: []string{
@@ -171,6 +171,8 @@ func (s *Site) StartWordPress(local, isPlugin, isTheme bool) error {
 }
 
 func (s *Site) InstallWordPress(appConfig config.AppConfig) error {
+
+	fmt.Println("Finishing WordPress setup...")
 
 	setupCommand := []string{
 		"core",

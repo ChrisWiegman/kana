@@ -37,13 +37,27 @@ func newStartCommand(appConfig config.AppConfig) *cobra.Command {
 
 func runStart(cmd *cobra.Command, args []string, appConfig config.AppConfig) {
 
-	site, err := site.NewSite(appConfig)
+	if flagIsPlugin && flagIsTheme {
+		fmt.Println(fmt.Errorf("you have set both the plugin and theme flags. Please choose only one option"))
+		os.Exit(1)
+	}
+
+	kanaSite, err := site.NewSite(appConfig)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	fmt.Printf("Starting development site: %s\n", site.GetURL(false))
+	startFlags := site.StartFlags{
+		Xdebug:   flagXdebug,
+		IsTheme:  flagIsTheme,
+		IsPlugin: flagIsPlugin,
+		Local:    flagLocal,
+	}
+
+	kanaSite.AddStartFlags(cmd, startFlags)
+
+	fmt.Printf("Starting development site: %s\n", kanaSite.GetURL(false))
 
 	traefikClient, err := traefik.NewTraefik(appConfig)
 	if err != nil {
@@ -57,35 +71,31 @@ func runStart(cmd *cobra.Command, args []string, appConfig config.AppConfig) {
 		os.Exit(1)
 	}
 
-	err = site.StartWordPress(flagLocal, flagIsPlugin, flagIsTheme)
+	err = kanaSite.StartWordPress()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	_, err = site.VerifySite()
+	_, err = kanaSite.VerifySite()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	fmt.Println("Finishing WordPress setup...")
-	err = site.InstallWordPress(appConfig)
+	err = kanaSite.InstallWordPress(appConfig)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	if flagXdebug {
-		fmt.Println("Installing Xdebug...")
-		_, err = site.InstallXdebug()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+	_, err = kanaSite.InstallXdebug()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
-	err = site.OpenSite()
+	err = kanaSite.OpenSite()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
