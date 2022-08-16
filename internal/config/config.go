@@ -43,6 +43,7 @@ type AppConfig struct {
 	DefaultPHPVersion    string
 	DefaultAdminUsername string
 	DefaultAdminPassword string
+	DefaultAdminEmail    string
 }
 
 func GetAppConfig() (AppConfig, error) {
@@ -79,6 +80,7 @@ func GetAppConfig() (AppConfig, error) {
 		DefaultPHPVersion:    viperConfig.GetString("php"),
 		DefaultAdminUsername: viperConfig.GetString("adminUser"),
 		DefaultAdminPassword: viperConfig.GetString("adminPassword"),
+		DefaultAdminEmail:    viperConfig.GetString("adminEmail"),
 	}
 
 	return kanaConfig, nil
@@ -95,6 +97,7 @@ func getViperConfig(appDirectory string) (*viper.Viper, error) {
 	defaultConfig.SetDefault("php", "7.4")
 	defaultConfig.SetDefault("adminUser", "admin")
 	defaultConfig.SetDefault("adminPassword", "password")
+	defaultConfig.SetDefault("adminEmail", "admin@mykanasite.localhost")
 
 	defaultConfig.SetConfigName("kana")
 	defaultConfig.SetConfigType("json")

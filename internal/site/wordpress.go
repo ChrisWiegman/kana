@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/ChrisWiegman/kana/internal/config"
 	"github.com/ChrisWiegman/kana/internal/docker"
 	"github.com/ChrisWiegman/kana/internal/traefik"
 	"github.com/docker/docker/api/types/mount"
@@ -130,7 +131,7 @@ func (s *Site) StartWordPress(local, isPlugin, isTheme bool) error {
 		},
 		{
 			Name:        fmt.Sprintf("kana_%s_wordpress", s.appConfig.SiteName),
-			Image:       "wordpress",
+			Image:       fmt.Sprintf("wordpress:php%s", s.appConfig.DefaultPHPVersion),
 			NetworkName: "kana",
 			HostName:    fmt.Sprintf("kana_%s_wordpress", s.appConfig.SiteName),
 			Env: []string{
@@ -169,16 +170,16 @@ func (s *Site) StartWordPress(local, isPlugin, isTheme bool) error {
 
 }
 
-func (s *Site) InstallWordPress() error {
+func (s *Site) InstallWordPress(appConfig config.AppConfig) error {
 
 	setupCommand := []string{
 		"core",
 		"install",
 		fmt.Sprintf("--url=%s", s.GetURL(false)),
-		"--title='Chris Wiegman Theme Development'",
-		"--admin_user=admin",
-		"--admin_password=password",
-		"--admin_email=contact@chriswiegman.com",
+		fmt.Sprintf("--title=Kana Development %s: %s", appConfig.SiteType, appConfig.SiteName),
+		fmt.Sprintf("--admin_user=%s", appConfig.DefaultAdminUsername),
+		fmt.Sprintf("--admin_password=%s", appConfig.DefaultAdminPassword),
+		fmt.Sprintf("--admin_email=%s", appConfig.DefaultAdminEmail),
 	}
 
 	_, err := s.RunWPCli(setupCommand)
@@ -205,7 +206,7 @@ func (s *Site) RunWPCli(command []string) (string, error) {
 
 	container := docker.ContainerConfig{
 		Name:        fmt.Sprintf("kana_%s_wordpress_cli", s.appConfig.SiteName),
-		Image:       "wordpress:cli",
+		Image:       fmt.Sprintf("wordpress:cli-php%s", s.appConfig.DefaultPHPVersion),
 		NetworkName: "kana",
 		HostName:    fmt.Sprintf("kana_%s_wordpress_cli", s.appConfig.SiteName),
 		Command:     fullCommand,
