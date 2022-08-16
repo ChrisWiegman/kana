@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"os"
 	"path"
 	"path/filepath"
@@ -17,18 +16,33 @@ var siteKey = "kana.site.key"
 var appDomain = "sites.kana.li"
 var configFolderName = ".config/kana"
 
+var validPHPVersions = []string{
+	"site",
+	"plugin",
+	"theme",
+}
+
+var validTypes = []string{
+	"site",
+	"plugin",
+	"theme",
+}
+
 type AppConfig struct {
-	AppDomain     string
-	SiteName      string
-	AppDirectory  string
-	SiteDirectory string
-	RootKey       string
-	RootCert      string
-	SiteCert      string
-	SiteKey       string
-	SiteXdebug    bool
-	SiteLocal     bool
-	SiteType      string
+	AppDomain            string
+	SiteName             string
+	AppDirectory         string
+	SiteDirectory        string
+	RootKey              string
+	RootCert             string
+	SiteCert             string
+	SiteKey              string
+	SiteXdebug           bool
+	SiteLocal            bool
+	SiteType             string
+	DefaultPHPVersion    string
+	DefaultAdminUsername string
+	DefaultAdminPassword string
 }
 
 func GetAppConfig() (AppConfig, error) {
@@ -51,17 +65,20 @@ func GetAppConfig() (AppConfig, error) {
 	}
 
 	kanaConfig := AppConfig{
-		AppDomain:     appDomain,
-		SiteName:      siteName,
-		AppDirectory:  appDirectory,
-		SiteDirectory: path.Join(appDirectory, "sites", siteName),
-		RootKey:       rootKey,
-		RootCert:      rootCert,
-		SiteCert:      siteCert,
-		SiteKey:       siteKey,
-		SiteXdebug:    viperConfig.GetBool("xdebug"),
-		SiteLocal:     viperConfig.GetBool("xdebug"),
-		SiteType:      viperConfig.GetString("type"),
+		AppDomain:            appDomain,
+		SiteName:             siteName,
+		AppDirectory:         appDirectory,
+		SiteDirectory:        path.Join(appDirectory, "sites", siteName),
+		RootKey:              rootKey,
+		RootCert:             rootCert,
+		SiteCert:             siteCert,
+		SiteKey:              siteKey,
+		SiteXdebug:           viperConfig.GetBool("xdebug"),
+		SiteLocal:            viperConfig.GetBool("xdebug"),
+		SiteType:             viperConfig.GetString("type"),
+		DefaultPHPVersion:    viperConfig.GetString("php"),
+		DefaultAdminUsername: viperConfig.GetString("adminUser"),
+		DefaultAdminPassword: viperConfig.GetString("adminPassword"),
 	}
 
 	return kanaConfig, nil
@@ -75,6 +92,9 @@ func getViperConfig(appDirectory string) (*viper.Viper, error) {
 	defaultConfig.SetDefault("xdebug", false)
 	defaultConfig.SetDefault("type", "site")
 	defaultConfig.SetDefault("local", false)
+	defaultConfig.SetDefault("php", "7.4")
+	defaultConfig.SetDefault("adminUser", "admin")
+	defaultConfig.SetDefault("adminPassword", "password")
 
 	defaultConfig.SetConfigName("kana")
 	defaultConfig.SetConfigType("json")
@@ -95,24 +115,35 @@ func getViperConfig(appDirectory string) (*viper.Viper, error) {
 		}
 	}
 
-	if !checkValidType(defaultConfig.GetString("type")) {
-		return viper.New(), fmt.Errorf("the value of site in your app config is not a valid config. possible values are [site, plugin, theme]")
+	changeConfig := false
+
+	// Reset default "site" type if there's an invalid type in the config file
+	if !checkString(defaultConfig.GetString("type"), validTypes) {
+		changeConfig = true
+		defaultConfig.Set("type", "site")
+	}
+
+	// Reset default php version if there's an invalid version in the config file
+	if !checkString(defaultConfig.GetString("php"), validPHPVersions) {
+		changeConfig = true
+		defaultConfig.Set("php", "7.4")
+	}
+
+	if changeConfig {
+		err = defaultConfig.WriteConfig()
+		if err != nil {
+			return defaultConfig, err
+		}
 	}
 
 	return defaultConfig, nil
 
 }
 
-func checkValidType(typeToCheck string) bool {
+func checkString(stringToCheck string, validStrings []string) bool {
 
-	validTypes := []string{
-		"site",
-		"plugin",
-		"theme",
-	}
-
-	for _, validType := range validTypes {
-		if validType == typeToCheck {
+	for _, validString := range validStrings {
+		if validString == stringToCheck {
 			return true
 		}
 	}
