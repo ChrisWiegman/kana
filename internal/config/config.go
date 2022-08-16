@@ -1,11 +1,13 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"path/filepath"
 
 	"github.com/mitchellh/go-homedir"
+	"github.com/spf13/viper"
 )
 
 var rootKey = "kana.root.key"
@@ -24,6 +26,9 @@ type AppConfig struct {
 	RootCert      string
 	SiteCert      string
 	SiteKey       string
+	SiteXdebug    bool
+	SiteLocal     bool
+	SiteType      string
 }
 
 func GetAppConfig() (AppConfig, error) {
@@ -40,6 +45,11 @@ func GetAppConfig() (AppConfig, error) {
 
 	siteName := filepath.Base(cwd)
 
+	viperConfig, err := getViperConfig(appDirectory)
+	if err != nil {
+		panic(err)
+	}
+
 	kanaConfig := AppConfig{
 		AppDomain:     appDomain,
 		SiteName:      siteName,
@@ -49,9 +59,65 @@ func GetAppConfig() (AppConfig, error) {
 		RootCert:      rootCert,
 		SiteCert:      siteCert,
 		SiteKey:       siteKey,
+		SiteXdebug:    viperConfig.GetBool("xdebug"),
+		SiteLocal:     viperConfig.GetBool("xdebug"),
+		SiteType:      viperConfig.GetString("type"),
 	}
 
 	return kanaConfig, nil
+
+}
+
+func getViperConfig(appDirectory string) (*viper.Viper, error) {
+
+	defaultConfig := viper.New()
+
+	defaultConfig.SetDefault("xdebug", false)
+	defaultConfig.SetDefault("type", "site")
+	defaultConfig.SetDefault("local", false)
+
+	defaultConfig.SetConfigName("kana")
+	defaultConfig.SetConfigType("json")
+	defaultConfig.AddConfigPath(path.Join(appDirectory, "config"))
+
+	err := defaultConfig.ReadInConfig()
+	if err != nil {
+
+		_, ok := err.(viper.ConfigFileNotFoundError)
+		if ok {
+
+			err = defaultConfig.SafeWriteConfig()
+			if err != nil {
+				return defaultConfig, err
+			}
+		} else {
+			return defaultConfig, err
+		}
+	}
+
+	if !checkValidType(defaultConfig.GetString("type")) {
+		return viper.New(), fmt.Errorf("the value of site in your app config is not a valid config. possible values are [site, plugin, theme]")
+	}
+
+	return defaultConfig, nil
+
+}
+
+func checkValidType(typeToCheck string) bool {
+
+	validTypes := []string{
+		"site",
+		"plugin",
+		"theme",
+	}
+
+	for _, validType := range validTypes {
+		if validType == typeToCheck {
+			return true
+		}
+	}
+
+	return false
 
 }
 
