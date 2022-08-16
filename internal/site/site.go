@@ -4,8 +4,8 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"os/exec"
 	"path"
 	"runtime"
@@ -57,7 +57,7 @@ func (s *Site) GetURL(insecure bool) string {
 
 func (s *Site) VerifySite() (bool, error) {
 
-	caCert, err := ioutil.ReadFile(s.rootCert)
+	caCert, err := os.ReadFile(s.rootCert)
 	if err != nil {
 		return false, err
 	}
