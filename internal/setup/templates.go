@@ -23,14 +23,14 @@ var configFiles = []File{
 	{
 		Name:        "dynamic.toml",
 		Template:    DYNAMIC_TOML,
-		LocalPath:   "conf/traefik",
+		LocalPath:   "config/traefik",
 		Permissions: 0644,
 		Overwrite:   true,
 	},
 	{
 		Name:        "traefik.toml",
 		Template:    TRAEFIK_TOML,
-		LocalPath:   "conf/traefik",
+		LocalPath:   "config/traefik",
 		Permissions: 0644,
 		Overwrite:   true,
 	},

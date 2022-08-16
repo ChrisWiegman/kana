@@ -62,12 +62,12 @@ func (t *Traefik) StartTraefik() error {
 		Volumes: []mount.Mount{
 			{
 				Type:   mount.TypeBind,
-				Source: path.Join(t.appDirectory, "conf", "traefik", "traefik.toml"),
+				Source: path.Join(t.appDirectory, "config", "traefik", "traefik.toml"),
 				Target: "/etc/traefik/traefik.toml",
 			},
 			{
 				Type:   mount.TypeBind,
-				Source: path.Join(t.appDirectory, "conf", "traefik", "dynamic.toml"),
+				Source: path.Join(t.appDirectory, "config", "traefik", "dynamic.toml"),
 				Target: "/etc/traefik/dynamic.toml",
 			},
 			{
