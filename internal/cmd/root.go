@@ -27,6 +27,7 @@ func Execute() {
 		newStopCommand(appConfig),
 		newOpenCommand(appConfig),
 		newWPCommand(appConfig),
+		newDestroyCommand(appConfig),
 	)
 
 	if err := cmd.Execute(); err != nil {

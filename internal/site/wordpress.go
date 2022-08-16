@@ -58,7 +58,7 @@ func (s *Site) StartWordPress(local, isPlugin, isTheme bool) error {
 		return err
 	}
 
-	siteDir := path.Join(s.appConfig.AppDirectory, "sites", s.appConfig.SiteDirectory)
+	siteDir := path.Join(s.appConfig.AppHomeDirectory, "sites", s.appConfig.SiteDirectory)
 	appDir := path.Join(siteDir, "app")
 	databaseDir := path.Join(siteDir, "database")
 
@@ -194,7 +194,7 @@ func (s *Site) RunWPCli(command []string) (string, error) {
 		return "", err
 	}
 
-	siteDir := path.Join(s.appConfig.AppDirectory, "sites", s.appConfig.SiteDirectory)
+	siteDir := path.Join(s.appConfig.AppHomeDirectory, "sites", s.appConfig.SiteDirectory)
 	appDir := path.Join(siteDir, "app")
 
 	fullCommand := []string{

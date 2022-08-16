@@ -23,7 +23,7 @@ func SetupApp(appConfig config.AppConfig) error {
 // ensureAppConfig Ensures the application's config has been generated and is where it needs to be
 func ensureAppConfig(kanaConfig config.AppConfig) error {
 
-	return writeFileArrayToDisk(configFiles, kanaConfig.AppDirectory)
+	return writeFileArrayToDisk(configFiles, kanaConfig.AppHomeDirectory)
 
 }
 
@@ -31,7 +31,7 @@ func ensureAppConfig(kanaConfig config.AppConfig) error {
 func ensureCerts(kanaConfig config.AppConfig) error {
 
 	createCert := false
-	rootCert := path.Join(kanaConfig.AppDirectory, "certs", kanaConfig.RootCert)
+	rootCert := path.Join(kanaConfig.AppHomeDirectory, "certs", kanaConfig.RootCert)
 
 	_, err := os.Stat(rootCert)
 	if err != nil && os.IsNotExist(err) {
@@ -40,7 +40,7 @@ func ensureCerts(kanaConfig config.AppConfig) error {
 
 	if createCert {
 
-		err = os.MkdirAll(path.Join(kanaConfig.AppDirectory, "certs"), 0750)
+		err = os.MkdirAll(path.Join(kanaConfig.AppHomeDirectory, "certs"), 0750)
 		if err != nil {
 			return err
 		}

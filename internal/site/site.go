@@ -37,7 +37,7 @@ func NewSite(appConfig config.AppConfig) (*Site, error) {
 
 	site.appConfig = appConfig
 	site.dockerClient = dockerClient
-	site.rootCert = path.Join(appConfig.AppDirectory, "certs", appConfig.RootCert)
+	site.rootCert = path.Join(appConfig.AppHomeDirectory, "certs", appConfig.RootCert)
 	site.siteDomain = fmt.Sprintf("%s.%s", appConfig.SiteDirectory, appConfig.AppDomain)
 	site.secureURL = fmt.Sprintf("https://%s/", site.siteDomain)
 	site.url = fmt.Sprintf("http://%s/", site.siteDomain)
