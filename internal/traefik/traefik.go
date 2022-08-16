@@ -25,7 +25,7 @@ func NewTraefik(appConfig config.AppConfig) (*Traefik, error) {
 		return t, err
 	}
 
-	t.appDirectory = appConfig.AppHomeDirectory
+	t.appDirectory = appConfig.AppDirectory
 	t.dockerClient = *dockerClient
 
 	return t, nil

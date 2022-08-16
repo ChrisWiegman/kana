@@ -15,18 +15,18 @@ var appDomain = "sites.kana.li"
 var configFolderName = ".config/kana"
 
 type AppConfig struct {
-	AppDomain        string
-	SiteDirectory    string
-	AppHomeDirectory string
-	RootKey          string
-	RootCert         string
-	SiteCert         string
-	SiteKey          string
+	AppDomain    string
+	SiteName     string
+	AppDirectory string
+	RootKey      string
+	RootCert     string
+	SiteCert     string
+	SiteKey      string
 }
 
 func GetAppConfig() (AppConfig, error) {
 
-	appHomeDirectory, err := getAppHomeDirectory()
+	appDirectory, err := getAppDirectory()
 	if err != nil {
 		return AppConfig{}, err
 	}
@@ -37,13 +37,13 @@ func GetAppConfig() (AppConfig, error) {
 	}
 
 	kanaConfig := AppConfig{
-		AppDomain:        appDomain,
-		SiteDirectory:    filepath.Base(cwd),
-		AppHomeDirectory: appHomeDirectory,
-		RootKey:          rootKey,
-		RootCert:         rootCert,
-		SiteCert:         siteCert,
-		SiteKey:          siteKey,
+		AppDomain:    appDomain,
+		SiteName:     filepath.Base(cwd),
+		AppDirectory: appDirectory,
+		RootKey:      rootKey,
+		RootCert:     rootCert,
+		SiteCert:     siteCert,
+		SiteKey:      siteKey,
 	}
 
 	return kanaConfig, nil
@@ -51,7 +51,7 @@ func GetAppConfig() (AppConfig, error) {
 }
 
 // getAppDirectory Return the path for the global config.
-func getAppHomeDirectory() (string, error) {
+func getAppDirectory() (string, error) {
 
 	home, err := homedir.Dir()
 	if err != nil {

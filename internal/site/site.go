@@ -37,8 +37,8 @@ func NewSite(appConfig config.AppConfig) (*Site, error) {
 
 	site.appConfig = appConfig
 	site.dockerClient = dockerClient
-	site.rootCert = path.Join(appConfig.AppHomeDirectory, "certs", appConfig.RootCert)
-	site.siteDomain = fmt.Sprintf("%s.%s", appConfig.SiteDirectory, appConfig.AppDomain)
+	site.rootCert = path.Join(appConfig.AppDirectory, "certs", appConfig.RootCert)
+	site.siteDomain = fmt.Sprintf("%s.%s", appConfig.SiteName, appConfig.AppDomain)
 	site.secureURL = fmt.Sprintf("https://%s/", site.siteDomain)
 	site.url = fmt.Sprintf("http://%s/", site.siteDomain)
 
@@ -151,7 +151,7 @@ func (s *Site) InstallXdebug() (bool, error) {
 // runCli Runs an arbitrary CLI command against the site's WordPress container
 func (s *Site) runCli(command string, restart bool) (docker.ExecResult, error) {
 
-	container := fmt.Sprintf("kana_%s_wordpress", s.appConfig.SiteDirectory)
+	container := fmt.Sprintf("kana_%s_wordpress", s.appConfig.SiteName)
 
 	output, err := s.dockerClient.ContainerExec(container, []string{command})
 	if err != nil {
