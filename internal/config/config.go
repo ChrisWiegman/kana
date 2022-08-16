@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"path"
 	"path/filepath"
 
 	"github.com/mitchellh/go-homedir"
@@ -15,13 +16,14 @@ var appDomain = "sites.kana.li"
 var configFolderName = ".config/kana"
 
 type AppConfig struct {
-	AppDomain    string
-	SiteName     string
-	AppDirectory string
-	RootKey      string
-	RootCert     string
-	SiteCert     string
-	SiteKey      string
+	AppDomain     string
+	SiteName      string
+	AppDirectory  string
+	SiteDirectory string
+	RootKey       string
+	RootCert      string
+	SiteCert      string
+	SiteKey       string
 }
 
 func GetAppConfig() (AppConfig, error) {
@@ -36,14 +38,17 @@ func GetAppConfig() (AppConfig, error) {
 		panic(err)
 	}
 
+	siteName := filepath.Base(cwd)
+
 	kanaConfig := AppConfig{
-		AppDomain:    appDomain,
-		SiteName:     filepath.Base(cwd),
-		AppDirectory: appDirectory,
-		RootKey:      rootKey,
-		RootCert:     rootCert,
-		SiteCert:     siteCert,
-		SiteKey:      siteKey,
+		AppDomain:     appDomain,
+		SiteName:      siteName,
+		AppDirectory:  appDirectory,
+		SiteDirectory: path.Join(appDirectory, "sites", siteName),
+		RootKey:       rootKey,
+		RootCert:      rootCert,
+		SiteCert:      siteCert,
+		SiteKey:       siteKey,
 	}
 
 	return kanaConfig, nil
