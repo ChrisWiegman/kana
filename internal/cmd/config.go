@@ -45,6 +45,7 @@ func newConfigSetCommand(site *site.Site) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			appConfig.SetDynamicContent(cmd, args, site.DynamicConfig)
 		},
+		Args: cobra.ExactArgs(2),
 	}
 
 	return cmd
