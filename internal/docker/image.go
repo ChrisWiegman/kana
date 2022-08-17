@@ -7,8 +7,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/ChrisWiegman/kana/internal/utilities"
-
+	"github.com/ChrisWiegman/kana/internal/console"
 	"github.com/docker/docker/api/types"
 )
 
@@ -23,8 +22,8 @@ type pullEvent struct {
 	} `json:"progressDetail"`
 }
 
-//https://gist.github.com/miguelmota/4980b18d750fb3b1eb571c3e207b1b92
-//https://riptutorial.com/docker/example/31980/image-pulling-with-progress-bars--written-in-go
+// https://gist.github.com/miguelmota/4980b18d750fb3b1eb571c3e207b1b92
+// https://riptutorial.com/docker/example/31980/image-pulling-with-progress-bars--written-in-go
 func (d *DockerClient) EnsureImage(imageName string) (err error) {
 
 	if !strings.Contains(imageName, ":") {
@@ -51,7 +50,7 @@ func (d *DockerClient) EnsureImage(imageName string) (err error) {
 
 	defer events.Close()
 
-	cursor := utilities.Cursor{}
+	cursor := console.Cursor{}
 	layers := make([]string, 0)
 	oldIndex := len(layers)
 
