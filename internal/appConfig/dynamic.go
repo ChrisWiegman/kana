@@ -2,8 +2,11 @@ package appConfig
 
 import (
 	"fmt"
+	"os"
 	"path"
 
+	"github.com/aquasecurity/table"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
@@ -71,4 +74,25 @@ func GetDynamicContent(staticConfig StaticConfig) (*viper.Viper, error) {
 	}
 
 	return dynamicConfig, nil
+}
+
+func ListDynamicContent(dynamicConfig *viper.Viper) {
+
+	t := table.New(os.Stdout)
+
+	t.SetHeaders("Key", "Value")
+
+	t.AddRow("adminEmail", dynamicConfig.GetString("adminEmail"))
+	t.AddRow("adminPassword", dynamicConfig.GetString("adminPassword"))
+	t.AddRow("adminUser", dynamicConfig.GetString("adminUser"))
+	t.AddRow("local", dynamicConfig.GetString("local"))
+	t.AddRow("php", dynamicConfig.GetString("php"))
+	t.AddRow("type", dynamicConfig.GetString("type"))
+	t.AddRow("xdebug", dynamicConfig.GetString("xdebug"))
+
+	t.Render()
+}
+
+func SetDynamicContent(md *cobra.Command, args []string, dynamicConfig *viper.Viper) {
+
 }
