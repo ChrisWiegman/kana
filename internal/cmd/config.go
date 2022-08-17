@@ -1,10 +1,11 @@
 package cmd
 
 import (
-	"fmt"
+	"os"
 
 	"github.com/ChrisWiegman/kana/internal/site"
 
+	"github.com/aquasecurity/table"
 	"github.com/spf13/cobra"
 )
 
@@ -38,5 +39,19 @@ func newConfigListCommand(site *site.Site) *cobra.Command {
 }
 
 func runConfig(cmd *cobra.Command, args []string, site *site.Site) {
-	fmt.Println(site.StaticConfig)
+
+	t := table.New(os.Stdout)
+
+	t.SetHeaders("Key", "Value")
+
+	t.AddRow("adminEmail", site.DynamicConfig.GetString("adminEmail"))
+	t.AddRow("adminPassword", site.DynamicConfig.GetString("adminPassword"))
+	t.AddRow("adminUser", site.DynamicConfig.GetString("adminUser"))
+	t.AddRow("local", site.DynamicConfig.GetString("local"))
+	t.AddRow("php", site.DynamicConfig.GetString("php"))
+	t.AddRow("type", site.DynamicConfig.GetString("type"))
+	t.AddRow("xdebug", site.DynamicConfig.GetString("xdebug"))
+
+	t.Render()
+
 }

@@ -39,6 +39,7 @@ func NewSite(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Viper) (*
 	}
 
 	site.StaticConfig = staticConfig
+	site.DynamicConfig = dynamicConfig
 	site.SiteConfig, err = getSiteConfig(staticConfig, dynamicConfig)
 	if err != nil {
 		return site, err
