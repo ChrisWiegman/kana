@@ -4,6 +4,8 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/mitchellh/go-homedir"
 )
 
 var rootKey = "kana.root.key"
@@ -52,5 +54,17 @@ func GetStaticConfig() (StaticConfig, error) {
 	}
 
 	return staticConfig, nil
+
+}
+
+// getAppDirectory Return the path for the global config.
+func getAppDirectory() (string, error) {
+
+	home, err := homedir.Dir()
+	if err != nil {
+		return "", err
+	}
+
+	return filepath.Join(home, configFolderName), nil
 
 }
