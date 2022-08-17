@@ -7,13 +7,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-type SiteConfig struct {
-	PHPVersion string
-	Xdebug     bool
-	Local      bool
-	Type       string
-}
-
 type SiteFlags struct {
 	Xdebug   bool
 	Local    bool
@@ -21,32 +14,25 @@ type SiteFlags struct {
 	IsPlugin bool
 }
 
-func getSiteConfig(staticConfig appConfig.StaticConfig, dynamicConfig appConfig.DynamicConfig) (SiteConfig, error) {
+func getSiteConfig(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Viper) (*viper.Viper, error) {
 
-	viperConfig := viper.New()
+	siteConfig := viper.New()
 
-	viperConfig.SetDefault("php", dynamicConfig.PHPVersion)
-	viperConfig.SetDefault("type", dynamicConfig.SiteType)
-	viperConfig.SetDefault("local", dynamicConfig.SiteLocal)
-	viperConfig.SetDefault("xdebug", dynamicConfig.SiteXdebug)
+	siteConfig.SetDefault("php", dynamicConfig.GetString("php"))
+	siteConfig.SetDefault("type", dynamicConfig.GetString("type"))
+	siteConfig.SetDefault("local", dynamicConfig.GetBool("local"))
+	siteConfig.SetDefault("xdebug", dynamicConfig.GetBool("xdebug"))
 
-	viperConfig.SetConfigName(".kana")
-	viperConfig.SetConfigType("json")
-	viperConfig.AddConfigPath(staticConfig.WorkingDirectory)
+	siteConfig.SetConfigName(".kana")
+	siteConfig.SetConfigType("json")
+	siteConfig.AddConfigPath(staticConfig.WorkingDirectory)
 
-	err := viperConfig.ReadInConfig()
+	err := siteConfig.ReadInConfig()
 	if err != nil {
 		_, ok := err.(viper.ConfigFileNotFoundError)
 		if !ok {
-			return SiteConfig{}, err
+			return siteConfig, err
 		}
-	}
-
-	siteConfig := SiteConfig{
-		PHPVersion: viperConfig.GetString("php"),
-		Type:       viperConfig.GetString("type"),
-		Local:      viperConfig.GetBool("local"),
-		Xdebug:     viperConfig.GetBool("xdebug"),
 	}
 
 	return siteConfig, nil
@@ -56,18 +42,18 @@ func getSiteConfig(staticConfig appConfig.StaticConfig, dynamicConfig appConfig.
 func (s *Site) ProcessSiteFlags(cmd *cobra.Command, flags SiteFlags) {
 
 	if cmd.Flags().Lookup("local").Changed {
-		s.SiteConfig.Local = flags.Local
+		s.SiteConfig.Set("local", flags.Local)
 	}
 
 	if cmd.Flags().Lookup("xdebug").Changed {
-		s.SiteConfig.Xdebug = flags.Xdebug
+		s.SiteConfig.Set("xdebug", flags.Xdebug)
 	}
 
 	if cmd.Flags().Lookup("plugin").Changed && flags.IsPlugin {
-		s.SiteConfig.Type = "plugin"
+		s.SiteConfig.Set("type", "plugin")
 	}
 
 	if cmd.Flags().Lookup("theme").Changed && flags.IsTheme {
-		s.SiteConfig.Type = "theme"
+		s.SiteConfig.Set("type", "theme")
 	}
 }

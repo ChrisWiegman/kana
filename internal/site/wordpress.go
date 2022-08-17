@@ -7,6 +7,7 @@ import (
 
 	"github.com/ChrisWiegman/kana/internal/docker"
 	"github.com/ChrisWiegman/kana/internal/traefik"
+
 	"github.com/docker/docker/api/types/mount"
 )
 
@@ -74,7 +75,7 @@ func (s *Site) StartWordPress() error {
 	appDir := path.Join(s.StaticConfig.SiteDirectory, "app")
 	databaseDir := path.Join(s.StaticConfig.SiteDirectory, "database")
 
-	if s.SiteConfig.Local {
+	if s.SiteConfig.GetBool("local") {
 		appDir, err = getLocalAppDir()
 		if err != nil {
 			return err
@@ -102,7 +103,7 @@ func (s *Site) StartWordPress() error {
 		return err
 	}
 
-	if s.SiteConfig.Type == "plugin" {
+	if s.SiteConfig.GetString("type") == "plugin" {
 		appVolumes = append(appVolumes, mount.Mount{
 			Type:   mount.TypeBind,
 			Source: cwd,
@@ -110,7 +111,7 @@ func (s *Site) StartWordPress() error {
 		})
 	}
 
-	if s.SiteConfig.Type == "theme" {
+	if s.SiteConfig.GetString("type") == "theme" {
 		appVolumes = append(appVolumes, mount.Mount{
 			Type:   mount.TypeBind,
 			Source: cwd,
@@ -143,7 +144,7 @@ func (s *Site) StartWordPress() error {
 		},
 		{
 			Name:        fmt.Sprintf("kana_%s_wordpress", s.StaticConfig.SiteName),
-			Image:       fmt.Sprintf("wordpress:php%s", s.SiteConfig.PHPVersion),
+			Image:       fmt.Sprintf("wordpress:php%s", s.SiteConfig.GetString("php")),
 			NetworkName: "kana",
 			HostName:    fmt.Sprintf("kana_%s_wordpress", s.StaticConfig.SiteName),
 			Env: []string{
@@ -190,10 +191,10 @@ func (s *Site) InstallWordPress() error {
 		"core",
 		"install",
 		fmt.Sprintf("--url=%s", s.GetURL(false)),
-		fmt.Sprintf("--title=Kana Development %s: %s", s.DynamicConfig.SiteType, s.StaticConfig.SiteName),
-		fmt.Sprintf("--admin_user=%s", s.DynamicConfig.AdminUsername),
-		fmt.Sprintf("--admin_password=%s", s.DynamicConfig.AdminPassword),
-		fmt.Sprintf("--admin_email=%s", s.DynamicConfig.AdminEmail),
+		fmt.Sprintf("--title=Kana Development %s: %s", s.SiteConfig.GetString("type"), s.StaticConfig.SiteName),
+		fmt.Sprintf("--admin_user=%s", s.DynamicConfig.GetString("adminUser")),
+		fmt.Sprintf("--admin_password=%s", s.DynamicConfig.GetString("adminPassword")),
+		fmt.Sprintf("--admin_email=%s", s.DynamicConfig.GetString("adminEmail")),
 	}
 
 	_, err := s.RunWPCli(setupCommand)
@@ -220,7 +221,7 @@ func (s *Site) RunWPCli(command []string) (string, error) {
 
 	container := docker.ContainerConfig{
 		Name:        fmt.Sprintf("kana_%s_wordpress_cli", s.StaticConfig.SiteName),
-		Image:       fmt.Sprintf("wordpress:cli-php%s", s.DynamicConfig.PHPVersion),
+		Image:       fmt.Sprintf("wordpress:cli-php%s", s.DynamicConfig.GetString("php")),
 		NetworkName: "kana",
 		HostName:    fmt.Sprintf("kana_%s_wordpress_cli", s.StaticConfig.SiteName),
 		Command:     fullCommand,

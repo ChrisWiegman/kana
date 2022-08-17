@@ -19,93 +19,56 @@ var ValidTypes = []string{
 	"theme",
 }
 
-type DynamicConfig struct {
-	viperConfig   *viper.Viper
-	SiteXdebug    bool
-	SiteLocal     bool
-	SiteType      string
-	PHPVersion    string
-	AdminUsername string
-	AdminPassword string
-	AdminEmail    string
-}
+func GetDynamicContent(staticConfig StaticConfig) (*viper.Viper, error) {
 
-func GetDynamicContent(staticConfig StaticConfig) (DynamicConfig, error) {
+	dynamicConfig := viper.New()
 
-	dynamicConfig := DynamicConfig{}
+	dynamicConfig.SetDefault("xdebug", false)
+	dynamicConfig.SetDefault("type", "site")
+	dynamicConfig.SetDefault("local", false)
+	dynamicConfig.SetDefault("php", "7.4")
+	dynamicConfig.SetDefault("adminUser", "admin")
+	dynamicConfig.SetDefault("adminPassword", "password")
+	dynamicConfig.SetDefault("adminEmail", "admin@mykanasite.localhost")
 
-	viperConfig, err := dynamicConfig.loadDynamicConfig(staticConfig.AppDirectory)
-	if err != nil {
-		return DynamicConfig{}, err
-	}
+	dynamicConfig.SetConfigName("kana")
+	dynamicConfig.SetConfigType("json")
+	dynamicConfig.AddConfigPath(path.Join(staticConfig.AppDirectory, "config"))
 
-	dynamicConfig.viperConfig = viperConfig
-	dynamicConfig.SiteXdebug = viperConfig.GetBool("xdebug")
-	dynamicConfig.SiteLocal = viperConfig.GetBool("xdebug")
-	dynamicConfig.SiteType = viperConfig.GetString("type")
-	dynamicConfig.PHPVersion = viperConfig.GetString("php")
-	dynamicConfig.AdminUsername = viperConfig.GetString("adminUser")
-	dynamicConfig.AdminPassword = viperConfig.GetString("adminPassword")
-	dynamicConfig.AdminEmail = viperConfig.GetString("adminEmail")
-
-	return dynamicConfig, nil
-}
-
-func (d *DynamicConfig) SaveDynamicConfig() error {
-
-	return d.viperConfig.WriteConfig()
-}
-
-func (d *DynamicConfig) loadDynamicConfig(appDirectory string) (*viper.Viper, error) {
-
-	defaultConfig := viper.New()
-
-	defaultConfig.SetDefault("xdebug", false)
-	defaultConfig.SetDefault("type", "site")
-	defaultConfig.SetDefault("local", false)
-	defaultConfig.SetDefault("php", "7.4")
-	defaultConfig.SetDefault("adminUser", "admin")
-	defaultConfig.SetDefault("adminPassword", "password")
-	defaultConfig.SetDefault("adminEmail", "admin@mykanasite.localhost")
-
-	defaultConfig.SetConfigName("kana")
-	defaultConfig.SetConfigType("json")
-	defaultConfig.AddConfigPath(path.Join(appDirectory, "config"))
-
-	err := defaultConfig.ReadInConfig()
+	err := dynamicConfig.ReadInConfig()
 	if err != nil {
 		_, ok := err.(viper.ConfigFileNotFoundError)
 		if ok {
-			err = defaultConfig.SafeWriteConfig()
+			err = dynamicConfig.SafeWriteConfig()
 			if err != nil {
 				fmt.Println("error 1")
-				return defaultConfig, err
+				return dynamicConfig, err
 			}
 		} else {
-			return defaultConfig, err
+			return dynamicConfig, err
 		}
 	}
 
 	changeConfig := false
 
 	// Reset default "site" type if there's an invalid type in the config file
-	if !CheckString(defaultConfig.GetString("type"), ValidTypes) {
+	if !CheckString(dynamicConfig.GetString("type"), ValidTypes) {
 		changeConfig = true
-		defaultConfig.Set("type", "site")
+		dynamicConfig.Set("type", "site")
 	}
 
 	// Reset default php version if there's an invalid version in the config file
-	if !CheckString(defaultConfig.GetString("php"), ValidPHPVersions) {
+	if !CheckString(dynamicConfig.GetString("php"), ValidPHPVersions) {
 		changeConfig = true
-		defaultConfig.Set("php", "7.4")
+		dynamicConfig.Set("php", "7.4")
 	}
 
 	if changeConfig {
-		err = defaultConfig.WriteConfig()
+		err = dynamicConfig.WriteConfig()
 		if err != nil {
-			return defaultConfig, err
+			return dynamicConfig, err
 		}
 	}
 
-	return defaultConfig, nil
+	return dynamicConfig, nil
 }

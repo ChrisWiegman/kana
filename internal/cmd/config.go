@@ -13,21 +13,23 @@ func newConfigCommand(site *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "config",
 		Short: "Edit the saved configuration for the app or the local site.",
-		Run: func(cmd *cobra.Command, args []string) {
-			runConfig(cmd, args, site)
-		},
 	}
+
+	cmd.AddCommand(
+		newConfigListCommand(site),
+	)
 
 	return cmd
 
 }
 
-// NewConfigListCommand Creates the config list command for Cobra
-func NewConfigListCommand() *cobra.Command {
+func newConfigListCommand(site *site.Site) *cobra.Command {
+
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "List all config items and their values.",
 		Run: func(cmd *cobra.Command, args []string) {
+			runConfig(cmd, args, site)
 		},
 		Args: cobra.ExactArgs(0),
 	}

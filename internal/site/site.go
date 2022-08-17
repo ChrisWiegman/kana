@@ -15,20 +15,21 @@ import (
 	"github.com/ChrisWiegman/kana/internal/appConfig"
 	"github.com/ChrisWiegman/kana/internal/docker"
 	"github.com/pkg/browser"
+	"github.com/spf13/viper"
 )
 
 type Site struct {
 	dockerClient  *docker.DockerClient
 	StaticConfig  appConfig.StaticConfig
-	DynamicConfig appConfig.DynamicConfig
-	SiteConfig    SiteConfig
+	DynamicConfig *viper.Viper
+	SiteConfig    *viper.Viper
 	rootCert      string
 	siteDomain    string
 	secureURL     string
 	url           string
 }
 
-func NewSite(staticConfig appConfig.StaticConfig, dynamicConfig appConfig.DynamicConfig) (*Site, error) {
+func NewSite(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Viper) (*Site, error) {
 
 	site := new(Site)
 
@@ -125,7 +126,7 @@ func (s *Site) OpenSite() error {
 
 func (s *Site) InstallXdebug() (bool, error) {
 
-	if !s.SiteConfig.Xdebug {
+	if !s.SiteConfig.GetBool("xdebug") {
 		return false, nil
 	}
 
