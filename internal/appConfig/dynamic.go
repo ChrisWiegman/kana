@@ -20,6 +20,7 @@ var ValidTypes = []string{
 }
 
 type DynamicConfig struct {
+	viperConfig   *viper.Viper
 	SiteXdebug    bool
 	SiteLocal     bool
 	SiteType      string
@@ -31,26 +32,31 @@ type DynamicConfig struct {
 
 func GetDynamicContent(staticConfig StaticConfig) (DynamicConfig, error) {
 
-	viperConfig, err := loadDynamicConfig(staticConfig.AppDirectory)
+	dynamicConfig := DynamicConfig{}
+
+	viperConfig, err := dynamicConfig.loadDynamicConfig(staticConfig.AppDirectory)
 	if err != nil {
 		return DynamicConfig{}, err
 	}
 
-	dynamicConfig := DynamicConfig{
-		SiteXdebug:    viperConfig.GetBool("xdebug"),
-		SiteLocal:     viperConfig.GetBool("xdebug"),
-		SiteType:      viperConfig.GetString("type"),
-		PHPVersion:    viperConfig.GetString("php"),
-		AdminUsername: viperConfig.GetString("adminUser"),
-		AdminPassword: viperConfig.GetString("adminPassword"),
-		AdminEmail:    viperConfig.GetString("adminEmail"),
-	}
+	dynamicConfig.viperConfig = viperConfig
+	dynamicConfig.SiteXdebug = viperConfig.GetBool("xdebug")
+	dynamicConfig.SiteLocal = viperConfig.GetBool("xdebug")
+	dynamicConfig.SiteType = viperConfig.GetString("type")
+	dynamicConfig.PHPVersion = viperConfig.GetString("php")
+	dynamicConfig.AdminUsername = viperConfig.GetString("adminUser")
+	dynamicConfig.AdminPassword = viperConfig.GetString("adminPassword")
+	dynamicConfig.AdminEmail = viperConfig.GetString("adminEmail")
 
 	return dynamicConfig, nil
-
 }
 
-func loadDynamicConfig(appDirectory string) (*viper.Viper, error) {
+func (d *DynamicConfig) SaveDynamicConfig() error {
+
+	return d.viperConfig.WriteConfig()
+}
+
+func (d *DynamicConfig) loadDynamicConfig(appDirectory string) (*viper.Viper, error) {
 
 	defaultConfig := viper.New()
 
@@ -102,5 +108,4 @@ func loadDynamicConfig(appDirectory string) (*viper.Viper, error) {
 	}
 
 	return defaultConfig, nil
-
 }
