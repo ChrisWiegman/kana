@@ -3,22 +3,18 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/ChrisWiegman/kana/internal/config"
-	"github.com/ChrisWiegman/kana/internal/setup"
+	"github.com/ChrisWiegman/kana/internal/site"
 
 	"github.com/spf13/cobra"
 )
 
-func newConfigCommand(appConfig config.AppConfig) *cobra.Command {
+func newConfigCommand(site *site.Site) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "config",
 		Short: "Edit the saved configuration for the app or the local site.",
 		Run: func(cmd *cobra.Command, args []string) {
-			runConfig(cmd, args, appConfig)
-		},
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			setup.SetupApp(appConfig)
+			runConfig(cmd, args, site)
 		},
 	}
 
@@ -26,7 +22,6 @@ func newConfigCommand(appConfig config.AppConfig) *cobra.Command {
 
 }
 
-func runConfig(cmd *cobra.Command, args []string, appConfig config.AppConfig) {
-
-	fmt.Println(appConfig)
+func runConfig(cmd *cobra.Command, args []string, site *site.Site) {
+	fmt.Println(site.StaticConfig)
 }

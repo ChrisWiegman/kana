@@ -11,7 +11,6 @@ import (
 	"encoding/asn1"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
 	"math"
 	"math/big"
 	"os"
@@ -19,7 +18,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ChrisWiegman/kana/internal/config"
+	"github.com/ChrisWiegman/kana/internal/appConfig"
 )
 
 type issuer struct {
@@ -27,12 +26,12 @@ type issuer struct {
 	cert *x509.Certificate
 }
 
-func GenCerts(kanaConfig config.AppConfig) error {
+func GenCerts(staticConfig appConfig.StaticConfig) error {
 
-	caKey := path.Join(kanaConfig.AppDirectory, "certs", kanaConfig.RootKey)
-	caCert := path.Join(kanaConfig.AppDirectory, "certs", kanaConfig.RootCert)
+	caKey := path.Join(staticConfig.AppDirectory, "certs", staticConfig.RootKey)
+	caCert := path.Join(staticConfig.AppDirectory, "certs", staticConfig.RootCert)
 	domains := []string{
-		fmt.Sprintf("*.%s", kanaConfig.AppDomain),
+		fmt.Sprintf("*.%s", staticConfig.AppDomain),
 	}
 
 	issuer, err := getIssuer(caKey, caCert)
@@ -40,15 +39,15 @@ func GenCerts(kanaConfig config.AppConfig) error {
 		return err
 	}
 
-	_, err = sign(issuer, domains, path.Join(kanaConfig.AppDirectory, "certs"), kanaConfig.SiteCert, kanaConfig.SiteKey)
+	_, err = sign(issuer, domains, path.Join(staticConfig.AppDirectory, "certs"), staticConfig.SiteCert, staticConfig.SiteKey)
 	return err
 
 }
 
 func getIssuer(keyFile, certFile string) (*issuer, error) {
 
-	keyContents, keyErr := ioutil.ReadFile(keyFile)
-	certContents, certErr := ioutil.ReadFile(certFile)
+	keyContents, keyErr := os.ReadFile(keyFile)
+	certContents, certErr := os.ReadFile(certFile)
 
 	if os.IsNotExist(keyErr) && os.IsNotExist(certErr) {
 

@@ -4,19 +4,18 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ChrisWiegman/kana/internal/config"
 	"github.com/ChrisWiegman/kana/internal/site"
 
 	"github.com/spf13/cobra"
 )
 
-func newDestroyCommand(appConfig config.AppConfig) *cobra.Command {
+func newDestroyCommand(site *site.Site) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "destroy",
 		Short: "Destroys the current WordPress site. This is a permanent change.",
 		Run: func(cmd *cobra.Command, args []string) {
-			runDestroy(cmd, args, appConfig)
+			runDestroy(cmd, args, site)
 		},
 	}
 
@@ -24,21 +23,15 @@ func newDestroyCommand(appConfig config.AppConfig) *cobra.Command {
 
 }
 
-func runDestroy(cmd *cobra.Command, args []string, appConfig config.AppConfig) {
+func runDestroy(cmd *cobra.Command, args []string, site *site.Site) {
 
-	site, err := site.NewSite(appConfig)
+	err := site.StopWordPress()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	err = site.StopWordPress()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	err = os.RemoveAll(appConfig.SiteDirectory)
+	err = os.RemoveAll(site.StaticConfig.SiteDirectory)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

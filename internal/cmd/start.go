@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ChrisWiegman/kana/internal/config"
+	"github.com/ChrisWiegman/kana/internal/appConfig"
 	"github.com/ChrisWiegman/kana/internal/site"
 	"github.com/ChrisWiegman/kana/internal/traefik"
 
@@ -16,13 +16,13 @@ var flagLocal bool
 var flagIsTheme bool
 var flagIsPlugin bool
 
-func newStartCommand(appConfig config.AppConfig) *cobra.Command {
+func newStartCommand(site *site.Site) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "start",
 		Short: "Starts a new environment in the local folder.",
 		Run: func(cmd *cobra.Command, args []string) {
-			runStart(cmd, args, appConfig)
+			runStart(cmd, args, site)
 		},
 	}
 
@@ -35,36 +35,38 @@ func newStartCommand(appConfig config.AppConfig) *cobra.Command {
 
 }
 
-func runStart(cmd *cobra.Command, args []string, appConfig config.AppConfig) {
+func runStart(cmd *cobra.Command, args []string, kanaSite *site.Site) {
 
 	if flagIsPlugin && flagIsTheme {
 		fmt.Println(fmt.Errorf("you have set both the plugin and theme flags. Please choose only one option"))
 		os.Exit(1)
 	}
 
-	kanaSite, err := site.NewSite(appConfig)
+	dynamicConfig, err := appConfig.GetDynamicContent(kanaSite.StaticConfig)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+
+	kanaSite.DynamicConfig = dynamicConfig
 
 	if kanaSite.IsSiteRunning() {
 		fmt.Println("Site is already running. Please stop your site before running the start command")
 		os.Exit(1)
 	}
 
-	startFlags := site.StartFlags{
+	startFlags := site.SiteFlags{
 		Xdebug:   flagXdebug,
 		IsTheme:  flagIsTheme,
 		IsPlugin: flagIsPlugin,
 		Local:    flagLocal,
 	}
 
-	kanaSite.AddStartFlags(cmd, startFlags)
+	kanaSite.ProcessSiteFlags(cmd, startFlags)
 
 	fmt.Printf("Starting development site: %s\n", kanaSite.GetURL(false))
 
-	traefikClient, err := traefik.NewTraefik(appConfig)
+	traefikClient, err := traefik.NewTraefik(kanaSite.StaticConfig)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -88,7 +90,7 @@ func runStart(cmd *cobra.Command, args []string, appConfig config.AppConfig) {
 		os.Exit(1)
 	}
 
-	err = kanaSite.InstallWordPress(appConfig)
+	err = kanaSite.InstallWordPress()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

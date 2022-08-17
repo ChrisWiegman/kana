@@ -1,5 +1,5 @@
 // nolint
-package setup 
+package appSetup 
 
 const (
 DYNAMIC_TOML = `[tls.options]

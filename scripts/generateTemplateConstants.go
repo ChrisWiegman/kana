@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -11,12 +10,12 @@ import (
 // Reads all files from the templates directory
 // and encodes them as strings literals in templates.go
 func main() {
-	fs, _ := ioutil.ReadDir("./internal/setup/source/")
-	out, err := os.Create("./internal/setup/constants.go")
+	fs, _ := os.ReadDir("./internal/appSetup/source/")
+	out, err := os.Create("./internal/appSetup/constants.go")
 	if err != nil {
 		fmt.Println(err)
 	}
-	out.Write([]byte("// nolint\npackage setup \n\nconst (\n"))
+	out.Write([]byte("// nolint\npackage appSetup \n\nconst (\n"))
 	for _, f := range fs {
 		if strings.HasPrefix(f.Name(), ".") {
 			// Don't include hidden files
@@ -24,7 +23,7 @@ func main() {
 		}
 		cname := normalize(f.Name())
 		out.Write([]byte(cname + " = `"))
-		f, err := os.Open("./internal/setup/source/" + f.Name())
+		f, err := os.Open("./internal/appSetup/source/" + f.Name())
 		if err != nil {
 			fmt.Println(err)
 		}

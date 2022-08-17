@@ -4,23 +4,36 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ChrisWiegman/kana/internal/config"
-	"github.com/ChrisWiegman/kana/internal/setup"
+	"github.com/ChrisWiegman/kana/internal/appConfig"
+	"github.com/ChrisWiegman/kana/internal/appSetup"
+	"github.com/ChrisWiegman/kana/internal/site"
 
 	"github.com/spf13/cobra"
 )
 
 func Execute() {
 
-	appConfig, err := config.GetAppConfig()
+	staticConfig, err := appConfig.GetStaticConfig()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
-	err = setup.SetupApp(appConfig)
+	err = appSetup.SetupApp(staticConfig)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	dynamicConfig, err := appConfig.GetDynamicContent(staticConfig)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	site, err := site.NewSite(staticConfig, dynamicConfig)
+	if err != nil {
+		fmt.Println(err)
 		os.Exit(1)
 	}
 
@@ -30,12 +43,12 @@ func Execute() {
 	}
 
 	cmd.AddCommand(
-		newStartCommand(appConfig),
-		newStopCommand(appConfig),
-		newOpenCommand(appConfig),
-		newWPCommand(appConfig),
-		newDestroyCommand(appConfig),
-		newConfigCommand(appConfig),
+		newStartCommand(site),
+		newStopCommand(site),
+		newOpenCommand(site),
+		newWPCommand(site),
+		newDestroyCommand(site),
+		newConfigCommand(site),
 	)
 
 	if err := cmd.Execute(); err != nil {

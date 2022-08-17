@@ -4,19 +4,18 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ChrisWiegman/kana/internal/config"
 	"github.com/ChrisWiegman/kana/internal/site"
 
 	"github.com/spf13/cobra"
 )
 
-func newWPCommand(appConfig config.AppConfig) *cobra.Command {
+func newWPCommand(site *site.Site) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "wp",
 		Short: "Run a wp-cli command against the current site.",
 		Run: func(cmd *cobra.Command, args []string) {
-			runWP(cmd, args, appConfig)
+			runWP(cmd, args, site)
 		},
 	}
 
@@ -26,13 +25,7 @@ func newWPCommand(appConfig config.AppConfig) *cobra.Command {
 
 }
 
-func runWP(cmd *cobra.Command, args []string, appConfig config.AppConfig) {
-
-	site, err := site.NewSite(appConfig)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+func runWP(cmd *cobra.Command, args []string, site *site.Site) {
 
 	output, err := site.RunWPCli(args)
 	if err != nil {

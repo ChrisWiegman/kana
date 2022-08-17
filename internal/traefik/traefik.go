@@ -3,7 +3,7 @@ package traefik
 import (
 	"path"
 
-	"github.com/ChrisWiegman/kana/internal/config"
+	"github.com/ChrisWiegman/kana/internal/appConfig"
 	"github.com/ChrisWiegman/kana/internal/docker"
 
 	"github.com/docker/docker/api/types/mount"
@@ -16,7 +16,7 @@ type Traefik struct {
 	appDirectory string
 }
 
-func NewTraefik(appConfig config.AppConfig) (*Traefik, error) {
+func NewTraefik(staticConfig appConfig.StaticConfig) (*Traefik, error) {
 
 	t := new(Traefik)
 
@@ -25,7 +25,7 @@ func NewTraefik(appConfig config.AppConfig) (*Traefik, error) {
 		return t, err
 	}
 
-	t.appDirectory = appConfig.AppDirectory
+	t.appDirectory = staticConfig.AppDirectory
 	t.dockerClient = *dockerClient
 
 	return t, nil
