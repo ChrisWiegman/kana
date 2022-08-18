@@ -15,7 +15,6 @@ import (
 	"math/big"
 	"os"
 	"path"
-	"strings"
 	"time"
 
 	"github.com/ChrisWiegman/kana/internal/appConfig"
@@ -269,13 +268,6 @@ func calculateSKID(pubKey crypto.PublicKey) ([]byte, error) {
 func sign(iss *issuer, domains []string, certPath, siteCert, siteKey string) (*x509.Certificate, error) {
 
 	cn := domains[0]
-
-	var cnFolder = strings.Replace(cn, "*", "_", -1)
-
-	err := os.Mkdir(cnFolder, 0700)
-	if err != nil && !os.IsExist(err) {
-		return nil, err
-	}
 
 	key, err := makeKey(path.Join(certPath, siteKey))
 	if err != nil {
