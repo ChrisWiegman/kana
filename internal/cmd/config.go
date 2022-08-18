@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/ChrisWiegman/kana/internal/appConfig"
 	"github.com/ChrisWiegman/kana/internal/site"
@@ -32,7 +33,11 @@ func runConfigCommand(cmd *cobra.Command, args []string, site *site.Site) {
 	case 1:
 		fmt.Println("get the config item")
 	case 2:
-		appConfig.SetDynamicContent(cmd, args, site.DynamicConfig)
+		err := appConfig.SetDynamicContent(cmd, args, site.DynamicConfig)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 	}
 
 }

@@ -192,9 +192,9 @@ func (s *Site) InstallWordPress() error {
 		"install",
 		fmt.Sprintf("--url=%s", s.GetURL(false)),
 		fmt.Sprintf("--title=Kana Development %s: %s", s.SiteConfig.GetString("type"), s.StaticConfig.SiteName),
-		fmt.Sprintf("--admin_user=%s", s.DynamicConfig.GetString("adminUser")),
-		fmt.Sprintf("--admin_password=%s", s.DynamicConfig.GetString("adminPassword")),
-		fmt.Sprintf("--admin_email=%s", s.DynamicConfig.GetString("adminEmail")),
+		fmt.Sprintf("--admin_user=%s", s.DynamicConfig.GetString("admin.username")),
+		fmt.Sprintf("--admin_password=%s", s.DynamicConfig.GetString("admin.password")),
+		fmt.Sprintf("--admin_email=%s", s.DynamicConfig.GetString("admin.email")),
 	}
 
 	_, err := s.RunWPCli(setupCommand)

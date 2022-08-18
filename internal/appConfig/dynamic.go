@@ -4,16 +4,18 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strconv"
 
 	"github.com/aquasecurity/table"
+	"github.com/go-playground/validator/v10"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var ValidPHPVersions = []string{
-	"site",
-	"plugin",
-	"theme",
+	"7.4",
+	"8.0",
+	"8.1",
 }
 
 var ValidTypes = []string{
@@ -30,9 +32,9 @@ func GetDynamicContent(staticConfig StaticConfig) (*viper.Viper, error) {
 	dynamicConfig.SetDefault("type", "site")
 	dynamicConfig.SetDefault("local", false)
 	dynamicConfig.SetDefault("php", "7.4")
-	dynamicConfig.SetDefault("adminUser", "admin")
-	dynamicConfig.SetDefault("adminPassword", "password")
-	dynamicConfig.SetDefault("adminEmail", "admin@mykanasite.localhost")
+	dynamicConfig.SetDefault("admin.username", "admin")
+	dynamicConfig.SetDefault("admin.password", "password")
+	dynamicConfig.SetDefault("admin.email", "admin@mykanasite.localhost")
 
 	dynamicConfig.SetConfigName("kana")
 	dynamicConfig.SetConfigType("json")
@@ -82,9 +84,9 @@ func ListDynamicContent(dynamicConfig *viper.Viper) {
 
 	t.SetHeaders("Key", "Value")
 
-	t.AddRow("adminEmail", dynamicConfig.GetString("adminEmail"))
-	t.AddRow("adminPassword", dynamicConfig.GetString("adminPassword"))
-	t.AddRow("adminUser", dynamicConfig.GetString("adminUser"))
+	t.AddRow("admin.email", dynamicConfig.GetString("admin.email"))
+	t.AddRow("admin.password", dynamicConfig.GetString("admin.password"))
+	t.AddRow("admnin.username", dynamicConfig.GetString("admin.username"))
 	t.AddRow("local", dynamicConfig.GetString("local"))
 	t.AddRow("php", dynamicConfig.GetString("php"))
 	t.AddRow("type", dynamicConfig.GetString("type"))
@@ -99,6 +101,43 @@ func SetDynamicContent(md *cobra.Command, args []string, dynamicConfig *viper.Vi
 		return fmt.Errorf("invalid setting. Please enter a valid key to set")
 	}
 
-	return nil
+	validate := validator.New()
+	var err error
 
+	switch args[0] {
+	case "local", "xdebug":
+		err = validate.Var(args[1], "boolean")
+		if err != nil {
+			return err
+		}
+		boolVal, err := strconv.ParseBool(args[1])
+		if err != nil {
+			return err
+		}
+		dynamicConfig.Set(args[0], boolVal)
+		return dynamicConfig.WriteConfig()
+	case "php":
+		if !CheckString(args[1], ValidPHPVersions) {
+			err = fmt.Errorf("please choose a valid php version")
+		}
+	case "type":
+		if !CheckString(args[1], ValidTypes) {
+			err = fmt.Errorf("please choose a valid project type")
+		}
+	case "admin.email":
+		err = validate.Var(args[1], "email")
+	case "admin.password":
+		err = validate.Var(args[1], "alphanumunicode")
+	case "admin.username":
+		err = validate.Var(args[1], "alpha")
+	default:
+		err = validate.Var(args[1], "boolean")
+	}
+
+	if err != nil {
+		return err
+	}
+
+	dynamicConfig.Set(args[0], args[1])
+	return dynamicConfig.WriteConfig()
 }
