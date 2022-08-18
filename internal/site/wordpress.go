@@ -212,6 +212,13 @@ func (s *Site) RunWPCli(command []string) (string, error) {
 	siteDir := path.Join(s.StaticConfig.AppDirectory, "sites", s.StaticConfig.SiteName)
 	appDir := path.Join(siteDir, "app")
 
+	if s.SiteConfig.GetBool("local") {
+		appDir, err = getLocalAppDir()
+		if err != nil {
+			return "", err
+		}
+	}
+
 	fullCommand := []string{
 		"wp",
 		"--path=/var/www/html",
