@@ -185,8 +185,8 @@ func makeRootCert(key crypto.Signer, filename string) (*x509.Certificate, error)
 		Subject: pkix.Name{
 			CommonName:         "Kana Development CA",
 			Country:            []string{"US"},
-			Province:           []string{"Florida"},
-			Locality:           []string{"Sarasota"},
+			Province:           []string{"Wyoming"},
+			Locality:           []string{"Casper"},
 			Organization:       []string{"Kana"},
 			OrganizationalUnit: []string{"Development"},
 		},
