@@ -40,6 +40,7 @@ func Execute() {
 	cmd := &cobra.Command{
 		Use:   "kana",
 		Short: "Kana is a simple WordPress development tool designed for plugin and theme developers.",
+		Args:  cobra.NoArgs,
 	}
 
 	cmd.AddCommand(

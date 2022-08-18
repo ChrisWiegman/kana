@@ -24,6 +24,7 @@ func newStartCommand(site *site.Site) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			runStart(cmd, args, site)
 		},
+		Args: cobra.NoArgs,
 	}
 
 	cmd.Flags().BoolVar(&flagXdebug, "xdebug", false, "Enable Xdebug when starting the container.")

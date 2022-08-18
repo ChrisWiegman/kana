@@ -17,7 +17,7 @@ func newDestroyCommand(site *site.Site) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			runDestroy(cmd, args, site)
 		},
-		Args: cobra.ExactArgs(0),
+		Args: cobra.NoArgs,
 	}
 
 	return cmd

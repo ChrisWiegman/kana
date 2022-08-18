@@ -17,6 +17,7 @@ func newWPCommand(site *site.Site) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			runWP(cmd, args, site)
 		},
+		Args: cobra.ArbitraryArgs,
 	}
 
 	cmd.DisableFlagParsing = true
