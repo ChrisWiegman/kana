@@ -4,6 +4,7 @@ import (
 	"path"
 
 	"github.com/ChrisWiegman/kana/internal/appConfig"
+	"github.com/ChrisWiegman/kana/internal/appSetup"
 	"github.com/ChrisWiegman/kana/internal/docker"
 
 	"github.com/docker/docker/api/types/mount"
@@ -19,6 +20,11 @@ type Traefik struct {
 func NewTraefik(staticConfig appConfig.StaticConfig) (*Traefik, error) {
 
 	t := new(Traefik)
+
+	err := appSetup.EnsureCerts(staticConfig)
+	if err != nil {
+		return t, err
+	}
 
 	dockerClient, err := docker.NewController()
 	if err != nil {

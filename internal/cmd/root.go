@@ -19,7 +19,7 @@ func Execute() {
 		os.Exit(1)
 	}
 
-	err = appSetup.SetupApp(staticConfig)
+	err = appSetup.EnsureStaticConfig(staticConfig)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

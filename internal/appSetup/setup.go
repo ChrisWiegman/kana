@@ -9,26 +9,15 @@ import (
 	"github.com/ChrisWiegman/kana/pkg/minica"
 )
 
-func SetupApp(staticConfig appConfig.StaticConfig) error {
-
-	err := ensureStaticConfig(staticConfig)
-	if err != nil {
-		return err
-	}
-
-	return ensureCerts(staticConfig)
-
-}
-
-// ensureStaticConfig Ensures the application's static config files have been generated and are where they need to be
-func ensureStaticConfig(staticConfig appConfig.StaticConfig) error {
+// EnsureStaticConfig Ensures the application's static config files have been generated and are where they need to be
+func EnsureStaticConfig(staticConfig appConfig.StaticConfig) error {
 
 	return writeFileArrayToDisk(configFiles, staticConfig.AppDirectory)
 
 }
 
-// ensureCerts Ensures SSL certificates have been generated and are where they need to be
-func ensureCerts(staticConfig appConfig.StaticConfig) error {
+// EnsureCerts Ensures SSL certificates have been generated and are where they need to be
+func EnsureCerts(staticConfig appConfig.StaticConfig) error {
 
 	createCert := false
 	rootCert := path.Join(staticConfig.AppDirectory, "certs", staticConfig.RootCert)
