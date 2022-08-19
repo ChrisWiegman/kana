@@ -139,5 +139,6 @@ func SetDynamicContent(md *cobra.Command, args []string, dynamicConfig *viper.Vi
 	}
 
 	dynamicConfig.Set(args[0], args[1])
+
 	return dynamicConfig.WriteConfig()
 }
