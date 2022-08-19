@@ -60,6 +60,17 @@ func NewSite(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Viper) (*
 	return site, nil
 }
 
+// ProcessNameFlag Processes the name flag on the site resetting all appropriate site variables
+func (s *Site) ProcessNameFlag(siteName string) {
+
+	s.StaticConfig.SiteName = siteName
+	s.StaticConfig.SiteDirectory = (path.Join(s.StaticConfig.AppDirectory, "sites", siteName))
+
+	s.siteDomain = fmt.Sprintf("%s.%s", s.StaticConfig.SiteName, s.StaticConfig.AppDomain)
+	s.secureURL = fmt.Sprintf("https://%s/", s.siteDomain)
+	s.url = fmt.Sprintf("http://%s/", s.siteDomain)
+}
+
 // GetURL returns the appropriate URL for the site
 func (s *Site) GetURL(insecure bool) string {
 
