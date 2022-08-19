@@ -28,8 +28,8 @@ func newStartCommand(site *site.Site) *cobra.Command {
 	}
 
 	cmd.Flags().BoolVar(&flagXdebug, "xdebug", false, "Enable Xdebug when starting the container.")
-	cmd.Flags().BoolVar(&flagIsPlugin, "plugin", false, "Enable Xdebug when starting the container.")
-	cmd.Flags().BoolVar(&flagIsTheme, "theme", false, "Enable Xdebug when starting the container.")
+	cmd.Flags().BoolVar(&flagIsPlugin, "plugin", false, "Run the site as a plugin using the current folder as the plugin source.")
+	cmd.Flags().BoolVar(&flagIsTheme, "theme", false, "Run the site as a theme using the current folder as the theme source.")
 	cmd.Flags().BoolVar(&flagLocal, "local", false, "Installs the WordPress files in your current path at ./wordpress instead of the global app path.")
 
 	return cmd
