@@ -11,6 +11,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var flagName string
+
 func Execute() {
 
 	staticConfig, err := appConfig.GetStaticConfig()
@@ -42,6 +44,8 @@ func Execute() {
 		Short: "Kana is a simple WordPress development tool designed for plugin and theme developers.",
 		Args:  cobra.NoArgs,
 	}
+
+	cmd.PersistentFlags().StringVarP(&flagName, "name", "n", "", "Specify a name for the site, used to override using the current folder.")
 
 	cmd.AddCommand(
 		newStartCommand(site),
