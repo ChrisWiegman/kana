@@ -63,6 +63,10 @@ func NewSite(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Viper) (*
 // ProcessNameFlag Processes the name flag on the site resetting all appropriate site variables
 func (s *Site) ProcessNameFlag(siteName string) {
 
+	if siteName == s.StaticConfig.SiteName {
+		return
+	}
+
 	s.StaticConfig.SiteName = siteName
 	s.StaticConfig.SiteDirectory = (path.Join(s.StaticConfig.AppDirectory, "sites", siteName))
 
