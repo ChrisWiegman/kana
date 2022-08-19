@@ -14,6 +14,7 @@ import (
 
 	"github.com/ChrisWiegman/kana/internal/appConfig"
 	"github.com/ChrisWiegman/kana/internal/docker"
+
 	"github.com/pkg/browser"
 	"github.com/spf13/viper"
 )
