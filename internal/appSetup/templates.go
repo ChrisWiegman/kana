@@ -56,7 +56,6 @@ func writeFileArrayToDisk(files []File, installPath string) error {
 	}
 
 	return nil
-
 }
 
 func writeFileFromTemplate(installPath string, file File) error {
@@ -78,5 +77,4 @@ func writeFileFromTemplate(installPath string, file File) error {
 	}
 
 	return os.WriteFile(destFile, finalTemplate, file.Permissions)
-
 }

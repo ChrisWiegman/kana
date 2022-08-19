@@ -124,7 +124,6 @@ func (d *DockerClient) EnsureImage(imageName string) (err error) {
 	cursor.Show()
 
 	return nil
-
 }
 
 func (d *DockerClient) RemoveImage(image string) (removed bool, err error) {
@@ -142,5 +141,4 @@ func (d *DockerClient) RemoveImage(image string) (removed bool, err error) {
 	}
 
 	return false, nil
-
 }

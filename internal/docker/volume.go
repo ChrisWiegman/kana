@@ -9,6 +9,7 @@ import (
 )
 
 func (d *DockerClient) FindVolume(name string) (volume *types.Volume, err error) {
+
 	volumes, err := d.client.VolumeList(context.Background(), filters.NewArgs())
 
 	if err != nil {
@@ -20,6 +21,7 @@ func (d *DockerClient) FindVolume(name string) (volume *types.Volume, err error)
 			return v, nil
 		}
 	}
+
 	return nil, nil
 }
 

@@ -11,6 +11,7 @@ import (
 	"github.com/docker/docker/api/types/mount"
 )
 
+// GetSiteContainers returns an array of strings containing the container names for the site
 func (s *Site) GetSiteContainers() []string {
 
 	return []string{
@@ -19,14 +20,15 @@ func (s *Site) GetSiteContainers() []string {
 	}
 }
 
+// IsSiteRunning Returns true if the site is up and running in Docker or false. Does not verify other errors
 func (s *Site) IsSiteRunning() bool {
 
 	containers, _ := s.dockerClient.ListContainers(s.StaticConfig.SiteName)
 
 	return len(containers) != 0
-
 }
 
+// StopWordPress Stops the site in docker, destroying the containers when they close
 func (s *Site) StopWordPress() error {
 
 	wordPressContainers := s.GetSiteContainers()
@@ -38,15 +40,16 @@ func (s *Site) StopWordPress() error {
 		}
 	}
 
+	// If no other sites are running, also shut down the Traefik container
 	traefikClient, err := traefik.NewTraefik(s.StaticConfig)
 	if err != nil {
 		return err
 	}
 
 	return traefikClient.MaybeStopTraefik()
-
 }
 
+// getLocalAppDir Gets the absolute path to WordPress if the local flag or option has been set
 func getLocalAppDir() (string, error) {
 
 	cwd, err := os.Getwd()
@@ -62,9 +65,9 @@ func getLocalAppDir() (string, error) {
 	}
 
 	return localAppDir, nil
-
 }
 
+// StartWordPress Starts the WordPress containers
 func (s *Site) StartWordPress() error {
 
 	_, _, err := s.dockerClient.EnsureNetwork("kana")
@@ -180,9 +183,9 @@ func (s *Site) StartWordPress() error {
 	}
 
 	return nil
-
 }
 
+// InstallWordPress Installs and configures WordPress core
 func (s *Site) InstallWordPress() error {
 
 	fmt.Println("Finishing WordPress setup...")
@@ -202,6 +205,7 @@ func (s *Site) InstallWordPress() error {
 
 }
 
+// RunWPCli Runs a wp-cli command returning it's output and any errors
 func (s *Site) RunWPCli(command []string) (string, error) {
 
 	_, _, err := s.dockerClient.EnsureNetwork("kana")
@@ -261,5 +265,4 @@ func (s *Site) RunWPCli(command []string) (string, error) {
 	}
 
 	return output, nil
-
 }

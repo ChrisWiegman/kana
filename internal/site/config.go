@@ -14,6 +14,7 @@ type SiteFlags struct {
 	IsPlugin bool
 }
 
+// getSiteConfig Get the config items that can be overridden locally with a .kana.json file.
 func getSiteConfig(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Viper) (*viper.Viper, error) {
 
 	siteConfig := viper.New()
@@ -39,6 +40,7 @@ func getSiteConfig(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Vip
 
 }
 
+// ProcessSiteFlags Process the start flags and save them to the settings object
 func (s *Site) ProcessSiteFlags(cmd *cobra.Command, flags SiteFlags) {
 
 	if cmd.Flags().Lookup("local").Changed {

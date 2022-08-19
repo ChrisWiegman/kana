@@ -44,7 +44,6 @@ func (d *DockerClient) getNetworkConfig(ports []ExposedPorts) portConfig {
 		PortBindings: portBindings,
 		PortSet:      portSet,
 	}
-
 }
 
 func (d *DockerClient) EnsureNetwork(name string) (created bool, network types.NetworkResource, err error) {
@@ -78,7 +77,6 @@ func (d *DockerClient) EnsureNetwork(name string) (created bool, network types.N
 	}
 
 	return false, types.NetworkResource{}, fmt.Errorf("could not create network")
-
 }
 
 func (d *DockerClient) RemoveNetwork(name string) (removed bool, err error) {
@@ -94,7 +92,6 @@ func (d *DockerClient) RemoveNetwork(name string) (removed bool, err error) {
 	}
 
 	return true, d.client.NetworkRemove(context.Background(), network.ID)
-
 }
 
 func (d *DockerClient) findNetworkByName(name string) (found bool, network types.NetworkResource, err error) {
@@ -112,7 +109,6 @@ func (d *DockerClient) findNetworkByName(name string) (found bool, network types
 	}
 
 	return false, types.NetworkResource{}, nil
-
 }
 
 func (d *DockerClient) findNetworkById(ID string) (found bool, network types.NetworkResource, err error) {
@@ -130,5 +126,4 @@ func (d *DockerClient) findNetworkById(ID string) (found bool, network types.Net
 	}
 
 	return false, types.NetworkResource{}, nil
-
 }

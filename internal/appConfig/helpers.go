@@ -9,5 +9,4 @@ func CheckString(stringToCheck string, validStrings []string) bool {
 	}
 
 	return false
-
 }

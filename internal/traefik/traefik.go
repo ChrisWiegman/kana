@@ -17,6 +17,7 @@ type Traefik struct {
 	appDirectory string
 }
 
+// NewTraefik Setup a new traefik object for controlling the traefik container
 func NewTraefik(staticConfig appConfig.StaticConfig) (*Traefik, error) {
 
 	t := new(Traefik)
@@ -35,9 +36,9 @@ func NewTraefik(staticConfig appConfig.StaticConfig) (*Traefik, error) {
 	t.dockerClient = *dockerClient
 
 	return t, nil
-
 }
 
+// StartTraefik starts the Traefik container
 func (t *Traefik) StartTraefik() error {
 
 	_, _, err := t.dockerClient.EnsureNetwork("kana")
@@ -92,9 +93,9 @@ func (t *Traefik) StartTraefik() error {
 	_, err = t.dockerClient.ContainerRun(traefikConfig)
 
 	return err
-
 }
 
+// MaybeStopTraefik Checks to see if other sites are running and shuts down the traefik instance if none are
 func (t *Traefik) MaybeStopTraefik() error {
 
 	containers, err := t.dockerClient.ListContainers("")
@@ -107,13 +108,12 @@ func (t *Traefik) MaybeStopTraefik() error {
 	}
 
 	return nil
-
 }
 
+// Stops the Traefik container
 func (t *Traefik) StopTraefik() error {
 
 	_, err := t.dockerClient.ContainerStop(traefikContainerName)
 
 	return err
-
 }

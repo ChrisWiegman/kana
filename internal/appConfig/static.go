@@ -54,7 +54,6 @@ func GetStaticConfig() (StaticConfig, error) {
 	}
 
 	return staticConfig, nil
-
 }
 
 // getAppDirectory Return the path for the global config.
@@ -66,5 +65,4 @@ func getAppDirectory() (string, error) {
 	}
 
 	return filepath.Join(home, configFolderName), nil
-
 }

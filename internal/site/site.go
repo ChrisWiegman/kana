@@ -29,15 +29,20 @@ type Site struct {
 	url           string
 }
 
+// NewSite creates a new site object
 func NewSite(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Viper) (*Site, error) {
 
 	site := new(Site)
 
+	// Add a docker client to the site
 	dockerClient, err := docker.NewController()
 	if err != nil {
 		return site, err
 	}
 
+	site.dockerClient = dockerClient
+
+	// Setup all config items (static, dynamic and site options)
 	site.StaticConfig = staticConfig
 	site.DynamicConfig = dynamicConfig
 	site.SiteConfig, err = getSiteConfig(staticConfig, dynamicConfig)
@@ -45,7 +50,7 @@ func NewSite(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Viper) (*
 		return site, err
 	}
 
-	site.dockerClient = dockerClient
+	// Setup other options generated from config items
 	site.rootCert = path.Join(staticConfig.AppDirectory, "certs", staticConfig.RootCert)
 	site.siteDomain = fmt.Sprintf("%s.%s", staticConfig.SiteName, staticConfig.AppDomain)
 	site.secureURL = fmt.Sprintf("https://%s/", site.siteDomain)
@@ -54,6 +59,7 @@ func NewSite(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Viper) (*
 	return site, nil
 }
 
+// GetURL returns the appropriate URL for the site
 func (s *Site) GetURL(insecure bool) string {
 
 	if insecure {
@@ -61,9 +67,9 @@ func (s *Site) GetURL(insecure bool) string {
 	}
 
 	return s.secureURL
-
 }
 
+// VerifySite verifies if a site is up and running without error
 func (s *Site) VerifySite() (bool, error) {
 
 	caCert, err := os.ReadFile(s.rootCert)
@@ -109,9 +115,9 @@ func (s *Site) VerifySite() (bool, error) {
 	}
 
 	return true, nil
-
 }
 
+// OpenSite Opens the current site in a browser if it is running correctly
 func (s *Site) OpenSite() error {
 
 	_, err := s.VerifySite()
@@ -122,9 +128,9 @@ func (s *Site) OpenSite() error {
 	openURL(s.secureURL)
 
 	return nil
-
 }
 
+// InstallXdebug installs xdebug in the site's PHP container
 func (s *Site) InstallXdebug() (bool, error) {
 
 	if !s.SiteConfig.GetBool("xdebug") {
@@ -154,13 +160,13 @@ func (s *Site) InstallXdebug() (bool, error) {
 			return false, err
 		}
 
+		// Verify that the command ran correctly
 		if i == 0 && strings.Contains(output.StdOut, "xdebug") {
 			return false, nil
 		}
 	}
 
 	return true, nil
-
 }
 
 // runCli Runs an arbitrary CLI command against the site's WordPress container
@@ -179,9 +185,9 @@ func (s *Site) runCli(command string, restart bool) (docker.ExecResult, error) {
 	}
 
 	return output, nil
-
 }
 
+// openURL opens the URL in the user's default browser based on which OS they're using
 func openURL(url string) error {
 
 	if runtime.GOOS == "linux" {

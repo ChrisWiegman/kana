@@ -26,12 +26,14 @@ func newDestroyCommand(site *site.Site) *cobra.Command {
 
 func runDestroy(cmd *cobra.Command, args []string, site *site.Site) {
 
+	// Stop the WordPress site.
 	err := site.StopWordPress()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
+	// Remove the site's folder in the config directory.
 	err = os.RemoveAll(site.StaticConfig.SiteDirectory)
 	if err != nil {
 		fmt.Println(err)

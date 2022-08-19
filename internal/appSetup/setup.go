@@ -9,11 +9,9 @@ import (
 	"github.com/ChrisWiegman/kana/pkg/minica"
 )
 
-// EnsureStaticConfig Ensures the application's static config files have been generated and are where they need to be
-func EnsureStaticConfig(staticConfig appConfig.StaticConfig) error {
-
+// EnsureStaticConfigFiles Ensures the application's static config files have been generated and are where they need to be
+func EnsureStaticConfigFiles(staticConfig appConfig.StaticConfig) error {
 	return writeFileArrayToDisk(configFiles, staticConfig.AppDirectory)
-
 }
 
 // EnsureCerts Ensures SSL certificates have been generated and are where they need to be
@@ -45,5 +43,4 @@ func EnsureCerts(staticConfig appConfig.StaticConfig) error {
 	}
 
 	return nil
-
 }

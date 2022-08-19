@@ -70,5 +70,4 @@ func (d *DockerClient) ensureDockerIsAvailable() error {
 	}
 
 	return err
-
 }

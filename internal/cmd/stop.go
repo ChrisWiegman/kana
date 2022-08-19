@@ -26,6 +26,7 @@ func newStopCommand(site *site.Site) *cobra.Command {
 
 func runStop(cmd *cobra.Command, args []string, site *site.Site) {
 
+	// Stop the WordPress site
 	err := site.StopWordPress()
 	if err != nil {
 		fmt.Println(err)

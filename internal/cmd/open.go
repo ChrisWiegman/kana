@@ -26,6 +26,7 @@ func newOpenCommand(site *site.Site) *cobra.Command {
 
 func runOpen(cmd *cobra.Command, args []string, site *site.Site) {
 
+	// Open the site in the user's default browser,
 	err := site.OpenSite()
 	if err != nil {
 		fmt.Println(err)

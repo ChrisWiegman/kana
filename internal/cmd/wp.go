@@ -28,6 +28,7 @@ func newWPCommand(site *site.Site) *cobra.Command {
 
 func runWP(cmd *cobra.Command, args []string, site *site.Site) {
 
+	// Run the output from wp-cli
 	output, err := site.RunWPCli(args)
 	if err != nil {
 		fmt.Println(err)

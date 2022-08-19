@@ -35,6 +35,7 @@ type ExecResult struct {
 	ExitCode int
 }
 
+// ListContainers Lists all running containers for a given site or all sites if no site is specified
 func (d *DockerClient) ListContainers(site string) ([]string, error) {
 
 	f := filters.NewArgs()
@@ -69,9 +70,9 @@ func (d *DockerClient) ListContainers(site string) ([]string, error) {
 	}
 
 	return containerIds, nil
-
 }
 
+// IsContainerRunning Checks if a given container is running by name
 func (d *DockerClient) IsContainerRunning(containerName string) (id string, isRunning bool) {
 
 	containers, err := d.client.ContainerList(context.Background(), types.ContainerListOptions{})
@@ -88,7 +89,6 @@ func (d *DockerClient) IsContainerRunning(containerName string) (id string, isRu
 	}
 
 	return "", false
-
 }
 
 func (d *DockerClient) ContainerRun(config ContainerConfig) (id string, err error) {
@@ -138,7 +138,9 @@ func (d *DockerClient) ContainerRun(config ContainerConfig) (id string, err erro
 }
 
 func (d *DockerClient) ContainerWait(id string) (state int64, err error) {
+
 	containerResult, errorCode := d.client.ContainerWait(context.Background(), id, "")
+
 	select {
 	case err := <-errorCode:
 		return 0, err
@@ -148,6 +150,7 @@ func (d *DockerClient) ContainerWait(id string) (state int64, err error) {
 }
 
 func (d *DockerClient) ContainerLog(id string) (result string, err error) {
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -212,7 +215,6 @@ func (d *DockerClient) ContainerStop(containerName string) (bool, error) {
 	}
 
 	return true, nil
-
 }
 
 func (d *DockerClient) ContainerRestart(containerName string) (bool, error) {
@@ -233,7 +235,6 @@ func (d *DockerClient) ContainerRestart(containerName string) (bool, error) {
 	}
 
 	return true, nil
-
 }
 
 func (d *DockerClient) ContainerExec(containerName string, command []string) (ExecResult, error) {
@@ -305,5 +306,4 @@ func (d *DockerClient) ContainerExec(containerName string, command []string) (Ex
 			StdErr:   errBuf.String(),
 		},
 		nil
-
 }
