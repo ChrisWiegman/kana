@@ -24,16 +24,7 @@ func newStartCommand(site *site.Site) *cobra.Command {
 			runStart(cmd, args, site)
 		},
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-
-			if cmd.Flags().Lookup("name").Changed {
-
-				if cmd.Flags().Lookup("plugin").Changed || cmd.Flags().Lookup("theme").Changed || cmd.Flags().Lookup("local").Changed {
-					fmt.Println(fmt.Errorf("the plugin, theme and local flags cannot be used with the name flag"))
-					os.Exit(1)
-				}
-
-				site.ProcessNameFlag(flagName)
-			}
+			site.ProcessNameFlag(cmd, flagName)
 		},
 		Args: cobra.NoArgs,
 	}
@@ -74,6 +65,8 @@ func runStart(cmd *cobra.Command, args []string, kanaSite *site.Site) {
 
 	// Let's start everything up
 	fmt.Printf("Starting development site: %s\n", kanaSite.GetURL(false))
+
+	return
 
 	// Start Traefik if we need it
 	traefikClient, err := traefik.NewTraefik(kanaSite.StaticConfig)

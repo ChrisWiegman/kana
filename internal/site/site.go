@@ -16,6 +16,7 @@ import (
 	"github.com/ChrisWiegman/kana/internal/docker"
 
 	"github.com/pkg/browser"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
@@ -61,11 +62,21 @@ func NewSite(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Viper) (*
 }
 
 // ProcessNameFlag Processes the name flag on the site resetting all appropriate site variables
-func (s *Site) ProcessNameFlag(siteName string) {
+func (s *Site) ProcessNameFlag(cmd *cobra.Command, siteName string) {
 
-	if siteName == s.StaticConfig.SiteName {
+	if !cmd.Flags().Lookup("name").Changed {
 		return
 	}
+
+	// Check that we're not using invalid start flags for the start command
+	if cmd.Use == "start" {
+		if cmd.Flags().Lookup("plugin").Changed || cmd.Flags().Lookup("theme").Changed || cmd.Flags().Lookup("local").Changed {
+			return
+		}
+	}
+
+	fmt.Println(s.StaticConfig.SiteName)
+	fmt.Println(siteName)
 
 	s.StaticConfig.SiteName = siteName
 	s.StaticConfig.SiteDirectory = (path.Join(s.StaticConfig.AppDirectory, "sites", siteName))

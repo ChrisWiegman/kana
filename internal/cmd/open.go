@@ -18,9 +18,7 @@ func newOpenCommand(site *site.Site) *cobra.Command {
 			runOpen(cmd, args, site)
 		},
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			if cmd.Flags().Lookup("name").Changed {
-				site.ProcessNameFlag(flagName)
-			}
+			site.ProcessNameFlag(cmd, flagName)
 		},
 		Args: cobra.NoArgs,
 	}
