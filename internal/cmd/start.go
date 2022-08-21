@@ -23,9 +23,6 @@ func newStartCommand(site *site.Site) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			runStart(cmd, args, site)
 		},
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			site.ProcessNameFlag(cmd, flagName)
-		},
 		Args: cobra.NoArgs,
 	}
 

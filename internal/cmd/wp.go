@@ -17,9 +17,6 @@ func newWPCommand(site *site.Site) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			runWP(cmd, args, site)
 		},
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			site.ProcessNameFlag(cmd, flagName)
-		},
 		Args: cobra.ArbitraryArgs,
 	}
 

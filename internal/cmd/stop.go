@@ -17,9 +17,6 @@ func newStopCommand(site *site.Site) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			runStop(cmd, args, site)
 		},
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			site.ProcessNameFlag(cmd, flagName)
-		},
 		Args: cobra.NoArgs,
 	}
 

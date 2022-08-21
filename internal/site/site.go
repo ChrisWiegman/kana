@@ -62,28 +62,67 @@ func NewSite(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Viper) (*
 }
 
 // ProcessNameFlag Processes the name flag on the site resetting all appropriate site variables
-func (s *Site) ProcessNameFlag(cmd *cobra.Command, siteName string) {
+func (s *Site) ProcessNameFlag(cmd *cobra.Command) error {
 
-	if !cmd.Flags().Lookup("name").Changed {
-		return
+	// By default the siteLink should be the working directory (assume it's linked)
+	siteLink := s.StaticConfig.WorkingDirectory
+
+	// Process the name flag if set
+	if cmd.Flags().Lookup("name").Changed {
+
+		// Check that we're not using invalid start flags for the start command
+		if cmd.Use == "start" {
+			if cmd.Flags().Lookup("plugin").Changed || cmd.Flags().Lookup("theme").Changed || cmd.Flags().Lookup("local").Changed {
+				return fmt.Errorf("invalid flags detected. 'plugin' 'theme' and 'local' flags are not valid with named sites")
+			}
+		}
+
+		s.StaticConfig.SiteName = cmd.Flags().Lookup("name").Value.String()
+		s.StaticConfig.SiteDirectory = (path.Join(s.StaticConfig.AppDirectory, "sites", s.StaticConfig.SiteName))
+
+		s.siteDomain = fmt.Sprintf("%s.%s", s.StaticConfig.SiteName, s.StaticConfig.AppDomain)
+		s.secureURL = fmt.Sprintf("https://%s/", s.siteDomain)
+		s.url = fmt.Sprintf("http://%s/", s.siteDomain)
+
+		siteLink = s.StaticConfig.SiteDirectory
 	}
 
-	// Check that we're not using invalid start flags for the start command
-	if cmd.Use == "start" {
-		if cmd.Flags().Lookup("plugin").Changed || cmd.Flags().Lookup("theme").Changed || cmd.Flags().Lookup("local").Changed {
-			return
+	siteLinkConfig := viper.New()
+
+	siteLinkConfig.SetDefault("link", siteLink)
+
+	siteLinkConfig.SetConfigName("link")
+	siteLinkConfig.SetConfigType("json")
+	siteLinkConfig.AddConfigPath(s.StaticConfig.SiteDirectory)
+
+	err := siteLinkConfig.ReadInConfig()
+	if err != nil {
+		_, ok := err.(viper.ConfigFileNotFoundError)
+		if ok {
+			err = os.MkdirAll(s.StaticConfig.SiteDirectory, 0750)
+			if err != nil {
+				return err
+			}
+			err = siteLinkConfig.SafeWriteConfig()
+			if err != nil {
+				return err
+			}
 		}
 	}
 
-	fmt.Println(s.StaticConfig.SiteName)
-	fmt.Println(siteName)
+	siteLink = siteLinkConfig.GetString("link")
 
-	s.StaticConfig.SiteName = siteName
-	s.StaticConfig.SiteDirectory = (path.Join(s.StaticConfig.AppDirectory, "sites", siteName))
+	// What do I do wit hthe link now?
 
-	s.siteDomain = fmt.Sprintf("%s.%s", s.StaticConfig.SiteName, s.StaticConfig.AppDomain)
-	s.secureURL = fmt.Sprintf("https://%s/", s.siteDomain)
-	s.url = fmt.Sprintf("http://%s/", s.siteDomain)
+	if siteLink == s.StaticConfig.SiteDirectory {
+		fmt.Println("we have a named site")
+	} else {
+		fmt.Println("we have a linked site")
+	}
+
+	fmt.Printf("Site Link: %s\n", siteLink)
+
+	return nil
 }
 
 // GetURL returns the appropriate URL for the site

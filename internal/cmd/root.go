@@ -48,6 +48,9 @@ func Execute() {
 		Use:   "kana",
 		Short: "Kana is a simple WordPress development tool designed for plugin and theme developers.",
 		Args:  cobra.NoArgs,
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			site.ProcessNameFlag(cmd)
+		},
 	}
 
 	// Add the "name" flag to allow for sites not connected to the local directory
