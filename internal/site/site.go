@@ -110,17 +110,7 @@ func (s *Site) ProcessNameFlag(cmd *cobra.Command) error {
 		}
 	}
 
-	siteLink = siteLinkConfig.GetString("link")
-
-	// What do I do wit hthe link now?
-
-	if siteLink == s.StaticConfig.SiteDirectory {
-		fmt.Println("we have a named site")
-	} else {
-		fmt.Println("we have a linked site")
-	}
-
-	fmt.Printf("Site Link: %s\n", siteLink)
+	s.StaticConfig.SiteDirectory = siteLinkConfig.GetString("link")
 
 	return nil
 }
