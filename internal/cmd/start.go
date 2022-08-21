@@ -66,8 +66,6 @@ func runStart(cmd *cobra.Command, args []string, kanaSite *site.Site) {
 	// Let's start everything up
 	fmt.Printf("Starting development site: %s\n", kanaSite.GetURL(false))
 
-	return
-
 	// Start Traefik if we need it
 	traefikClient, err := traefik.NewTraefik(kanaSite.StaticConfig)
 	if err != nil {
