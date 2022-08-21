@@ -26,9 +26,6 @@ func newDestroyCommand(site *site.Site) *cobra.Command {
 
 func runDestroy(cmd *cobra.Command, args []string, site *site.Site) {
 
-	fmt.Println("destroying the site")
-	return
-
 	// Stop the WordPress site.
 	err := site.StopWordPress()
 	if err != nil {
