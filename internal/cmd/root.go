@@ -39,7 +39,7 @@ func Execute() {
 	// Create a site object
 	site, err := site.NewSite(staticConfig, dynamicConfig)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
@@ -49,7 +49,11 @@ func Execute() {
 		Short: "Kana is a simple WordPress development tool designed for plugin and theme developers.",
 		Args:  cobra.NoArgs,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			site.ProcessNameFlag(cmd)
+			err := site.ProcessNameFlag(cmd)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				os.Exit(1)
+			}
 		},
 	}
 
