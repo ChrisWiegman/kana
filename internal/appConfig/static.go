@@ -40,7 +40,7 @@ func GetStaticConfig() (StaticConfig, error) {
 		return StaticConfig{}, err
 	}
 
-	siteName := getSiteName(cwd)
+	siteName := sanitizeSiteName(filepath.Base(cwd))
 
 	staticConfig := StaticConfig{
 		AppDomain:        appDomain,
@@ -57,18 +57,13 @@ func GetStaticConfig() (StaticConfig, error) {
 	return staticConfig, nil
 }
 
-// getSiteName Returns the site name, properly sanitized for use.
-func getSiteName(currentDirectory string) string {
+// sanitizeSiteName Returns the site name, properly sanitized for use.
+func sanitizeSiteName(rawSiteName string) string {
 
-	siteName := filepath.Base(currentDirectory)
-
-	siteName = strings.TrimSpace(siteName)
+	siteName := strings.TrimSpace(rawSiteName)
 	siteName = strings.ToLower(siteName)
 	siteName = strings.ReplaceAll(siteName, " ", "-")
-	siteName = strings.ToValidUTF8(siteName, "")
-
-	return siteName
-
+	return strings.ToValidUTF8(siteName, "")
 }
 
 // getAppDirectory Return the path for the global config.
