@@ -21,7 +21,6 @@ func newStopCommand(site *site.Site) *cobra.Command {
 	}
 
 	return cmd
-
 }
 
 func runStop(cmd *cobra.Command, args []string, site *site.Site) {

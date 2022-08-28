@@ -21,7 +21,6 @@ func newOpenCommand(site *site.Site) *cobra.Command {
 	}
 
 	return cmd
-
 }
 
 func runOpen(cmd *cobra.Command, args []string, site *site.Site) {

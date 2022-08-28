@@ -33,7 +33,6 @@ func newStartCommand(site *site.Site) *cobra.Command {
 	cmd.Flags().BoolVarP(&flagLocal, "local", "l", false, "Installs the WordPress files in your current path at ./wordpress instead of the global app path.")
 
 	return cmd
-
 }
 
 func runStart(cmd *cobra.Command, args []string, kanaSite *site.Site) {

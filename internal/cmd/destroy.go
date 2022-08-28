@@ -21,7 +21,6 @@ func newDestroyCommand(site *site.Site) *cobra.Command {
 	}
 
 	return cmd
-
 }
 
 func runDestroy(cmd *cobra.Command, args []string, site *site.Site) {

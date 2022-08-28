@@ -37,7 +37,6 @@ func getSiteConfig(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Vip
 	}
 
 	return siteConfig, nil
-
 }
 
 // ProcessSiteFlags Process the start flags and save them to the settings object

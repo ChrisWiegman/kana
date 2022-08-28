@@ -22,7 +22,6 @@ func newConfigCommand(site *site.Site) *cobra.Command {
 	}
 
 	return cmd
-
 }
 
 func runConfigCommand(cmd *cobra.Command, args []string, site *site.Site) {
@@ -47,5 +46,4 @@ func runConfigCommand(cmd *cobra.Command, args []string, site *site.Site) {
 			os.Exit(1)
 		}
 	}
-
 }

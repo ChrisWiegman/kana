@@ -56,5 +56,4 @@ func TestEnsureVolume(t *testing.T) {
 	if removed != true {
 		t.Errorf("Volume should have been removed but wasn't")
 	}
-
 }

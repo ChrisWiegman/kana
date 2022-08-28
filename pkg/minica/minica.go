@@ -39,8 +39,8 @@ func GenCerts(staticConfig appConfig.StaticConfig) error {
 	}
 
 	_, err = sign(issuer, domains, path.Join(staticConfig.AppDirectory, "certs"), staticConfig.SiteCert, staticConfig.SiteKey)
-	return err
 
+	return err
 }
 
 func getIssuer(keyFile, certFile string) (*issuer, error) {
@@ -79,7 +79,9 @@ func getIssuer(keyFile, certFile string) (*issuer, error) {
 
 	equal, err := publicKeysEqual(key.Public(), cert.PublicKey)
 	if err != nil {
+
 		return nil, fmt.Errorf("comparing public keys: %s", err)
+
 	} else if !equal {
 
 		return nil, fmt.Errorf("public key in CA certificate %s doesn't match private key in %s",
@@ -87,14 +89,15 @@ func getIssuer(keyFile, certFile string) (*issuer, error) {
 	}
 
 	return &issuer{key, cert}, nil
-
 }
 
 func readPrivateKey(keyContents []byte) (crypto.Signer, error) {
 
 	block, _ := pem.Decode(keyContents)
 	if block == nil {
+
 		return nil, fmt.Errorf("no PEM found")
+
 	} else if block.Type != "RSA PRIVATE KEY" && block.Type != "ECDSA PRIVATE KEY" {
 
 		return nil, fmt.Errorf("incorrect PEM type %s", block.Type)
@@ -102,14 +105,15 @@ func readPrivateKey(keyContents []byte) (crypto.Signer, error) {
 	}
 
 	return x509.ParsePKCS1PrivateKey(block.Bytes)
-
 }
 
 func readCert(certContents []byte) (*x509.Certificate, error) {
 
 	block, _ := pem.Decode(certContents)
 	if block == nil {
+
 		return nil, fmt.Errorf("no PEM found")
+
 	} else if block.Type != "CERTIFICATE" {
 
 		return nil, fmt.Errorf("incorrect PEM type %s", block.Type)
@@ -117,7 +121,6 @@ func readCert(certContents []byte) (*x509.Certificate, error) {
 	}
 
 	return x509.ParseCertificate(block.Bytes)
-
 }
 
 func makeIssuer(keyFile, certFile string) error {
@@ -133,7 +136,6 @@ func makeIssuer(keyFile, certFile string) error {
 	}
 
 	return nil
-
 }
 
 func makeKey(filename string) (*rsa.PrivateKey, error) {
@@ -165,7 +167,6 @@ func makeKey(filename string) (*rsa.PrivateKey, error) {
 	}
 
 	return key, nil
-
 }
 
 func makeRootCert(key crypto.Signer, filename string) (*x509.Certificate, error) {
@@ -224,7 +225,6 @@ func makeRootCert(key crypto.Signer, filename string) (*x509.Certificate, error)
 	}
 
 	return x509.ParseCertificate(der)
-
 }
 
 func publicKeysEqual(a, b interface{}) (bool, error) {
@@ -240,7 +240,6 @@ func publicKeysEqual(a, b interface{}) (bool, error) {
 	}
 
 	return bytes.Equal(aBytes, bBytes), nil
-
 }
 
 func calculateSKID(pubKey crypto.PublicKey) ([]byte, error) {
@@ -262,7 +261,6 @@ func calculateSKID(pubKey crypto.PublicKey) ([]byte, error) {
 
 	skid := sha1.Sum(spki.SubjectPublicKey.Bytes)
 	return skid[:], nil
-
 }
 
 func sign(iss *issuer, domains []string, certPath, siteCert, siteKey string) (*x509.Certificate, error) {
@@ -320,5 +318,4 @@ func sign(iss *issuer, domains []string, certPath, siteCert, siteKey string) (*x
 	}
 
 	return x509.ParseCertificate(der)
-
 }
