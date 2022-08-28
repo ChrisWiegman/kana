@@ -77,7 +77,7 @@ func (s *Site) ProcessNameFlag(cmd *cobra.Command) error {
 			}
 		}
 
-		s.StaticConfig.SiteName = cmd.Flags().Lookup("name").Value.String()
+		s.StaticConfig.SiteName = appConfig.SanitizeSiteName(cmd.Flags().Lookup("name").Value.String())
 		s.StaticConfig.SiteDirectory = (path.Join(s.StaticConfig.AppDirectory, "sites", s.StaticConfig.SiteName))
 
 		s.siteDomain = fmt.Sprintf("%s.%s", s.StaticConfig.SiteName, s.StaticConfig.AppDomain)
