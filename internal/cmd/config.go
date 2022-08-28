@@ -33,7 +33,13 @@ func runConfigCommand(cmd *cobra.Command, args []string, site *site.Site) {
 	case 0:
 		appConfig.ListDynamicContent(site.DynamicConfig)
 	case 1:
-		fmt.Println("get the config item")
+		value, err := appConfig.GetDynamicContentItem(cmd, args, site.DynamicConfig)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		fmt.Println(value)
 	case 2:
 		err := appConfig.SetDynamicContent(cmd, args, site.DynamicConfig)
 		if err != nil {

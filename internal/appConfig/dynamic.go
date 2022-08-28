@@ -95,6 +95,15 @@ func ListDynamicContent(dynamicConfig *viper.Viper) {
 	t.Render()
 }
 
+func GetDynamicContentItem(md *cobra.Command, args []string, dynamicConfig *viper.Viper) (string, error) {
+
+	if !dynamicConfig.IsSet(args[0]) {
+		return "", fmt.Errorf("invalid setting. Please enter a valid key to get")
+	}
+
+	return dynamicConfig.GetString(args[0]), nil
+}
+
 func SetDynamicContent(md *cobra.Command, args []string, dynamicConfig *viper.Viper) error {
 
 	if !dynamicConfig.IsSet(args[0]) {
