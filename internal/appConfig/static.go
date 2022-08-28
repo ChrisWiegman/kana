@@ -40,7 +40,7 @@ func GetStaticConfig() (StaticConfig, error) {
 		return StaticConfig{}, err
 	}
 
-	siteName := sanitizeSiteName(filepath.Base(cwd))
+	siteName := SanitizeSiteName(filepath.Base(cwd))
 
 	staticConfig := StaticConfig{
 		AppDomain:        appDomain,
@@ -57,8 +57,8 @@ func GetStaticConfig() (StaticConfig, error) {
 	return staticConfig, nil
 }
 
-// sanitizeSiteName Returns the site name, properly sanitized for use.
-func sanitizeSiteName(rawSiteName string) string {
+// SanitizeSiteName Returns the site name, properly sanitized for use.
+func SanitizeSiteName(rawSiteName string) string {
 
 	siteName := strings.TrimSpace(rawSiteName)
 	siteName = strings.ToLower(siteName)
