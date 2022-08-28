@@ -110,7 +110,7 @@ func (s *Site) ProcessNameFlag(cmd *cobra.Command) error {
 		}
 	}
 
-	s.StaticConfig.SiteDirectory = siteLinkConfig.GetString("link")
+	s.StaticConfig.WorkingDirectory = siteLinkConfig.GetString("link")
 
 	return nil
 }
