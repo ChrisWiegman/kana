@@ -4,6 +4,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/mitchellh/go-homedir"
 )
@@ -39,7 +40,7 @@ func GetStaticConfig() (StaticConfig, error) {
 		return StaticConfig{}, err
 	}
 
-	siteName := filepath.Base(cwd)
+	siteName := getSiteName(cwd)
 
 	staticConfig := StaticConfig{
 		AppDomain:        appDomain,
@@ -54,6 +55,20 @@ func GetStaticConfig() (StaticConfig, error) {
 	}
 
 	return staticConfig, nil
+}
+
+// getSiteName Returns the site name, properly sanitized for use.
+func getSiteName(currentDirectory string) string {
+
+	siteName := filepath.Base(currentDirectory)
+
+	siteName = strings.TrimSpace(siteName)
+	siteName = strings.ToLower(siteName)
+	siteName = strings.ReplaceAll(siteName, " ", "-")
+	siteName = strings.ToValidUTF8(siteName, "")
+
+	return siteName
+
 }
 
 // getAppDirectory Return the path for the global config.
