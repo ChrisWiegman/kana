@@ -118,6 +118,7 @@ func (t *Traefik) StopTraefik() error {
 		return err
 	}
 
+	// Delete the "kana" network as well
 	_, err = t.dockerClient.RemoveNetwork("kana")
 
 	return err
