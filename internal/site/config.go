@@ -1,6 +1,9 @@
 package site
 
 import (
+	"os"
+	"path"
+
 	"github.com/ChrisWiegman/kana/internal/appConfig"
 
 	"github.com/spf13/cobra"
@@ -38,6 +41,16 @@ func getSiteConfig(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Vip
 	}
 
 	return siteConfig, nil
+}
+
+// IsLocalSite Determines if a site is a "local" site (started with the "local" flag) so that other commands can work as needed.
+func (s *Site) IsLocalSite() bool {
+
+	if _, err := os.Stat(path.Join(s.StaticConfig.SiteDirectory, "app")); os.IsNotExist(err) {
+		return true
+	}
+
+	return false
 }
 
 // ProcessSiteFlags Process the start flags and save them to the settings object

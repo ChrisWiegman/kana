@@ -236,7 +236,7 @@ func (s *Site) RunWPCli(command []string) (string, error) {
 	siteDir := path.Join(s.StaticConfig.AppDirectory, "sites", s.StaticConfig.SiteName)
 	appDir := path.Join(siteDir, "app")
 
-	if s.SiteConfig.GetBool("local") {
+	if s.SiteConfig.GetBool("local") || s.IsLocalSite() {
 		appDir, err = getLocalAppDir()
 		if err != nil {
 			return "", err
