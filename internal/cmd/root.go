@@ -68,6 +68,7 @@ func Execute() {
 		newWPCommand(site),
 		newDestroyCommand(site),
 		newConfigCommand(site),
+		newExportCommand(site),
 	)
 
 	// Execute anything we need to

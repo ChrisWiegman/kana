@@ -43,6 +43,17 @@ func getSiteConfig(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Vip
 	return siteConfig, nil
 }
 
+func (s *Site) ExportSiteSettings() error {
+
+	s.SiteConfig.Set("local", s.IsLocalSite())
+
+	if _, err := os.Stat(path.Join(s.StaticConfig.WorkingDirectory, ".kana.json")); os.IsNotExist(err) {
+		return s.SiteConfig.SafeWriteConfig()
+	}
+
+	return s.SiteConfig.WriteConfig()
+}
+
 // IsLocalSite Determines if a site is a "local" site (started with the "local" flag) so that other commands can work as needed.
 func (s *Site) IsLocalSite() bool {
 
