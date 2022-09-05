@@ -103,6 +103,13 @@ func runStart(cmd *cobra.Command, args []string, kanaSite *site.Site) {
 		os.Exit(1)
 	}
 
+	// Install any configuration plugins if needed
+	err = kanaSite.InstallDefaultPlugins()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
 	// Open the site in the user's browser
 	err = kanaSite.OpenSite()
 	if err != nil {

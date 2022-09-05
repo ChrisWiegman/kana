@@ -23,6 +23,7 @@ func getSiteConfig(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Vip
 	siteConfig.SetDefault("type", dynamicConfig.GetString("type"))
 	siteConfig.SetDefault("local", dynamicConfig.GetBool("local"))
 	siteConfig.SetDefault("xdebug", dynamicConfig.GetBool("xdebug"))
+	siteConfig.SetDefault("plugins", []string{})
 
 	siteConfig.SetConfigName(".kana")
 	siteConfig.SetConfigType("json")

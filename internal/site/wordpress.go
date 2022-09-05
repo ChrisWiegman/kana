@@ -202,7 +202,27 @@ func (s *Site) InstallWordPress() error {
 
 	_, err := s.RunWPCli(setupCommand)
 	return err
+}
 
+// InstallDefaultPlugins Installs a list of WordPress plugins
+func (s *Site) InstallDefaultPlugins() error {
+
+	for _, plugin := range s.SiteConfig.GetStringSlice("plugins") {
+
+		setupCommand := []string{
+			"plugin",
+			"install",
+			"--activate",
+			plugin,
+		}
+
+		_, err := s.RunWPCli(setupCommand)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // RunWPCli Runs a wp-cli command returning it's output and any errors
