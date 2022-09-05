@@ -27,6 +27,11 @@ func newWPCommand(site *site.Site) *cobra.Command {
 
 func runWP(cmd *cobra.Command, args []string, site *site.Site) {
 
+	if !site.IsSiteRunning() {
+		fmt.Println("The wp command only works on a running site. Please run 'kana start' to start the site.")
+		os.Exit(1)
+	}
+
 	// Run the output from wp-cli
 	output, err := site.RunWPCli(args)
 	if err != nil {
