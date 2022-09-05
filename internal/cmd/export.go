@@ -32,7 +32,7 @@ func runExport(cmd *cobra.Command, args []string, site *site.Site) {
 		os.Exit(1)
 	}
 
-	err := site.ExportSiteSettings()
+	err := site.ExportSiteConfig()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

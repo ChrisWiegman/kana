@@ -1,8 +1,10 @@
 package site
 
 import (
+	"fmt"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/ChrisWiegman/kana/internal/appConfig"
 
@@ -43,9 +45,9 @@ func getSiteConfig(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Vip
 	return siteConfig, nil
 }
 
-func (s *Site) ExportSiteSettings() error {
+func (s *Site) ExportSiteConfig() error {
 
-	config := s.GetCurrentWordPressConfig()
+	config := s.GetRunningConfig()
 
 	s.SiteConfig.Set("local", config.Local)
 	s.SiteConfig.Set("type", config.Type)
@@ -63,7 +65,7 @@ func (s *Site) IsLocalSite() bool {
 
 	// If the site is already running, try to make this easier
 	if s.IsSiteRunning() {
-		runningConfig := s.GetCurrentWordPressConfig()
+		runningConfig := s.GetRunningConfig()
 		if runningConfig.Local {
 			return true
 		}
@@ -107,4 +109,42 @@ func (s *Site) ProcessSiteFlags(cmd *cobra.Command, flags SiteFlags) {
 	if cmd.Flags().Lookup("theme").Changed && flags.IsTheme {
 		s.SiteConfig.Set("type", "theme")
 	}
+}
+
+// GetRunningConfig gets various options that were used to start the site
+func (s *Site) GetRunningConfig() CurrentConfig {
+
+	currentConfig := CurrentConfig{
+		Type:   "site",
+		Local:  false,
+		Xdebug: false,
+	}
+
+	output, _ := s.runCli("pecl list | grep xdebug", false)
+	if strings.Contains(output.StdOut, "xdebug") {
+		currentConfig.Xdebug = true
+	}
+
+	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana_%s_wordpress", s.StaticConfig.SiteName))
+
+	if len(mounts) == 1 {
+		currentConfig.Type = "site"
+	}
+
+	for _, mount := range mounts {
+
+		if mount.Source == path.Join(s.StaticConfig.WorkingDirectory, "wordpress") {
+			currentConfig.Local = true
+		}
+
+		if strings.Contains(mount.Destination, "/var/www/html/wp-content/plugins/") {
+			currentConfig.Type = "plugin"
+		}
+
+		if strings.Contains(mount.Destination, "/var/www/html/wp-content/themes/") {
+			currentConfig.Type = "theme"
+		}
+	}
+
+	return currentConfig
 }

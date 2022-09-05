@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"strings"
 
 	"github.com/ChrisWiegman/kana/internal/docker"
 	"github.com/ChrisWiegman/kana/internal/traefik"
@@ -192,44 +191,6 @@ func (s *Site) StartWordPress() error {
 	return nil
 }
 
-// GetCurrentWordPressConfig gets various options that were used to start the site
-func (s *Site) GetCurrentWordPressConfig() CurrentConfig {
-
-	currentConfig := CurrentConfig{
-		Type:   "site",
-		Local:  false,
-		Xdebug: false,
-	}
-
-	output, _ := s.runCli("pecl list | grep xdebug", false)
-	if strings.Contains(output.StdOut, "xdebug") {
-		currentConfig.Xdebug = true
-	}
-
-	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana_%s_wordpress", s.StaticConfig.SiteName))
-
-	if len(mounts) == 1 {
-		currentConfig.Type = "site"
-	}
-
-	for _, mount := range mounts {
-
-		if mount.Source == path.Join(s.StaticConfig.WorkingDirectory, "wordpress") {
-			currentConfig.Local = true
-		}
-
-		if strings.Contains(mount.Destination, "/var/www/html/wp-content/plugins/") {
-			currentConfig.Type = "plugin"
-		}
-
-		if strings.Contains(mount.Destination, "/var/www/html/wp-content/themes/") {
-			currentConfig.Type = "theme"
-		}
-	}
-
-	return currentConfig
-}
-
 // InstallWordPress Installs and configures WordPress core
 func (s *Site) InstallWordPress() error {
 
@@ -280,7 +241,7 @@ func (s *Site) RunWPCli(command []string) (string, error) {
 
 	siteDir := path.Join(s.StaticConfig.AppDirectory, "sites", s.StaticConfig.SiteName)
 	appDir := path.Join(siteDir, "app")
-	runningConfig := s.GetCurrentWordPressConfig()
+	runningConfig := s.GetRunningConfig()
 
 	if runningConfig.Local {
 		appDir, err = getLocalAppDir()
