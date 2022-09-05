@@ -91,6 +91,19 @@ func (d *DockerClient) IsContainerRunning(containerName string) (id string, isRu
 	return "", false
 }
 
+// ContainerGetMounts Returns a slice containing all the mounts to the given container
+func (d *DockerClient) ContainerGetMounts(containerName string) []types.MountPoint {
+
+	containerID, isRunning := d.IsContainerRunning(containerName)
+	if !isRunning {
+		return []types.MountPoint{}
+	}
+
+	results, _ := d.client.ContainerInspect(context.Background(), containerID)
+
+	return results.Mounts
+}
+
 func (d *DockerClient) ContainerRun(config ContainerConfig) (id string, err error) {
 
 	containerID, isRunning := d.IsContainerRunning(config.Name)
