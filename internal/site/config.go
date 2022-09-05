@@ -46,11 +46,24 @@ func getSiteConfig(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Vip
 // IsLocalSite Determines if a site is a "local" site (started with the "local" flag) so that other commands can work as needed.
 func (s *Site) IsLocalSite() bool {
 
+	// First check the app site folders. If we've created the site (has a DB) without an "app" folder we can assume it was local last time.
+	hasNonLocalAppFolder := true
+	hasDatabaseFolder := true
+
 	if _, err := os.Stat(path.Join(s.StaticConfig.SiteDirectory, "app")); os.IsNotExist(err) {
+		hasNonLocalAppFolder = false
+	}
+
+	if _, err := os.Stat(path.Join(s.StaticConfig.SiteDirectory, "database")); os.IsNotExist(err) {
+		hasDatabaseFolder = false
+	}
+
+	if hasDatabaseFolder && !hasNonLocalAppFolder {
 		return true
 	}
 
-	return false
+	// Return the flag for all other conditions
+	return s.SiteConfig.GetBool("local")
 }
 
 // ProcessSiteFlags Process the start flags and save them to the settings object

@@ -78,7 +78,7 @@ func (s *Site) StartWordPress() error {
 	appDir := path.Join(s.StaticConfig.SiteDirectory, "app")
 	databaseDir := path.Join(s.StaticConfig.SiteDirectory, "database")
 
-	if s.SiteConfig.GetBool("local") {
+	if s.IsLocalSite() {
 		appDir, err = getLocalAppDir()
 		if err != nil {
 			return err
@@ -236,7 +236,7 @@ func (s *Site) RunWPCli(command []string) (string, error) {
 	siteDir := path.Join(s.StaticConfig.AppDirectory, "sites", s.StaticConfig.SiteName)
 	appDir := path.Join(siteDir, "app")
 
-	if s.SiteConfig.GetBool("local") || s.IsLocalSite() {
+	if s.IsLocalSite() {
 		appDir, err = getLocalAppDir()
 		if err != nil {
 			return "", err
