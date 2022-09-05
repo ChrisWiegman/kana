@@ -114,6 +114,11 @@ func (t *Traefik) MaybeStopTraefik() error {
 func (t *Traefik) StopTraefik() error {
 
 	_, err := t.dockerClient.ContainerStop(traefikContainerName)
+	if err != nil {
+		return err
+	}
+
+	_, err = t.dockerClient.RemoveNetwork("kana")
 
 	return err
 }
