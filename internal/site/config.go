@@ -45,7 +45,10 @@ func getSiteConfig(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Vip
 
 func (s *Site) ExportSiteSettings() error {
 
-	s.SiteConfig.Set("local", s.IsLocalSite())
+	config := s.GetCurrentWordPressConfig()
+
+	s.SiteConfig.Set("local", config.Local)
+	s.SiteConfig.Set("type", config.Type)
 
 	if _, err := os.Stat(path.Join(s.StaticConfig.WorkingDirectory, ".kana.json")); os.IsNotExist(err) {
 		return s.SiteConfig.SafeWriteConfig()
@@ -56,6 +59,14 @@ func (s *Site) ExportSiteSettings() error {
 
 // IsLocalSite Determines if a site is a "local" site (started with the "local" flag) so that other commands can work as needed.
 func (s *Site) IsLocalSite() bool {
+
+	// If the site is already running, try to make this easier
+	if s.IsSiteRunning() {
+		runningConfig := s.GetCurrentWordPressConfig()
+		if runningConfig.Local {
+			return true
+		}
+	}
 
 	// First check the app site folders. If we've created the site (has a DB) without an "app" folder we can assume it was local last time.
 	hasNonLocalAppFolder := true
