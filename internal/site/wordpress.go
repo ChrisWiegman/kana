@@ -13,8 +13,9 @@ import (
 )
 
 type CurrentConfig struct {
-	Type  string
-	Local bool
+	Type   string
+	Local  bool
+	Xdebug bool
 }
 
 // GetSiteContainers returns an array of strings containing the container names for the site
@@ -195,8 +196,14 @@ func (s *Site) StartWordPress() error {
 func (s *Site) GetCurrentWordPressConfig() CurrentConfig {
 
 	currentConfig := CurrentConfig{
-		Type:  "site",
-		Local: false,
+		Type:   "site",
+		Local:  false,
+		Xdebug: false,
+	}
+
+	output, _ := s.runCli("pecl list | grep xdebug", false)
+	if strings.Contains(output.StdOut, "xdebug") {
+		currentConfig.Xdebug = true
 	}
 
 	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana_%s_wordpress", s.StaticConfig.SiteName))

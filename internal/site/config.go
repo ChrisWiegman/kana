@@ -49,6 +49,7 @@ func (s *Site) ExportSiteSettings() error {
 
 	s.SiteConfig.Set("local", config.Local)
 	s.SiteConfig.Set("type", config.Type)
+	s.SiteConfig.Set("xdebug", config.Xdebug)
 
 	if _, err := os.Stat(path.Join(s.StaticConfig.WorkingDirectory, ".kana.json")); os.IsNotExist(err) {
 		return s.SiteConfig.SafeWriteConfig()
