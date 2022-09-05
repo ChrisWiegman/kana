@@ -1,6 +1,7 @@
 package site
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path"
@@ -15,6 +16,13 @@ type CurrentConfig struct {
 	Type   string
 	Local  bool
 	Xdebug bool
+}
+
+type PluginInfo struct {
+	Name    string `json:"name"`
+	Status  string `json:"status"`
+	Update  string `json:"update"`
+	Version string `json:"version"`
 }
 
 // GetSiteContainers returns an array of strings containing the container names for the site
@@ -301,4 +309,36 @@ func (s *Site) RunWPCli(command []string) (string, error) {
 	}
 
 	return output, nil
+}
+
+// GetInstalledWordPressPlugins Returns a list of the plugins that have been installed on the site
+func (s *Site) GetInstalledWordPressPlugins() ([]string, error) {
+
+	commands := []string{
+		"plugin",
+		"list",
+		"--format=json",
+	}
+
+	commandOutput, err := s.RunWPCli(commands)
+	if err != nil {
+		return []string{}, err
+	}
+
+	rawPlugins := []PluginInfo{}
+	plugins := []string{}
+
+	err = json.Unmarshal([]byte(commandOutput), &rawPlugins)
+	if err != nil {
+		return []string{}, err
+	}
+
+	for _, plugin := range rawPlugins {
+
+		if plugin.Status != "dropin" && plugin.Name != s.StaticConfig.SiteName && plugin.Name != "hello" && plugin.Name != "akismet" {
+			plugins = append(plugins, plugin.Name)
+		}
+	}
+
+	return plugins, nil
 }

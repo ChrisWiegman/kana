@@ -48,12 +48,17 @@ func getSiteConfig(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Vip
 func (s *Site) ExportSiteConfig() error {
 
 	config := s.GetRunningConfig()
+	plugins, err := s.GetInstalledWordPressPlugins()
+	if err != nil {
+		return err
+	}
 
 	s.SiteConfig.Set("local", config.Local)
 	s.SiteConfig.Set("type", config.Type)
 	s.SiteConfig.Set("xdebug", config.Xdebug)
+	s.SiteConfig.Set("plugins", plugins)
 
-	if _, err := os.Stat(path.Join(s.StaticConfig.WorkingDirectory, ".kana.json")); os.IsNotExist(err) {
+	if _, err = os.Stat(path.Join(s.StaticConfig.WorkingDirectory, ".kana.json")); os.IsNotExist(err) {
 		return s.SiteConfig.SafeWriteConfig()
 	}
 
