@@ -73,6 +73,40 @@ func getLocalAppDir() (string, error) {
 	return localAppDir, nil
 }
 
+func (s *Site) getMounts(appDir, siteType string) ([]mount.Mount, error) {
+
+	appVolumes := []mount.Mount{
+		{
+			Type:   mount.TypeBind,
+			Source: appDir,
+			Target: "/var/www/html",
+		},
+	}
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		return appVolumes, err
+	}
+
+	if s.SiteConfig.GetString("type") == "plugin" {
+		appVolumes = append(appVolumes, mount.Mount{
+			Type:   mount.TypeBind,
+			Source: cwd,
+			Target: path.Join("/var/www/html", "wp-content", "plugins", s.StaticConfig.SiteName),
+		})
+	}
+
+	if s.SiteConfig.GetString("type") == "theme" {
+		appVolumes = append(appVolumes, mount.Mount{
+			Type:   mount.TypeBind,
+			Source: cwd,
+			Target: path.Join("/var/www/html", "wp-content", "themes", s.StaticConfig.SiteName),
+		})
+	}
+
+	return appVolumes, nil
+}
+
 // StartWordPress Starts the WordPress containers
 func (s *Site) StartWordPress() error {
 
@@ -99,33 +133,9 @@ func (s *Site) StartWordPress() error {
 		return err
 	}
 
-	appVolumes := []mount.Mount{
-		{
-			Type:   mount.TypeBind,
-			Source: appDir,
-			Target: "/var/www/html",
-		},
-	}
-
-	cwd, err := os.Getwd()
+	appVolumes, err := s.getMounts(appDir, s.SiteConfig.GetString("type"))
 	if err != nil {
 		return err
-	}
-
-	if s.SiteConfig.GetString("type") == "plugin" {
-		appVolumes = append(appVolumes, mount.Mount{
-			Type:   mount.TypeBind,
-			Source: cwd,
-			Target: path.Join("/var/www/html", "wp-content", "plugins", s.StaticConfig.SiteName),
-		})
-	}
-
-	if s.SiteConfig.GetString("type") == "theme" {
-		appVolumes = append(appVolumes, mount.Mount{
-			Type:   mount.TypeBind,
-			Source: cwd,
-			Target: path.Join("/var/www/html", "wp-content", "themes", s.StaticConfig.SiteName),
-		})
 	}
 
 	wordPressContainers := []docker.ContainerConfig{
@@ -250,33 +260,9 @@ func (s *Site) RunWPCli(command []string) (string, error) {
 		}
 	}
 
-	cwd, err := os.Getwd()
+	appVolumes, err := s.getMounts(appDir, runningConfig.Type)
 	if err != nil {
 		return "", err
-	}
-
-	appVolumes := []mount.Mount{
-		{
-			Type:   mount.TypeBind,
-			Source: appDir,
-			Target: "/var/www/html",
-		},
-	}
-
-	if runningConfig.Type == "plugin" {
-		appVolumes = append(appVolumes, mount.Mount{
-			Type:   mount.TypeBind,
-			Source: cwd,
-			Target: path.Join("/var/www/html", "wp-content", "plugins", s.StaticConfig.SiteName),
-		})
-	}
-
-	if runningConfig.Type == "theme" {
-		appVolumes = append(appVolumes, mount.Mount{
-			Type:   mount.TypeBind,
-			Source: cwd,
-			Target: path.Join("/var/www/html", "wp-content", "themes", s.StaticConfig.SiteName),
-		})
 	}
 
 	fullCommand := []string{
