@@ -4,12 +4,18 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/ChrisWiegman/kana/internal/docker"
 	"github.com/ChrisWiegman/kana/internal/traefik"
 
 	"github.com/docker/docker/api/types/mount"
 )
+
+type CurrentConfig struct {
+	Type  string
+	Local bool
+}
 
 // GetSiteContainers returns an array of strings containing the container names for the site
 func (s *Site) GetSiteContainers() []string {
@@ -185,6 +191,38 @@ func (s *Site) StartWordPress() error {
 	return nil
 }
 
+// GetCurrentWordPressConfig gets various options that were used to start the site
+func (s *Site) GetCurrentWordPressConfig() CurrentConfig {
+
+	currentConfig := CurrentConfig{
+		Type:  "site",
+		Local: false,
+	}
+
+	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana_%s_wordpress", s.StaticConfig.SiteName))
+
+	if len(mounts) == 1 {
+		currentConfig.Type = "site"
+	}
+
+	for _, mount := range mounts {
+
+		if mount.Source == path.Join(s.StaticConfig.WorkingDirectory, "wordpress") {
+			currentConfig.Local = true
+		}
+
+		if strings.Contains(mount.Destination, "/var/www/html/wp-content/plugins/") {
+			currentConfig.Type = "plugin"
+		}
+
+		if strings.Contains(mount.Destination, "/var/www/html/wp-content/themes/") {
+			currentConfig.Type = "theme"
+		}
+	}
+
+	return currentConfig
+}
+
 // InstallWordPress Installs and configures WordPress core
 func (s *Site) InstallWordPress() error {
 
@@ -235,12 +273,42 @@ func (s *Site) RunWPCli(command []string) (string, error) {
 
 	siteDir := path.Join(s.StaticConfig.AppDirectory, "sites", s.StaticConfig.SiteName)
 	appDir := path.Join(siteDir, "app")
+	runningConfig := s.GetCurrentWordPressConfig()
 
-	if s.IsLocalSite() {
+	if runningConfig.Local {
 		appDir, err = getLocalAppDir()
 		if err != nil {
 			return "", err
 		}
+	}
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+
+	appVolumes := []mount.Mount{
+		{
+			Type:   mount.TypeBind,
+			Source: appDir,
+			Target: "/var/www/html",
+		},
+	}
+
+	if runningConfig.Type == "plugin" {
+		appVolumes = append(appVolumes, mount.Mount{
+			Type:   mount.TypeBind,
+			Source: cwd,
+			Target: path.Join("/var/www/html", "wp-content", "plugins", s.StaticConfig.SiteName),
+		})
+	}
+
+	if runningConfig.Type == "theme" {
+		appVolumes = append(appVolumes, mount.Mount{
+			Type:   mount.TypeBind,
+			Source: cwd,
+			Target: path.Join("/var/www/html", "wp-content", "themes", s.StaticConfig.SiteName),
+		})
 	}
 
 	fullCommand := []string{
@@ -265,13 +333,7 @@ func (s *Site) RunWPCli(command []string) (string, error) {
 		Labels: map[string]string{
 			"kana.site": s.StaticConfig.SiteName,
 		},
-		Volumes: []mount.Mount{
-			{
-				Type:   mount.TypeBind,
-				Source: appDir,
-				Target: "/var/www/html",
-			},
-		},
+		Volumes: appVolumes,
 	}
 
 	err = s.dockerClient.EnsureImage(container.Image)
