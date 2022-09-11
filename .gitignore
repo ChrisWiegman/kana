@@ -56,3 +56,6 @@ vendor/
 
 # Ignore the generated binary
 kana
+
+# Ignore goreleasaer's build files
+dist/
