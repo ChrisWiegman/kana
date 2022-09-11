@@ -64,6 +64,11 @@ func NewSite(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Viper) (*
 // ProcessNameFlag Processes the name flag on the site resetting all appropriate site variables
 func (s *Site) ProcessNameFlag(cmd *cobra.Command) error {
 
+	// Don't run this on commands that wouldn't possibly use it.
+	if cmd.Use == "config" || cmd.Use == "version" || cmd.Use == "help" {
+		return nil
+	}
+
 	// By default the siteLink should be the working directory (assume it's linked)
 	siteLink := s.StaticConfig.WorkingDirectory
 
