@@ -159,6 +159,7 @@ Note that I am using this project for my own work and it is under active develop
 - Much more clear prompts and messages on the commands themselves
 - Other system support (time allowed)
 - Writing a lot more tests (it's a personal project, I start where I can)
+- A proper website for all this documentation (I already bought a domain, afterall)
 
 # Completely Uninstalling Kana
 
