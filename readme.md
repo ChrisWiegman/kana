@@ -14,13 +14,20 @@ I've gone through many different tools to run WordPress sites over the years. Al
 
 - MacOS
 - [Docker Desktop](https://www.docker.com)
-- [Go](https://go.dev) _for installation_
 
 I've built Kana on a Mac and, at least for now, it will probably only run on a Mac. If I can get resources to expand that to Linux or beyond I will gladly do so.
 
 # Installing Kana
 
-You will need Go installed locally to build the application for now. I hope to fix this in the new future.
+While I will add Kana to Homebrew at some point, for now installation is rather manual.
+
+## Download from GitHub releases
+
+Simply download the latest release from our [release page](https://github.com/ChrisWiegman/kana-cli/releases) and extract the CLI to a location accessible by your system PATH
+
+## Build manually
+
+You will need [Go](https://go.dev) installed locally to build the application for now. I hope to fix this in the new future.
 
 1. Clone this repo `git clone git@github.com:ChrisWiegman/kana-cli.git`
 2. CD into the repo and run `make install`
@@ -151,12 +158,13 @@ Note that I am using this project for my own work and it is under active develop
 - Support for more xdebug modes (trace, etc)
 - Much more clear prompts and messages on the commands themselves
 - Other system support (time allowed)
+- Writing a lot more tests (it's a personal project, I start where I can)
 
 # Completely Uninstalling Kana
 
 I hate apps that leave leftovers on your machine. When stopping a site all Docker resources except the images will be removed. To remove the app completely beyond that you'll want to delete the following:
 
-1. Delete the application from your $GOBIN path
+1. Delete the application from your $GOBIN or system path
 2. Delete the `~/.config/kana` folder which contains all site and app configuration
 3. Delete the `Kana Development CA` certificate from the _System_ keychain in the _Keychain Access_ app
 
