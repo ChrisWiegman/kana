@@ -2,6 +2,8 @@ name: go-test
 
 on:
   push:
+    branches:
+      - "**"
     tags-ignore:
       - "**"
   pull_request:
