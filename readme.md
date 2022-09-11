@@ -16,8 +16,12 @@ I've built Kana on a Mac and, at least for now, it will probably only run on a M
 
 # Installing Kana
 
+You will need Go installed locally to build the application for now. I hope to fix this in the new future.
+
 1. Clone this repo `git clone git@github.com:ChrisWiegman/kana-cli.git`
 2. CD into the repo and run `make install`
+
+Assuming you have Go properly setup with GOBIN in your system path, you should now be able to use Kana. Run `kana version` to test.
 
 # Using Kana
 
@@ -143,3 +147,13 @@ Note that I am using this project for my own work and it is under active develop
 - Support for more xdebug modes (trace, etc)
 - Much more clear prompts and messages on the commands themselves
 - Other system support (time allowed)
+
+# Completely Uninstalling Kana
+
+I hate apps that leave leftovers on your machine. When stopping a site all Docker resources except the images will be removed. To remove the app completely beyond that you'll want to delete the following:
+
+1. Delete the application from your $GOBIN path
+2. Delete the `~/.config/kana` folder which contains all site and app configuration
+3. Delete the `Kana Development CA` certificate from the _System_ keychain in the _Keychain Access_ app
+
+You can also safely remove any new images added however it is not a requirement. Many other apps might share those images leading to your system simply needing to download them again.
