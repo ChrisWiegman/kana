@@ -6,8 +6,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/ChrisWiegman/kana/internal/docker"
-	"github.com/ChrisWiegman/kana/internal/traefik"
+	"github.com/ChrisWiegman/kana-cli/internal/docker"
+	"github.com/ChrisWiegman/kana-cli/internal/traefik"
 
 	"github.com/docker/docker/api/types/mount"
 )

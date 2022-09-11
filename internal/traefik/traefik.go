@@ -3,9 +3,9 @@ package traefik
 import (
 	"path"
 
-	"github.com/ChrisWiegman/kana/internal/appConfig"
-	"github.com/ChrisWiegman/kana/internal/appSetup"
-	"github.com/ChrisWiegman/kana/internal/docker"
+	"github.com/ChrisWiegman/kana-cli/internal/appConfig"
+	"github.com/ChrisWiegman/kana-cli/internal/appSetup"
+	"github.com/ChrisWiegman/kana-cli/internal/docker"
 
 	"github.com/docker/docker/api/types/mount"
 )

@@ -7,7 +7,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/ChrisWiegman/kana/internal/console"
+	"github.com/ChrisWiegman/kana-cli/internal/console"
 
 	"github.com/docker/docker/api/types"
 )

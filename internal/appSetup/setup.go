@@ -5,8 +5,8 @@ import (
 	"os/exec"
 	"path"
 
-	"github.com/ChrisWiegman/kana/internal/appConfig"
-	"github.com/ChrisWiegman/kana/pkg/minica"
+	"github.com/ChrisWiegman/kana-cli/internal/appConfig"
+	"github.com/ChrisWiegman/kana-cli/pkg/minica"
 )
 
 // EnsureStaticConfigFiles Ensures the application's static config files have been generated and are where they need to be

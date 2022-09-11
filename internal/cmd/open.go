@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ChrisWiegman/kana/internal/site"
+	"github.com/ChrisWiegman/kana-cli/internal/site"
 
 	"github.com/spf13/cobra"
 )

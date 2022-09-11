@@ -17,7 +17,7 @@ import (
 	"path"
 	"time"
 
-	"github.com/ChrisWiegman/kana/internal/appConfig"
+	"github.com/ChrisWiegman/kana-cli/internal/appConfig"
 )
 
 type issuer struct {

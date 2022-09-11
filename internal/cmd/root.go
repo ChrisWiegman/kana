@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ChrisWiegman/kana/internal/appConfig"
-	"github.com/ChrisWiegman/kana/internal/appSetup"
-	"github.com/ChrisWiegman/kana/internal/site"
+	"github.com/ChrisWiegman/kana-cli/internal/appConfig"
+	"github.com/ChrisWiegman/kana-cli/internal/appSetup"
+	"github.com/ChrisWiegman/kana-cli/internal/site"
 
 	"github.com/spf13/cobra"
 )
@@ -69,6 +69,7 @@ func Execute() {
 		newDestroyCommand(site),
 		newConfigCommand(site),
 		newExportCommand(site),
+		newVersionCommand(site),
 	)
 
 	// Execute anything we need to

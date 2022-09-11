@@ -6,7 +6,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/ChrisWiegman/kana/internal/appConfig"
+	"github.com/ChrisWiegman/kana-cli/internal/appConfig"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
