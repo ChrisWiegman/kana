@@ -2,6 +2,10 @@
 
 Kana is a simple CLI tool for developing WordPress plugins and themes efficiently.
 
+# Project status
+
+As of version 0.0.1 I am using Kana for my own work on my personal website and a few tiny projects I've been developing. It is, however, still a very early project that will continue to receive a lot of updates over the coming weeks, months and beyond. While I hope it can help you too, I cannot promise you won't find bugs. Please do report any issues you find and I will gladly work to fix them to make this project useful for us all.
+
 # Why Kana?
 
 I've gone through many different tools to run WordPress sites over the years. All of them are either extremely complex or don't support basic features such as ensuring plugin and theme development can be a first-class experience. I rarely build sites with WordPress and I wanted a tool that will allow me to build the plugins and themes I do work on as efficiently as possible.
