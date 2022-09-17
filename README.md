@@ -19,7 +19,16 @@ I've built Kana on a Mac and, at least for now, it will probably only run on a M
 
 # Installing Kana
 
-While I will add Kana to Homebrew at some point, for now installation is rather manual.
+There are a few options for installing Kana. You can use [Homebrew](https://brew.sh) (recommended), you can install it from the "releases" page here or you can build it manually.
+
+## Install from Homebrew
+
+Installing from [Homebrew](https://brew.sh) is the recommended approach as it allows for automatic updates when needed. To install from Homebrew run the following 2 commands:
+
+```
+brew tap ChrisWiegman/kana
+brew install kana
+```
 
 ## Download from GitHub releases
 
