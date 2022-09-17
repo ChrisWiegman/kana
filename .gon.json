@@ -1,8 +1,0 @@
-{
-    "apple_id": {
-        "password": "@env:AC_PASSWORD"
-    },
-    "sign": {
-        "application_identity": "Developer ID Application: Chris Wiegman"
-    }
-}

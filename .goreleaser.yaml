@@ -31,9 +31,3 @@ brews:
       branch: main
     license: "MIT"
     skip_upload: true
-signs:
-  - signature: "${artifact}.dmg"
-    ids: ["macos"]
-    cmd: gon
-    args: [".gon.json"]
-    artifacts: all
