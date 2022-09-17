@@ -31,7 +31,6 @@ brews:
       branch: main
     name: kana
     license: "GPL-3.0 license"
-    folder: Formula
     test: |
       system "#{bin}/kana version"
     homepage: "https://github.com/ChrisWiegman/kana-cli"
