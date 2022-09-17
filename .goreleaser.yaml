@@ -29,5 +29,5 @@ brews:
       owner: ChrisWiegman
       name: homebrew-kana
       branch: main
-    license: "MIT"
+    license: "GPL-3.0 license"
     skip_upload: true
