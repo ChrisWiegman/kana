@@ -131,6 +131,12 @@ func (s *Site) StartWordPress() error {
 		if err != nil {
 			return err
 		}
+
+		// Replace wp-config.php with the container's file
+		_, err := os.Stat(path.Join(appDir, "wp-config.php"))
+		if err == nil {
+			os.Remove(path.Join(appDir, "wp-config.php"))
+		}
 	}
 
 	if err := os.MkdirAll(appDir, 0750); err != nil {
