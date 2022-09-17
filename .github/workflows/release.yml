@@ -30,4 +30,4 @@ jobs:
           version: latest
           args: --rm-dist --release-notes=${{ env.RELEASE_NOTES_PATH }} --skip-validate --debug
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
