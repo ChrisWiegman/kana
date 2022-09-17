@@ -175,8 +175,9 @@ Note that I am using this project for my own work and it is under active develop
 
 I hate apps that leave leftovers on your machine. When stopping a site all Docker resources except the images will be removed. To remove the app completely beyond that you'll want to delete the following:
 
-1. Delete the application from your $GOBIN or system path
+1. Delete the application from your $GOBIN or system path (or run `brew uninstall kana` if installed via homebrew)
 2. Delete the `~/.config/kana` folder which contains all site and app configuration
 3. Delete the `Kana Development CA` certificate from the _System_ keychain in the _Keychain Access_ app
+4. If installed via homebrew run `brew untap ChrisWiegman/kana` to remove the Homebrew tap
 
 You can also safely remove any new images added however it is not a requirement. Many other apps might share those images leading to your system simply needing to download them again.
