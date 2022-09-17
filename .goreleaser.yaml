@@ -30,4 +30,3 @@ brews:
       name: homebrew-kana
       branch: main
     license: "GPL-3.0 license"
-    skip_upload: true
