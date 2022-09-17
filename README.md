@@ -163,12 +163,13 @@ To trigger step debugging you'll also need the appropriate extension for your br
 
 Note that I am using this project for my own work and it is under active development. Some of the things I'm currently working on include:
 
-- Easier install on Mac
+- Code signing on Mac to prevent security notices on initial run
 - Support for more xdebug modes (trace, etc)
 - Much more clear prompts and messages on the commands themselves
 - Other system support (time allowed)
 - Writing a lot more tests (it's a personal project, I start where I can)
-- A proper website for all this documentation (I already bought a domain, afterall)
+- A proper website for all this documentation (I already bought a domain, after all)
+- Possible support for Docker alternatives
 
 # Completely Uninstalling Kana
 
