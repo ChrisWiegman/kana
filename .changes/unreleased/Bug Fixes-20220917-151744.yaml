@@ -1,0 +1,4 @@
+kind: Bug Fixes
+body: 'Prevent site failure if an existing wp-config is already present when using
+  the "local" flag. #3'
+time: 2022-09-17T15:17:44.040933259Z

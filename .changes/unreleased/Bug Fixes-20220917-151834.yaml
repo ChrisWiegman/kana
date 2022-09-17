@@ -1,0 +1,4 @@
+kind: Bug Fixes
+body: Prevent race condition that can occur due to Traefik not finishing full SSL
+  config before we check the site.
+time: 2022-09-17T15:18:34.001596587Z
