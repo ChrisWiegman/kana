@@ -30,6 +30,8 @@ brew tap ChrisWiegman/kana
 brew install kana
 ```
 
+Note that, as there are numerous ways to install Docker, I have chosen, at least for now, to not list it as a dependency when installing via Homebrew. You'll want to make sure Docker is already installed or install it with `brew install --cask docker`.
+
 ## Download from GitHub releases
 
 Simply download the latest release from our [release page](https://github.com/ChrisWiegman/kana-cli/releases) and extract the CLI to a location accessible by your system PATH
