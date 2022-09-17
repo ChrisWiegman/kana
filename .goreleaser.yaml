@@ -2,13 +2,11 @@
 # Make sure to check the documentation at https://goreleaser.com
 before:
   hooks:
-    # You may remove this if you don't use go modules.
     - go mod tidy
-    # you may remove this if you don't need go generate
-    - go generate ./...
 builds:
   - env:
       - CGO_ENABLED=0
+    id: macos
     goos:
       - darwin
     main: ./cmd/kana/main.go
@@ -33,3 +31,9 @@ brews:
       branch: main
     license: "MIT"
     skip_upload: true
+signs:
+  - signature: "${artifact}.dmg"
+    ids: ["macos"]
+    cmd: gon
+    args: [".gon.json"]
+    artifacts: all
