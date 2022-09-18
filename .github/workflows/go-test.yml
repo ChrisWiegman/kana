@@ -11,7 +11,7 @@ on:
       - main
 
 jobs:
-  release:
+  go-test:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
