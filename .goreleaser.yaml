@@ -1,13 +1,12 @@
-# This is an example .goreleaser.yml file with some sensible defaults.
-# Make sure to check the documentation at https://goreleaser.com
+project_name: kana
+
 before:
   hooks:
-    # You may remove this if you don't use go modules.
     - go mod tidy
-    # you may remove this if you don't need go generate
-    - go generate ./...
+
 builds:
-  - env:
+  - id: macos
+    env:
       - CGO_ENABLED=0
     goos:
       - darwin
@@ -15,14 +14,28 @@ builds:
     binary: kana
     ldflags:
       - -s -w -X github.com/ChrisWiegman/kana-cli/internal/cmd.Version={{.Version}} -X github.com/ChrisWiegman/kana-cli/internal/cmd.GitHash={{.Commit}} -X github.com/ChrisWiegman/kana-cli/internal/cmd.Timestamp={{.Date}}
+
 archives:
-  - replacements:
+  - format: zip
+    replacements:
       darwin: Darwin
       386: i386
       amd64: x86_64
-checksum:
-  name_template: "checksums.txt"
+
 snapshot:
   name_template: "{{ incpatch .Version }}-devel"
+
 changelog:
   skip: false
+
+brews:
+  - tap:
+      owner: ChrisWiegman
+      name: homebrew-kana
+      branch: main
+    name: kana
+    license: "GPL-3.0 license"
+    test: |
+      system "#{bin}/kana version"
+    homepage: "https://github.com/ChrisWiegman/kana-cli"
+    description: "A simple, portable CLI for efficient WordPress development."

@@ -142,9 +142,7 @@ func (s *Site) VerifySite() (bool, error) {
 
 	client := &http.Client{
 		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				RootCAs: caCertPool,
-			},
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		},
 	}
 

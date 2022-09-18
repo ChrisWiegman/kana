@@ -15,11 +15,26 @@ I've gone through many different tools to run WordPress sites over the years. Al
 - MacOS
 - [Docker Desktop](https://www.docker.com)
 
-I've built Kana on a Mac and, at least for now, it will probably only run on a Mac. If I can get resources to expand that to Linux or beyond I will gladly do so.
+I've built Kana on a Mac and, at least for now, it will probably only run on a Mac. If I can get the time and resources (something to test it on) to expand that to Linux or beyond I will gladly do so.
 
 # Installing Kana
 
-While I will add Kana to Homebrew at some point, for now installation is rather manual.
+There are a few options for installing Kana. You can use [Homebrew](https://brew.sh) (recommended), you can install it from the "releases" page here or you can build it manually.
+
+**Note:** I have purchased Apple Developer access to properly sign the binaries however, I'm currently struggling to implement that in the code. In the meantime, if you get the error about not being able to run un-trusted software the first time you use Kana, go to System Preferences -> Security and click to allow the application to run.
+
+You can track my progress on improving this process on [Issue #2](https://github.com/ChrisWiegman/kana-cli/issues/2).
+
+## Install from Homebrew
+
+Installing from [Homebrew](https://brew.sh) is the recommended approach as it allows for automatic updates when needed. To install from Homebrew run the following 2 commands:
+
+```
+brew tap ChrisWiegman/kana
+brew install kana
+```
+
+Note that, as there are numerous ways to install Docker, I have chosen, at least for now, to not list it as a dependency when installing via Homebrew. You'll want to make sure Docker is already installed or install it with `brew install --cask docker`.
 
 ## Download from GitHub releases
 
@@ -154,19 +169,21 @@ To trigger step debugging you'll also need the appropriate extension for your br
 
 Note that I am using this project for my own work and it is under active development. Some of the things I'm currently working on include:
 
-- Easier install on Mac
+- Code signing on Mac to prevent security notices on initial run (see https://github.com/ChrisWiegman/kana-cli/issues/2)
 - Support for more xdebug modes (trace, etc)
 - Much more clear prompts and messages on the commands themselves
-- Other system support (time allowed)
+- Other system support (Linux and Windows) (time allowed)
 - Writing a lot more tests (it's a personal project, I start where I can)
-- A proper website for all this documentation (I already bought a domain, afterall)
+- A proper website for all this documentation (I already bought a domain, after all)
+- Possible support for Docker alternatives
 
 # Completely Uninstalling Kana
 
 I hate apps that leave leftovers on your machine. When stopping a site all Docker resources except the images will be removed. To remove the app completely beyond that you'll want to delete the following:
 
-1. Delete the application from your $GOBIN or system path
+1. Delete the application from your $GOBIN or system path (or run `brew uninstall kana` if installed via homebrew)
 2. Delete the `~/.config/kana` folder which contains all site and app configuration
 3. Delete the `Kana Development CA` certificate from the _System_ keychain in the _Keychain Access_ app
+4. If installed via homebrew run `brew untap ChrisWiegman/kana` to remove the Homebrew tap
 
 You can also safely remove any new images added however it is not a requirement. Many other apps might share those images leading to your system simply needing to download them again.
