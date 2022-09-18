@@ -23,6 +23,9 @@ jobs:
           go-version: 1.19
 
       - name: Build
+        run: make release
+
+      - name: Build
         run: make build
 
       - name: Test
