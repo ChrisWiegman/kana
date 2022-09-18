@@ -27,11 +27,10 @@ You can track my progress on improving this process on [Issue #2](https://github
 
 ## Install from Homebrew
 
-Installing from [Homebrew](https://brew.sh) is the recommended approach as it allows for automatic updates when needed. To install from Homebrew run the following 2 commands:
+Installing from [Homebrew](https://brew.sh) is the recommended approach as it allows for automatic updates when needed. To install from Homebrew run the following command:
 
 ```
-brew tap ChrisWiegman/kana
-brew install kana
+brew install ChrisWiegman/kana/kana
 ```
 
 Note that, as there are numerous ways to install Docker, I have chosen, at least for now, to not list it as a dependency when installing via Homebrew. You'll want to make sure Docker is already installed or install it with `brew install --cask docker`.
