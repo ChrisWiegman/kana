@@ -12,9 +12,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Fetch all tags
-        run: git fetch --force --tags
-
       - name: Setup Go
         uses: actions/setup-go@v3
         with:
