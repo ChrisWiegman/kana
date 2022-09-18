@@ -1,5 +1,5 @@
 PKG       := github.com/ChrisWiegman/kana-cli
-VERSION   := $(shell git describe --tags)
+VERSION   := $(shell git describe --tags || echo "0.0.1")
 GITHASH   := $(shell git describe --tags --always --dirty)
 TIMESTAMP := $(shell date -u '+%Y-%m-%d_%I:%M:%S%p')
 ARGS = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
@@ -63,3 +63,12 @@ update:
 .PHONY: release
 release:
 	echo $(VERSION)
+	docker run --rm \
+	--privileged \
+	-v $(PWD):/go/src/$(PKG) \
+	-w /go/src/$(PKG) \
+	goreleaser/goreleaser \
+		release \
+		--rm-dist \
+		--release-notes=./.changes/$(VERSION).md \
+		--snapshot

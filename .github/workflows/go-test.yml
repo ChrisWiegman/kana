@@ -21,7 +21,7 @@ jobs:
         run: git fetch --force --tags
 
       - name: Version
-        run: make release
+        run: echo ${{ env.GITHUB_REF }}
 
       - name: Setup Go
         uses: actions/setup-go@v3

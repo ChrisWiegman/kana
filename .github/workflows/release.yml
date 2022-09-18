@@ -22,7 +22,7 @@ jobs:
 
       - name: Add env vars
         run: |
-          echo RELEASE_NOTES_PATH=.changes/$(shell git describe --tags || echo "0.0.1").md >> $GITHUB_ENV
+          echo RELEASE_NOTES_PATH=.changes/${{ env.GITHUB_REF }}.md >> $GITHUB_ENV
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v3.1.0
