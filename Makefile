@@ -62,6 +62,7 @@ update:
 
 .PHONY: release
 release:
+	echo $(VERSION)
 	docker run --rm \
 	--privileged \
 	-v $(PWD):/go/src/$(PKG) \
