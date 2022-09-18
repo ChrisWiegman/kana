@@ -15,11 +15,15 @@ I've gone through many different tools to run WordPress sites over the years. Al
 - MacOS
 - [Docker Desktop](https://www.docker.com)
 
-I've built Kana on a Mac and, at least for now, it will probably only run on a Mac. If I can get resources to expand that to Linux or beyond I will gladly do so.
+I've built Kana on a Mac and, at least for now, it will probably only run on a Mac. If I can get the time and resources (something to test it on) to expand that to Linux or beyond I will gladly do so.
 
 # Installing Kana
 
 There are a few options for installing Kana. You can use [Homebrew](https://brew.sh) (recommended), you can install it from the "releases" page here or you can build it manually.
+
+**Note:** I have purchased Apple Developer access to properly sign the binaries however, I'm currently struggling to implement that in the code. In the meantime, if you get the error about not being able to run un-trusted software the first time you use Kana, go to System Preferences -> Security and click to allow the application to run.
+
+You can track my progress on improving this process on [Issue #2](https://github.com/ChrisWiegman/kana-cli/issues/2).
 
 ## Install from Homebrew
 
@@ -165,7 +169,7 @@ To trigger step debugging you'll also need the appropriate extension for your br
 
 Note that I am using this project for my own work and it is under active development. Some of the things I'm currently working on include:
 
-- Code signing on Mac to prevent security notices on initial run
+- Code signing on Mac to prevent security notices on initial run (see https://github.com/ChrisWiegman/kana-cli/issues/2)
 - Support for more xdebug modes (trace, etc)
 - Much more clear prompts and messages on the commands themselves
 - Other system support (time allowed)
