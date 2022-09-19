@@ -81,7 +81,7 @@ func getLocalAppDir() (string, error) {
 	return localAppDir, nil
 }
 
-func (s *Site) getMounts(appDir, siteType string) ([]mount.Mount, error) {
+func (s *Site) getMounts(appDir, devDir, siteType string) ([]mount.Mount, error) {
 
 	appVolumes := []mount.Mount{
 		{
@@ -91,15 +91,10 @@ func (s *Site) getMounts(appDir, siteType string) ([]mount.Mount, error) {
 		},
 	}
 
-	cwd, err := os.Getwd()
-	if err != nil {
-		return appVolumes, err
-	}
-
 	if s.SiteConfig.GetString("type") == "plugin" {
 		appVolumes = append(appVolumes, mount.Mount{
 			Type:   mount.TypeBind,
-			Source: cwd,
+			Source: devDir,
 			Target: path.Join("/var/www/html", "wp-content", "plugins", s.StaticConfig.SiteName),
 		})
 	}
@@ -107,7 +102,7 @@ func (s *Site) getMounts(appDir, siteType string) ([]mount.Mount, error) {
 	if s.SiteConfig.GetString("type") == "theme" {
 		appVolumes = append(appVolumes, mount.Mount{
 			Type:   mount.TypeBind,
-			Source: cwd,
+			Source: devDir,
 			Target: path.Join("/var/www/html", "wp-content", "themes", s.StaticConfig.SiteName),
 		})
 	}
@@ -123,13 +118,27 @@ func (s *Site) StartWordPress() error {
 		return err
 	}
 
+	cwd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
 	appDir := path.Join(s.StaticConfig.SiteDirectory, "app")
 	databaseDir := path.Join(s.StaticConfig.SiteDirectory, "database")
+	devDir := cwd
 
 	if s.IsLocalSite() {
 		appDir, err = getLocalAppDir()
 		if err != nil {
 			return err
+		}
+
+		if s.SiteConfig.GetString("type") == "plugin" {
+			devDir = path.Join(cwd, "plugin")
+		}
+
+		if s.SiteConfig.GetString("type") == "theme" {
+			devDir = path.Join(cwd, "theme")
 		}
 
 		// Replace wp-config.php with the container's file
@@ -143,11 +152,17 @@ func (s *Site) StartWordPress() error {
 		return err
 	}
 
+	if devDir != s.StaticConfig.SiteDirectory {
+		if err := os.MkdirAll(devDir, 0750); err != nil {
+			return err
+		}
+	}
+
 	if err := os.MkdirAll(databaseDir, 0750); err != nil {
 		return err
 	}
 
-	appVolumes, err := s.getMounts(appDir, s.SiteConfig.GetString("type"))
+	appVolumes, err := s.getMounts(appDir, devDir, s.SiteConfig.GetString("type"))
 	if err != nil {
 		return err
 	}
@@ -263,9 +278,25 @@ func (s *Site) RunWPCli(command []string) (string, error) {
 		return "", err
 	}
 
+	cwd, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+
 	siteDir := path.Join(s.StaticConfig.AppDirectory, "sites", s.StaticConfig.SiteName)
 	appDir := path.Join(siteDir, "app")
+	devDir := cwd
 	runningConfig := s.GetRunningConfig()
+
+	if s.IsLocalSite() {
+		if s.SiteConfig.GetString("type") == "plugin" {
+			devDir = path.Join(cwd, "plugin")
+		}
+
+		if s.SiteConfig.GetString("type") == "theme" {
+			devDir = path.Join(cwd, "theme")
+		}
+	}
 
 	if runningConfig.Local {
 		appDir, err = getLocalAppDir()
@@ -274,7 +305,7 @@ func (s *Site) RunWPCli(command []string) (string, error) {
 		}
 	}
 
-	appVolumes, err := s.getMounts(appDir, runningConfig.Type)
+	appVolumes, err := s.getMounts(appDir, devDir, runningConfig.Type)
 	if err != nil {
 		return "", err
 	}
