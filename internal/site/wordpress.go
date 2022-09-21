@@ -96,7 +96,7 @@ func (s *Site) getMounts(appDir, siteType string) ([]mount.Mount, error) {
 		return appVolumes, err
 	}
 
-	if s.SiteConfig.GetString("type") == "plugin" {
+	if siteType == "plugin" {
 		appVolumes = append(appVolumes, mount.Mount{
 			Type:   mount.TypeBind,
 			Source: cwd,
@@ -104,7 +104,7 @@ func (s *Site) getMounts(appDir, siteType string) ([]mount.Mount, error) {
 		})
 	}
 
-	if s.SiteConfig.GetString("type") == "theme" {
+	if siteType == "theme" {
 		appVolumes = append(appVolumes, mount.Mount{
 			Type:   mount.TypeBind,
 			Source: cwd,
