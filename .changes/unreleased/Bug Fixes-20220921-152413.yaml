@@ -1,0 +1,3 @@
+kind: Bug Fixes
+body: Ensure wp-cli commands work on theme and plugin projects.
+time: 2022-09-21T15:24:13.256117505Z
