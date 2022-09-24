@@ -23,6 +23,7 @@ archives:
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     replacements:
       amd64: x86_64
+      darwin: macos
     files:
       - LICENSE.txt
       - CHANGELOG.md
