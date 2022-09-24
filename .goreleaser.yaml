@@ -1,13 +1,14 @@
 project_name: kana
 
+env:
+  - CGO_ENABLED=0
+
 before:
   hooks:
     - go mod tidy
 
 builds:
   - id: macos
-    env:
-      - CGO_ENABLED=0
     goos:
       - darwin
     main: ./cmd/kana/main.go
@@ -16,11 +17,15 @@ builds:
       - -s -w -X github.com/ChrisWiegman/kana-cli/internal/cmd.Version={{.Version}} -X github.com/ChrisWiegman/kana-cli/internal/cmd.GitHash={{.Commit}} -X github.com/ChrisWiegman/kana-cli/internal/cmd.Timestamp={{.Date}}
 
 archives:
-  - format: zip
+  - id: macos
+    builds: [macos]
+    format: zip
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     replacements:
-      darwin: Darwin
-      386: i386
       amd64: x86_64
+    files:
+      - LICENSE.txt
+      - CHANGELOG.md
 
 snapshot:
   name_template: "{{ incpatch .Version }}-devel"
