@@ -29,6 +29,8 @@ func getSiteConfig(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Vip
 	siteConfig.SetDefault("local", dynamicConfig.GetBool("local"))
 	siteConfig.SetDefault("xdebug", dynamicConfig.GetBool("xdebug"))
 	siteConfig.SetDefault("plugins", []string{})
+	siteConfig.SetDefault("localPlugins", []string{})
+	siteConfig.SetDefault("localPluginsPath", dynamicConfig.GetString("localPluginsPath"))
 
 	siteConfig.SetConfigName(".kana")
 	siteConfig.SetConfigType("json")
@@ -53,10 +55,17 @@ func (s *Site) ExportSiteConfig() error {
 		return err
 	}
 
+	localPlugins, err := s.GetInstalledWordPressLocalPlugins()
+	if err != nil {
+		return err
+	}
+
 	s.SiteConfig.Set("local", config.Local)
 	s.SiteConfig.Set("type", config.Type)
 	s.SiteConfig.Set("xdebug", config.Xdebug)
 	s.SiteConfig.Set("plugins", plugins)
+	s.SiteConfig.Set("localPlugins", localPlugins)
+	s.SiteConfig.Set("localPluginsPath", config.LocalPluginsPath)
 
 	if _, err = os.Stat(path.Join(s.StaticConfig.WorkingDirectory, ".kana.json")); os.IsNotExist(err) {
 		return s.SiteConfig.SafeWriteConfig()
@@ -120,9 +129,10 @@ func (s *Site) ProcessSiteFlags(cmd *cobra.Command, flags SiteFlags) {
 func (s *Site) GetRunningConfig() CurrentConfig {
 
 	currentConfig := CurrentConfig{
-		Type:   "site",
-		Local:  false,
-		Xdebug: false,
+		Type:             "site",
+		Local:            false,
+		Xdebug:           false,
+		LocalPluginsPath: "",
 	}
 
 	output, _ := s.runCli("pecl list | grep xdebug", false)

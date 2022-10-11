@@ -13,9 +13,10 @@ import (
 )
 
 type CurrentConfig struct {
-	Type   string
-	Local  bool
-	Xdebug bool
+	Type             string
+	Local            bool
+	Xdebug           bool
+	LocalPluginsPath string
 }
 
 type PluginInfo struct {
@@ -81,7 +82,7 @@ func getLocalAppDir() (string, error) {
 	return localAppDir, nil
 }
 
-func (s *Site) getMounts(appDir, siteType string) ([]mount.Mount, error) {
+func (s *Site) getMounts(appDir, siteType string, localPluginsPath string) ([]mount.Mount, error) {
 
 	appVolumes := []mount.Mount{
 		{
@@ -110,6 +111,14 @@ func (s *Site) getMounts(appDir, siteType string) ([]mount.Mount, error) {
 			Source: cwd,
 			Target: path.Join("/var/www/html", "wp-content", "themes", s.StaticConfig.SiteName),
 		})
+
+		if localPluginsPath != "" {
+			appVolumes = append(appVolumes, mount.Mount{
+				Type:   mount.TypeBind,
+				Source: localPluginsPath,
+				Target: path.Join("/var/www/html", "wp-content", "plugins"),
+			})
+		}
 	}
 
 	return appVolumes, nil
@@ -147,7 +156,7 @@ func (s *Site) StartWordPress() error {
 		return err
 	}
 
-	appVolumes, err := s.getMounts(appDir, s.SiteConfig.GetString("type"))
+	appVolumes, err := s.getMounts(appDir, s.SiteConfig.GetString("type"), s.SiteConfig.GetString("localPluginsPath"))
 	if err != nil {
 		return err
 	}
@@ -274,7 +283,7 @@ func (s *Site) RunWPCli(command []string) (string, error) {
 		}
 	}
 
-	appVolumes, err := s.getMounts(appDir, runningConfig.Type)
+	appVolumes, err := s.getMounts(appDir, runningConfig.Type, runningConfig.LocalPluginsPath)
 	if err != nil {
 		return "", err
 	}
@@ -315,6 +324,11 @@ func (s *Site) RunWPCli(command []string) (string, error) {
 	}
 
 	return output, nil
+}
+
+// GetInstalledWordPressPlugins Returns a list of the plugins that have been installed on the site
+func (s *Site) GetInstalledWordPressLocalPlugins() ([]string, error) {
+	return s.GetInstalledWordPressPlugins()
 }
 
 // GetInstalledWordPressPlugins Returns a list of the plugins that have been installed on the site
