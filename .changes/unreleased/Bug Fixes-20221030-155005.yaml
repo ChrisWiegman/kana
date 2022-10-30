@@ -1,5 +1,0 @@
-kind: Bug Fixes
-body:
-  Fix issue where Docker Desktop 4.13 breaks Kana due to no longer setting /var/run/docker.sock
-  (see https://docs.docker.com/desktop/release-notes/#docker-desktop-4130)
-time: 2022-10-30T15:50:05.877216341Z
