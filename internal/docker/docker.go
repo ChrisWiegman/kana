@@ -7,7 +7,9 @@ package docker
 import (
 	"context"
 	"fmt"
+	"os"
 	"os/exec"
+	"os/user"
 	"runtime"
 	"time"
 
@@ -22,6 +24,18 @@ type DockerClient struct {
 func NewController() (c *DockerClient, err error) {
 
 	c = new(DockerClient)
+
+	currentUser, err := user.Current()
+	if err != nil {
+		return nil, err
+	}
+
+	// Docker Desktop 4.13 removes /var/run/docker.sock. This workaround should fix the problem. See https://docs.docker.com/desktop/release-notes/#docker-desktop-4130
+	_, err = os.Stat("/var/run/docker.sock")
+	if err != nil && os.IsNotExist(err) {
+		dockerHost := fmt.Sprintf("unix:///Users/%s/.docker/run/docker.sock", currentUser.Username)
+		os.Setenv("DOCKER_HOST", dockerHost)
+	}
 
 	c.client, err = client.NewClientWithOpts(client.FromEnv)
 	if err != nil {

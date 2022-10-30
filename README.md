@@ -21,10 +21,6 @@ I've built Kana on a Mac and, at least for now, it will probably only run on a M
 
 There are a few options for installing Kana. You can use [Homebrew](https://brew.sh) (recommended), you can install it from the "releases" page here or you can build it manually.
 
-**Note:** I have purchased Apple Developer access to properly sign the binaries however, I'm currently struggling to implement that in the code. In the meantime, if you get the error about not being able to run un-trusted software the first time you use Kana, go to System Preferences -> Security and click to allow the application to run.
-
-You can track my progress on improving this process on [Issue #2](https://github.com/ChrisWiegman/kana-cli/issues/2).
-
 ## Install from Homebrew
 
 Installing from [Homebrew](https://brew.sh) is the recommended approach as it allows for automatic updates when needed. To install from Homebrew run the following command:
@@ -38,6 +34,10 @@ Note that, as there are numerous ways to install Docker, I have chosen, at least
 ## Download from GitHub releases
 
 Simply download the latest release from our [release page](https://github.com/ChrisWiegman/kana-cli/releases) and extract the CLI to a location accessible by your system PATH
+
+**Note:** I have purchased Apple Developer access to properly sign the binaries however, I'm currently struggling to implement that in the code. In the meantime, if you get the error about not being able to run un-trusted software the first time you use Kana, go to System Preferences -> Security and click to allow the application to run or install the app via Homebrew.
+
+You can track my progress on improving this process on [Issue #2](https://github.com/ChrisWiegman/kana-cli/issues/2).
 
 ## Build manually
 
