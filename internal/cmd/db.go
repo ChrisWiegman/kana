@@ -2,13 +2,15 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
+	"github.com/ChrisWiegman/kana-cli/internal/database"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 
 	"github.com/spf13/cobra"
 )
 
-var flagDrop bool
+var flagPreserve bool
 var flagReplaceDomain string
 
 func newDbCommand(site *site.Site) *cobra.Command {
@@ -28,8 +30,8 @@ func newDbCommand(site *site.Site) *cobra.Command {
 		Args: cobra.ExactArgs(1),
 	}
 
-	importCmd.Flags().BoolVarP(&flagDrop, "drop", "d", false, "Drop the existing database (recommended)")
-	importCmd.Flags().StringVarP(&flagReplaceDomain, "replace-domain", "r", "", "The old site domain to replace automatically with the development site domain")
+	importCmd.Flags().BoolVarP(&flagPreserve, "preserve", "p", false, "Preserve the existing database (don't drop it before import)")
+	importCmd.Flags().StringVarP(&flagReplaceDomain, "replace-domain", "d", "", "The old site domain to replace automatically with the development site domain")
 
 	cmd.AddCommand(importCmd)
 
@@ -37,5 +39,9 @@ func newDbCommand(site *site.Site) *cobra.Command {
 }
 
 func runDbImport(cmd *cobra.Command, args []string, kanaSite *site.Site) {
-	fmt.Println(args)
+	err := database.Import(kanaSite, args[0], flagPreserve, flagReplaceDomain)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }
