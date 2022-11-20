@@ -2,7 +2,6 @@ package database
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"path"
 
@@ -16,32 +15,21 @@ func Import(site *site.Site, file string, preserve bool, replaceDomain string) e
 		return err
 	}
 
-	importFile := path.Join(cwd, file)
-	if _, err = os.Stat(importFile); os.IsNotExist(err) {
+	rawImportFile := path.Join(cwd, file)
+	if _, err = os.Stat(rawImportFile); os.IsNotExist(err) {
 		return fmt.Errorf("the specified sql file does not exist. Please enter a valid file to import")
 	}
 
-	source, err := os.Open(importFile)
-
-	if err != nil {
-		return err
-	}
-	defer source.Close()
-
 	kanaImportFile := path.Join(site.StaticConfig.SiteDirectory, "import.sql")
 
-	destination, err := os.Create(kanaImportFile)
-	if err != nil {
-		return err
-	}
-	defer destination.Close()
-
-	_, err = io.Copy(destination, source)
+	err = copyFile(rawImportFile, kanaImportFile)
 	if err != nil {
 		return err
 	}
 
 	if !preserve {
+
+		fmt.Println("Dropping the existing database.")
 
 		dropCommand := []string{
 			"db",
@@ -54,20 +42,18 @@ func Import(site *site.Site, file string, preserve bool, replaceDomain string) e
 			"create",
 		}
 
-		out, err := site.RunWPCli(dropCommand)
+		_, err := site.RunWPCli(dropCommand)
 		if err != nil {
 			return err
 		}
 
-		fmt.Println(out)
-
-		out, err = site.RunWPCli(createCommand)
+		_, err = site.RunWPCli(createCommand)
 		if err != nil {
 			return err
 		}
-
-		fmt.Println(out)
 	}
+
+	fmt.Println("Importing the database file.")
 
 	importCommand := []string{
 		"db",
@@ -75,14 +61,14 @@ func Import(site *site.Site, file string, preserve bool, replaceDomain string) e
 		"/Site/import.sql",
 	}
 
-	out, err := site.RunWPCli(importCommand)
+	_, err = site.RunWPCli(importCommand)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(out)
-
 	if replaceDomain != "" {
+
+		fmt.Println("Replacing the old domain name")
 
 		replaceCommand := []string{
 			"search-replace",
@@ -91,12 +77,10 @@ func Import(site *site.Site, file string, preserve bool, replaceDomain string) e
 			"--all-tables",
 		}
 
-		out, err := site.RunWPCli(replaceCommand)
+		_, err := site.RunWPCli(replaceCommand)
 		if err != nil {
 			return err
 		}
-
-		fmt.Println(out)
 	}
 
 	return nil
