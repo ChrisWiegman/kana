@@ -81,13 +81,18 @@ func getLocalAppDir() (string, error) {
 	return localAppDir, nil
 }
 
-func (s *Site) getMounts(appDir, siteType string) ([]mount.Mount, error) {
+func (s *Site) getMounts(siteDir, appDir, siteType string) ([]mount.Mount, error) {
 
 	appVolumes := []mount.Mount{
 		{
 			Type:   mount.TypeBind,
 			Source: appDir,
 			Target: "/var/www/html",
+		},
+		{
+			Type:   mount.TypeBind,
+			Source: siteDir,
+			Target: "/Site",
 		},
 	}
 
@@ -147,7 +152,7 @@ func (s *Site) StartWordPress() error {
 		return err
 	}
 
-	appVolumes, err := s.getMounts(appDir, s.SiteConfig.GetString("type"))
+	appVolumes, err := s.getMounts(s.StaticConfig.SiteDirectory, appDir, s.SiteConfig.GetString("type"))
 	if err != nil {
 		return err
 	}
@@ -274,7 +279,7 @@ func (s *Site) RunWPCli(command []string) (string, error) {
 		}
 	}
 
-	appVolumes, err := s.getMounts(appDir, runningConfig.Type)
+	appVolumes, err := s.getMounts(s.StaticConfig.SiteDirectory, appDir, runningConfig.Type)
 	if err != nil {
 		return "", err
 	}

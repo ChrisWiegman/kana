@@ -70,6 +70,7 @@ func Execute() {
 		newConfigCommand(site),
 		newExportCommand(site),
 		newVersionCommand(site),
+		newDbCommand(site),
 	)
 
 	// Execute anything we need to
