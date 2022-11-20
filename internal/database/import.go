@@ -73,7 +73,7 @@ func Import(site *site.Site, file string, preserve bool, replaceDomain string) e
 		replaceCommand := []string{
 			"search-replace",
 			replaceDomain,
-			site.StaticConfig.AppDomain,
+			fmt.Sprintf("%s.%s", site.StaticConfig.SiteName, site.StaticConfig.AppDomain),
 			"--all-tables",
 		}
 
