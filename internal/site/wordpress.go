@@ -84,12 +84,12 @@ func getLocalAppDir() (string, error) {
 func (s *Site) getMounts(siteDir, appDir, siteType string) ([]mount.Mount, error) {
 
 	appVolumes := []mount.Mount{
-		{
+		{ // The root directory of the WordPress site
 			Type:   mount.TypeBind,
 			Source: appDir,
 			Target: "/var/www/html",
 		},
-		{
+		{ // Kana's primary site directory (used for temp files such as DB import and export)
 			Type:   mount.TypeBind,
 			Source: siteDir,
 			Target: "/Site",
@@ -102,7 +102,7 @@ func (s *Site) getMounts(siteDir, appDir, siteType string) ([]mount.Mount, error
 	}
 
 	if siteType == "plugin" {
-		appVolumes = append(appVolumes, mount.Mount{
+		appVolumes = append(appVolumes, mount.Mount{ // Map's the user's working directory as a plugin
 			Type:   mount.TypeBind,
 			Source: cwd,
 			Target: path.Join("/var/www/html", "wp-content", "plugins", s.StaticConfig.SiteName),
@@ -110,7 +110,7 @@ func (s *Site) getMounts(siteDir, appDir, siteType string) ([]mount.Mount, error
 	}
 
 	if siteType == "theme" {
-		appVolumes = append(appVolumes, mount.Mount{
+		appVolumes = append(appVolumes, mount.Mount{ // Map's the user's working directory as a theme
 			Type:   mount.TypeBind,
 			Source: cwd,
 			Target: path.Join("/var/www/html", "wp-content", "themes", s.StaticConfig.SiteName),
@@ -173,7 +173,7 @@ func (s *Site) StartWordPress() error {
 				"kana.site": s.StaticConfig.SiteName,
 			},
 			Volumes: []mount.Mount{
-				{
+				{ // Maps a database folder to the MySQL container for persistence
 					Type:   mount.TypeBind,
 					Source: databaseDir,
 					Target: "/var/lib/mysql",
