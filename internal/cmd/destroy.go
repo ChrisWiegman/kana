@@ -45,19 +45,19 @@ func runDestroy(cmd *cobra.Command, args []string, site *site.Site) {
 		// Stop the WordPress site.
 		err := site.StopWordPress()
 		if err != nil {
-			console.Error(err, flagDebugMode)
+			console.Error(err, flagVerbose)
 		}
 
 		// Remove the site's folder in the config directory.
 		err = os.RemoveAll(site.StaticConfig.SiteDirectory)
 		if err != nil {
-			console.Error(err, flagDebugMode)
+			console.Error(err, flagVerbose)
 		}
 
 		console.Success(fmt.Sprintf("Your site, %s, has been completely destroyed.", aurora.Bold(aurora.Blue(site.StaticConfig.SiteName))))
 		return
 	}
 
-	console.Error(fmt.Errorf("site destruction cancelled. No data has been lost"), flagDebugMode)
+	console.Error(fmt.Errorf("site destruction cancelled. No data has been lost"), flagVerbose)
 
 }

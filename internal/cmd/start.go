@@ -39,12 +39,12 @@ func runStart(cmd *cobra.Command, args []string, kanaSite *site.Site) {
 
 	// A site shouldn't be both a plugin and a theme so this reports an error if that is the case.
 	if flagIsPlugin && flagIsTheme {
-		console.Error(fmt.Errorf("you have set both the plugin and theme flags. Please choose only one option"), flagDebugMode)
+		console.Error(fmt.Errorf("you have set both the plugin and theme flags. Please choose only one option"), flagVerbose)
 	}
 
 	// Check that the site is already running and show an error if it is.
 	if kanaSite.IsSiteRunning() {
-		console.Error(fmt.Errorf("the site is already running. Please stop your site before running the start command"), flagDebugMode)
+		console.Error(fmt.Errorf("the site is already running. Please stop your site before running the start command"), flagVerbose)
 	}
 
 	// Process any overrides set with flags on the start command
@@ -63,48 +63,48 @@ func runStart(cmd *cobra.Command, args []string, kanaSite *site.Site) {
 	// Start Traefik if we need it
 	traefikClient, err := traefik.NewTraefik(kanaSite.StaticConfig)
 	if err != nil {
-		console.Error(err, flagDebugMode)
+		console.Error(err, flagVerbose)
 	}
 
 	err = traefikClient.StartTraefik()
 	if err != nil {
-		console.Error(err, flagDebugMode)
+		console.Error(err, flagVerbose)
 	}
 
 	// Start WordPress
 	err = kanaSite.StartWordPress()
 	if err != nil {
-		console.Error(err, flagDebugMode)
+		console.Error(err, flagVerbose)
 	}
 
 	// Make sure the WordPress site is running
 	_, err = kanaSite.VerifySite()
 	if err != nil {
-		console.Error(err, flagDebugMode)
+		console.Error(err, flagVerbose)
 	}
 
 	// Setup WordPress
 	err = kanaSite.InstallWordPress()
 	if err != nil {
-		console.Error(err, flagDebugMode)
+		console.Error(err, flagVerbose)
 	}
 
 	// Install Xdebug if we need to
 	_, err = kanaSite.InstallXdebug()
 	if err != nil {
-		console.Error(err, flagDebugMode)
+		console.Error(err, flagVerbose)
 	}
 
 	// Install any configuration plugins if needed
 	err = kanaSite.InstallDefaultPlugins()
 	if err != nil {
-		console.Error(err, flagDebugMode)
+		console.Error(err, flagVerbose)
 	}
 
 	// Open the site in the user's browser
 	err = kanaSite.OpenSite()
 	if err != nil {
-		console.Error(err, flagDebugMode)
+		console.Error(err, flagVerbose)
 	}
 
 	console.Success("Your site has started and should be open in your default browser.")

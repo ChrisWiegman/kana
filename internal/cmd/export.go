@@ -31,12 +31,12 @@ func newExportCommand(site *site.Site) *cobra.Command {
 func runExport(cmd *cobra.Command, args []string, site *site.Site) {
 
 	if !site.IsSiteRunning() {
-		console.Error(fmt.Errorf("the export command only works on a running site.  Please run 'kana start' to start the site"), flagDebugMode)
+		console.Error(fmt.Errorf("the export command only works on a running site.  Please run 'kana start' to start the site"), flagVerbose)
 	}
 
 	err := site.ExportSiteConfig()
 	if err != nil {
-		console.Error(err, flagDebugMode)
+		console.Error(err, flagVerbose)
 	}
 
 	console.Success(fmt.Sprintf("Your config has been exported to %s", path.Join(site.StaticConfig.WorkingDirectory, ".kana.json")))

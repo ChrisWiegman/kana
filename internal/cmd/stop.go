@@ -31,7 +31,7 @@ func runStop(cmd *cobra.Command, args []string, site *site.Site) {
 	// Stop the WordPress site
 	err := site.StopWordPress()
 	if err != nil {
-		console.Error(err, flagDebugMode)
+		console.Error(err, flagVerbose)
 	}
 
 	console.Success(fmt.Sprintf("Your site, %s, has been stopped. Please run `kana start` again if you would like to use it.", aurora.Bold(aurora.Blue(site.StaticConfig.SiteName))))

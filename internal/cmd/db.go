@@ -59,7 +59,7 @@ func newDbCommand(site *site.Site) *cobra.Command {
 func runDbImport(cmd *cobra.Command, args []string, kanaSite *site.Site) {
 	err := database.Import(kanaSite, args[0], flagPreserve, flagReplaceDomain)
 	if err != nil {
-		console.Error(err, flagDebugMode)
+		console.Error(err, flagVerbose)
 	}
 
 	console.Success("Your database file has been successfully imported and processed. Reload your site to see the changes.")
@@ -68,7 +68,7 @@ func runDbImport(cmd *cobra.Command, args []string, kanaSite *site.Site) {
 func runDbExport(cmd *cobra.Command, args []string, kanaSite *site.Site) {
 	file, err := database.Export(kanaSite, args)
 	if err != nil {
-		console.Error(err, flagDebugMode)
+		console.Error(err, flagVerbose)
 	}
 
 	console.Success(fmt.Sprintf("Export complete. Your database has been exported to %s.", file))

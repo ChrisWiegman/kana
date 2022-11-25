@@ -32,14 +32,14 @@ func runConfigCommand(cmd *cobra.Command, args []string, site *site.Site) {
 	case 1:
 		value, err := appConfig.GetDynamicContentItem(cmd, args, site.DynamicConfig)
 		if err != nil {
-			console.Error(err, flagDebugMode)
+			console.Error(err, flagVerbose)
 		}
 
 		console.Println(value)
 	case 2:
 		err := appConfig.SetDynamicContent(cmd, args, site.DynamicConfig)
 		if err != nil {
-			console.Error(err, flagDebugMode)
+			console.Error(err, flagVerbose)
 		}
 	}
 }
