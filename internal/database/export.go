@@ -8,11 +8,11 @@ import (
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 )
 
-func Export(site *site.Site, args []string) error {
+func Export(site *site.Site, args []string) (string, error) {
 
 	cwd, err := os.Getwd()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	exportFileName := fmt.Sprintf("kana-%s.sql", site.StaticConfig.SiteName)
@@ -31,15 +31,13 @@ func Export(site *site.Site, args []string) error {
 
 	_, err = site.RunWPCli(exportCommand)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	err = copyFile(path.Join(site.StaticConfig.SiteDirectory, "export.sql"), exportFile)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	fmt.Printf("Export complete. Your database has been exported to %s.\n", exportFile)
-
-	return nil
+	return exportFile, nil
 }

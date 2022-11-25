@@ -106,4 +106,6 @@ func runStart(cmd *cobra.Command, args []string, kanaSite *site.Site) {
 	if err != nil {
 		console.Error(err, flagDebugMode)
 	}
+
+	console.Success("Your site has started and should be open in your default browser.")
 }

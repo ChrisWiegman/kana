@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/database"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
@@ -59,11 +61,15 @@ func runDbImport(cmd *cobra.Command, args []string, kanaSite *site.Site) {
 	if err != nil {
 		console.Error(err, flagDebugMode)
 	}
+
+	console.Success("Your database file has been successfully imported and processed. Reload your site to see the changes.")
 }
 
 func runDbExport(cmd *cobra.Command, args []string, kanaSite *site.Site) {
-	err := database.Export(kanaSite, args)
+	file, err := database.Export(kanaSite, args)
 	if err != nil {
 		console.Error(err, flagDebugMode)
 	}
+
+	console.Success(fmt.Sprintf("Export complete. Your database has been exported to %s.", file))
 }
