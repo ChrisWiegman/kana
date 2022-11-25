@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 )
 
@@ -29,7 +30,7 @@ func Import(site *site.Site, file string, preserve bool, replaceDomain string) e
 
 	if !preserve {
 
-		fmt.Println("Dropping the existing database.")
+		console.Println("Dropping the existing database.")
 
 		dropCommand := []string{
 			"db",
@@ -53,7 +54,7 @@ func Import(site *site.Site, file string, preserve bool, replaceDomain string) e
 		}
 	}
 
-	fmt.Println("Importing the database file.")
+	console.Println("Importing the database file.")
 
 	importCommand := []string{
 		"db",
@@ -68,7 +69,7 @@ func Import(site *site.Site, file string, preserve bool, replaceDomain string) e
 
 	if replaceDomain != "" {
 
-		fmt.Println("Replacing the old domain name")
+		console.Println("Replacing the old domain name")
 
 		replaceCommand := []string{
 			"search-replace",

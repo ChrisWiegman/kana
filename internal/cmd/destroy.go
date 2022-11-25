@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
+	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 
 	"github.com/spf13/cobra"
@@ -30,14 +30,12 @@ func runDestroy(cmd *cobra.Command, args []string, site *site.Site) {
 	// Stop the WordPress site.
 	err := site.StopWordPress()
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		console.Error(err, flagDebugMode)
 	}
 
 	// Remove the site's folder in the config directory.
 	err = os.RemoveAll(site.StaticConfig.SiteDirectory)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		console.Error(err, flagDebugMode)
 	}
 }

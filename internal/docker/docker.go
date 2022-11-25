@@ -13,6 +13,7 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 )
@@ -56,7 +57,7 @@ func (d *DockerClient) ensureDockerIsAvailable() error {
 	if err != nil {
 		if runtime.GOOS == "darwin" {
 
-			fmt.Println("Docker doesn't appear to be running. Trying to start Docker.")
+			console.Println("Docker doesn't appear to be running. Trying to start Docker.")
 			err = exec.Command("open", "-a", "Docker").Run()
 			if err != nil {
 				return fmt.Errorf("error: unable to start Docker for Mac")
@@ -69,7 +70,7 @@ func (d *DockerClient) ensureDockerIsAvailable() error {
 				retries++
 
 				if retries == 12 {
-					fmt.Println("Restarting Docker is taking too long. We seem to have hit an error")
+					console.Println("Restarting Docker is taking too long. We seem to have hit an error")
 					return fmt.Errorf("error: unable to start Docker for Mac")
 				}
 

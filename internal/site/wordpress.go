@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/docker"
 	"github.com/ChrisWiegman/kana-cli/internal/traefik"
 
@@ -223,7 +224,7 @@ func (s *Site) StartWordPress() error {
 // InstallWordPress Installs and configures WordPress core
 func (s *Site) InstallWordPress() error {
 
-	fmt.Println("Finishing WordPress setup...")
+	console.Println("Finishing WordPress setup...")
 
 	setupCommand := []string{
 		"core",

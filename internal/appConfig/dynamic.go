@@ -46,7 +46,6 @@ func GetDynamicContent(staticConfig StaticConfig) (*viper.Viper, error) {
 		if ok {
 			err = dynamicConfig.SafeWriteConfig()
 			if err != nil {
-				fmt.Println("error 1")
 				return dynamicConfig, err
 			}
 		} else {

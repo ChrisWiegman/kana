@@ -1,9 +1,7 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
+	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/database"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 
@@ -59,15 +57,13 @@ func newDbCommand(site *site.Site) *cobra.Command {
 func runDbImport(cmd *cobra.Command, args []string, kanaSite *site.Site) {
 	err := database.Import(kanaSite, args[0], flagPreserve, flagReplaceDomain)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		console.Error(err, flagDebugMode)
 	}
 }
 
 func runDbExport(cmd *cobra.Command, args []string, kanaSite *site.Site) {
 	err := database.Export(kanaSite, args)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		console.Error(err, flagDebugMode)
 	}
 }

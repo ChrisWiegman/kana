@@ -14,7 +14,7 @@ func main() {
 	fs, _ := os.ReadDir("./internal/appSetup/source/")
 	out, err := os.Create("./internal/appSetup/constants.go")
 	if err != nil {
-		fmt.Println(err)
+		os.Exit(1)
 	}
 
 	out.Write([]byte("// nolint\npackage appSetup \n\nconst (\n"))
@@ -32,6 +32,7 @@ func main() {
 		f, err := os.Open("./internal/appSetup/source/" + f.Name())
 		if err != nil {
 			fmt.Println(err)
+			os.Exit(1)
 		}
 
 		io.Copy(out, f)

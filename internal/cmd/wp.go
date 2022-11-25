@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
+	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 
 	"github.com/spf13/cobra"
@@ -30,16 +30,14 @@ func newWPCommand(site *site.Site) *cobra.Command {
 func runWP(cmd *cobra.Command, args []string, site *site.Site) {
 
 	if !site.IsSiteRunning() {
-		fmt.Println("The wp command only works on a running site. Please run 'kana start' to start the site.")
-		os.Exit(1)
+		console.Error(fmt.Errorf("the `wp` command only works on a running site. Please run 'kana start' to start the site"), flagDebugMode)
 	}
 
 	// Run the output from wp-cli
 	output, err := site.RunWPCli(args)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		console.Error(err, flagDebugMode)
 	}
 
-	fmt.Println(output)
+	console.Println(output)
 }

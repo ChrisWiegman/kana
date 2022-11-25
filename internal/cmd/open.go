@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
+	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 
 	"github.com/spf13/cobra"
@@ -30,7 +30,6 @@ func runOpen(cmd *cobra.Command, args []string, site *site.Site) {
 	// Open the site in the user's default browser,
 	err := site.OpenSite()
 	if err != nil {
-		fmt.Println(fmt.Errorf("the site doesn't appear to be running. Please use `kana start` to start the site"))
-		os.Exit(1)
+		console.Error(fmt.Errorf("the site doesn't appear to be running. Please use `kana start` to start the site"), flagDebugMode)
 	}
 }

@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/ChrisWiegman/kana-cli/internal/appConfig"
+	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/docker"
 
 	"github.com/pkg/browser"
@@ -204,7 +205,7 @@ func (s *Site) InstallXdebug() (bool, error) {
 		return false, nil
 	}
 
-	fmt.Println("Installing Xdebug...")
+	console.Println("Installing Xdebug...")
 
 	commands := []string{
 		"pecl list | grep xdebug",
