@@ -1,0 +1,4 @@
+kind: Features
+body: Prompt for confirmation when "destroy" is used or automatically confirm with
+  `--confirm-destroy` flag
+time: 2022-11-25T18:32:33.284242251Z
