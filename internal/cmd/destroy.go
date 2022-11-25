@@ -20,6 +20,8 @@ func newDestroyCommand(site *site.Site) *cobra.Command {
 		Args: cobra.NoArgs,
 	}
 
+	commandsRequiringSite = append(commandsRequiringSite, cmd.Use)
+
 	return cmd
 }
 

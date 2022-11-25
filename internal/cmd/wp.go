@@ -20,6 +20,8 @@ func newWPCommand(site *site.Site) *cobra.Command {
 		Args: cobra.ArbitraryArgs,
 	}
 
+	commandsRequiringSite = append(commandsRequiringSite, cmd.Use)
+
 	cmd.DisableFlagParsing = true
 
 	return cmd

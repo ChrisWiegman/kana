@@ -12,6 +12,7 @@ import (
 )
 
 var flagName string
+var commandsRequiringSite []string
 
 func Execute() {
 
@@ -49,9 +50,14 @@ func Execute() {
 		Short: "Kana is a simple WordPress development tool designed for plugin and theme developers.",
 		Args:  cobra.NoArgs,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			err := site.ProcessNameFlag(cmd)
+			isSite, err := site.ProcessNameFlag(cmd)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
+				os.Exit(1)
+			}
+
+			if !isSite && arrayContains(commandsRequiringSite, cmd.Use) {
+				fmt.Println(fmt.Errorf("the current site you are trying to work with does not exist. Use `kana start` to initialize"))
 				os.Exit(1)
 			}
 		},
@@ -78,4 +84,14 @@ func Execute() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+}
+
+func arrayContains(array []string, name string) bool {
+	for _, value := range array {
+		if value == name {
+			return true
+		}
+	}
+
+	return false
 }

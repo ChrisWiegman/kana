@@ -62,11 +62,13 @@ func NewSite(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Viper) (*
 }
 
 // ProcessNameFlag Processes the name flag on the site resetting all appropriate site variables
-func (s *Site) ProcessNameFlag(cmd *cobra.Command) error {
+func (s *Site) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
+
+	isSite := false // Don't assume we're in a site that has been initialized.
 
 	// Don't run this on commands that wouldn't possibly use it.
 	if cmd.Use == "config" || cmd.Use == "version" || cmd.Use == "help" {
-		return nil
+		return isSite, nil
 	}
 
 	// By default the siteLink should be the working directory (assume it's linked)
@@ -78,7 +80,7 @@ func (s *Site) ProcessNameFlag(cmd *cobra.Command) error {
 		// Check that we're not using invalid start flags for the start command
 		if cmd.Use == "start" {
 			if cmd.Flags().Lookup("plugin").Changed || cmd.Flags().Lookup("theme").Changed || cmd.Flags().Lookup("local").Changed {
-				return fmt.Errorf("invalid flags detected. 'plugin' 'theme' and 'local' flags are not valid with named sites")
+				return isSite, fmt.Errorf("invalid flags detected. 'plugin' 'theme' and 'local' flags are not valid with named sites")
 			}
 		}
 
@@ -92,6 +94,11 @@ func (s *Site) ProcessNameFlag(cmd *cobra.Command) error {
 		siteLink = s.StaticConfig.SiteDirectory
 	}
 
+	_, err := os.Stat(path.Join(s.StaticConfig.SiteDirectory, "link.json"))
+	if err == nil || !os.IsNotExist(err) {
+		isSite = true
+	}
+
 	siteLinkConfig := viper.New()
 
 	siteLinkConfig.SetDefault("link", siteLink)
@@ -100,24 +107,25 @@ func (s *Site) ProcessNameFlag(cmd *cobra.Command) error {
 	siteLinkConfig.SetConfigType("json")
 	siteLinkConfig.AddConfigPath(s.StaticConfig.SiteDirectory)
 
-	err := siteLinkConfig.ReadInConfig()
+	err = siteLinkConfig.ReadInConfig()
 	if err != nil {
 		_, ok := err.(viper.ConfigFileNotFoundError)
 		if ok && cmd.Use == "start" {
+			isSite = true
 			err = os.MkdirAll(s.StaticConfig.SiteDirectory, 0750)
 			if err != nil {
-				return err
+				return isSite, err
 			}
 			err = siteLinkConfig.SafeWriteConfig()
 			if err != nil {
-				return err
+				return isSite, err
 			}
 		}
 	}
 
 	s.StaticConfig.WorkingDirectory = siteLinkConfig.GetString("link")
 
-	return nil
+	return isSite, nil
 }
 
 // GetURL returns the appropriate URL for the site

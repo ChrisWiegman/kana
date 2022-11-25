@@ -21,6 +21,8 @@ func newDbCommand(site *site.Site) *cobra.Command {
 		Args:  cobra.NoArgs,
 	}
 
+	commandsRequiringSite = append(commandsRequiringSite, cmd.Use)
+
 	importCmd := &cobra.Command{
 		Use:   "import <sql file>",
 		Short: "Import a database from an existing WordPress site",
@@ -30,6 +32,8 @@ func newDbCommand(site *site.Site) *cobra.Command {
 		Args: cobra.ExactArgs(1),
 	}
 
+	commandsRequiringSite = append(commandsRequiringSite, importCmd.Use)
+
 	exportCmd := &cobra.Command{
 		Use:   "export [sql file]",
 		Short: "Export the site's WordPress database",
@@ -38,6 +42,8 @@ func newDbCommand(site *site.Site) *cobra.Command {
 		},
 		Args: cobra.MaximumNArgs(1),
 	}
+
+	commandsRequiringSite = append(commandsRequiringSite, exportCmd.Use)
 
 	importCmd.Flags().BoolVarP(&flagPreserve, "preserve", "p", false, "Preserve the existing database (don't drop it before import)")
 	importCmd.Flags().StringVarP(&flagReplaceDomain, "replace-domain", "d", "", "The old site domain to replace automatically with the development site domain")
