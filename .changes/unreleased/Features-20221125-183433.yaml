@@ -1,0 +1,4 @@
+kind: Features
+body: Added a global "debug" flag which will display a trace when an error occurs
+  to more easily troubleshoot what is going on
+time: 2022-11-25T18:34:33.130702918Z
