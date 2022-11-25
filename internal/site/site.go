@@ -103,7 +103,7 @@ func (s *Site) ProcessNameFlag(cmd *cobra.Command) error {
 	err := siteLinkConfig.ReadInConfig()
 	if err != nil {
 		_, ok := err.(viper.ConfigFileNotFoundError)
-		if ok {
+		if ok && cmd.Use == "start" {
 			err = os.MkdirAll(s.StaticConfig.SiteDirectory, 0750)
 			if err != nil {
 				return err
