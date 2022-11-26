@@ -79,6 +79,25 @@ If you do not specify the `local` flag you can find Kana's site files in `~/.con
 
 `--name` The name flag allows you to run an arbitrary site from anywhere. For example, if you already started and stopped a site from a directory called _test_ you can run `kana start --name=test` to start that site from anywhere. If you use the `name` flag on a new site it will create that site without a link to any local folder. This can be handy for testing a plugin or other configuration but not that none of the other start flags will apply.
 
+## Importing an existing WordPress database
+
+Kana offers a simple way to import an existing WordPress database. Just use the `kana db import <your database file>` to get started.
+
+If you're coming from a site with a different home address you can specify `--replace-domain=<my old site domain>` to automatically replace it with the appropriate domain for your dev site.
+
+### Example:
+
+`kana db import --replace-domain=chriswiegman.com database.sql` would import the file _database.sql_ from my current directory and rename the old site address, chriswiegman.com, to the current and correct site address to work in Kana.
+
+### Import options
+
+`--replace-domain` The domain of your source site to replace with the appropriate Kana domain
+`--preserve` Prevents Kana from dropping any existing database and overwrites what you have. Warning: this may result in unpredictable issues.
+
+### Exporting your Kana database
+
+You can also export the database file your Kana site is using with `kana db export`. By default it will save the file in your default site directory but you can specify a relative path to the file where you would like to export your database if you wish.
+
 ## Stop
 
 `kana stop` will stop the current site and, if no other sites are running, will shut down shared containers as well.

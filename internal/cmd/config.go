@@ -1,10 +1,8 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/ChrisWiegman/kana-cli/internal/appConfig"
+	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 
 	"github.com/spf13/cobra"
@@ -34,16 +32,14 @@ func runConfigCommand(cmd *cobra.Command, args []string, site *site.Site) {
 	case 1:
 		value, err := appConfig.GetDynamicContentItem(cmd, args, site.DynamicConfig)
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			console.Error(err, flagVerbose)
 		}
 
-		fmt.Println(value)
+		console.Println(value)
 	case 2:
 		err := appConfig.SetDynamicContent(cmd, args, site.DynamicConfig)
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			console.Error(err, flagVerbose)
 		}
 	}
 }

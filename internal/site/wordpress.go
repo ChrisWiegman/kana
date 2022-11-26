@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/docker"
 	"github.com/ChrisWiegman/kana-cli/internal/traefik"
 
@@ -81,13 +82,18 @@ func getLocalAppDir() (string, error) {
 	return localAppDir, nil
 }
 
-func (s *Site) getMounts(appDir, siteType string) ([]mount.Mount, error) {
+func (s *Site) getMounts(siteDir, appDir, siteType string) ([]mount.Mount, error) {
 
 	appVolumes := []mount.Mount{
-		{
+		{ // The root directory of the WordPress site
 			Type:   mount.TypeBind,
 			Source: appDir,
 			Target: "/var/www/html",
+		},
+		{ // Kana's primary site directory (used for temp files such as DB import and export)
+			Type:   mount.TypeBind,
+			Source: siteDir,
+			Target: "/Site",
 		},
 	}
 
@@ -97,7 +103,7 @@ func (s *Site) getMounts(appDir, siteType string) ([]mount.Mount, error) {
 	}
 
 	if siteType == "plugin" {
-		appVolumes = append(appVolumes, mount.Mount{
+		appVolumes = append(appVolumes, mount.Mount{ // Map's the user's working directory as a plugin
 			Type:   mount.TypeBind,
 			Source: cwd,
 			Target: path.Join("/var/www/html", "wp-content", "plugins", s.StaticConfig.SiteName),
@@ -105,7 +111,7 @@ func (s *Site) getMounts(appDir, siteType string) ([]mount.Mount, error) {
 	}
 
 	if siteType == "theme" {
-		appVolumes = append(appVolumes, mount.Mount{
+		appVolumes = append(appVolumes, mount.Mount{ // Map's the user's working directory as a theme
 			Type:   mount.TypeBind,
 			Source: cwd,
 			Target: path.Join("/var/www/html", "wp-content", "themes", s.StaticConfig.SiteName),
@@ -147,7 +153,7 @@ func (s *Site) StartWordPress() error {
 		return err
 	}
 
-	appVolumes, err := s.getMounts(appDir, s.SiteConfig.GetString("type"))
+	appVolumes, err := s.getMounts(s.StaticConfig.SiteDirectory, appDir, s.SiteConfig.GetString("type"))
 	if err != nil {
 		return err
 	}
@@ -168,7 +174,7 @@ func (s *Site) StartWordPress() error {
 				"kana.site": s.StaticConfig.SiteName,
 			},
 			Volumes: []mount.Mount{
-				{
+				{ // Maps a database folder to the MySQL container for persistence
 					Type:   mount.TypeBind,
 					Source: databaseDir,
 					Target: "/var/lib/mysql",
@@ -218,7 +224,7 @@ func (s *Site) StartWordPress() error {
 // InstallWordPress Installs and configures WordPress core
 func (s *Site) InstallWordPress() error {
 
-	fmt.Println("Finishing WordPress setup...")
+	console.Println("Finishing WordPress setup...")
 
 	setupCommand := []string{
 		"core",
@@ -274,7 +280,7 @@ func (s *Site) RunWPCli(command []string) (string, error) {
 		}
 	}
 
-	appVolumes, err := s.getMounts(appDir, runningConfig.Type)
+	appVolumes, err := s.getMounts(s.StaticConfig.SiteDirectory, appDir, runningConfig.Type)
 	if err != nil {
 		return "", err
 	}
@@ -288,7 +294,7 @@ func (s *Site) RunWPCli(command []string) (string, error) {
 
 	container := docker.ContainerConfig{
 		Name:        fmt.Sprintf("kana_%s_wordpress_cli", s.StaticConfig.SiteName),
-		Image:       fmt.Sprintf("wordpress:cli-php%s", s.DynamicConfig.GetString("php")),
+		Image:       fmt.Sprintf("wordpress:cli-php%s", s.SiteConfig.GetString("php")),
 		NetworkName: "kana",
 		HostName:    fmt.Sprintf("kana_%s_wordpress_cli", s.StaticConfig.SiteName),
 		Command:     fullCommand,

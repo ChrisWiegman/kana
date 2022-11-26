@@ -2,8 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"os"
+	"path"
 
+	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 
 	"github.com/spf13/cobra"
@@ -20,6 +21,8 @@ func newExportCommand(site *site.Site) *cobra.Command {
 		Args: cobra.ArbitraryArgs,
 	}
 
+	commandsRequiringSite = append(commandsRequiringSite, cmd.Use)
+
 	cmd.DisableFlagParsing = true
 
 	return cmd
@@ -28,13 +31,13 @@ func newExportCommand(site *site.Site) *cobra.Command {
 func runExport(cmd *cobra.Command, args []string, site *site.Site) {
 
 	if !site.IsSiteRunning() {
-		fmt.Println("The export command only works on a running site.  Please run 'kana start' to start the site.")
-		os.Exit(1)
+		console.Error(fmt.Errorf("the export command only works on a running site.  Please run 'kana start' to start the site"), flagVerbose)
 	}
 
 	err := site.ExportSiteConfig()
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		console.Error(err, flagVerbose)
 	}
+
+	console.Success(fmt.Sprintf("Your config has been exported to %s", path.Join(site.StaticConfig.WorkingDirectory, ".kana.json")))
 }
