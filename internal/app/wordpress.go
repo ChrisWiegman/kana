@@ -133,6 +133,7 @@ func (s *Site) StartWordPress() error {
 	databaseDir := path.Join(s.config.Directories.Site, "database")
 
 	if s.IsLocalSite() {
+
 		appDir, err = getLocalAppDir()
 		if err != nil {
 			return err

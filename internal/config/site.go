@@ -87,19 +87,19 @@ func (c *Config) loadSiteViper() (*viper.Viper, error) {
 func (c *Config) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
 
 	if cmd.Flags().Lookup("local").Changed {
-		c.Site.Viper.Set("local", flags.Local)
+		c.Site.Local = flags.Local
 	}
 
 	if cmd.Flags().Lookup("xdebug").Changed {
-		c.Site.Viper.Set("xdebug", flags.Xdebug)
+		c.Site.Xdebug = flags.Local
 	}
 
 	if cmd.Flags().Lookup("plugin").Changed && flags.IsPlugin {
-		c.Site.Viper.Set("type", "plugin")
+		c.Site.Type = "plugih"
 	}
 
 	if cmd.Flags().Lookup("theme").Changed && flags.IsTheme {
-		c.Site.Viper.Set("type", "theme")
+		c.Site.Type = "theme"
 	}
 }
 
