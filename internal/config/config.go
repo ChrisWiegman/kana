@@ -31,9 +31,9 @@ var validTypes = []string{
 	"theme",
 }
 
-func NewConfig() (Config, error) {
+func NewConfig() (*Config, error) {
 
-	kanaConfig := Config{}
+	kanaConfig := new(Config)
 
 	kanaConfig.App = AppConfig{
 		AppDomain: appDomain,
