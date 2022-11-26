@@ -3,8 +3,9 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/ChrisWiegman/kana-cli/internal/app"
+	"github.com/ChrisWiegman/kana-cli/internal/config"
 	"github.com/ChrisWiegman/kana-cli/internal/console"
-	"github.com/ChrisWiegman/kana-cli/internal/site"
 	"github.com/ChrisWiegman/kana-cli/internal/traefik"
 
 	"github.com/spf13/cobra"
@@ -15,13 +16,13 @@ var flagLocal bool
 var flagIsTheme bool
 var flagIsPlugin bool
 
-func newStartCommand(site *site.Site) *cobra.Command {
+func newStartCommand(kanaConfig *config.Config) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "start",
 		Short: "Starts a new environment in the local folder.",
 		Run: func(cmd *cobra.Command, args []string) {
-			runStart(cmd, args, site)
+			runStart(cmd, args, kanaConfig)
 		},
 		Args: cobra.NoArgs,
 	}
@@ -35,7 +36,12 @@ func newStartCommand(site *site.Site) *cobra.Command {
 	return cmd
 }
 
-func runStart(cmd *cobra.Command, args []string, kanaSite *site.Site) {
+func runStart(cmd *cobra.Command, args []string, kanaConfig *config.Config) {
+
+	site, err := app.NewSite(kanaConfig)
+	if err != nil {
+		console.Error(err, flagVerbose)
+	}
 
 	// A site shouldn't be both a plugin and a theme so this reports an error if that is the case.
 	if flagIsPlugin && flagIsTheme {
@@ -43,25 +49,25 @@ func runStart(cmd *cobra.Command, args []string, kanaSite *site.Site) {
 	}
 
 	// Check that the site is already running and show an error if it is.
-	if kanaSite.IsSiteRunning() {
+	if site.IsSiteRunning() {
 		console.Error(fmt.Errorf("the site is already running. Please stop your site before running the start command"), flagVerbose)
 	}
 
 	// Process any overrides set with flags on the start command
-	startFlags := site.SiteFlags{
+	startFlags := config.StartFlags{
 		Xdebug:   flagXdebug,
 		IsTheme:  flagIsTheme,
 		IsPlugin: flagIsPlugin,
 		Local:    flagLocal,
 	}
 
-	kanaSite.ProcessSiteFlags(cmd, startFlags)
+	kanaConfig.ProcessStartFlags(cmd, startFlags)
 
 	// Let's start everything up
-	fmt.Printf("Starting development site: %s\n", kanaSite.GetURL(false))
+	fmt.Printf("Starting development site: %s\n", site.GetURL(false))
 
 	// Start Traefik if we need it
-	traefikClient, err := traefik.NewTraefik(kanaSite.StaticConfig)
+	traefikClient, err := traefik.NewTraefik2(kanaConfig)
 	if err != nil {
 		console.Error(err, flagVerbose)
 	}
@@ -72,37 +78,37 @@ func runStart(cmd *cobra.Command, args []string, kanaSite *site.Site) {
 	}
 
 	// Start WordPress
-	err = kanaSite.StartWordPress()
+	err = site.StartWordPress()
 	if err != nil {
 		console.Error(err, flagVerbose)
 	}
 
 	// Make sure the WordPress site is running
-	_, err = kanaSite.VerifySite()
+	_, err = site.VerifySite()
 	if err != nil {
 		console.Error(err, flagVerbose)
 	}
 
 	// Setup WordPress
-	err = kanaSite.InstallWordPress()
+	err = site.InstallWordPress()
 	if err != nil {
 		console.Error(err, flagVerbose)
 	}
 
 	// Install Xdebug if we need to
-	_, err = kanaSite.InstallXdebug()
+	_, err = site.InstallXdebug()
 	if err != nil {
 		console.Error(err, flagVerbose)
 	}
 
 	// Install any configuration plugins if needed
-	err = kanaSite.InstallDefaultPlugins()
+	err = site.InstallDefaultPlugins()
 	if err != nil {
 		console.Error(err, flagVerbose)
 	}
 
 	// Open the site in the user's browser
-	err = kanaSite.OpenSite()
+	err = site.OpenSite()
 	if err != nil {
 		console.Error(err, flagVerbose)
 	}
