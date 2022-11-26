@@ -80,7 +80,7 @@ func Execute() {
 	cmd.AddCommand(
 		newStartCommand(site),
 		newStopCommand(site),
-		newOpenCommand(site, kanaConfig),
+		newOpenCommand(kanaConfig),
 		newWPCommand(site),
 		newDestroyCommand(site),
 		newConfigCommand(site),
