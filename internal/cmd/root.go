@@ -55,17 +55,6 @@ func Execute() {
 		console.Error(err, flagVerbose)
 	}
 
-	fmt.Println(kanaConfig.App.PHP)
-	fmt.Println(dynamicConfig.GetString("php"))
-	fmt.Println(kanaConfig.Directories.App)
-	fmt.Println(staticConfig.AppDirectory)
-	fmt.Println(kanaConfig.Site.PHP)
-	fmt.Println(site.SiteConfig.GetString("php"))
-	fmt.Println(kanaConfig.Site.SiteName)
-	fmt.Println(staticConfig.SiteName)
-	fmt.Println(kanaConfig.Site.SiteDirectory)
-	fmt.Println(staticConfig.SiteDirectory)
-
 	// Setup the cobra command
 	cmd := &cobra.Command{
 		Use:   "kana",
@@ -91,7 +80,7 @@ func Execute() {
 	cmd.AddCommand(
 		newStartCommand(site),
 		newStopCommand(site),
-		newOpenCommand(site),
+		newOpenCommand(site, kanaConfig),
 		newWPCommand(site),
 		newDestroyCommand(site),
 		newConfigCommand(site),
