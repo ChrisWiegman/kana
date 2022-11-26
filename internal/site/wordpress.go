@@ -294,7 +294,7 @@ func (s *Site) RunWPCli(command []string) (string, error) {
 
 	container := docker.ContainerConfig{
 		Name:        fmt.Sprintf("kana_%s_wordpress_cli", s.StaticConfig.SiteName),
-		Image:       fmt.Sprintf("wordpress:cli-php%s", s.DynamicConfig.GetString("php")),
+		Image:       fmt.Sprintf("wordpress:cli-php%s", s.SiteConfig.GetString("php")),
 		NetworkName: "kana",
 		HostName:    fmt.Sprintf("kana_%s_wordpress_cli", s.StaticConfig.SiteName),
 		Command:     fullCommand,
