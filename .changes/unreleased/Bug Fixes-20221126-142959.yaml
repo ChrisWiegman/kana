@@ -1,0 +1,3 @@
+kind: Bug Fixes
+body: WP-CLI will now use the same PHP version as the local site
+time: 2022-11-26T14:29:59.03571017Z
