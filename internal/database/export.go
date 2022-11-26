@@ -16,7 +16,7 @@ func Export(kanaConfig *config.Config, args []string) (string, error) {
 		return "", err
 	}
 
-	exportFileName := fmt.Sprintf("kana-%s.sql", kanaConfig.Site.SiteName)
+	exportFileName := fmt.Sprintf("kana-%s.sql", kanaConfig.Site.Name)
 	exportFile := path.Join(cwd, exportFileName)
 
 	if len(args) == 1 {

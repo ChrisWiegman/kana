@@ -40,5 +40,5 @@ func runOpen(cmd *cobra.Command, args []string, kanaConfig *config.Config) {
 		console.Error(fmt.Errorf("the site doesn't appear to be running. Please use `kana start` to start the site"), flagVerbose)
 	}
 
-	console.Success(fmt.Sprintf("Your site, %s, has been opened in your default browser.", aurora.Bold(aurora.Blue(kanaConfig.Site.SiteName))))
+	console.Success(fmt.Sprintf("Your site, %s, has been opened in your default browser.", aurora.Bold(aurora.Blue(kanaConfig.Site.Name))))
 }

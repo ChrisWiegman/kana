@@ -39,7 +39,7 @@ func runDestroy(cmd *cobra.Command, args []string, kanaConfig *config.Config) {
 	if flagConfirmDestroy {
 		confirmDestroy = true
 	} else {
-		confirmDestroy = console.PromptConfirm(fmt.Sprintf("Are you sure you want to destroy %s? %s", aurora.Bold(aurora.Blue(kanaConfig.Site.SiteName)), aurora.Bold(aurora.Yellow("This operation is destructive and cannot be undone."))), false)
+		confirmDestroy = console.PromptConfirm(fmt.Sprintf("Are you sure you want to destroy %s? %s", aurora.Bold(aurora.Blue(kanaConfig.Site.Name)), aurora.Bold(aurora.Yellow("This operation is destructive and cannot be undone."))), false)
 	}
 
 	if confirmDestroy {
@@ -61,7 +61,7 @@ func runDestroy(cmd *cobra.Command, args []string, kanaConfig *config.Config) {
 			console.Error(err, flagVerbose)
 		}
 
-		console.Success(fmt.Sprintf("Your site, %s, has been completely destroyed.", aurora.Bold(aurora.Blue(kanaConfig.Site.SiteName))))
+		console.Success(fmt.Sprintf("Your site, %s, has been completely destroyed.", aurora.Bold(aurora.Blue(kanaConfig.Site.Name))))
 		return
 	}
 

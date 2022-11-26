@@ -40,5 +40,5 @@ func runStop(cmd *cobra.Command, args []string, kanaConfig *config.Config) {
 		console.Error(err, flagVerbose)
 	}
 
-	console.Success(fmt.Sprintf("Your site, %s, has been stopped. Please run `kana start` again if you would like to use it.", aurora.Bold(aurora.Blue(kanaConfig.Site.SiteName))))
+	console.Success(fmt.Sprintf("Your site, %s, has been stopped. Please run `kana start` again if you would like to use it.", aurora.Bold(aurora.Blue(kanaConfig.Site.Name))))
 }

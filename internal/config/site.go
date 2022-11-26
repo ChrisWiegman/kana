@@ -18,7 +18,7 @@ type StartFlags struct {
 }
 
 type SiteConfig struct {
-	SiteName  string
+	Name      string
 	Domain    string
 	URL       string
 	SecureURL string
@@ -38,7 +38,7 @@ func (c *Config) LoadSiteConfig() error {
 	c.Site.SecureURL = fmt.Sprintf("https://%s/", c.Site.Domain)
 	c.Site.URL = fmt.Sprintf("http://%s/", c.Site.Domain)
 
-	c.Site.SiteName = siteName
+	c.Site.Name = siteName
 	c.Directories.Site = path.Join(c.Directories.App, "sites", siteName)
 
 	siteViper, err := c.loadSiteViper()
@@ -125,10 +125,10 @@ func (c *Config) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 			}
 		}
 
-		c.Site.SiteName = sanitizeSiteName(cmd.Flags().Lookup("name").Value.String())
-		c.Directories.Site = (path.Join(c.Directories.App, "sites", c.Site.SiteName))
+		c.Site.Name = sanitizeSiteName(cmd.Flags().Lookup("name").Value.String())
+		c.Directories.Site = (path.Join(c.Directories.App, "sites", c.Site.Name))
 
-		c.Site.Domain = fmt.Sprintf("%s.%s", c.Site.SiteName, c.App.Domain)
+		c.Site.Domain = fmt.Sprintf("%s.%s", c.Site.Name, c.App.Domain)
 		c.Site.SecureURL = fmt.Sprintf("https://%s/", c.Site.Domain)
 		c.Site.URL = fmt.Sprintf("http://%s/", c.Site.Domain)
 

@@ -159,7 +159,7 @@ func (s *Site) InstallXdebug() (bool, error) {
 // runCli Runs an arbitrary CLI command against the site's WordPress container
 func (s *Site) runCli(command string, restart bool) (docker.ExecResult, error) {
 
-	container := fmt.Sprintf("kana_%s_wordpress", s.config.Site.SiteName)
+	container := fmt.Sprintf("kana_%s_wordpress", s.config.Site.Name)
 
 	output, err := s.dockerClient.ContainerExec(container, []string{command})
 	if err != nil {
@@ -230,7 +230,7 @@ func (s *Site) GetRunningConfig() CurrentConfig {
 		currentConfig.Xdebug = true
 	}
 
-	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana_%s_wordpress", s.config.Site.SiteName))
+	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana_%s_wordpress", s.config.Site.Name))
 
 	if len(mounts) == 1 {
 		currentConfig.Type = "site"
