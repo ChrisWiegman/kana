@@ -86,7 +86,7 @@ func Execute() {
 		newConfigCommand(site),
 		newExportCommand(site),
 		newVersionCommand(site),
-		newDbCommand(site),
+		newDbCommand(kanaConfig),
 	)
 
 	// Execute anything we need to
