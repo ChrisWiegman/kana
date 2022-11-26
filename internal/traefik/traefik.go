@@ -5,6 +5,7 @@ import (
 
 	"github.com/ChrisWiegman/kana-cli/internal/appConfig"
 	"github.com/ChrisWiegman/kana-cli/internal/appSetup"
+	"github.com/ChrisWiegman/kana-cli/internal/config"
 	"github.com/ChrisWiegman/kana-cli/internal/docker"
 
 	"github.com/docker/docker/api/types/mount"
@@ -15,6 +16,27 @@ var traefikContainerName = "kana_traefik"
 type Traefik struct {
 	dockerClient docker.DockerClient
 	appDirectory string
+}
+
+// NewTraefik Setup a new traefik object for controlling the traefik container
+func NewTraefik2(kanaConfig *config.Config) (*Traefik, error) {
+
+	t := new(Traefik)
+
+	err := kanaConfig.EnsureCerts()
+	if err != nil {
+		return t, err
+	}
+
+	dockerClient, err := docker.NewController()
+	if err != nil {
+		return t, err
+	}
+
+	t.appDirectory = kanaConfig.Directories.App
+	t.dockerClient = *dockerClient
+
+	return t, nil
 }
 
 // NewTraefik Setup a new traefik object for controlling the traefik container
