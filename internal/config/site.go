@@ -34,6 +34,10 @@ type SiteConfig struct {
 func (c *Config) LoadSiteConfig() error {
 
 	siteName := sanitizeSiteName(filepath.Base(c.Directories.Working))
+	// Setup other options generated from config items
+	c.Site.Domain = fmt.Sprintf("%s.%s", siteName, c.App.AppDomain)
+	c.Site.SecureURL = fmt.Sprintf("https://%s/", c.Site.Domain)
+	c.Site.URL = fmt.Sprintf("http://%s/", c.Site.Domain)
 
 	c.Site.SiteName = siteName
 	c.Directories.Site = path.Join(c.Directories.App, "sites", siteName)
