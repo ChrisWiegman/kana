@@ -1,4 +1,0 @@
-kind: Bug Fixes
-body: Show a more usable error message when using the `open` command on a site that
-  hasn't been started
-time: 2022-11-25T17:09:21.00270776Z

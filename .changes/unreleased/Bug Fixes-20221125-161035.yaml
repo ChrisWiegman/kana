@@ -1,4 +1,0 @@
-kind: Bug Fixes
-body: Kana will no longer create a site config folder when running commands other
-  than "start"
-time: 2022-11-25T16:10:35.561361461Z
