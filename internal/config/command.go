@@ -8,38 +8,37 @@ import (
 	"github.com/aquasecurity/table"
 	"github.com/go-playground/validator/v10"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
-func ListDynamicContent(dynamicConfig *viper.Viper) {
+func (c *Config) ListDynamicContent() {
 
 	t := table.New(os.Stdout)
 
 	t.SetHeaders("Key", "Value")
 
-	t.AddRow("admin.email", dynamicConfig.GetString("admin.email"))
-	t.AddRow("admin.password", dynamicConfig.GetString("admin.password"))
-	t.AddRow("admnin.username", dynamicConfig.GetString("admin.username"))
-	t.AddRow("local", dynamicConfig.GetString("local"))
-	t.AddRow("php", dynamicConfig.GetString("php"))
-	t.AddRow("type", dynamicConfig.GetString("type"))
-	t.AddRow("xdebug", dynamicConfig.GetString("xdebug"))
+	t.AddRow("admin.email", c.App.Viper.GetString("admin.email"))
+	t.AddRow("admin.password", c.App.Viper.GetString("admin.password"))
+	t.AddRow("admnin.username", c.App.Viper.GetString("admin.username"))
+	t.AddRow("local", c.App.Viper.GetString("local"))
+	t.AddRow("php", c.App.Viper.GetString("php"))
+	t.AddRow("type", c.App.Viper.GetString("type"))
+	t.AddRow("xdebug", c.App.Viper.GetString("xdebug"))
 
 	t.Render()
 }
 
-func GetDynamicContentItem(md *cobra.Command, args []string, dynamicConfig *viper.Viper) (string, error) {
+func (c *Config) GetDynamicContentItem(md *cobra.Command, args []string) (string, error) {
 
-	if !dynamicConfig.IsSet(args[0]) {
+	if !c.App.Viper.IsSet(args[0]) {
 		return "", fmt.Errorf("invalid setting. Please enter a valid key to get")
 	}
 
-	return dynamicConfig.GetString(args[0]), nil
+	return c.App.Viper.GetString(args[0]), nil
 }
 
-func SetDynamicContent(md *cobra.Command, args []string, dynamicConfig *viper.Viper) error {
+func (c *Config) SetDynamicContent(md *cobra.Command, args []string) error {
 
-	if !dynamicConfig.IsSet(args[0]) {
+	if !c.App.Viper.IsSet(args[0]) {
 		return fmt.Errorf("invalid setting. Please enter a valid key to set")
 	}
 
@@ -56,8 +55,8 @@ func SetDynamicContent(md *cobra.Command, args []string, dynamicConfig *viper.Vi
 		if err != nil {
 			return err
 		}
-		dynamicConfig.Set(args[0], boolVal)
-		return dynamicConfig.WriteConfig()
+		c.App.Viper.Set(args[0], boolVal)
+		return c.App.Viper.WriteConfig()
 	case "php":
 		if !CheckString(args[1], validPHPVersions) {
 			err = fmt.Errorf("please choose a valid php version")
@@ -80,7 +79,7 @@ func SetDynamicContent(md *cobra.Command, args []string, dynamicConfig *viper.Vi
 		return err
 	}
 
-	dynamicConfig.Set(args[0], args[1])
+	c.App.Viper.Set(args[0], args[1])
 
-	return dynamicConfig.WriteConfig()
+	return c.App.Viper.WriteConfig()
 }

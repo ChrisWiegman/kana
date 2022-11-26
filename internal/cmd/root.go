@@ -3,10 +3,8 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/ChrisWiegman/kana-cli/internal/appConfig"
 	"github.com/ChrisWiegman/kana-cli/internal/config"
 	"github.com/ChrisWiegman/kana-cli/internal/console"
-	"github.com/ChrisWiegman/kana-cli/internal/site"
 
 	"github.com/spf13/cobra"
 )
@@ -33,24 +31,6 @@ func Execute() {
 	}
 
 	err = kanaConfig.LoadSiteConfig()
-	if err != nil {
-		console.Error(err, flagVerbose)
-	}
-
-	// Setup the static config items that cannot be overripen
-	staticConfig, err := appConfig.GetStaticConfig()
-	if err != nil {
-		console.Error(err, flagVerbose)
-	}
-
-	// Get the dynamic config that the user might have set themselves
-	dynamicConfig, err := appConfig.GetDynamicContent(staticConfig)
-	if err != nil {
-		console.Error(err, flagVerbose)
-	}
-
-	// Create a site object
-	site, err := site.NewSite(staticConfig, dynamicConfig)
 	if err != nil {
 		console.Error(err, flagVerbose)
 	}
@@ -83,7 +63,7 @@ func Execute() {
 		newOpenCommand(kanaConfig),
 		newWPCommand(kanaConfig),
 		newDestroyCommand(kanaConfig),
-		newConfigCommand(site),
+		newConfigCommand(kanaConfig),
 		newExportCommand(kanaConfig),
 		newVersionCommand(kanaConfig),
 		newDbCommand(kanaConfig),
