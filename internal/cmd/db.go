@@ -3,9 +3,9 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/ChrisWiegman/kana-cli/internal/config"
 	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/database"
-	"github.com/ChrisWiegman/kana-cli/internal/site"
 
 	"github.com/spf13/cobra"
 )
@@ -13,7 +13,7 @@ import (
 var flagPreserve bool
 var flagReplaceDomain string
 
-func newDbCommand(site *site.Site) *cobra.Command {
+func newDbCommand(kanaConfig *config.Config) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "db",
@@ -27,7 +27,7 @@ func newDbCommand(site *site.Site) *cobra.Command {
 		Use:   "import <sql file>",
 		Short: "Import a database from an existing WordPress site",
 		Run: func(cmd *cobra.Command, args []string) {
-			runDbImport(cmd, args, site)
+			runDbImport(cmd, args, kanaConfig)
 		},
 		Args: cobra.ExactArgs(1),
 	}
@@ -38,7 +38,7 @@ func newDbCommand(site *site.Site) *cobra.Command {
 		Use:   "export [sql file]",
 		Short: "Export the site's WordPress database",
 		Run: func(cmd *cobra.Command, args []string) {
-			runDbExport(cmd, args, site)
+			runDbExport(cmd, args, kanaConfig)
 		},
 		Args: cobra.MaximumNArgs(1),
 	}
@@ -56,8 +56,8 @@ func newDbCommand(site *site.Site) *cobra.Command {
 	return cmd
 }
 
-func runDbImport(cmd *cobra.Command, args []string, kanaSite *site.Site) {
-	err := database.Import(kanaSite, args[0], flagPreserve, flagReplaceDomain)
+func runDbImport(cmd *cobra.Command, args []string, kanaConfig *config.Config) {
+	err := database.Import(kanaConfig, args[0], flagPreserve, flagReplaceDomain)
 	if err != nil {
 		console.Error(err, flagVerbose)
 	}
@@ -65,8 +65,8 @@ func runDbImport(cmd *cobra.Command, args []string, kanaSite *site.Site) {
 	console.Success("Your database file has been successfully imported and processed. Reload your site to see the changes.")
 }
 
-func runDbExport(cmd *cobra.Command, args []string, kanaSite *site.Site) {
-	file, err := database.Export(kanaSite, args)
+func runDbExport(cmd *cobra.Command, args []string, kanaConfig *config.Config) {
+	file, err := database.Export(kanaConfig, args)
 	if err != nil {
 		console.Error(err, flagVerbose)
 	}

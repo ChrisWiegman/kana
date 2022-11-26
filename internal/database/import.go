@@ -5,11 +5,12 @@ import (
 	"os"
 	"path"
 
+	"github.com/ChrisWiegman/kana-cli/internal/config"
 	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 )
 
-func Import(site *site.Site, file string, preserve bool, replaceDomain string) error {
+func Import(kanaConfig *config.Config, file string, preserve bool, replaceDomain string) error {
 
 	cwd, err := os.Getwd()
 	if err != nil {
@@ -21,9 +22,14 @@ func Import(site *site.Site, file string, preserve bool, replaceDomain string) e
 		return fmt.Errorf("the specified sql file does not exist. Please enter a valid file to import")
 	}
 
-	kanaImportFile := path.Join(site.StaticConfig.SiteDirectory, "import.sql")
+	kanaImportFile := path.Join(kanaConfig.Directories.Site, "import.sql")
 
 	err = copyFile(rawImportFile, kanaImportFile)
+	if err != nil {
+		return err
+	}
+
+	site, err := site.NewSite(kanaConfig)
 	if err != nil {
 		return err
 	}
@@ -43,7 +49,7 @@ func Import(site *site.Site, file string, preserve bool, replaceDomain string) e
 			"create",
 		}
 
-		_, err := site.RunWPCli(dropCommand)
+		_, err = site.RunWPCli(dropCommand)
 		if err != nil {
 			return err
 		}
@@ -74,7 +80,7 @@ func Import(site *site.Site, file string, preserve bool, replaceDomain string) e
 		replaceCommand := []string{
 			"search-replace",
 			replaceDomain,
-			fmt.Sprintf("%s.%s", site.StaticConfig.SiteName, site.StaticConfig.AppDomain),
+			kanaConfig.Site.Domain,
 			"--all-tables",
 		}
 

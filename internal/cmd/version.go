@@ -3,8 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/ChrisWiegman/kana-cli/internal/site"
-
+	"github.com/ChrisWiegman/kana-cli/internal/config"
 	"github.com/spf13/cobra"
 )
 
@@ -14,13 +13,13 @@ var (
 	Timestamp = ""
 )
 
-func newVersionCommand(site *site.Site) *cobra.Command {
+func newVersionCommand(kanaConfig *config.Config) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "version",
 		Short: "Displays version information for the Kana CLI.",
 		Run: func(cmd *cobra.Command, args []string) {
-			runVersion(cmd, args, site)
+			runVersion(cmd, args, kanaConfig)
 		},
 		Args: cobra.NoArgs,
 	}
@@ -28,7 +27,7 @@ func newVersionCommand(site *site.Site) *cobra.Command {
 	return cmd
 }
 
-func runVersion(cmd *cobra.Command, args []string, site *site.Site) {
+func runVersion(cmd *cobra.Command, args []string, kanaConfig *config.Config) {
 
 	fmt.Printf("Version: %s\n", Version)
 	fmt.Printf("Commit Hash: %s\n", GitHash)

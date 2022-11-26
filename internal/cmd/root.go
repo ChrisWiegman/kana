@@ -3,10 +3,8 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/ChrisWiegman/kana-cli/internal/appConfig"
-	"github.com/ChrisWiegman/kana-cli/internal/appSetup"
+	"github.com/ChrisWiegman/kana-cli/internal/config"
 	"github.com/ChrisWiegman/kana-cli/internal/console"
-	"github.com/ChrisWiegman/kana-cli/internal/site"
 
 	"github.com/spf13/cobra"
 )
@@ -17,26 +15,22 @@ var commandsRequiringSite []string
 
 func Execute() {
 
-	// Setup the static config items that cannot be overripen
-	staticConfig, err := appConfig.GetStaticConfig()
+	kanaConfig, err := config.NewConfig()
 	if err != nil {
 		console.Error(err, flagVerbose)
 	}
 
-	// Ensure the static content files are in place and up to date
-	err = appSetup.EnsureStaticConfigFiles(staticConfig)
+	err = kanaConfig.EnsureStaticConfigFiles()
 	if err != nil {
 		console.Error(err, flagVerbose)
 	}
 
-	// Get the dynamic config that the user might have set themselves
-	dynamicConfig, err := appConfig.GetDynamicContent(staticConfig)
+	err = kanaConfig.LoadAppConfig()
 	if err != nil {
 		console.Error(err, flagVerbose)
 	}
 
-	// Create a site object
-	site, err := site.NewSite(staticConfig, dynamicConfig)
+	err = kanaConfig.LoadSiteConfig()
 	if err != nil {
 		console.Error(err, flagVerbose)
 	}
@@ -47,7 +41,7 @@ func Execute() {
 		Short: "Kana is a simple WordPress development tool designed for plugin and theme developers.",
 		Args:  cobra.NoArgs,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			isSite, err := site.ProcessNameFlag(cmd)
+			isSite, err := kanaConfig.ProcessNameFlag(cmd)
 			if err != nil {
 				console.Error(err, flagVerbose)
 			}
@@ -64,15 +58,15 @@ func Execute() {
 
 	// Register the subcommands
 	cmd.AddCommand(
-		newStartCommand(site),
-		newStopCommand(site),
-		newOpenCommand(site),
-		newWPCommand(site),
-		newDestroyCommand(site),
-		newConfigCommand(site),
-		newExportCommand(site),
-		newVersionCommand(site),
-		newDbCommand(site),
+		newStartCommand(kanaConfig),
+		newStopCommand(kanaConfig),
+		newOpenCommand(kanaConfig),
+		newWPCommand(kanaConfig),
+		newDestroyCommand(kanaConfig),
+		newConfigCommand(kanaConfig),
+		newExportCommand(kanaConfig),
+		newVersionCommand(kanaConfig),
+		newDbCommand(kanaConfig),
 	)
 
 	// Execute anything we need to
