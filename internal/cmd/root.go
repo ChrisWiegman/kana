@@ -79,7 +79,7 @@ func Execute() {
 	// Register the subcommands
 	cmd.AddCommand(
 		newStartCommand(site),
-		newStopCommand(site),
+		newStopCommand(kanaConfig),
 		newOpenCommand(kanaConfig),
 		newWPCommand(site),
 		newDestroyCommand(site),

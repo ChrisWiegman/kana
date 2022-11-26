@@ -3,20 +3,21 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/ChrisWiegman/kana-cli/internal/app"
+	"github.com/ChrisWiegman/kana-cli/internal/config"
 	"github.com/ChrisWiegman/kana-cli/internal/console"
-	"github.com/ChrisWiegman/kana-cli/internal/site"
 	"github.com/logrusorgru/aurora/v4"
 
 	"github.com/spf13/cobra"
 )
 
-func newStopCommand(site *site.Site) *cobra.Command {
+func newStopCommand(kanaConfig *config.Config) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "stop",
 		Short: "Stops the WordPress development environment.",
 		Run: func(cmd *cobra.Command, args []string) {
-			runStop(cmd, args, site)
+			runStop(cmd, args, kanaConfig)
 		},
 		Args: cobra.NoArgs,
 	}
@@ -26,13 +27,18 @@ func newStopCommand(site *site.Site) *cobra.Command {
 	return cmd
 }
 
-func runStop(cmd *cobra.Command, args []string, site *site.Site) {
+func runStop(cmd *cobra.Command, args []string, kanaConfig *config.Config) {
 
-	// Stop the WordPress site
-	err := site.StopWordPress()
+	site, err := app.NewSite(kanaConfig)
 	if err != nil {
 		console.Error(err, flagVerbose)
 	}
 
-	console.Success(fmt.Sprintf("Your site, %s, has been stopped. Please run `kana start` again if you would like to use it.", aurora.Bold(aurora.Blue(site.StaticConfig.SiteName))))
+	// Stop the WordPress site
+	err = site.StopWordPress()
+	if err != nil {
+		console.Error(err, flagVerbose)
+	}
+
+	console.Success(fmt.Sprintf("Your site, %s, has been stopped. Please run `kana start` again if you would like to use it.", aurora.Bold(aurora.Blue(kanaConfig.Site.SiteName))))
 }
