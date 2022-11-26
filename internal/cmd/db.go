@@ -27,7 +27,13 @@ func newDbCommand(kanaConfig *config.Config) *cobra.Command {
 		Use:   "import <sql file>",
 		Short: "Import a database from an existing WordPress site",
 		Run: func(cmd *cobra.Command, args []string) {
-			runDbImport(cmd, args, kanaConfig)
+
+			err := database.Import(kanaConfig, args[0], flagPreserve, flagReplaceDomain)
+			if err != nil {
+				console.Error(err, flagVerbose)
+			}
+
+			console.Success("Your database file has been successfully imported and processed. Reload your site to see the changes.")
 		},
 		Args: cobra.ExactArgs(1),
 	}
@@ -38,7 +44,13 @@ func newDbCommand(kanaConfig *config.Config) *cobra.Command {
 		Use:   "export [sql file]",
 		Short: "Export the site's WordPress database",
 		Run: func(cmd *cobra.Command, args []string) {
-			runDbExport(cmd, args, kanaConfig)
+
+			file, err := database.Export(kanaConfig, args)
+			if err != nil {
+				console.Error(err, flagVerbose)
+			}
+
+			console.Success(fmt.Sprintf("Export complete. Your database has been exported to %s.", file))
 		},
 		Args: cobra.MaximumNArgs(1),
 	}
@@ -54,24 +66,4 @@ func newDbCommand(kanaConfig *config.Config) *cobra.Command {
 	)
 
 	return cmd
-}
-
-func runDbImport(cmd *cobra.Command, args []string, kanaConfig *config.Config) {
-
-	err := database.Import(kanaConfig, args[0], flagPreserve, flagReplaceDomain)
-	if err != nil {
-		console.Error(err, flagVerbose)
-	}
-
-	console.Success("Your database file has been successfully imported and processed. Reload your site to see the changes.")
-}
-
-func runDbExport(cmd *cobra.Command, args []string, kanaConfig *config.Config) {
-
-	file, err := database.Export(kanaConfig, args)
-	if err != nil {
-		console.Error(err, flagVerbose)
-	}
-
-	console.Success(fmt.Sprintf("Export complete. Your database has been exported to %s.", file))
 }

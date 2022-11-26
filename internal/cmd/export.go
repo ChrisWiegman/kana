@@ -17,7 +17,22 @@ func newExportCommand(kanaConfig *config.Config) *cobra.Command {
 		Use:   "export",
 		Short: "Export the current config to a .kana.json file to save with your repo.",
 		Run: func(cmd *cobra.Command, args []string) {
-			runExport(cmd, args, kanaConfig)
+
+			site, err := site.NewSite(kanaConfig)
+			if err != nil {
+				console.Error(err, flagVerbose)
+			}
+
+			if !site.IsSiteRunning() {
+				console.Error(fmt.Errorf("the export command only works on a running site.  Please run 'kana start' to start the site"), flagVerbose)
+			}
+
+			err = site.ExportSiteConfig()
+			if err != nil {
+				console.Error(err, flagVerbose)
+			}
+
+			console.Success(fmt.Sprintf("Your config has been exported to %s", path.Join(kanaConfig.Directories.Working, ".kana.json")))
 		},
 		Args: cobra.ArbitraryArgs,
 	}
@@ -27,23 +42,4 @@ func newExportCommand(kanaConfig *config.Config) *cobra.Command {
 	cmd.DisableFlagParsing = true
 
 	return cmd
-}
-
-func runExport(cmd *cobra.Command, args []string, kanaConfig *config.Config) {
-
-	site, err := site.NewSite(kanaConfig)
-	if err != nil {
-		console.Error(err, flagVerbose)
-	}
-
-	if !site.IsSiteRunning() {
-		console.Error(fmt.Errorf("the export command only works on a running site.  Please run 'kana start' to start the site"), flagVerbose)
-	}
-
-	err = site.ExportSiteConfig()
-	if err != nil {
-		console.Error(err, flagVerbose)
-	}
-
-	console.Success(fmt.Sprintf("Your config has been exported to %s", path.Join(kanaConfig.Directories.Working, ".kana.json")))
 }
