@@ -29,37 +29,29 @@ type AppConfig struct {
 	Viper         *viper.Viper
 }
 
-// getAppConfig gets config information that transcends sites such as app and default settings
-func (c *Config) getAppConfig() (AppConfig, error) {
+// LoadAppConfig gets config information that transcends sites such as app and default settings
+func (c *Config) LoadAppConfig() error {
 
-	appConfig := AppConfig{
-		AppDomain: appDomain,
-		RootKey:   rootKey,
-		RootCert:  rootCert,
-		SiteCert:  siteCert,
-		SiteKey:   siteKey,
-	}
-
-	dynamicConfig, err := c.loadAppConfig(c.Directories.App)
+	dynamicConfig, err := c.loadAppViper()
 	if err != nil {
-		return appConfig, err
+		return err
 	}
 
-	appConfig.Viper = dynamicConfig
-	appConfig.Xdebug = dynamicConfig.GetBool("xdebug")
-	appConfig.Local = dynamicConfig.GetBool("local")
-	appConfig.AdminEmail = dynamicConfig.GetString("admin.email")
-	appConfig.AdminPassword = dynamicConfig.GetString("admin.password")
-	appConfig.AdminUsername = dynamicConfig.GetString("admin.username")
-	appConfig.PHP = dynamicConfig.GetString("php")
-	appConfig.Type = dynamicConfig.GetString("type")
+	c.App.Viper = dynamicConfig
+	c.App.Xdebug = dynamicConfig.GetBool("xdebug")
+	c.App.Local = dynamicConfig.GetBool("local")
+	c.App.AdminEmail = dynamicConfig.GetString("admin.email")
+	c.App.AdminPassword = dynamicConfig.GetString("admin.password")
+	c.App.AdminUsername = dynamicConfig.GetString("admin.username")
+	c.App.PHP = dynamicConfig.GetString("php")
+	c.App.Type = dynamicConfig.GetString("type")
 
-	return appConfig, err
+	return err
 
 }
 
-// loadAppConfig loads the app config using viper and sets defaults
-func (c *Config) loadAppConfig(appDirectory string) (*viper.Viper, error) {
+// loadAppViper loads the app config using viper and sets defaults
+func (c *Config) loadAppViper() (*viper.Viper, error) {
 
 	dynamicConfig := viper.New()
 
@@ -73,7 +65,7 @@ func (c *Config) loadAppConfig(appDirectory string) (*viper.Viper, error) {
 
 	dynamicConfig.SetConfigName("kana")
 	dynamicConfig.SetConfigType("json")
-	dynamicConfig.AddConfigPath(path.Join(appDirectory, "config"))
+	dynamicConfig.AddConfigPath(path.Join(c.Directories.App, "config"))
 
 	err := dynamicConfig.ReadInConfig()
 	if err != nil {

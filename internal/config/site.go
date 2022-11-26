@@ -26,31 +26,30 @@ type SiteConfig struct {
 	Viper         *viper.Viper
 }
 
-func (c *Config) getSiteConfig() (SiteConfig, error) {
+func (c *Config) LoadSiteConfig() error {
 
-	siteConfig := SiteConfig{}
 	siteName := sanitizeSiteName(filepath.Base(c.Directories.Working))
 
-	siteConfig.SiteName = siteName
-	siteConfig.SiteDirectory = path.Join(c.Directories.App, "sites", siteName)
+	c.Site.SiteName = siteName
+	c.Site.SiteDirectory = path.Join(c.Directories.App, "sites", siteName)
 
-	siteViper, err := c.loadSiteConfig()
+	siteViper, err := c.loadSiteViper()
 	if err != nil {
-		return siteConfig, err
+		return err
 	}
 
-	siteConfig.Viper = siteViper
-	siteConfig.Xdebug = siteViper.GetBool("xdebug")
-	siteConfig.Local = siteViper.GetBool("local")
-	siteConfig.PHP = siteViper.GetString("php")
-	siteConfig.Type = siteViper.GetString("type")
-	siteConfig.Plugins = siteViper.GetStringSlice("plugins")
+	c.Site.Viper = siteViper
+	c.Site.Xdebug = siteViper.GetBool("xdebug")
+	c.Site.Local = siteViper.GetBool("local")
+	c.Site.PHP = siteViper.GetString("php")
+	c.Site.Type = siteViper.GetString("type")
+	c.Site.Plugins = siteViper.GetStringSlice("plugins")
 
-	return siteConfig, nil
+	return nil
 }
 
 // loadSiteConfig Get the config items that can be overridden locally with a .kana.json file.
-func (c *Config) loadSiteConfig() (*viper.Viper, error) {
+func (c *Config) loadSiteViper() (*viper.Viper, error) {
 
 	siteConfig := viper.New()
 

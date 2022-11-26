@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/ChrisWiegman/kana-cli/internal/appConfig"
-	"github.com/ChrisWiegman/kana-cli/internal/appSetup"
+	"github.com/ChrisWiegman/kana-cli/internal/config"
 	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 
@@ -17,14 +17,28 @@ var commandsRequiringSite []string
 
 func Execute() {
 
-	// Setup the static config items that cannot be overripen
-	staticConfig, err := appConfig.GetStaticConfig()
+	kanaConfig, err := config.NewConfig()
 	if err != nil {
 		console.Error(err, flagVerbose)
 	}
 
-	// Ensure the static content files are in place and up to date
-	err = appSetup.EnsureStaticConfigFiles(staticConfig)
+	err = kanaConfig.EnsureStaticConfigFiles()
+	if err != nil {
+		console.Error(err, flagVerbose)
+	}
+
+	err = kanaConfig.LoadAppConfig()
+	if err != nil {
+		console.Error(err, flagVerbose)
+	}
+
+	err = kanaConfig.LoadSiteConfig()
+	if err != nil {
+		console.Error(err, flagVerbose)
+	}
+
+	// Setup the static config items that cannot be overripen
+	staticConfig, err := appConfig.GetStaticConfig()
 	if err != nil {
 		console.Error(err, flagVerbose)
 	}
@@ -40,6 +54,17 @@ func Execute() {
 	if err != nil {
 		console.Error(err, flagVerbose)
 	}
+
+	fmt.Println(kanaConfig.App.PHP)
+	fmt.Println(dynamicConfig.GetString("php"))
+	fmt.Println(kanaConfig.Directories.App)
+	fmt.Println(staticConfig.AppDirectory)
+	fmt.Println(kanaConfig.Site.PHP)
+	fmt.Println(site.SiteConfig.GetString("php"))
+	fmt.Println(kanaConfig.Site.SiteName)
+	fmt.Println(staticConfig.SiteName)
+	fmt.Println(kanaConfig.Site.SiteDirectory)
+	fmt.Println(staticConfig.SiteDirectory)
 
 	// Setup the cobra command
 	cmd := &cobra.Command{
