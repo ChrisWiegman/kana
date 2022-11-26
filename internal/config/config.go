@@ -10,6 +10,7 @@ import (
 type Directories struct {
 	App     string
 	Working string
+	Site    string
 }
 
 type Config struct {
