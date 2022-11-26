@@ -29,10 +29,10 @@ type SiteConfig struct {
 func (c *Config) getSiteConfig() (SiteConfig, error) {
 
 	siteConfig := SiteConfig{}
-	siteName := sanitizeSiteName(filepath.Base(c.WorkingDirectory))
+	siteName := sanitizeSiteName(filepath.Base(c.Directories.Working))
 
 	siteConfig.SiteName = siteName
-	siteConfig.SiteDirectory = path.Join(c.App.AppDirectory, "sites", siteName)
+	siteConfig.SiteDirectory = path.Join(c.Directories.App, "sites", siteName)
 
 	siteViper, err := c.loadSiteConfig()
 	if err != nil {
@@ -62,7 +62,7 @@ func (c *Config) loadSiteConfig() (*viper.Viper, error) {
 
 	siteConfig.SetConfigName(".kana")
 	siteConfig.SetConfigType("json")
-	siteConfig.AddConfigPath(c.WorkingDirectory)
+	siteConfig.AddConfigPath(c.Directories.Working)
 
 	err := siteConfig.ReadInConfig()
 	if err != nil {

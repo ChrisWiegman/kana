@@ -11,13 +11,13 @@ import (
 // and encodes them as strings literals in templates.go
 func main() {
 
-	fs, _ := os.ReadDir("./internal/appSetup/source/")
-	out, err := os.Create("./internal/appSetup/constants.go")
+	fs, _ := os.ReadDir("./internal/config/source/")
+	out, err := os.Create("./internal/config/constants.go")
 	if err != nil {
 		os.Exit(1)
 	}
 
-	out.Write([]byte("// nolint\npackage appSetup \n\nconst (\n"))
+	out.Write([]byte("// nolint\npackage config \n\nconst (\n"))
 
 	for _, f := range fs {
 
@@ -29,7 +29,7 @@ func main() {
 
 		out.Write([]byte(cname + " = `"))
 
-		f, err := os.Open("./internal/appSetup/source/" + f.Name())
+		f, err := os.Open("./internal/config/source/" + f.Name())
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)

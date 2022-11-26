@@ -2,12 +2,20 @@ package config
 
 import (
 	"os"
+	"path/filepath"
+
+	"github.com/mitchellh/go-homedir"
 )
 
+type Directories struct {
+	App     string
+	Working string
+}
+
 type Config struct {
-	WorkingDirectory string
-	App              AppConfig
-	Site             SiteConfig
+	Directories Directories
+	App         AppConfig
+	Site        SiteConfig
 }
 
 var validPHPVersions = []string{
@@ -31,21 +39,14 @@ func NewConfig() (Config, error) {
 		return kanaConfig, err
 	}
 
-	kanaConfig.WorkingDirectory = cwd
+	kanaConfig.Directories.Working = cwd
 
-	appConfig, err := kanaConfig.getAppConfig()
+	home, err := homedir.Dir()
 	if err != nil {
 		return kanaConfig, err
 	}
 
-	kanaConfig.App = appConfig
-
-	siteConfig, err := kanaConfig.getSiteConfig()
-	if err != nil {
-		return kanaConfig, err
-	}
-
-	kanaConfig.Site = siteConfig
+	kanaConfig.Directories.App = filepath.Join(home, configFolderName)
 
 	return kanaConfig, nil
 

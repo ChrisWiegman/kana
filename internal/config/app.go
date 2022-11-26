@@ -22,7 +22,6 @@ type AppConfig struct {
 	AdminPassword string
 	AdminEmail    string
 	AppDomain     string
-	AppDirectory  string
 	RootKey       string
 	RootCert      string
 	SiteCert      string
@@ -41,14 +40,7 @@ func (c *Config) getAppConfig() (AppConfig, error) {
 		SiteKey:   siteKey,
 	}
 
-	appDirectory, err := getAppDirectory()
-	if err != nil {
-		return appConfig, err
-	}
-
-	appConfig.AppDirectory = appDirectory
-
-	dynamicConfig, err := c.loadAppConfig(appDirectory)
+	dynamicConfig, err := c.loadAppConfig(c.Directories.App)
 	if err != nil {
 		return appConfig, err
 	}
