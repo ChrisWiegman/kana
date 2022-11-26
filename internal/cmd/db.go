@@ -57,6 +57,7 @@ func newDbCommand(kanaConfig *config.Config) *cobra.Command {
 }
 
 func runDbImport(cmd *cobra.Command, args []string, kanaConfig *config.Config) {
+
 	err := database.Import(kanaConfig, args[0], flagPreserve, flagReplaceDomain)
 	if err != nil {
 		console.Error(err, flagVerbose)
@@ -66,6 +67,7 @@ func runDbImport(cmd *cobra.Command, args []string, kanaConfig *config.Config) {
 }
 
 func runDbExport(cmd *cobra.Command, args []string, kanaConfig *config.Config) {
+
 	file, err := database.Export(kanaConfig, args)
 	if err != nil {
 		console.Error(err, flagVerbose)

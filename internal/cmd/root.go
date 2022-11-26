@@ -65,7 +65,7 @@ func Execute() {
 		newDestroyCommand(kanaConfig),
 		newConfigCommand(kanaConfig),
 		newExportCommand(kanaConfig),
-		newVersionCommand(kanaConfig),
+		newVersionCommand(),
 		newDbCommand(kanaConfig),
 	)
 
