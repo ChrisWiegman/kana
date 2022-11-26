@@ -80,7 +80,7 @@ func Import(kanaConfig *config.Config, file string, preserve bool, replaceDomain
 		replaceCommand := []string{
 			"search-replace",
 			replaceDomain,
-			fmt.Sprintf("%s.%s", kanaConfig.Site.SiteName, kanaConfig.App.AppDomain),
+			kanaConfig.Site.Domain,
 			"--all-tables",
 		}
 

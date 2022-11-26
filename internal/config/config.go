@@ -36,11 +36,11 @@ func NewConfig() (*Config, error) {
 	kanaConfig := new(Config)
 
 	kanaConfig.App = AppConfig{
-		AppDomain: appDomain,
-		RootKey:   rootKey,
-		RootCert:  rootCert,
-		SiteCert:  siteCert,
-		SiteKey:   siteKey,
+		Domain:   domain,
+		RootKey:  rootKey,
+		RootCert: rootCert,
+		SiteCert: siteCert,
+		SiteKey:  siteKey,
 	}
 
 	cwd, err := os.Getwd()

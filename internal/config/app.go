@@ -10,7 +10,7 @@ var rootKey = "kana.root.key"
 var rootCert = "kana.root.pem"
 var siteCert = "kana.site.pem"
 var siteKey = "kana.site.key"
-var appDomain = "sites.kana.li"
+var domain = "sites.kana.li"
 var configFolderName = ".config/kana"
 
 type AppConfig struct {
@@ -21,7 +21,7 @@ type AppConfig struct {
 	AdminUsername string
 	AdminPassword string
 	AdminEmail    string
-	AppDomain     string
+	Domain        string
 	RootKey       string
 	RootCert      string
 	SiteCert      string

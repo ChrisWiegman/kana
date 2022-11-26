@@ -33,7 +33,7 @@ func (c *Config) EnsureCerts() error {
 
 		certInfo := minica.CertInfo{
 			CertDir:    c.Directories.App,
-			CertDomain: c.App.AppDomain,
+			CertDomain: c.App.Domain,
 			RootKey:    c.App.RootKey,
 			RootCert:   c.App.RootCert,
 			SiteCert:   c.App.SiteCert,

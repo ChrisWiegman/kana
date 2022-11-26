@@ -196,9 +196,9 @@ func (s *Site) StartWordPress() error {
 			Labels: map[string]string{
 				"traefik.enable": "true",
 				fmt.Sprintf("traefik.http.routers.wordpress-%s-http.entrypoints", s.config.Site.SiteName): "web",
-				fmt.Sprintf("traefik.http.routers.wordpress-%s-http.rule", s.config.Site.SiteName):        fmt.Sprintf("Host(`%s.%s`)", s.config.Site.SiteName, s.config.App.AppDomain),
+				fmt.Sprintf("traefik.http.routers.wordpress-%s-http.rule", s.config.Site.SiteName):        fmt.Sprintf("Host(`%s`)", s.config.Site.Domain),
 				fmt.Sprintf("traefik.http.routers.wordpress-%s.entrypoints", s.config.Site.SiteName):      "websecure",
-				fmt.Sprintf("traefik.http.routers.wordpress-%s.rule", s.config.Site.SiteName):             fmt.Sprintf("Host(`%s.%s`)", s.config.Site.SiteName, s.config.App.AppDomain),
+				fmt.Sprintf("traefik.http.routers.wordpress-%s.rule", s.config.Site.SiteName):             fmt.Sprintf("Host(`%s`)", s.config.Site.Domain),
 				fmt.Sprintf("traefik.http.routers.wordpress-%s.tls", s.config.Site.SiteName):              "true",
 				"kana.site": s.config.Site.SiteName,
 			},
