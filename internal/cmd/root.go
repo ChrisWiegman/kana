@@ -82,7 +82,7 @@ func Execute() {
 		newStopCommand(kanaConfig),
 		newOpenCommand(kanaConfig),
 		newWPCommand(kanaConfig),
-		newDestroyCommand(site),
+		newDestroyCommand(kanaConfig),
 		newConfigCommand(site),
 		newExportCommand(site),
 		newVersionCommand(site),
