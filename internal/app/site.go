@@ -253,3 +253,23 @@ func (s *Site) GetRunningConfig() CurrentConfig {
 
 	return currentConfig
 }
+
+func (s *Site) ExportSiteConfig() error {
+
+	config := s.GetRunningConfig()
+	plugins, err := s.GetInstalledWordPressPlugins()
+	if err != nil {
+		return err
+	}
+
+	s.config.Site.Viper.Set("local", config.Local)
+	s.config.Site.Viper.Set("type", config.Type)
+	s.config.Site.Viper.Set("xdebug", config.Xdebug)
+	s.config.Site.Viper.Set("plugins", plugins)
+
+	if _, err = os.Stat(path.Join(s.config.Directories.Working, ".kana.json")); os.IsNotExist(err) {
+		return s.config.Site.Viper.SafeWriteConfig()
+	}
+
+	return s.config.Site.Viper.WriteConfig()
+}
