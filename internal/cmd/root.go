@@ -61,7 +61,7 @@ func Execute() {
 		Short: "Kana is a simple WordPress development tool designed for plugin and theme developers.",
 		Args:  cobra.NoArgs,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			isSite, err := site.ProcessNameFlag(cmd)
+			isSite, err := kanaConfig.ProcessNameFlag(cmd)
 			if err != nil {
 				console.Error(err, flagVerbose)
 			}
