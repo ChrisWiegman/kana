@@ -5,8 +5,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/ChrisWiegman/kana-cli/internal/app"
 	"github.com/ChrisWiegman/kana-cli/internal/config"
+	"github.com/ChrisWiegman/kana-cli/internal/site"
 )
 
 func Export(kanaConfig *config.Config, args []string) (string, error) {
@@ -30,7 +30,7 @@ func Export(kanaConfig *config.Config, args []string) (string, error) {
 		"/Site/export.sql",
 	}
 
-	site, err := app.NewSite(kanaConfig)
+	site, err := site.NewSite(kanaConfig)
 	if err != nil {
 		return "", err
 	}

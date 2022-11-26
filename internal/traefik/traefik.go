@@ -3,8 +3,6 @@ package traefik
 import (
 	"path"
 
-	"github.com/ChrisWiegman/kana-cli/internal/appConfig"
-	"github.com/ChrisWiegman/kana-cli/internal/appSetup"
 	"github.com/ChrisWiegman/kana-cli/internal/config"
 	"github.com/ChrisWiegman/kana-cli/internal/docker"
 
@@ -19,7 +17,7 @@ type Traefik struct {
 }
 
 // NewTraefik Setup a new traefik object for controlling the traefik container
-func NewTraefik2(kanaConfig *config.Config) (*Traefik, error) {
+func NewTraefik(kanaConfig *config.Config) (*Traefik, error) {
 
 	t := new(Traefik)
 
@@ -34,27 +32,6 @@ func NewTraefik2(kanaConfig *config.Config) (*Traefik, error) {
 	}
 
 	t.appDirectory = kanaConfig.Directories.App
-	t.dockerClient = *dockerClient
-
-	return t, nil
-}
-
-// NewTraefik Setup a new traefik object for controlling the traefik container
-func NewTraefik(staticConfig appConfig.StaticConfig) (*Traefik, error) {
-
-	t := new(Traefik)
-
-	err := appSetup.EnsureCerts(staticConfig)
-	if err != nil {
-		return t, err
-	}
-
-	dockerClient, err := docker.NewController()
-	if err != nil {
-		return t, err
-	}
-
-	t.appDirectory = staticConfig.AppDirectory
 	t.dockerClient = *dockerClient
 
 	return t, nil

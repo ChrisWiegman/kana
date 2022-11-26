@@ -3,9 +3,9 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/ChrisWiegman/kana-cli/internal/app"
 	"github.com/ChrisWiegman/kana-cli/internal/config"
 	"github.com/ChrisWiegman/kana-cli/internal/console"
+	"github.com/ChrisWiegman/kana-cli/internal/site"
 
 	"github.com/spf13/cobra"
 )
@@ -30,7 +30,7 @@ func newWPCommand(kanaConfig *config.Config) *cobra.Command {
 
 func runWP(cmd *cobra.Command, args []string, kanaConfig *config.Config) {
 
-	site, err := app.NewSite(kanaConfig)
+	site, err := site.NewSite(kanaConfig)
 	if err != nil {
 		console.Error(err, flagVerbose)
 	}

@@ -6,7 +6,6 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/ChrisWiegman/kana-cli/internal/appConfig"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -126,7 +125,7 @@ func (c *Config) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 			}
 		}
 
-		c.Site.SiteName = appConfig.SanitizeSiteName(cmd.Flags().Lookup("name").Value.String())
+		c.Site.SiteName = sanitizeSiteName(cmd.Flags().Lookup("name").Value.String())
 		c.Directories.Site = (path.Join(c.Directories.App, "sites", c.Site.SiteName))
 
 		c.Site.Domain = fmt.Sprintf("%s.%s", c.Site.SiteName, c.App.AppDomain)

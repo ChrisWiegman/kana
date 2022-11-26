@@ -3,9 +3,9 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/ChrisWiegman/kana-cli/internal/app"
 	"github.com/ChrisWiegman/kana-cli/internal/config"
 	"github.com/ChrisWiegman/kana-cli/internal/console"
+	"github.com/ChrisWiegman/kana-cli/internal/site"
 	"github.com/ChrisWiegman/kana-cli/internal/traefik"
 
 	"github.com/spf13/cobra"
@@ -38,7 +38,7 @@ func newStartCommand(kanaConfig *config.Config) *cobra.Command {
 
 func runStart(cmd *cobra.Command, args []string, kanaConfig *config.Config) {
 
-	site, err := app.NewSite(kanaConfig)
+	site, err := site.NewSite(kanaConfig)
 	if err != nil {
 		console.Error(err, flagVerbose)
 	}
@@ -67,7 +67,7 @@ func runStart(cmd *cobra.Command, args []string, kanaConfig *config.Config) {
 	fmt.Printf("Starting development site: %s\n", site.GetURL(false))
 
 	// Start Traefik if we need it
-	traefikClient, err := traefik.NewTraefik2(kanaConfig)
+	traefikClient, err := traefik.NewTraefik(kanaConfig)
 	if err != nil {
 		console.Error(err, flagVerbose)
 	}

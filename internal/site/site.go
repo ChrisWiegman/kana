@@ -12,28 +12,20 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ChrisWiegman/kana-cli/internal/appConfig"
+	"github.com/ChrisWiegman/kana-cli/internal/config"
 	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/docker"
 
 	"github.com/pkg/browser"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 type Site struct {
-	dockerClient  *docker.DockerClient
-	StaticConfig  appConfig.StaticConfig
-	DynamicConfig *viper.Viper
-	SiteConfig    *viper.Viper
-	rootCert      string
-	siteDomain    string
-	secureURL     string
-	url           string
+	dockerClient *docker.DockerClient
+	config       *config.Config
 }
 
 // NewSite creates a new site object
-func NewSite(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Viper) (*Site, error) {
+func NewSite(kanaConfig *config.Config) (*Site, error) {
 
 	site := new(Site)
 
@@ -45,104 +37,28 @@ func NewSite(staticConfig appConfig.StaticConfig, dynamicConfig *viper.Viper) (*
 
 	site.dockerClient = dockerClient
 
-	// Setup all config items (static, dynamic and site options)
-	site.StaticConfig = staticConfig
-	site.DynamicConfig = dynamicConfig
-	site.SiteConfig, err = getSiteConfig(staticConfig, dynamicConfig)
-	if err != nil {
-		return site, err
-	}
-
-	// Setup other options generated from config items
-	site.rootCert = path.Join(staticConfig.AppDirectory, "certs", staticConfig.RootCert)
-	site.siteDomain = fmt.Sprintf("%s.%s", staticConfig.SiteName, staticConfig.AppDomain)
-	site.secureURL = fmt.Sprintf("https://%s/", site.siteDomain)
-	site.url = fmt.Sprintf("http://%s/", site.siteDomain)
+	site.config = kanaConfig
 
 	return site, nil
-}
-
-// ProcessNameFlag Processes the name flag on the site resetting all appropriate site variables
-func (s *Site) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
-
-	isSite := false // Don't assume we're in a site that has been initialized.
-
-	// Don't run this on commands that wouldn't possibly use it.
-	if cmd.Use == "config" || cmd.Use == "version" || cmd.Use == "help" {
-		return isSite, nil
-	}
-
-	// By default the siteLink should be the working directory (assume it's linked)
-	siteLink := s.StaticConfig.WorkingDirectory
-
-	// Process the name flag if set
-	if cmd.Flags().Lookup("name").Changed {
-
-		// Check that we're not using invalid start flags for the start command
-		if cmd.Use == "start" {
-			if cmd.Flags().Lookup("plugin").Changed || cmd.Flags().Lookup("theme").Changed || cmd.Flags().Lookup("local").Changed {
-				return isSite, fmt.Errorf("invalid flags detected. 'plugin' 'theme' and 'local' flags are not valid with named sites")
-			}
-		}
-
-		s.StaticConfig.SiteName = appConfig.SanitizeSiteName(cmd.Flags().Lookup("name").Value.String())
-		s.StaticConfig.SiteDirectory = (path.Join(s.StaticConfig.AppDirectory, "sites", s.StaticConfig.SiteName))
-
-		s.siteDomain = fmt.Sprintf("%s.%s", s.StaticConfig.SiteName, s.StaticConfig.AppDomain)
-		s.secureURL = fmt.Sprintf("https://%s/", s.siteDomain)
-		s.url = fmt.Sprintf("http://%s/", s.siteDomain)
-
-		siteLink = s.StaticConfig.SiteDirectory
-	}
-
-	_, err := os.Stat(path.Join(s.StaticConfig.SiteDirectory, "link.json"))
-	if err == nil || !os.IsNotExist(err) {
-		isSite = true
-	}
-
-	siteLinkConfig := viper.New()
-
-	siteLinkConfig.SetDefault("link", siteLink)
-
-	siteLinkConfig.SetConfigName("link")
-	siteLinkConfig.SetConfigType("json")
-	siteLinkConfig.AddConfigPath(s.StaticConfig.SiteDirectory)
-
-	err = siteLinkConfig.ReadInConfig()
-	if err != nil {
-		_, ok := err.(viper.ConfigFileNotFoundError)
-		if ok && cmd.Use == "start" {
-			isSite = true
-			err = os.MkdirAll(s.StaticConfig.SiteDirectory, 0750)
-			if err != nil {
-				return isSite, err
-			}
-			err = siteLinkConfig.SafeWriteConfig()
-			if err != nil {
-				return isSite, err
-			}
-		}
-	}
-
-	s.StaticConfig.WorkingDirectory = siteLinkConfig.GetString("link")
-
-	return isSite, nil
 }
 
 // GetURL returns the appropriate URL for the site
 func (s *Site) GetURL(insecure bool) string {
 
 	if insecure {
-		return s.url
+		return s.config.Site.URL
 	}
 
-	return s.secureURL
+	return s.config.Site.SecureURL
 }
 
 // VerifySite verifies if a site is up and running without error
 func (s *Site) VerifySite() (bool, error) {
 
-	caCert, err := os.ReadFile(s.rootCert)
+	// Setup other options generated from config items
+	rootCert := path.Join(s.config.Directories.App, "certs", s.config.App.RootCert)
+
+	caCert, err := os.ReadFile(rootCert)
 	if err != nil {
 		return false, err
 	}
@@ -155,7 +71,7 @@ func (s *Site) VerifySite() (bool, error) {
 		},
 	}
 
-	resp, err := client.Get(s.secureURL)
+	resp, err := client.Get(s.config.Site.SecureURL)
 	if err != nil {
 		return false, err
 	}
@@ -164,7 +80,7 @@ func (s *Site) VerifySite() (bool, error) {
 
 	for resp.StatusCode != 200 {
 
-		resp, err = client.Get(s.secureURL)
+		resp, err = client.Get(s.config.Site.SecureURL)
 		if err != nil {
 			return false, err
 		}
@@ -193,7 +109,7 @@ func (s *Site) OpenSite() error {
 		return err
 	}
 
-	openURL(s.secureURL)
+	openURL(s.config.Site.SecureURL)
 
 	return nil
 }
@@ -201,7 +117,7 @@ func (s *Site) OpenSite() error {
 // InstallXdebug installs xdebug in the site's PHP container
 func (s *Site) InstallXdebug() (bool, error) {
 
-	if !s.SiteConfig.GetBool("xdebug") {
+	if !s.config.Site.Xdebug {
 		return false, nil
 	}
 
@@ -243,7 +159,7 @@ func (s *Site) InstallXdebug() (bool, error) {
 // runCli Runs an arbitrary CLI command against the site's WordPress container
 func (s *Site) runCli(command string, restart bool) (docker.ExecResult, error) {
 
-	container := fmt.Sprintf("kana_%s_wordpress", s.StaticConfig.SiteName)
+	container := fmt.Sprintf("kana_%s_wordpress", s.config.Site.SiteName)
 
 	output, err := s.dockerClient.ContainerExec(container, []string{command})
 	if err != nil {
@@ -267,4 +183,93 @@ func openURL(url string) error {
 	}
 
 	return browser.OpenURL(url)
+}
+
+// IsLocalSite Determines if a site is a "local" site (started with the "local" flag) so that other commands can work as needed.
+func (s *Site) IsLocalSite() bool {
+
+	// If the site is already running, try to make this easier
+	if s.IsSiteRunning() {
+		runningConfig := s.GetRunningConfig()
+		if runningConfig.Local {
+			return true
+		}
+	}
+
+	// First check the app site folders. If we've created the site (has a DB) without an "app" folder we can assume it was local last time.
+	hasNonLocalAppFolder := true
+	hasDatabaseFolder := true
+
+	if _, err := os.Stat(path.Join(s.config.Directories.Site, "app")); os.IsNotExist(err) {
+		hasNonLocalAppFolder = false
+	}
+
+	if _, err := os.Stat(path.Join(s.config.Directories.Site, "database")); os.IsNotExist(err) {
+		hasDatabaseFolder = false
+	}
+
+	if hasDatabaseFolder && !hasNonLocalAppFolder {
+		return true
+	}
+
+	// Return the flag for all other conditions
+	return s.config.Site.Local
+}
+
+// GetRunningConfig gets various options that were used to start the site
+func (s *Site) GetRunningConfig() CurrentConfig {
+
+	currentConfig := CurrentConfig{
+		Type:   "site",
+		Local:  false,
+		Xdebug: false,
+	}
+
+	output, _ := s.runCli("pecl list | grep xdebug", false)
+	if strings.Contains(output.StdOut, "xdebug") {
+		currentConfig.Xdebug = true
+	}
+
+	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana_%s_wordpress", s.config.Site.SiteName))
+
+	if len(mounts) == 1 {
+		currentConfig.Type = "site"
+	}
+
+	for _, mount := range mounts {
+
+		if mount.Source == path.Join(s.config.Directories.Working, "wordpress") {
+			currentConfig.Local = true
+		}
+
+		if strings.Contains(mount.Destination, "/var/www/html/wp-content/plugins/") {
+			currentConfig.Type = "plugin"
+		}
+
+		if strings.Contains(mount.Destination, "/var/www/html/wp-content/themes/") {
+			currentConfig.Type = "theme"
+		}
+	}
+
+	return currentConfig
+}
+
+func (s *Site) ExportSiteConfig() error {
+
+	config := s.GetRunningConfig()
+	plugins, err := s.GetInstalledWordPressPlugins()
+	if err != nil {
+		return err
+	}
+
+	s.config.Site.Viper.Set("local", config.Local)
+	s.config.Site.Viper.Set("type", config.Type)
+	s.config.Site.Viper.Set("xdebug", config.Xdebug)
+	s.config.Site.Viper.Set("plugins", plugins)
+
+	if _, err = os.Stat(path.Join(s.config.Directories.Working, ".kana.json")); os.IsNotExist(err) {
+		return s.config.Site.Viper.SafeWriteConfig()
+	}
+
+	return s.config.Site.Viper.WriteConfig()
 }

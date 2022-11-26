@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ChrisWiegman/kana-cli/internal/app"
 	"github.com/ChrisWiegman/kana-cli/internal/config"
 	"github.com/ChrisWiegman/kana-cli/internal/console"
+	"github.com/ChrisWiegman/kana-cli/internal/site"
 	"github.com/logrusorgru/aurora/v4"
 
 	"github.com/spf13/cobra"
@@ -44,7 +44,7 @@ func runDestroy(cmd *cobra.Command, args []string, kanaConfig *config.Config) {
 
 	if confirmDestroy {
 
-		site, err := app.NewSite(kanaConfig)
+		site, err := site.NewSite(kanaConfig)
 		if err != nil {
 			console.Error(err, flagVerbose)
 		}

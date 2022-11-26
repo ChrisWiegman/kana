@@ -5,9 +5,9 @@ import (
 	"os"
 	"path"
 
-	"github.com/ChrisWiegman/kana-cli/internal/app"
 	"github.com/ChrisWiegman/kana-cli/internal/config"
 	"github.com/ChrisWiegman/kana-cli/internal/console"
+	"github.com/ChrisWiegman/kana-cli/internal/site"
 )
 
 func Import(kanaConfig *config.Config, file string, preserve bool, replaceDomain string) error {
@@ -29,7 +29,7 @@ func Import(kanaConfig *config.Config, file string, preserve bool, replaceDomain
 		return err
 	}
 
-	site, err := app.NewSite(kanaConfig)
+	site, err := site.NewSite(kanaConfig)
 	if err != nil {
 		return err
 	}

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"path"
 
-	"github.com/ChrisWiegman/kana-cli/internal/app"
 	"github.com/ChrisWiegman/kana-cli/internal/config"
 	"github.com/ChrisWiegman/kana-cli/internal/console"
+	"github.com/ChrisWiegman/kana-cli/internal/site"
 
 	"github.com/spf13/cobra"
 )
@@ -31,7 +31,7 @@ func newExportCommand(kanaConfig *config.Config) *cobra.Command {
 
 func runExport(cmd *cobra.Command, args []string, kanaConfig *config.Config) {
 
-	site, err := app.NewSite(kanaConfig)
+	site, err := site.NewSite(kanaConfig)
 	if err != nil {
 		console.Error(err, flagVerbose)
 	}
