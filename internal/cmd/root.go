@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/ChrisWiegman/kana-cli/internal/config"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 	"github.com/ChrisWiegman/kana-cli/pkg/console"
 
@@ -26,6 +27,8 @@ func Execute() {
 		Short: "Kana is a simple WordPress development tool designed for plugin and theme developers.",
 		Args:  cobra.NoArgs,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+
+			// Process the "name" flag for every command
 			isSite, err := site.Config.ProcessNameFlag(cmd)
 			if err != nil {
 				console.Error(err, flagVerbose)
@@ -33,6 +36,25 @@ func Execute() {
 
 			if !isSite && arrayContains(commandsRequiringSite, cmd.Use) {
 				console.Error(fmt.Errorf("the current site you are trying to work with does not exist. Use `kana start` to initialize"), flagVerbose)
+			}
+
+			// Process the "start" command flags
+			if cmd.Use == "start" {
+
+				// A site shouldn't be both a plugin and a theme so this reports an error if that is the case.
+				if flagIsPlugin && flagIsTheme {
+					console.Error(fmt.Errorf("you have set both the plugin and theme flags. Please choose only one option"), flagVerbose)
+				}
+
+				// Process any overrides set with flags on the start command
+				startFlags := config.StartFlags{
+					Xdebug:   flagXdebug,
+					IsTheme:  flagIsTheme,
+					IsPlugin: flagIsPlugin,
+					Local:    flagLocal,
+				}
+
+				site.Config.ProcessStartFlags(cmd, startFlags)
 			}
 		},
 	}

@@ -17,13 +17,18 @@ func newStopCommand(kanaSite *site.Site) *cobra.Command {
 		Short: "Stops the WordPress development environment.",
 		Run: func(cmd *cobra.Command, args []string) {
 
-			// Stop the WordPress site
-			err := kanaSite.StopSite()
+			err := kanaSite.EnsureDocker()
 			if err != nil {
 				console.Error(err, flagVerbose)
 			}
 
-			console.Success(fmt.Sprintf("Your site, %s, has been stopped. Please run `kana start` again if you would like to use it.", aurora.Bold(aurora.Blue(kanaSite.Config.Local.Name))))
+			// Stop the WordPress site
+			err = kanaSite.StopSite()
+			if err != nil {
+				console.Error(err, flagVerbose)
+			}
+
+			console.Success(fmt.Sprintf("Your site, %s, has been stopped. Please run `kana start` again if you would like to use it.", aurora.Bold(aurora.Blue(kanaSite.Config.Name))))
 		},
 		Args: cobra.NoArgs,
 	}

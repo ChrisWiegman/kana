@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/ChrisWiegman/kana-cli/internal/config"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 	"github.com/ChrisWiegman/kana-cli/pkg/console"
 
@@ -22,27 +21,17 @@ func newStartCommand(kanaSite *site.Site) *cobra.Command {
 		Short: "Starts a new environment in the local folder.",
 		Run: func(cmd *cobra.Command, args []string) {
 
-			// A site shouldn't be both a plugin and a theme so this reports an error if that is the case.
-			if flagIsPlugin && flagIsTheme {
-				console.Error(fmt.Errorf("you have set both the plugin and theme flags. Please choose only one option"), flagVerbose)
+			err := kanaSite.EnsureDocker()
+			if err != nil {
+				console.Error(err, flagVerbose)
 			}
-
-			// Process any overrides set with flags on the start command
-			startFlags := config.StartFlags{
-				Xdebug:   flagXdebug,
-				IsTheme:  flagIsTheme,
-				IsPlugin: flagIsPlugin,
-				Local:    flagLocal,
-			}
-
-			kanaSite.Config.ProcessStartFlags(cmd, startFlags)
 
 			// Check that the site is already running and show an error if it is.
 			if kanaSite.IsSiteRunning() {
 				console.Error(fmt.Errorf("the site is already running. Please stop your site before running the start command"), flagVerbose)
 			}
 
-			err := kanaSite.StartSite()
+			err = kanaSite.StartSite()
 			if err != nil {
 				console.Error(err, flagVerbose)
 			}

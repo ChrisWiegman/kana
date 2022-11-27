@@ -17,11 +17,16 @@ func newExportCommand(kanaSite *site.Site) *cobra.Command {
 		Short: "Export the current config to a .kana.json file to save with your repo.",
 		Run: func(cmd *cobra.Command, args []string) {
 
+			err := kanaSite.EnsureDocker()
+			if err != nil {
+				console.Error(err, flagVerbose)
+			}
+
 			if !kanaSite.IsSiteRunning() {
 				console.Error(fmt.Errorf("the export command only works on a running site.  Please run 'kana start' to start the site"), flagVerbose)
 			}
 
-			err := kanaSite.ExportSiteConfig()
+			err = kanaSite.ExportSiteConfig()
 			if err != nil {
 				console.Error(err, flagVerbose)
 			}

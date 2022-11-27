@@ -40,7 +40,7 @@ func (c *Config) EnsureSSLCerts() error {
 
 	createCert := false
 	certPath := path.Join(c.Directories.App, "certs")
-	rootCert := path.Join(certPath, c.Global.RootCert)
+	rootCert := path.Join(certPath, c.RootCert)
 
 	_, err := os.Stat(rootCert)
 	if err != nil && os.IsNotExist(err) {
@@ -56,11 +56,11 @@ func (c *Config) EnsureSSLCerts() error {
 
 		certInfo := minica.CertInfo{
 			CertDir:    certPath,
-			CertDomain: c.Global.Domain,
-			RootKey:    c.Global.RootKey,
-			RootCert:   c.Global.RootCert,
-			SiteCert:   c.Global.SiteCert,
-			SiteKey:    c.Global.SiteKey,
+			CertDomain: c.AppDomain,
+			RootKey:    c.RootKey,
+			RootCert:   c.RootCert,
+			SiteCert:   c.SiteCert,
+			SiteKey:    c.SiteKey,
 		}
 
 		err = minica.GenCerts(certInfo)

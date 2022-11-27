@@ -6,23 +6,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-var rootKey = "kana.root.key"
-var rootCert = "kana.root.pem"
-var siteCert = "kana.site.pem"
-var siteKey = "kana.site.key"
-var domain = "sites.kana.li"
-var configFolderName = ".config/kana"
-
-type GlobalConfig struct {
-	Local, Xdebug                            bool
-	AdminEmail, AdminPassword, AdminUsername string
-	Domain                                   string
-	PHP                                      string
-	RootCert, RootKey, SiteCert, SiteKey     string
-	Type                                     string
-	viper                                    *viper.Viper
-}
-
 // loadGlobalConfig gets config information that transcends sites such as app and default settings
 func (c *Config) loadGlobalConfig() error {
 
@@ -31,14 +14,14 @@ func (c *Config) loadGlobalConfig() error {
 		return err
 	}
 
-	c.Global.viper = globalViperConfig
-	c.Global.Xdebug = globalViperConfig.GetBool("xdebug")
-	c.Global.Local = globalViperConfig.GetBool("local")
-	c.Global.AdminEmail = globalViperConfig.GetString("admin.email")
-	c.Global.AdminPassword = globalViperConfig.GetString("admin.password")
-	c.Global.AdminUsername = globalViperConfig.GetString("admin.username")
-	c.Global.PHP = globalViperConfig.GetString("php")
-	c.Global.Type = globalViperConfig.GetString("type")
+	c.global = globalViperConfig
+	c.Xdebug = globalViperConfig.GetBool("xdebug")
+	c.Local = globalViperConfig.GetBool("local")
+	c.AdminEmail = globalViperConfig.GetString("admin.email")
+	c.AdminPassword = globalViperConfig.GetString("admin.password")
+	c.AdminUsername = globalViperConfig.GetString("admin.username")
+	c.PHP = globalViperConfig.GetString("php")
+	c.Type = globalViperConfig.GetString("type")
 
 	return err
 }

@@ -17,14 +17,10 @@ type StartFlags struct {
 	IsPlugin bool
 }
 
-type LocalConfig struct {
-	Local, Xdebug  bool
-	Domain, Name   string
-	PHP            string
-	SecureURL, URL string
-	Type           string
-	Plugins        []string
-	Viper          *viper.Viper
+type LocalSettings struct {
+	Local, Xdebug bool
+	Type          string
+	Plugins       []string
 }
 
 // ProcessNameFlag Processes the name flag on the site resetting all appropriate local variables
@@ -50,12 +46,12 @@ func (c *Config) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 			}
 		}
 
-		c.Local.Name = sanitizeSiteName(cmd.Flags().Lookup("name").Value.String())
-		c.Directories.Site = (path.Join(c.Directories.App, "sites", c.Local.Name))
+		c.Name = sanitizeSiteName(cmd.Flags().Lookup("name").Value.String())
+		c.Directories.Site = (path.Join(c.Directories.App, "sites", c.Name))
 
-		c.Local.Domain = fmt.Sprintf("%s.%s", c.Local.Name, c.Global.Domain)
-		c.Local.SecureURL = fmt.Sprintf("https://%s/", c.Local.Domain)
-		c.Local.URL = fmt.Sprintf("http://%s/", c.Local.Domain)
+		c.SiteDomain = fmt.Sprintf("%s.%s", c.Name, c.AppDomain)
+		c.SecureURL = fmt.Sprintf("https://%s/", c.SiteDomain)
+		c.URL = fmt.Sprintf("http://%s/", c.SiteDomain)
 
 		siteLink = c.Directories.Site
 	}
@@ -98,20 +94,35 @@ func (c *Config) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 func (c *Config) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
 
 	if cmd.Flags().Lookup("local").Changed {
-		c.Local.Local = flags.Local
+		c.Local = flags.Local
 	}
 
 	if cmd.Flags().Lookup("xdebug").Changed {
-		c.Local.Xdebug = flags.Local
+		c.Xdebug = flags.Local
 	}
 
 	if cmd.Flags().Lookup("plugin").Changed && flags.IsPlugin {
-		c.Local.Type = "plugih"
+		c.Type = "plugih"
 	}
 
 	if cmd.Flags().Lookup("theme").Changed && flags.IsTheme {
-		c.Local.Type = "theme"
+		c.Type = "theme"
 	}
+}
+
+// WriteLocalSettings Writes all appropriate local settings to the local config file
+func (c *Config) WriteLocalSettings(localSettings LocalSettings) error {
+
+	c.local.Set("local", localSettings.Local)
+	c.local.Set("type", localSettings.Type)
+	c.local.Set("xdebug", localSettings.Xdebug)
+	c.local.Set("plugins", localSettings.Plugins)
+
+	if _, err := os.Stat(path.Join(c.Directories.Working, ".kana.json")); os.IsNotExist(err) {
+		return c.local.SafeWriteConfig()
+	}
+
+	return c.local.WriteConfig()
 }
 
 // loadLocalConfig Loads the config for the current site being called
@@ -119,11 +130,11 @@ func (c *Config) loadLocalConfig() error {
 
 	siteName := sanitizeSiteName(filepath.Base(c.Directories.Working))
 	// Setup other options generated from config items
-	c.Local.Domain = fmt.Sprintf("%s.%s", siteName, c.Global.Domain)
-	c.Local.SecureURL = fmt.Sprintf("https://%s/", c.Local.Domain)
-	c.Local.URL = fmt.Sprintf("http://%s/", c.Local.Domain)
+	c.SiteDomain = fmt.Sprintf("%s.%s", siteName, c.AppDomain)
+	c.SecureURL = fmt.Sprintf("https://%s/", c.SiteDomain)
+	c.URL = fmt.Sprintf("http://%s/", c.SiteDomain)
 
-	c.Local.Name = siteName
+	c.Name = siteName
 	c.Directories.Site = path.Join(c.Directories.App, "sites", siteName)
 
 	localViper, err := c.loadlocalViper()
@@ -131,12 +142,12 @@ func (c *Config) loadLocalConfig() error {
 		return err
 	}
 
-	c.Local.Viper = localViper
-	c.Local.Xdebug = localViper.GetBool("xdebug")
-	c.Local.Local = localViper.GetBool("local")
-	c.Local.PHP = localViper.GetString("php")
-	c.Local.Type = localViper.GetString("type")
-	c.Local.Plugins = localViper.GetStringSlice("plugins")
+	c.local = localViper
+	c.Xdebug = localViper.GetBool("xdebug")
+	c.Local = localViper.GetBool("local")
+	c.PHP = localViper.GetString("php")
+	c.Type = localViper.GetString("type")
+	c.Plugins = localViper.GetStringSlice("plugins")
 
 	return nil
 }
@@ -144,25 +155,25 @@ func (c *Config) loadLocalConfig() error {
 // loadSiteConfig Get the config items that can be overridden locally with a .kana.json file.
 func (c *Config) loadlocalViper() (*viper.Viper, error) {
 
-	siteConfig := viper.New()
+	localConfig := viper.New()
 
-	siteConfig.SetDefault("php", c.Global.PHP)
-	siteConfig.SetDefault("type", c.Global.Type)
-	siteConfig.SetDefault("local", c.Global.Local)
-	siteConfig.SetDefault("xdebug", c.Global.Xdebug)
-	siteConfig.SetDefault("plugins", []string{})
+	localConfig.SetDefault("php", c.PHP)
+	localConfig.SetDefault("type", c.Type)
+	localConfig.SetDefault("local", c.Local)
+	localConfig.SetDefault("xdebug", c.Xdebug)
+	localConfig.SetDefault("plugins", []string{})
 
-	siteConfig.SetConfigName(".kana")
-	siteConfig.SetConfigType("json")
-	siteConfig.AddConfigPath(c.Directories.Working)
+	localConfig.SetConfigName(".kana")
+	localConfig.SetConfigType("json")
+	localConfig.AddConfigPath(c.Directories.Working)
 
-	err := siteConfig.ReadInConfig()
+	err := localConfig.ReadInConfig()
 	if err != nil {
 		_, ok := err.(viper.ConfigFileNotFoundError)
 		if !ok {
-			return siteConfig, err
+			return localConfig, err
 		}
 	}
 
-	return siteConfig, nil
+	return localConfig, nil
 }

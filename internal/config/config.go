@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/mitchellh/go-homedir"
+	"github.com/spf13/viper"
 )
 
 type Directories struct {
@@ -14,9 +15,18 @@ type Directories struct {
 }
 
 type Config struct {
-	Directories Directories
-	Global      GlobalConfig
-	Local       LocalConfig
+	Directories                              Directories
+	Local, Xdebug                            bool
+	AdminEmail, AdminPassword, AdminUsername string
+	AppDomain, SiteDomain                    string
+	Name                                     string
+	PHP                                      string
+	RootCert, RootKey, SiteCert, SiteKey     string
+	SecureURL, URL                           string
+	Type                                     string
+	Plugins                                  []string
+	global                                   *viper.Viper
+	local                                    *viper.Viper
 }
 
 var validPHPVersions = []string{
@@ -31,17 +41,22 @@ var validTypes = []string{
 	"theme",
 }
 
+var rootKey = "kana.root.key"
+var rootCert = "kana.root.pem"
+var siteCert = "kana.site.pem"
+var siteKey = "kana.site.key"
+var domain = "sites.kana.li"
+var configFolderName = ".config/kana"
+
 func NewConfig() (*Config, error) {
 
 	kanaConfig := new(Config)
 
-	kanaConfig.Global = GlobalConfig{
-		Domain:   domain,
-		RootKey:  rootKey,
-		RootCert: rootCert,
-		SiteCert: siteCert,
-		SiteKey:  siteKey,
-	}
+	kanaConfig.AppDomain = domain
+	kanaConfig.RootKey = rootKey
+	kanaConfig.RootCert = rootCert
+	kanaConfig.SiteCert = siteCert
+	kanaConfig.SiteKey = siteKey
 
 	cwd, err := os.Getwd()
 	if err != nil {

@@ -15,11 +15,11 @@ import (
 
 func (c *Config) GetGlobalSetting(md *cobra.Command, args []string) (string, error) {
 
-	if !c.Global.viper.IsSet(args[0]) {
+	if !c.global.IsSet(args[0]) {
 		return "", fmt.Errorf("invalid setting. Please enter a valid key to get")
 	}
 
-	return c.Global.viper.GetString(args[0]), nil
+	return c.global.GetString(args[0]), nil
 }
 
 func (c *Config) ListConfig() {
@@ -28,17 +28,17 @@ func (c *Config) ListConfig() {
 
 	t.SetHeaders("Setting", "Global Value", "Local Value")
 
-	t.AddRow("admin.email", console.Bold(c.Global.AdminEmail))
-	t.AddRow("admin.password", console.Bold(c.Global.AdminPassword))
-	t.AddRow("admnin.username", console.Bold(c.Global.AdminUsername))
-	t.AddRow("local", console.Bold(strconv.FormatBool(c.Global.Local)), console.Bold(strconv.FormatBool(c.Local.Local)))
-	t.AddRow("php", console.Bold(c.Global.PHP), console.Bold(c.Local.PHP))
-	t.AddRow("type", console.Bold(c.Global.Type), console.Bold(c.Local.Type))
-	t.AddRow("xdebug", console.Bold(strconv.FormatBool(c.Global.Xdebug)), console.Bold(strconv.FormatBool(c.Local.Local)))
+	t.AddRow("admin.email", console.Bold(c.global.GetString("admin.email")))
+	t.AddRow("admin.password", console.Bold(c.global.GetString("admin.password")))
+	t.AddRow("admnin.username", console.Bold(c.global.GetString("admin.username")))
+	t.AddRow("local", console.Bold(c.global.GetString("local")), console.Bold(c.local.GetString("local")))
+	t.AddRow("php", console.Bold(c.global.GetString("php")), console.Bold(c.local.GetString("php")))
+	t.AddRow("type", console.Bold(c.global.GetString("type")), console.Bold(c.local.GetString("type")))
+	t.AddRow("xdebug", console.Bold(c.global.GetString("xdebug")), console.Bold(c.local.GetString("xdebug")))
 
 	boldPlugins := []string{}
 
-	for _, plugin := range c.Local.Plugins {
+	for _, plugin := range c.Plugins {
 		boldPlugins = append(boldPlugins, console.Bold(plugin))
 	}
 
@@ -51,7 +51,7 @@ func (c *Config) ListConfig() {
 
 func (c *Config) SetGlobalSetting(md *cobra.Command, args []string) error {
 
-	if !c.Global.viper.IsSet(args[0]) {
+	if !c.global.IsSet(args[0]) {
 		return fmt.Errorf("invalid setting. Please enter a valid key to set")
 	}
 
@@ -68,8 +68,8 @@ func (c *Config) SetGlobalSetting(md *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
-		c.Global.viper.Set(args[0], boolVal)
-		return c.Global.viper.WriteConfig()
+		c.global.Set(args[0], boolVal)
+		return c.global.WriteConfig()
 	case "php":
 		if !isValidString(args[1], validPHPVersions) {
 			err = fmt.Errorf("please choose a valid php version")
@@ -92,7 +92,7 @@ func (c *Config) SetGlobalSetting(md *cobra.Command, args []string) error {
 		return err
 	}
 
-	c.Global.viper.Set(args[0], args[1])
+	c.global.Set(args[0], args[1])
 
-	return c.Global.viper.WriteConfig()
+	return c.global.WriteConfig()
 }

@@ -28,44 +28,39 @@ func NewSite() (*Site, error) {
 
 	site := new(Site)
 
+	err := site.loadConfig()
+
+	return site, err
+}
+
+// EnsureDocker Ensures Docker is available for commands that need it.
+func (s *Site) EnsureDocker() error {
+
 	// Add a docker client to the site
 	dockerClient, err := docker.NewController()
 	if err != nil {
-		return site, err
+		return err
 	}
 
-	site.dockerClient = dockerClient
-
-	err = site.loadConfig()
-
-	return site, err
+	s.dockerClient = dockerClient
+	return nil
 }
 
 // ExportSiteSConfig Saves the current running config to a file.
 func (s *Site) ExportSiteConfig() error {
 
-	config := s.getRunningConfig()
-	plugins, err := s.getInstalledWordPressPlugins()
+	localSettings, err := s.getRunningConfig(true)
 	if err != nil {
 		return err
 	}
 
-	s.Config.Local.Viper.Set("local", config.Local)
-	s.Config.Local.Viper.Set("type", config.Type)
-	s.Config.Local.Viper.Set("xdebug", config.Xdebug)
-	s.Config.Local.Viper.Set("plugins", plugins)
-
-	if _, err = os.Stat(path.Join(s.Config.Directories.Working, ".kana.json")); os.IsNotExist(err) {
-		return s.Config.Local.Viper.SafeWriteConfig()
-	}
-
-	return s.Config.Local.Viper.WriteConfig()
+	return s.Config.WriteLocalSettings(localSettings)
 }
 
 // IsSiteRunning Returns true if the site is up and running in Docker or false. Does not verify other errors
 func (s *Site) IsSiteRunning() bool {
 
-	containers, _ := s.dockerClient.ListContainers(s.Config.Local.Name)
+	containers, _ := s.dockerClient.ListContainers(s.Config.Name)
 
 	return len(containers) != 0
 }
@@ -79,11 +74,11 @@ func (s *Site) OpenSite() error {
 	}
 
 	if runtime.GOOS == "linux" {
-		openCmd := exec.Command("xdg-open", s.Config.Local.SecureURL)
+		openCmd := exec.Command("xdg-open", s.Config.SecureURL)
 		return openCmd.Run()
 	}
 
-	return browser.OpenURL(s.Config.Local.SecureURL)
+	return browser.OpenURL(s.Config.SecureURL)
 }
 
 // StartSite Starts a site, including Traefik if needed
@@ -163,57 +158,72 @@ func getLocalAppDir() (string, error) {
 }
 
 // getRunningConfig gets various options that were used to start the site
-func (s *Site) getRunningConfig() CurrentConfig {
+func (s *Site) getRunningConfig(withPlugins bool) (config.LocalSettings, error) {
 
-	currentConfig := CurrentConfig{
+	localSettings := config.LocalSettings{
 		Type:   "site",
 		Local:  false,
 		Xdebug: false,
 	}
 
-	output, _ := s.runCli("pecl list | grep xdebug", false)
-	if strings.Contains(output.StdOut, "xdebug") {
-		currentConfig.Xdebug = true
+	output, err := s.runCli("pecl list | grep xdebug", false)
+	if err != nil {
+		return localSettings, err
 	}
 
-	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana_%s_wordpress", s.Config.Local.Name))
+	if strings.Contains(output.StdOut, "xdebug") {
+		localSettings.Xdebug = true
+	}
+
+	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana_%s_wordpress", s.Config.Name))
 
 	if len(mounts) == 1 {
-		currentConfig.Type = "site"
+		localSettings.Type = "site"
 	}
 
 	for _, mount := range mounts {
 
 		if mount.Source == path.Join(s.Config.Directories.Working, "wordpress") {
-			currentConfig.Local = true
+			localSettings.Local = true
 		}
 
 		if strings.Contains(mount.Destination, "/var/www/html/wp-content/plugins/") {
-			currentConfig.Type = "plugin"
+			localSettings.Type = "plugin"
 		}
 
 		if strings.Contains(mount.Destination, "/var/www/html/wp-content/themes/") {
-			currentConfig.Type = "theme"
+			localSettings.Type = "theme"
 		}
 	}
 
-	return currentConfig
+	// Don't get plugins if we don't need them
+	if withPlugins {
+
+		plugins, err := s.getInstalledWordPressPlugins()
+		if err != nil {
+			return localSettings, err
+		}
+
+		localSettings.Plugins = plugins
+	}
+
+	return localSettings, nil
 }
 
 // getSiteURL returns the appropriate URL for the site
 func (s *Site) getSiteURL(insecure bool) string {
 
 	if insecure {
-		return s.Config.Local.URL
+		return s.Config.URL
 	}
 
-	return s.Config.Local.SecureURL
+	return s.Config.SecureURL
 }
 
 // installXdebug installs xdebug in the site's PHP container
 func (s *Site) installXdebug() (bool, error) {
 
-	if !s.Config.Local.Xdebug {
+	if !s.Config.Xdebug {
 		return false, nil
 	}
 
@@ -257,7 +267,7 @@ func (s *Site) isLocalSite() bool {
 
 	// If the site is already running, try to make this easier
 	if s.IsSiteRunning() {
-		runningConfig := s.getRunningConfig()
+		runningConfig, _ := s.getRunningConfig(false)
 		if runningConfig.Local {
 			return true
 		}
@@ -280,7 +290,7 @@ func (s *Site) isLocalSite() bool {
 	}
 
 	// Return the flag for all other conditions
-	return s.Config.Local.Local
+	return s.Config.Local
 }
 
 func (s *Site) loadConfig() error {
@@ -294,7 +304,7 @@ func (s *Site) loadConfig() error {
 // runCli Runs an arbitrary CLI command against the site's WordPress container
 func (s *Site) runCli(command string, restart bool) (docker.ExecResult, error) {
 
-	container := fmt.Sprintf("kana_%s_wordpress", s.Config.Local.Name)
+	container := fmt.Sprintf("kana_%s_wordpress", s.Config.Name)
 
 	output, err := s.dockerClient.ContainerExec(container, []string{command})
 	if err != nil {
@@ -313,7 +323,7 @@ func (s *Site) runCli(command string, restart bool) (docker.ExecResult, error) {
 func (s *Site) verifySite() (bool, error) {
 
 	// Setup other options generated from config items
-	rootCert := path.Join(s.Config.Directories.App, "certs", s.Config.Global.RootCert)
+	rootCert := path.Join(s.Config.Directories.App, "certs", s.Config.RootCert)
 
 	caCert, err := os.ReadFile(rootCert)
 	if err != nil {
@@ -328,7 +338,7 @@ func (s *Site) verifySite() (bool, error) {
 		},
 	}
 
-	resp, err := client.Get(s.Config.Local.SecureURL)
+	resp, err := client.Get(s.Config.SecureURL)
 	if err != nil {
 		return false, err
 	}
@@ -337,7 +347,7 @@ func (s *Site) verifySite() (bool, error) {
 
 	for resp.StatusCode != 200 {
 
-		resp, err = client.Get(s.Config.Local.SecureURL)
+		resp, err = client.Get(s.Config.SecureURL)
 		if err != nil {
 			return false, err
 		}

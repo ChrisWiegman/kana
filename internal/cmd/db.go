@@ -27,7 +27,12 @@ func newDbCommand(kanaSite *site.Site) *cobra.Command {
 		Short: "Import a database from an existing WordPress site",
 		Run: func(cmd *cobra.Command, args []string) {
 
-			err := kanaSite.ImportDatabase(args[0], flagPreserve, flagReplaceDomain)
+			err := kanaSite.EnsureDocker()
+			if err != nil {
+				console.Error(err, flagVerbose)
+			}
+
+			err = kanaSite.ImportDatabase(args[0], flagPreserve, flagReplaceDomain)
 			if err != nil {
 				console.Error(err, flagVerbose)
 			}
