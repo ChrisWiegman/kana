@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/aquasecurity/table"
 	"github.com/go-playground/validator/v10"
 	"github.com/spf13/cobra"
 )
 
-func (c *Config) GetDynamicContentItem(md *cobra.Command, args []string) (string, error) {
+func (c *Config) GetGlobalSetting(md *cobra.Command, args []string) (string, error) {
 
 	if !c.Global.viper.IsSet(args[0]) {
 		return "", fmt.Errorf("invalid setting. Please enter a valid key to get")
@@ -19,24 +20,28 @@ func (c *Config) GetDynamicContentItem(md *cobra.Command, args []string) (string
 	return c.Global.viper.GetString(args[0]), nil
 }
 
-func (c *Config) ListDynamicContent() {
+func (c *Config) ListConfig() {
 
 	t := table.New(os.Stdout)
 
-	t.SetHeaders("Key", "Value")
+	t.SetHeaders("Key", "Global Value", "Local Value")
 
-	t.AddRow("admin.email", c.Global.viper.GetString("admin.email"))
-	t.AddRow("admin.password", c.Global.viper.GetString("admin.password"))
-	t.AddRow("admnin.username", c.Global.viper.GetString("admin.username"))
-	t.AddRow("local", c.Global.viper.GetString("local"))
-	t.AddRow("php", c.Global.viper.GetString("php"))
-	t.AddRow("type", c.Global.viper.GetString("type"))
-	t.AddRow("xdebug", c.Global.viper.GetString("xdebug"))
+	t.AddRow("admin.email", c.Global.AdminEmail)
+	t.AddRow("admin.password", c.Global.AdminPassword)
+	t.AddRow("admnin.username", c.Global.AdminUsername)
+	t.AddRow("local", strconv.FormatBool(c.Global.Local), strconv.FormatBool(c.Local.Local))
+	t.AddRow("php", c.Global.PHP, c.Local.PHP)
+	t.AddRow("type", c.Global.Type, c.Local.Type)
+	t.AddRow("xdebug", strconv.FormatBool(c.Global.Xdebug), strconv.FormatBool(c.Local.Local))
+
+	plugins := strings.Join(c.Local.Plugins, "\n")
+
+	t.AddRow("plugins", "", plugins)
 
 	t.Render()
 }
 
-func (c *Config) SetDynamicContent(md *cobra.Command, args []string) error {
+func (c *Config) SetGlobalSetting(md *cobra.Command, args []string) error {
 
 	if !c.Global.viper.IsSet(args[0]) {
 		return fmt.Errorf("invalid setting. Please enter a valid key to set")

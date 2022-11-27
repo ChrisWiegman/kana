@@ -18,16 +18,16 @@ func newConfigCommand(kanaSite *site.Site) *cobra.Command {
 			// This is similar to how setting git options works
 			switch len(args) {
 			case 0:
-				kanaSite.Config.ListDynamicContent()
+				kanaSite.Config.ListConfig()
 			case 1:
-				value, err := kanaSite.Config.GetDynamicContentItem(cmd, args)
+				value, err := kanaSite.Config.GetGlobalSetting(cmd, args)
 				if err != nil {
 					console.Error(err, flagVerbose)
 				}
 
 				console.Println(value)
 			case 2:
-				err := kanaSite.Config.SetDynamicContent(cmd, args)
+				err := kanaSite.Config.SetGlobalSetting(cmd, args)
 				if err != nil {
 					console.Error(err, flagVerbose)
 				}
