@@ -41,7 +41,7 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
 
 	globalViperConfig.SetConfigName("kana")
 	globalViperConfig.SetConfigType("json")
-	globalViperConfig.AddConfigPath(path.Join(s.Directories.App, "config"))
+	globalViperConfig.AddConfigPath(path.Join(s.AppDirectory, "config"))
 
 	err := globalViperConfig.ReadInConfig()
 	if err != nil {

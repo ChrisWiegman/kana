@@ -31,7 +31,7 @@ func newExportCommand(kanaSite *site.Site) *cobra.Command {
 				console.Error(err, flagVerbose)
 			}
 
-			console.Success(fmt.Sprintf("Your config has been exported to %s", path.Join(kanaSite.Config.Directories.Working, ".kana.json")))
+			console.Success(fmt.Sprintf("Your config has been exported to %s", path.Join(kanaSite.Config.WorkingDirectory, ".kana.json")))
 		},
 		Args: cobra.ArbitraryArgs,
 	}

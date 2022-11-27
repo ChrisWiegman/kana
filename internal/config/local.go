@@ -34,7 +34,7 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 	}
 
 	// By default the siteLink should be the working directory (assume it's linked)
-	siteLink := s.Directories.Working
+	siteLink := s.WorkingDirectory
 
 	// Process the name flag if set
 	if cmd.Flags().Lookup("name").Changed {
@@ -47,16 +47,16 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 		}
 
 		s.Name = sanitizeSiteName(cmd.Flags().Lookup("name").Value.String())
-		s.Directories.Site = (path.Join(s.Directories.App, "sites", s.Name))
+		s.SiteDirectory = (path.Join(s.AppDirectory, "sites", s.Name))
 
 		s.SiteDomain = fmt.Sprintf("%s.%s", s.Name, s.AppDomain)
 		s.SecureURL = fmt.Sprintf("https://%s/", s.SiteDomain)
 		s.URL = fmt.Sprintf("http://%s/", s.SiteDomain)
 
-		siteLink = s.Directories.Site
+		siteLink = s.SiteDirectory
 	}
 
-	_, err := os.Stat(path.Join(s.Directories.Site, "link.json"))
+	_, err := os.Stat(path.Join(s.SiteDirectory, "link.json"))
 	if err == nil || !os.IsNotExist(err) {
 		isSite = true
 	}
@@ -67,14 +67,14 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 
 	siteLinkConfig.SetConfigName("link")
 	siteLinkConfig.SetConfigType("json")
-	siteLinkConfig.AddConfigPath(s.Directories.Site)
+	siteLinkConfig.AddConfigPath(s.SiteDirectory)
 
 	err = siteLinkConfig.ReadInConfig()
 	if err != nil {
 		_, ok := err.(viper.ConfigFileNotFoundError)
 		if ok && cmd.Use == "start" {
 			isSite = true
-			err = os.MkdirAll(s.Directories.Site, 0750)
+			err = os.MkdirAll(s.SiteDirectory, 0750)
 			if err != nil {
 				return isSite, err
 			}
@@ -85,7 +85,7 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 		}
 	}
 
-	s.Directories.Working = siteLinkConfig.GetString("link")
+	s.WorkingDirectory = siteLinkConfig.GetString("link")
 
 	return isSite, nil
 }
@@ -118,7 +118,7 @@ func (s *Settings) WriteLocalSettings(localSettings LocalSettings) error {
 	s.local.Set("xdebug", localSettings.Xdebug)
 	s.local.Set("plugins", localSettings.Plugins)
 
-	if _, err := os.Stat(path.Join(s.Directories.Working, ".kana.json")); os.IsNotExist(err) {
+	if _, err := os.Stat(path.Join(s.WorkingDirectory, ".kana.json")); os.IsNotExist(err) {
 		return s.local.SafeWriteConfig()
 	}
 
@@ -128,14 +128,14 @@ func (s *Settings) WriteLocalSettings(localSettings LocalSettings) error {
 // loadLocalConfig Loads the config for the current site being called
 func (s *Settings) loadLocalConfig() error {
 
-	siteName := sanitizeSiteName(filepath.Base(s.Directories.Working))
+	siteName := sanitizeSiteName(filepath.Base(s.WorkingDirectory))
 	// Setup other options generated from config items
 	s.SiteDomain = fmt.Sprintf("%s.%s", siteName, s.AppDomain)
 	s.SecureURL = fmt.Sprintf("https://%s/", s.SiteDomain)
 	s.URL = fmt.Sprintf("http://%s/", s.SiteDomain)
 
 	s.Name = siteName
-	s.Directories.Site = path.Join(s.Directories.App, "sites", siteName)
+	s.SiteDirectory = path.Join(s.AppDirectory, "sites", siteName)
 
 	localViper, err := s.loadlocalViper()
 	if err != nil {
@@ -165,7 +165,7 @@ func (s *Settings) loadlocalViper() (*viper.Viper, error) {
 
 	localConfig.SetConfigName(".kana")
 	localConfig.SetConfigType("json")
-	localConfig.AddConfigPath(s.Directories.Working)
+	localConfig.AddConfigPath(s.WorkingDirectory)
 
 	err := localConfig.ReadInConfig()
 	if err != nil {

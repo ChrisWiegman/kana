@@ -9,39 +9,36 @@ import (
 )
 
 // The following are the default settings for Kana
-var rootKey = "kana.root.key"
-var rootCert = "kana.root.pem"
-var siteCert = "kana.site.pem"
-var siteKey = "kana.site.key"
-var domain = "sites.kana.li"
-var configFolderName = ".config/kana"
-var php = "8.1"
-var siteType = "site"
-var xdebug = false
-var local = false
-var adminUsername = "admin"
-var adminPassword = "password"
-var adminEmail = "admin@sites.kana.li"
+var (
+	rootKey          = "kana.root.key"
+	rootCert         = "kana.root.pem"
+	siteCert         = "kana.site.pem"
+	siteKey          = "kana.site.key"
+	domain           = "sites.kana.li"
+	configFolderName = ".config/kana"
+	php              = "8.1"
+	siteType         = "site"
+	xdebug           = false
+	local            = false
+	adminUsername    = "admin"
+	adminPassword    = "password"
+	adminEmail       = "admin@sites.kana.li"
+)
 
+// Individual Settings for use throughout the app lifecycle
 type Settings struct {
-	Directories                              Directories
-	Local, Xdebug                            bool
-	AdminEmail, AdminPassword, AdminUsername string
-	AppDomain, SiteDomain                    string
-	Name                                     string
-	PHP                                      string
-	RootCert, RootKey, SiteCert, SiteKey     string
-	SecureURL, URL                           string
-	Type                                     string
-	Plugins                                  []string
-	global                                   *viper.Viper
-	local                                    *viper.Viper
-}
-
-type Directories struct {
-	App     string
-	Working string
-	Site    string
+	Local, Xdebug                                 bool
+	AdminEmail, AdminPassword, AdminUsername      string
+	AppDirectory, SiteDirectory, WorkingDirectory string
+	AppDomain, SiteDomain                         string
+	Name                                          string
+	PHP                                           string
+	RootCert, RootKey, SiteCert, SiteKey          string
+	SecureURL, URL                                string
+	Type                                          string
+	Plugins                                       []string
+	global                                        *viper.Viper
+	local                                         *viper.Viper
 }
 
 var validPHPVersions = []string{
@@ -71,14 +68,14 @@ func NewConfig() (*Settings, error) {
 		return kanaSettings, err
 	}
 
-	kanaSettings.Directories.Working = cwd
+	kanaSettings.WorkingDirectory = cwd
 
 	home, err := homedir.Dir()
 	if err != nil {
 		return kanaSettings, err
 	}
 
-	kanaSettings.Directories.App = filepath.Join(home, configFolderName)
+	kanaSettings.AppDirectory = filepath.Join(home, configFolderName)
 
 	err = kanaSettings.EnsureStaticConfigFiles()
 	if err != nil {

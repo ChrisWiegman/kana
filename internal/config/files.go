@@ -39,7 +39,7 @@ var configFiles = []File{
 func (s *Settings) EnsureSSLCerts() error {
 
 	createCert := false
-	certPath := path.Join(s.Directories.App, "certs")
+	certPath := path.Join(s.AppDirectory, "certs")
 	rootCert := path.Join(certPath, s.RootCert)
 
 	_, err := os.Stat(rootCert)
@@ -80,8 +80,8 @@ func (s *Settings) EnsureStaticConfigFiles() error {
 
 	for _, file := range configFiles {
 
-		filePath := path.Join(s.Directories.App, file.LocalPath)
-		destFile := path.Join(s.Directories.App, file.LocalPath, file.Name)
+		filePath := path.Join(s.AppDirectory, file.LocalPath)
+		destFile := path.Join(s.AppDirectory, file.LocalPath, file.Name)
 
 		if err := os.MkdirAll(filePath, 0750); err != nil {
 			return err

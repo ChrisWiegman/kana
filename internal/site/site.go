@@ -183,7 +183,7 @@ func (s *Site) getRunningConfig(withPlugins bool) (config.LocalSettings, error) 
 
 	for _, mount := range mounts {
 
-		if mount.Source == path.Join(s.Config.Directories.Working, "wordpress") {
+		if mount.Source == path.Join(s.Config.WorkingDirectory, "wordpress") {
 			localSettings.Local = true
 		}
 
@@ -277,11 +277,11 @@ func (s *Site) isLocalSite() bool {
 	hasNonLocalAppFolder := true
 	hasDatabaseFolder := true
 
-	if _, err := os.Stat(path.Join(s.Config.Directories.Site, "app")); os.IsNotExist(err) {
+	if _, err := os.Stat(path.Join(s.Config.SiteDirectory, "app")); os.IsNotExist(err) {
 		hasNonLocalAppFolder = false
 	}
 
-	if _, err := os.Stat(path.Join(s.Config.Directories.Site, "database")); os.IsNotExist(err) {
+	if _, err := os.Stat(path.Join(s.Config.SiteDirectory, "database")); os.IsNotExist(err) {
 		hasDatabaseFolder = false
 	}
 
@@ -323,7 +323,7 @@ func (s *Site) runCli(command string, restart bool) (docker.ExecResult, error) {
 func (s *Site) verifySite() (bool, error) {
 
 	// Setup other options generated from config items
-	rootCert := path.Join(s.Config.Directories.App, "certs", s.Config.RootCert)
+	rootCert := path.Join(s.Config.AppDirectory, "certs", s.Config.RootCert)
 
 	caCert, err := os.ReadFile(rootCert)
 	if err != nil {

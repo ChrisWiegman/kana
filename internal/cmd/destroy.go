@@ -42,7 +42,7 @@ func newDestroyCommand(kanaSite *site.Site) *cobra.Command {
 				}
 
 				// Remove the site's folder in the config directory.
-				err = os.RemoveAll(kanaSite.Config.Directories.Site)
+				err = os.RemoveAll(kanaSite.Config.SiteDirectory)
 				if err != nil {
 					console.Error(err, flagVerbose)
 				}

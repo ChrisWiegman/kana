@@ -22,7 +22,7 @@ type PluginInfo struct {
 // RunWPCli Runs a wp-cli command returning it's output and any errors
 func (s *Site) RunWPCli(command []string) (string, error) {
 
-	siteDir := path.Join(s.Config.Directories.App, "sites", s.Config.Name)
+	siteDir := path.Join(s.Config.AppDirectory, "sites", s.Config.Name)
 	appDir := path.Join(siteDir, "app")
 	runningConfig, err := s.getRunningConfig(false)
 	if err != nil {
@@ -36,7 +36,7 @@ func (s *Site) RunWPCli(command []string) (string, error) {
 		}
 	}
 
-	appVolumes, err := s.getMounts(s.Config.Directories.Site, appDir, runningConfig.Type)
+	appVolumes, err := s.getMounts(s.Config.SiteDirectory, appDir, runningConfig.Type)
 	if err != nil {
 		return "", err
 	}
@@ -207,8 +207,8 @@ func (s *Site) startWordPress() error {
 		return err
 	}
 
-	appDir := path.Join(s.Config.Directories.Site, "app")
-	databaseDir := path.Join(s.Config.Directories.Site, "database")
+	appDir := path.Join(s.Config.SiteDirectory, "app")
+	databaseDir := path.Join(s.Config.SiteDirectory, "database")
 
 	if s.isLocalSite() {
 
@@ -232,7 +232,7 @@ func (s *Site) startWordPress() error {
 		return err
 	}
 
-	appVolumes, err := s.getMounts(s.Config.Directories.Working, appDir, s.Config.Type)
+	appVolumes, err := s.getMounts(s.Config.WorkingDirectory, appDir, s.Config.Type)
 	if err != nil {
 		return err
 	}
