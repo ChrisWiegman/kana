@@ -7,6 +7,7 @@ require (
 	github.com/docker/docker v20.10.21+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/go-playground/validator/v10 v10.11.1
+	github.com/logrusorgru/aurora/v4 v4.0.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8
 	github.com/spf13/cobra v1.6.1
@@ -37,7 +38,6 @@ require (
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
-	github.com/logrusorgru/aurora/v4 v4.0.0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mattn/go-runewidth v0.0.14 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
