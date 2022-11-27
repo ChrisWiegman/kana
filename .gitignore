@@ -57,5 +57,8 @@ vendor/
 # Ignore the generated binary
 kana
 
+# Ignore the constants file
+internal/config/constants.go
+
 # Ignore goreleasaer's build files
 dist/
