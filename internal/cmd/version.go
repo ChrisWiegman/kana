@@ -8,7 +8,6 @@ import (
 
 var (
 	Version   = ""
-	GitHash   = ""
 	Timestamp = ""
 )
 
@@ -20,7 +19,6 @@ func newVersionCommand() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 
 			fmt.Printf("Version: %s\n", Version)
-			fmt.Printf("Commit Hash: %s\n", GitHash)
 			fmt.Printf("Build Time: %s\n", Timestamp)
 		},
 		Args: cobra.NoArgs,

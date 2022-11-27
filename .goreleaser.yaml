@@ -14,7 +14,7 @@ builds:
     main: ./cmd/kana/main.go
     binary: kana
     ldflags:
-      - -s -w -X github.com/ChrisWiegman/kana-cli/internal/cmd.Version={{.Version}} -X github.com/ChrisWiegman/kana-cli/internal/cmd.GitHash={{.Commit}} -X github.com/ChrisWiegman/kana-cli/internal/cmd.Timestamp={{.Date}}
+      - -s -w -X github.com/ChrisWiegman/kana-cli/internal/cmd.Version={{.Version}} -X github.com/ChrisWiegman/kana-cli/internal/cmd.Timestamp={{.Date}}
 
 archives:
   - id: macos
