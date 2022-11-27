@@ -1,4 +1,4 @@
-package config
+package settings
 
 import (
 	"fmt"
@@ -125,8 +125,8 @@ func (s *Settings) WriteLocalSettings(localSettings LocalSettings) error {
 	return s.local.WriteConfig()
 }
 
-// loadLocalConfig Loads the config for the current site being called
-func (s *Settings) loadLocalConfig() error {
+// loadLocalSettings Loads the config for the current site being called
+func (s *Settings) loadLocalSettings() error {
 
 	siteName := sanitizeSiteName(filepath.Base(s.WorkingDirectory))
 	// Setup other options generated from config items
@@ -155,25 +155,25 @@ func (s *Settings) loadLocalConfig() error {
 // loadSiteConfig Get the config items that can be overridden locally with a .kana.json file.
 func (s *Settings) loadlocalViper() (*viper.Viper, error) {
 
-	localConfig := viper.New()
+	localSettings := viper.New()
 
-	localConfig.SetDefault("php", s.PHP)
-	localConfig.SetDefault("type", s.Type)
-	localConfig.SetDefault("local", s.Local)
-	localConfig.SetDefault("xdebug", s.Xdebug)
-	localConfig.SetDefault("plugins", []string{})
+	localSettings.SetDefault("php", s.PHP)
+	localSettings.SetDefault("type", s.Type)
+	localSettings.SetDefault("local", s.Local)
+	localSettings.SetDefault("xdebug", s.Xdebug)
+	localSettings.SetDefault("plugins", []string{})
 
-	localConfig.SetConfigName(".kana")
-	localConfig.SetConfigType("json")
-	localConfig.AddConfigPath(s.WorkingDirectory)
+	localSettings.SetConfigName(".kana")
+	localSettings.SetConfigType("json")
+	localSettings.AddConfigPath(s.WorkingDirectory)
 
-	err := localConfig.ReadInConfig()
+	err := localSettings.ReadInConfig()
 	if err != nil {
 		_, ok := err.(viper.ConfigFileNotFoundError)
 		if !ok {
-			return localConfig, err
+			return localSettings, err
 		}
 	}
 
-	return localConfig, nil
+	return localSettings, nil
 }

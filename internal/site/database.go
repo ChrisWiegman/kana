@@ -15,7 +15,7 @@ func (s *Site) ExportDatabase(args []string) (string, error) {
 		return "", err
 	}
 
-	exportFileName := fmt.Sprintf("kana-%s.sql", s.Config.Name)
+	exportFileName := fmt.Sprintf("kana-%s.sql", s.Settings.Name)
 	exportFile := path.Join(cwd, exportFileName)
 
 	if len(args) == 1 {
@@ -34,7 +34,7 @@ func (s *Site) ExportDatabase(args []string) (string, error) {
 		return "", err
 	}
 
-	err = copyFile(path.Join(s.Config.SiteDirectory, "export.sql"), exportFile)
+	err = copyFile(path.Join(s.Settings.SiteDirectory, "export.sql"), exportFile)
 	if err != nil {
 		return "", err
 	}
@@ -54,7 +54,7 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string) 
 		return fmt.Errorf("the specified sql file does not exist. Please enter a valid file to import")
 	}
 
-	kanaImportFile := path.Join(s.Config.SiteDirectory, "import.sql")
+	kanaImportFile := path.Join(s.Settings.SiteDirectory, "import.sql")
 
 	err = copyFile(rawImportFile, kanaImportFile)
 	if err != nil {
@@ -107,7 +107,7 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string) 
 		replaceCommand := []string{
 			"search-replace",
 			replaceDomain,
-			s.Config.SiteDomain,
+			s.Settings.SiteDomain,
 			"--all-tables",
 		}
 

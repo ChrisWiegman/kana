@@ -28,7 +28,7 @@ func (s *Site) maybeStopTraefik() error {
 // startTraefik Starts the Traefik container
 func (s *Site) startTraefik() error {
 
-	err := s.Config.EnsureSSLCerts()
+	err := s.Settings.EnsureSSLCerts()
 	if err != nil {
 		return err
 	}
@@ -61,17 +61,17 @@ func (s *Site) startTraefik() error {
 		Volumes: []mount.Mount{
 			{
 				Type:   mount.TypeBind,
-				Source: path.Join(s.Config.AppDirectory, "config", "traefik", "traefik.toml"),
+				Source: path.Join(s.Settings.AppDirectory, "config", "traefik", "traefik.toml"),
 				Target: "/etc/traefik/traefik.toml",
 			},
 			{
 				Type:   mount.TypeBind,
-				Source: path.Join(s.Config.AppDirectory, "config", "traefik", "dynamic.toml"),
+				Source: path.Join(s.Settings.AppDirectory, "config", "traefik", "dynamic.toml"),
 				Target: "/etc/traefik/dynamic.toml",
 			},
 			{
 				Type:   mount.TypeBind,
-				Source: path.Join(s.Config.AppDirectory, "certs"),
+				Source: path.Join(s.Settings.AppDirectory, "certs"),
 				Target: "/var/certs",
 			},
 			{

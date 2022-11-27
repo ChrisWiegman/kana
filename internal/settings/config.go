@@ -1,4 +1,4 @@
-package config
+package settings
 
 import (
 	"fmt"
@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// GetGlobalSetting Retrieves a global setting for the "config" command
 func (s *Settings) GetGlobalSetting(md *cobra.Command, args []string) (string, error) {
 
 	if !s.global.IsSet(args[0]) {
@@ -22,7 +23,8 @@ func (s *Settings) GetGlobalSetting(md *cobra.Command, args []string) (string, e
 	return s.global.GetString(args[0]), nil
 }
 
-func (s *Settings) ListConfig() {
+// ListSettings Lists all settings for the config command
+func (s *Settings) ListSettings() {
 
 	t := table.New(os.Stdout)
 
@@ -49,6 +51,7 @@ func (s *Settings) ListConfig() {
 	t.Render()
 }
 
+// SetGlobalSetting Sets a global setting for the "config" command
 func (s *Settings) SetGlobalSetting(md *cobra.Command, args []string) error {
 
 	if !s.global.IsSet(args[0]) {

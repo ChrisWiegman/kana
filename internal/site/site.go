@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ChrisWiegman/kana-cli/internal/config"
+	"github.com/ChrisWiegman/kana-cli/internal/settings"
 	"github.com/ChrisWiegman/kana-cli/pkg/console"
 	"github.com/ChrisWiegman/kana-cli/pkg/docker"
 	"github.com/pkg/browser"
@@ -20,7 +20,7 @@ import (
 
 type Site struct {
 	dockerClient *docker.DockerClient
-	Config       *config.Settings
+	Settings     *settings.Settings
 }
 
 // NewSite creates a new site object
@@ -54,13 +54,13 @@ func (s *Site) ExportSiteConfig() error {
 		return err
 	}
 
-	return s.Config.WriteLocalSettings(localSettings)
+	return s.Settings.WriteLocalSettings(localSettings)
 }
 
 // IsSiteRunning Returns true if the site is up and running in Docker or false. Does not verify other errors
 func (s *Site) IsSiteRunning() bool {
 
-	containers, _ := s.dockerClient.ListContainers(s.Config.Name)
+	containers, _ := s.dockerClient.ListContainers(s.Settings.Name)
 
 	return len(containers) != 0
 }
@@ -74,11 +74,11 @@ func (s *Site) OpenSite() error {
 	}
 
 	if runtime.GOOS == "linux" {
-		openCmd := exec.Command("xdg-open", s.Config.SecureURL)
+		openCmd := exec.Command("xdg-open", s.Settings.SecureURL)
 		return openCmd.Run()
 	}
 
-	return browser.OpenURL(s.Config.SecureURL)
+	return browser.OpenURL(s.Settings.SecureURL)
 }
 
 // StartSite Starts a site, including Traefik if needed
@@ -158,9 +158,9 @@ func getLocalAppDir() (string, error) {
 }
 
 // getRunningConfig gets various options that were used to start the site
-func (s *Site) getRunningConfig(withPlugins bool) (config.LocalSettings, error) {
+func (s *Site) getRunningConfig(withPlugins bool) (settings.LocalSettings, error) {
 
-	localSettings := config.LocalSettings{
+	localSettings := settings.LocalSettings{
 		Type:   "site",
 		Local:  false,
 		Xdebug: false,
@@ -175,7 +175,7 @@ func (s *Site) getRunningConfig(withPlugins bool) (config.LocalSettings, error) 
 		localSettings.Xdebug = true
 	}
 
-	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana_%s_wordpress", s.Config.Name))
+	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana_%s_wordpress", s.Settings.Name))
 
 	if len(mounts) == 1 {
 		localSettings.Type = "site"
@@ -183,7 +183,7 @@ func (s *Site) getRunningConfig(withPlugins bool) (config.LocalSettings, error) 
 
 	for _, mount := range mounts {
 
-		if mount.Source == path.Join(s.Config.WorkingDirectory, "wordpress") {
+		if mount.Source == path.Join(s.Settings.WorkingDirectory, "wordpress") {
 			localSettings.Local = true
 		}
 
@@ -214,16 +214,16 @@ func (s *Site) getRunningConfig(withPlugins bool) (config.LocalSettings, error) 
 func (s *Site) getSiteURL(insecure bool) string {
 
 	if insecure {
-		return s.Config.URL
+		return s.Settings.URL
 	}
 
-	return s.Config.SecureURL
+	return s.Settings.SecureURL
 }
 
 // installXdebug installs xdebug in the site's PHP container
 func (s *Site) installXdebug() (bool, error) {
 
-	if !s.Config.Xdebug {
+	if !s.Settings.Xdebug {
 		return false, nil
 	}
 
@@ -277,11 +277,11 @@ func (s *Site) isLocalSite() bool {
 	hasNonLocalAppFolder := true
 	hasDatabaseFolder := true
 
-	if _, err := os.Stat(path.Join(s.Config.SiteDirectory, "app")); os.IsNotExist(err) {
+	if _, err := os.Stat(path.Join(s.Settings.SiteDirectory, "app")); os.IsNotExist(err) {
 		hasNonLocalAppFolder = false
 	}
 
-	if _, err := os.Stat(path.Join(s.Config.SiteDirectory, "database")); os.IsNotExist(err) {
+	if _, err := os.Stat(path.Join(s.Settings.SiteDirectory, "database")); os.IsNotExist(err) {
 		hasDatabaseFolder = false
 	}
 
@@ -290,21 +290,21 @@ func (s *Site) isLocalSite() bool {
 	}
 
 	// Return the flag for all other conditions
-	return s.Config.Local
+	return s.Settings.Local
 }
 
 func (s *Site) loadConfig() error {
 
 	var err error
 
-	s.Config, err = config.NewConfig()
+	s.Settings, err = settings.NewSettings()
 	return err
 }
 
 // runCli Runs an arbitrary CLI command against the site's WordPress container
 func (s *Site) runCli(command string, restart bool) (docker.ExecResult, error) {
 
-	container := fmt.Sprintf("kana_%s_wordpress", s.Config.Name)
+	container := fmt.Sprintf("kana_%s_wordpress", s.Settings.Name)
 
 	output, err := s.dockerClient.ContainerExec(container, []string{command})
 	if err != nil {
@@ -323,7 +323,7 @@ func (s *Site) runCli(command string, restart bool) (docker.ExecResult, error) {
 func (s *Site) verifySite() (bool, error) {
 
 	// Setup other options generated from config items
-	rootCert := path.Join(s.Config.AppDirectory, "certs", s.Config.RootCert)
+	rootCert := path.Join(s.Settings.AppDirectory, "certs", s.Settings.RootCert)
 
 	caCert, err := os.ReadFile(rootCert)
 	if err != nil {
@@ -338,7 +338,7 @@ func (s *Site) verifySite() (bool, error) {
 		},
 	}
 
-	resp, err := client.Get(s.Config.SecureURL)
+	resp, err := client.Get(s.Settings.SecureURL)
 	if err != nil {
 		return false, err
 	}
@@ -347,7 +347,7 @@ func (s *Site) verifySite() (bool, error) {
 
 	for resp.StatusCode != 200 {
 
-		resp, err = client.Get(s.Config.SecureURL)
+		resp, err = client.Get(s.Settings.SecureURL)
 		if err != nil {
 			return false, err
 		}

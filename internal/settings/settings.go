@@ -1,4 +1,4 @@
-package config
+package settings
 
 import (
 	"os"
@@ -53,7 +53,7 @@ var validTypes = []string{
 	"theme",
 }
 
-func NewConfig() (*Settings, error) {
+func NewSettings() (*Settings, error) {
 
 	kanaSettings := new(Settings)
 
@@ -82,12 +82,12 @@ func NewConfig() (*Settings, error) {
 		return kanaSettings, err
 	}
 
-	err = kanaSettings.loadGlobalConfig()
+	err = kanaSettings.loadGlobalSettings()
 	if err != nil {
 		return kanaSettings, err
 	}
 
-	err = kanaSettings.loadLocalConfig()
+	err = kanaSettings.loadLocalSettings()
 
 	return kanaSettings, err
 }

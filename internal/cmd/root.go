@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/ChrisWiegman/kana-cli/internal/config"
+	"github.com/ChrisWiegman/kana-cli/internal/settings"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 	"github.com/ChrisWiegman/kana-cli/pkg/console"
 
@@ -29,7 +29,7 @@ func Execute() {
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 
 			// Process the "name" flag for every command
-			isSite, err := site.Config.ProcessNameFlag(cmd)
+			isSite, err := site.Settings.ProcessNameFlag(cmd)
 			if err != nil {
 				console.Error(err, flagVerbose)
 			}
@@ -47,14 +47,14 @@ func Execute() {
 				}
 
 				// Process any overrides set with flags on the start command
-				startFlags := config.StartFlags{
+				startFlags := settings.StartFlags{
 					Xdebug:   flagXdebug,
 					IsTheme:  flagIsTheme,
 					IsPlugin: flagIsPlugin,
 					Local:    flagLocal,
 				}
 
-				site.Config.ProcessStartFlags(cmd, startFlags)
+				site.Settings.ProcessStartFlags(cmd, startFlags)
 			}
 		},
 	}

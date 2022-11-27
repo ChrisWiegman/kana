@@ -28,7 +28,7 @@ func newOpenCommand(kanaSite *site.Site) *cobra.Command {
 				console.Error(fmt.Errorf("the site doesn't appear to be running. Please use `kana start` to start the site"), flagVerbose)
 			}
 
-			console.Success(fmt.Sprintf("Your site, %s, has been opened in your default browser.", aurora.Bold(aurora.Blue(kanaSite.Config.Name))))
+			console.Success(fmt.Sprintf("Your site, %s, has been opened in your default browser.", aurora.Bold(aurora.Blue(kanaSite.Settings.Name))))
 		},
 		Args: cobra.NoArgs,
 	}
