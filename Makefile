@@ -10,7 +10,6 @@ ARGS = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
 .PHONY: build
 build:
 	go mod vendor
-	go run ./scripts/generateTemplateConstants.go
 	go install \
 		-ldflags "-s -w -X $(PKG)/internal/cmd.Version=$(VERSION) -X $(PKG)/internal/cmd.GitHash=$(GITHASH) -X $(PKG)/internal/cmd.Timestamp=$(TIMESTAMP)" \
 		./cmd/...
@@ -55,7 +54,6 @@ clean:
 .PHONY: install
 install:
 	go mod vendor
-	go run ./scripts/generateTemplateConstants.go
 	go install \
 		-ldflags "-s -w -X $(PKG)/internal/cmd.Version=$(VERSION) -X $(PKG)/internal/cmd.GitHash=$(GITHASH) -X $(PKG)/internal/cmd.Timestamp=$(TIMESTAMP)" \
 		./cmd/...

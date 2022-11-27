@@ -2,9 +2,16 @@ package config
 
 import (
 	"bytes"
+	_ "embed"
 	"os"
 	"path/filepath"
 )
+
+//go:embed source/dynamic.toml
+var DYNAMIC_TOML string
+
+//go:embed source/traefik.toml
+var TRAEFIK_TOML string
 
 type File struct {
 	Name, Template, LocalPath string
