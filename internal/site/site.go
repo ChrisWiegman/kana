@@ -20,7 +20,7 @@ import (
 
 type Site struct {
 	dockerClient *docker.DockerClient
-	Config       *config.Config
+	Config       *config.Settings
 }
 
 // NewSite creates a new site object

@@ -8,13 +8,22 @@ import (
 	"github.com/spf13/viper"
 )
 
-type Directories struct {
-	App     string
-	Working string
-	Site    string
-}
+// The following are the default settings for Kana
+var rootKey = "kana.root.key"
+var rootCert = "kana.root.pem"
+var siteCert = "kana.site.pem"
+var siteKey = "kana.site.key"
+var domain = "sites.kana.li"
+var configFolderName = ".config/kana"
+var php = "8.1"
+var siteType = "site"
+var xdebug = false
+var local = false
+var adminUsername = "admin"
+var adminPassword = "password"
+var adminEmail = "admin@sites.kana.li"
 
-type Config struct {
+type Settings struct {
 	Directories                              Directories
 	Local, Xdebug                            bool
 	AdminEmail, AdminPassword, AdminUsername string
@@ -29,6 +38,12 @@ type Config struct {
 	local                                    *viper.Viper
 }
 
+type Directories struct {
+	App     string
+	Working string
+	Site    string
+}
+
 var validPHPVersions = []string{
 	"7.4",
 	"8.0",
@@ -41,48 +56,41 @@ var validTypes = []string{
 	"theme",
 }
 
-var rootKey = "kana.root.key"
-var rootCert = "kana.root.pem"
-var siteCert = "kana.site.pem"
-var siteKey = "kana.site.key"
-var domain = "sites.kana.li"
-var configFolderName = ".config/kana"
+func NewConfig() (*Settings, error) {
 
-func NewConfig() (*Config, error) {
+	kanaSettings := new(Settings)
 
-	kanaConfig := new(Config)
-
-	kanaConfig.AppDomain = domain
-	kanaConfig.RootKey = rootKey
-	kanaConfig.RootCert = rootCert
-	kanaConfig.SiteCert = siteCert
-	kanaConfig.SiteKey = siteKey
+	kanaSettings.AppDomain = domain
+	kanaSettings.RootKey = rootKey
+	kanaSettings.RootCert = rootCert
+	kanaSettings.SiteCert = siteCert
+	kanaSettings.SiteKey = siteKey
 
 	cwd, err := os.Getwd()
 	if err != nil {
-		return kanaConfig, err
+		return kanaSettings, err
 	}
 
-	kanaConfig.Directories.Working = cwd
+	kanaSettings.Directories.Working = cwd
 
 	home, err := homedir.Dir()
 	if err != nil {
-		return kanaConfig, err
+		return kanaSettings, err
 	}
 
-	kanaConfig.Directories.App = filepath.Join(home, configFolderName)
+	kanaSettings.Directories.App = filepath.Join(home, configFolderName)
 
-	err = kanaConfig.EnsureStaticConfigFiles()
+	err = kanaSettings.EnsureStaticConfigFiles()
 	if err != nil {
-		return kanaConfig, err
+		return kanaSettings, err
 	}
 
-	err = kanaConfig.loadGlobalConfig()
+	err = kanaSettings.loadGlobalConfig()
 	if err != nil {
-		return kanaConfig, err
+		return kanaSettings, err
 	}
 
-	err = kanaConfig.loadLocalConfig()
+	err = kanaSettings.loadLocalConfig()
 
-	return kanaConfig, err
+	return kanaSettings, err
 }

@@ -7,41 +7,41 @@ import (
 )
 
 // loadGlobalConfig gets config information that transcends sites such as app and default settings
-func (c *Config) loadGlobalConfig() error {
+func (s *Settings) loadGlobalConfig() error {
 
-	globalViperConfig, err := c.loadGlobalViper()
+	globalViperConfig, err := s.loadGlobalViper()
 	if err != nil {
 		return err
 	}
 
-	c.global = globalViperConfig
-	c.Xdebug = globalViperConfig.GetBool("xdebug")
-	c.Local = globalViperConfig.GetBool("local")
-	c.AdminEmail = globalViperConfig.GetString("admin.email")
-	c.AdminPassword = globalViperConfig.GetString("admin.password")
-	c.AdminUsername = globalViperConfig.GetString("admin.username")
-	c.PHP = globalViperConfig.GetString("php")
-	c.Type = globalViperConfig.GetString("type")
+	s.global = globalViperConfig
+	s.Xdebug = globalViperConfig.GetBool("xdebug")
+	s.Local = globalViperConfig.GetBool("local")
+	s.AdminEmail = globalViperConfig.GetString("admin.email")
+	s.AdminPassword = globalViperConfig.GetString("admin.password")
+	s.AdminUsername = globalViperConfig.GetString("admin.username")
+	s.PHP = globalViperConfig.GetString("php")
+	s.Type = globalViperConfig.GetString("type")
 
 	return err
 }
 
 // loadGlobalViper loads the global config using viper and sets defaults
-func (c *Config) loadGlobalViper() (*viper.Viper, error) {
+func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
 
 	globalViperConfig := viper.New()
 
-	globalViperConfig.SetDefault("xdebug", false)
-	globalViperConfig.SetDefault("type", "site")
-	globalViperConfig.SetDefault("local", false)
-	globalViperConfig.SetDefault("php", "7.4")
-	globalViperConfig.SetDefault("admin.username", "admin")
-	globalViperConfig.SetDefault("admin.password", "password")
-	globalViperConfig.SetDefault("admin.email", "admin@mykanasite.localhost")
+	globalViperConfig.SetDefault("xdebug", xdebug)
+	globalViperConfig.SetDefault("type", siteType)
+	globalViperConfig.SetDefault("local", local)
+	globalViperConfig.SetDefault("php", php)
+	globalViperConfig.SetDefault("admin.username", adminUsername)
+	globalViperConfig.SetDefault("admin.password", adminPassword)
+	globalViperConfig.SetDefault("admin.email", adminEmail)
 
 	globalViperConfig.SetConfigName("kana")
 	globalViperConfig.SetConfigType("json")
-	globalViperConfig.AddConfigPath(path.Join(c.Directories.App, "config"))
+	globalViperConfig.AddConfigPath(path.Join(s.Directories.App, "config"))
 
 	err := globalViperConfig.ReadInConfig()
 	if err != nil {

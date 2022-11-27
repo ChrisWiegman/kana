@@ -24,7 +24,7 @@ type LocalSettings struct {
 }
 
 // ProcessNameFlag Processes the name flag on the site resetting all appropriate local variables
-func (c *Config) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
+func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 
 	isSite := false // Don't assume we're in a site that has been initialized.
 
@@ -34,7 +34,7 @@ func (c *Config) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 	}
 
 	// By default the siteLink should be the working directory (assume it's linked)
-	siteLink := c.Directories.Working
+	siteLink := s.Directories.Working
 
 	// Process the name flag if set
 	if cmd.Flags().Lookup("name").Changed {
@@ -46,17 +46,17 @@ func (c *Config) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 			}
 		}
 
-		c.Name = sanitizeSiteName(cmd.Flags().Lookup("name").Value.String())
-		c.Directories.Site = (path.Join(c.Directories.App, "sites", c.Name))
+		s.Name = sanitizeSiteName(cmd.Flags().Lookup("name").Value.String())
+		s.Directories.Site = (path.Join(s.Directories.App, "sites", s.Name))
 
-		c.SiteDomain = fmt.Sprintf("%s.%s", c.Name, c.AppDomain)
-		c.SecureURL = fmt.Sprintf("https://%s/", c.SiteDomain)
-		c.URL = fmt.Sprintf("http://%s/", c.SiteDomain)
+		s.SiteDomain = fmt.Sprintf("%s.%s", s.Name, s.AppDomain)
+		s.SecureURL = fmt.Sprintf("https://%s/", s.SiteDomain)
+		s.URL = fmt.Sprintf("http://%s/", s.SiteDomain)
 
-		siteLink = c.Directories.Site
+		siteLink = s.Directories.Site
 	}
 
-	_, err := os.Stat(path.Join(c.Directories.Site, "link.json"))
+	_, err := os.Stat(path.Join(s.Directories.Site, "link.json"))
 	if err == nil || !os.IsNotExist(err) {
 		isSite = true
 	}
@@ -67,14 +67,14 @@ func (c *Config) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 
 	siteLinkConfig.SetConfigName("link")
 	siteLinkConfig.SetConfigType("json")
-	siteLinkConfig.AddConfigPath(c.Directories.Site)
+	siteLinkConfig.AddConfigPath(s.Directories.Site)
 
 	err = siteLinkConfig.ReadInConfig()
 	if err != nil {
 		_, ok := err.(viper.ConfigFileNotFoundError)
 		if ok && cmd.Use == "start" {
 			isSite = true
-			err = os.MkdirAll(c.Directories.Site, 0750)
+			err = os.MkdirAll(s.Directories.Site, 0750)
 			if err != nil {
 				return isSite, err
 			}
@@ -85,87 +85,87 @@ func (c *Config) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 		}
 	}
 
-	c.Directories.Working = siteLinkConfig.GetString("link")
+	s.Directories.Working = siteLinkConfig.GetString("link")
 
 	return isSite, nil
 }
 
 // ProcessStartFlags Process the start flags and save them to the settings object
-func (c *Config) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
+func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
 
 	if cmd.Flags().Lookup("local").Changed {
-		c.Local = flags.Local
+		s.Local = flags.Local
 	}
 
 	if cmd.Flags().Lookup("xdebug").Changed {
-		c.Xdebug = flags.Local
+		s.Xdebug = flags.Local
 	}
 
 	if cmd.Flags().Lookup("plugin").Changed && flags.IsPlugin {
-		c.Type = "plugih"
+		s.Type = "plugih"
 	}
 
 	if cmd.Flags().Lookup("theme").Changed && flags.IsTheme {
-		c.Type = "theme"
+		s.Type = "theme"
 	}
 }
 
 // WriteLocalSettings Writes all appropriate local settings to the local config file
-func (c *Config) WriteLocalSettings(localSettings LocalSettings) error {
+func (s *Settings) WriteLocalSettings(localSettings LocalSettings) error {
 
-	c.local.Set("local", localSettings.Local)
-	c.local.Set("type", localSettings.Type)
-	c.local.Set("xdebug", localSettings.Xdebug)
-	c.local.Set("plugins", localSettings.Plugins)
+	s.local.Set("local", localSettings.Local)
+	s.local.Set("type", localSettings.Type)
+	s.local.Set("xdebug", localSettings.Xdebug)
+	s.local.Set("plugins", localSettings.Plugins)
 
-	if _, err := os.Stat(path.Join(c.Directories.Working, ".kana.json")); os.IsNotExist(err) {
-		return c.local.SafeWriteConfig()
+	if _, err := os.Stat(path.Join(s.Directories.Working, ".kana.json")); os.IsNotExist(err) {
+		return s.local.SafeWriteConfig()
 	}
 
-	return c.local.WriteConfig()
+	return s.local.WriteConfig()
 }
 
 // loadLocalConfig Loads the config for the current site being called
-func (c *Config) loadLocalConfig() error {
+func (s *Settings) loadLocalConfig() error {
 
-	siteName := sanitizeSiteName(filepath.Base(c.Directories.Working))
+	siteName := sanitizeSiteName(filepath.Base(s.Directories.Working))
 	// Setup other options generated from config items
-	c.SiteDomain = fmt.Sprintf("%s.%s", siteName, c.AppDomain)
-	c.SecureURL = fmt.Sprintf("https://%s/", c.SiteDomain)
-	c.URL = fmt.Sprintf("http://%s/", c.SiteDomain)
+	s.SiteDomain = fmt.Sprintf("%s.%s", siteName, s.AppDomain)
+	s.SecureURL = fmt.Sprintf("https://%s/", s.SiteDomain)
+	s.URL = fmt.Sprintf("http://%s/", s.SiteDomain)
 
-	c.Name = siteName
-	c.Directories.Site = path.Join(c.Directories.App, "sites", siteName)
+	s.Name = siteName
+	s.Directories.Site = path.Join(s.Directories.App, "sites", siteName)
 
-	localViper, err := c.loadlocalViper()
+	localViper, err := s.loadlocalViper()
 	if err != nil {
 		return err
 	}
 
-	c.local = localViper
-	c.Xdebug = localViper.GetBool("xdebug")
-	c.Local = localViper.GetBool("local")
-	c.PHP = localViper.GetString("php")
-	c.Type = localViper.GetString("type")
-	c.Plugins = localViper.GetStringSlice("plugins")
+	s.local = localViper
+	s.Xdebug = localViper.GetBool("xdebug")
+	s.Local = localViper.GetBool("local")
+	s.PHP = localViper.GetString("php")
+	s.Type = localViper.GetString("type")
+	s.Plugins = localViper.GetStringSlice("plugins")
 
 	return nil
 }
 
 // loadSiteConfig Get the config items that can be overridden locally with a .kana.json file.
-func (c *Config) loadlocalViper() (*viper.Viper, error) {
+func (s *Settings) loadlocalViper() (*viper.Viper, error) {
 
 	localConfig := viper.New()
 
-	localConfig.SetDefault("php", c.PHP)
-	localConfig.SetDefault("type", c.Type)
-	localConfig.SetDefault("local", c.Local)
-	localConfig.SetDefault("xdebug", c.Xdebug)
+	localConfig.SetDefault("php", s.PHP)
+	localConfig.SetDefault("type", s.Type)
+	localConfig.SetDefault("local", s.Local)
+	localConfig.SetDefault("xdebug", s.Xdebug)
 	localConfig.SetDefault("plugins", []string{})
 
 	localConfig.SetConfigName(".kana")
 	localConfig.SetConfigType("json")
-	localConfig.AddConfigPath(c.Directories.Working)
+	localConfig.AddConfigPath(s.Directories.Working)
 
 	err := localConfig.ReadInConfig()
 	if err != nil {

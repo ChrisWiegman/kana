@@ -36,11 +36,11 @@ var configFiles = []File{
 }
 
 // EnsureSSLCerts Ensures SSL certificates have been generated and are where they need to be
-func (c *Config) EnsureSSLCerts() error {
+func (s *Settings) EnsureSSLCerts() error {
 
 	createCert := false
-	certPath := path.Join(c.Directories.App, "certs")
-	rootCert := path.Join(certPath, c.RootCert)
+	certPath := path.Join(s.Directories.App, "certs")
+	rootCert := path.Join(certPath, s.RootCert)
 
 	_, err := os.Stat(rootCert)
 	if err != nil && os.IsNotExist(err) {
@@ -56,11 +56,11 @@ func (c *Config) EnsureSSLCerts() error {
 
 		certInfo := minica.CertInfo{
 			CertDir:    certPath,
-			CertDomain: c.AppDomain,
-			RootKey:    c.RootKey,
-			RootCert:   c.RootCert,
-			SiteCert:   c.SiteCert,
-			SiteKey:    c.SiteKey,
+			CertDomain: s.AppDomain,
+			RootKey:    s.RootKey,
+			RootCert:   s.RootCert,
+			SiteCert:   s.SiteCert,
+			SiteKey:    s.SiteKey,
 		}
 
 		err = minica.GenCerts(certInfo)
@@ -76,12 +76,12 @@ func (c *Config) EnsureSSLCerts() error {
 }
 
 // EnsureStaticConfigFiles Ensures the application's static config files have been generated and are where they need to be
-func (c *Config) EnsureStaticConfigFiles() error {
+func (s *Settings) EnsureStaticConfigFiles() error {
 
 	for _, file := range configFiles {
 
-		filePath := path.Join(c.Directories.App, file.LocalPath)
-		destFile := path.Join(c.Directories.App, file.LocalPath, file.Name)
+		filePath := path.Join(s.Directories.App, file.LocalPath)
+		destFile := path.Join(s.Directories.App, file.LocalPath, file.Name)
 
 		if err := os.MkdirAll(filePath, 0750); err != nil {
 			return err
