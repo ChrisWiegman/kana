@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ChrisWiegman/kana-cli/pkg/console"
+
 	"github.com/aquasecurity/table"
 	"github.com/go-playground/validator/v10"
 	"github.com/spf13/cobra"
@@ -24,17 +26,23 @@ func (c *Config) ListConfig() {
 
 	t := table.New(os.Stdout)
 
-	t.SetHeaders("Key", "Global Value", "Local Value")
+	t.SetHeaders("Setting", "Global Value", "Local Value")
 
-	t.AddRow("admin.email", c.Global.AdminEmail)
-	t.AddRow("admin.password", c.Global.AdminPassword)
-	t.AddRow("admnin.username", c.Global.AdminUsername)
-	t.AddRow("local", strconv.FormatBool(c.Global.Local), strconv.FormatBool(c.Local.Local))
-	t.AddRow("php", c.Global.PHP, c.Local.PHP)
-	t.AddRow("type", c.Global.Type, c.Local.Type)
-	t.AddRow("xdebug", strconv.FormatBool(c.Global.Xdebug), strconv.FormatBool(c.Local.Local))
+	t.AddRow("admin.email", console.Bold(c.Global.AdminEmail))
+	t.AddRow("admin.password", console.Bold(c.Global.AdminPassword))
+	t.AddRow("admnin.username", console.Bold(c.Global.AdminUsername))
+	t.AddRow("local", console.Bold(strconv.FormatBool(c.Global.Local)), console.Bold(strconv.FormatBool(c.Local.Local)))
+	t.AddRow("php", console.Bold(c.Global.PHP), console.Bold(c.Local.PHP))
+	t.AddRow("type", console.Bold(c.Global.Type), console.Bold(c.Local.Type))
+	t.AddRow("xdebug", console.Bold(strconv.FormatBool(c.Global.Xdebug)), console.Bold(strconv.FormatBool(c.Local.Local)))
 
-	plugins := strings.Join(c.Local.Plugins, "\n")
+	boldPlugins := []string{}
+
+	for _, plugin := range c.Local.Plugins {
+		boldPlugins = append(boldPlugins, console.Bold(plugin))
+	}
+
+	plugins := console.Bold(strings.Join(boldPlugins, "\n"))
 
 	t.AddRow("plugins", "", plugins)
 

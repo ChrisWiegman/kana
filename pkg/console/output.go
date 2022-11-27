@@ -9,6 +9,11 @@ import (
 	"github.com/logrusorgru/aurora/v4"
 )
 
+// Bold outputs the requested text as bold
+func Bold(output string) string {
+	return fmt.Sprint(aurora.Bold(output))
+}
+
 // Error displays the error message and a panic if needed.
 func Error(err error, debugMode bool) {
 
