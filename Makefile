@@ -61,16 +61,3 @@ install:
 .PHONY: update
 update:
 	go get -u ./...
-
-.PHONY: release
-release:
-	echo $(VERSION)
-	docker run --rm \
-	--privileged \
-	-v $(PWD):/go/src/$(PKG) \
-	-w /go/src/$(PKG) \
-	goreleaser/goreleaser \
-		release \
-		--rm-dist \
-		--release-notes=./.changes/$(VERSION).md \
-		--snapshot
