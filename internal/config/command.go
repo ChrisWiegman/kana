@@ -12,11 +12,11 @@ import (
 
 func (c *Config) GetDynamicContentItem(md *cobra.Command, args []string) (string, error) {
 
-	if !c.Global.Viper.IsSet(args[0]) {
+	if !c.Global.viper.IsSet(args[0]) {
 		return "", fmt.Errorf("invalid setting. Please enter a valid key to get")
 	}
 
-	return c.Global.Viper.GetString(args[0]), nil
+	return c.Global.viper.GetString(args[0]), nil
 }
 
 func (c *Config) ListDynamicContent() {
@@ -25,20 +25,20 @@ func (c *Config) ListDynamicContent() {
 
 	t.SetHeaders("Key", "Value")
 
-	t.AddRow("admin.email", c.Global.Viper.GetString("admin.email"))
-	t.AddRow("admin.password", c.Global.Viper.GetString("admin.password"))
-	t.AddRow("admnin.username", c.Global.Viper.GetString("admin.username"))
-	t.AddRow("local", c.Global.Viper.GetString("local"))
-	t.AddRow("php", c.Global.Viper.GetString("php"))
-	t.AddRow("type", c.Global.Viper.GetString("type"))
-	t.AddRow("xdebug", c.Global.Viper.GetString("xdebug"))
+	t.AddRow("admin.email", c.Global.viper.GetString("admin.email"))
+	t.AddRow("admin.password", c.Global.viper.GetString("admin.password"))
+	t.AddRow("admnin.username", c.Global.viper.GetString("admin.username"))
+	t.AddRow("local", c.Global.viper.GetString("local"))
+	t.AddRow("php", c.Global.viper.GetString("php"))
+	t.AddRow("type", c.Global.viper.GetString("type"))
+	t.AddRow("xdebug", c.Global.viper.GetString("xdebug"))
 
 	t.Render()
 }
 
 func (c *Config) SetDynamicContent(md *cobra.Command, args []string) error {
 
-	if !c.Global.Viper.IsSet(args[0]) {
+	if !c.Global.viper.IsSet(args[0]) {
 		return fmt.Errorf("invalid setting. Please enter a valid key to set")
 	}
 
@@ -55,8 +55,8 @@ func (c *Config) SetDynamicContent(md *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
-		c.Global.Viper.Set(args[0], boolVal)
-		return c.Global.Viper.WriteConfig()
+		c.Global.viper.Set(args[0], boolVal)
+		return c.Global.viper.WriteConfig()
 	case "php":
 		if !isValidString(args[1], validPHPVersions) {
 			err = fmt.Errorf("please choose a valid php version")
@@ -79,7 +79,7 @@ func (c *Config) SetDynamicContent(md *cobra.Command, args []string) error {
 		return err
 	}
 
-	c.Global.Viper.Set(args[0], args[1])
+	c.Global.viper.Set(args[0], args[1])
 
-	return c.Global.Viper.WriteConfig()
+	return c.Global.viper.WriteConfig()
 }

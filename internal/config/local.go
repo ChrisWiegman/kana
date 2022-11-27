@@ -18,16 +18,13 @@ type StartFlags struct {
 }
 
 type LocalConfig struct {
-	Name      string
-	Domain    string
-	URL       string
-	SecureURL string
-	PHP       string
-	Xdebug    bool
-	Local     bool
-	Type      string
-	Plugins   []string
-	Viper     *viper.Viper
+	Local, Xdebug  bool
+	Domain, Name   string
+	PHP            string
+	SecureURL, URL string
+	Type           string
+	Plugins        []string
+	Viper          *viper.Viper
 }
 
 // ProcessNameFlag Processes the name flag on the site resetting all appropriate local variables
@@ -129,23 +126,23 @@ func (c *Config) loadLocalConfig() error {
 	c.Local.Name = siteName
 	c.Directories.Site = path.Join(c.Directories.App, "sites", siteName)
 
-	siteViper, err := c.loadSiteViper()
+	localViper, err := c.loadlocalViper()
 	if err != nil {
 		return err
 	}
 
-	c.Local.Viper = siteViper
-	c.Local.Xdebug = siteViper.GetBool("xdebug")
-	c.Local.Local = siteViper.GetBool("local")
-	c.Local.PHP = siteViper.GetString("php")
-	c.Local.Type = siteViper.GetString("type")
-	c.Local.Plugins = siteViper.GetStringSlice("plugins")
+	c.Local.Viper = localViper
+	c.Local.Xdebug = localViper.GetBool("xdebug")
+	c.Local.Local = localViper.GetBool("local")
+	c.Local.PHP = localViper.GetString("php")
+	c.Local.Type = localViper.GetString("type")
+	c.Local.Plugins = localViper.GetStringSlice("plugins")
 
 	return nil
 }
 
 // loadSiteConfig Get the config items that can be overridden locally with a .kana.json file.
-func (c *Config) loadSiteViper() (*viper.Viper, error) {
+func (c *Config) loadlocalViper() (*viper.Viper, error) {
 
 	siteConfig := viper.New()
 
