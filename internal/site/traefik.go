@@ -3,7 +3,7 @@ package site
 import (
 	"path"
 
-	"github.com/ChrisWiegman/kana-cli/internal/docker"
+	"github.com/ChrisWiegman/kana-cli/pkg/docker"
 
 	"github.com/docker/docker/api/types/mount"
 )

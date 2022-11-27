@@ -22,13 +22,9 @@ func Error(err error, debugMode bool) {
 	os.Exit(1)
 }
 
+// Println is a temporary wrapper on fmt.Println
 func Println(output string) {
 	fmt.Println(output)
-}
-
-// Success displays a formatted success message on successful completion of the command
-func Success(output string) {
-	fmt.Printf("%s %s\n", aurora.Bold(aurora.Green("[Success]")), output)
 }
 
 // PromptConfirm asks the user to confirm output.
@@ -57,4 +53,9 @@ func PromptConfirm(promptText string, def bool) bool {
 			return false
 		}
 	}
+}
+
+// Success displays a formatted success message on successful completion of the command
+func Success(output string) {
+	fmt.Printf("%s %s\n", aurora.Bold(aurora.Green("[Success]")), output)
 }
