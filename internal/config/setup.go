@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path"
@@ -17,22 +18,25 @@ func (c *Config) EnsureStaticConfigFiles() error {
 func (c *Config) EnsureCerts() error {
 
 	createCert := false
-	rootCert := path.Join(c.Directories.App, "certs", c.App.RootCert)
+	certPath := path.Join(c.Directories.App, "certs")
+	rootCert := path.Join(certPath, c.App.RootCert)
 
 	_, err := os.Stat(rootCert)
 	if err != nil && os.IsNotExist(err) {
 		createCert = true
 	}
 
+	fmt.Println(rootCert)
+
 	if createCert {
 
-		err = os.MkdirAll(path.Join(c.Directories.App, "certs"), 0750)
+		err = os.MkdirAll(certPath, 0750)
 		if err != nil {
 			return err
 		}
 
 		certInfo := minica.CertInfo{
-			CertDir:    c.Directories.App,
+			CertDir:    certPath,
 			CertDomain: c.App.Domain,
 			RootKey:    c.App.RootKey,
 			RootCert:   c.App.RootCert,
