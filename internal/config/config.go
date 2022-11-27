@@ -57,6 +57,17 @@ func NewConfig() (*Config, error) {
 
 	kanaConfig.Directories.App = filepath.Join(home, configFolderName)
 
-	return kanaConfig, nil
+	err = kanaConfig.EnsureStaticConfigFiles()
+	if err != nil {
+		return kanaConfig, err
+	}
 
+	err = kanaConfig.LoadAppConfig()
+	if err != nil {
+		return kanaConfig, err
+	}
+
+	err = kanaConfig.LoadSiteConfig()
+
+	return kanaConfig, err
 }

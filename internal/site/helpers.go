@@ -1,4 +1,4 @@
-package database
+package site
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"os"
 )
 
+// copyFile Copies a file on the user's host from one place to another
 func copyFile(src, dest string) error {
 
 	srcStat, err := os.Stat(src)

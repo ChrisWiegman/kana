@@ -1,16 +1,48 @@
-package database
+package site
 
 import (
 	"fmt"
 	"os"
 	"path"
 
-	"github.com/ChrisWiegman/kana-cli/internal/config"
 	"github.com/ChrisWiegman/kana-cli/internal/console"
-	"github.com/ChrisWiegman/kana-cli/internal/site"
 )
 
-func Import(kanaConfig *config.Config, file string, preserve bool, replaceDomain string) error {
+func (s *Site) ExportDatabase(args []string) (string, error) {
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+
+	exportFileName := fmt.Sprintf("kana-%s.sql", s.Config.Site.Name)
+	exportFile := path.Join(cwd, exportFileName)
+
+	if len(args) == 1 {
+		exportFile = path.Join(cwd, args[0])
+	}
+
+	exportCommand := []string{
+		"db",
+		"export",
+		"--add-drop-table",
+		"/Site/export.sql",
+	}
+
+	_, err = s.RunWPCli(exportCommand)
+	if err != nil {
+		return "", err
+	}
+
+	err = copyFile(path.Join(s.Config.Directories.Site, "export.sql"), exportFile)
+	if err != nil {
+		return "", err
+	}
+
+	return exportFile, nil
+}
+
+func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string) error {
 
 	cwd, err := os.Getwd()
 	if err != nil {
@@ -22,14 +54,9 @@ func Import(kanaConfig *config.Config, file string, preserve bool, replaceDomain
 		return fmt.Errorf("the specified sql file does not exist. Please enter a valid file to import")
 	}
 
-	kanaImportFile := path.Join(kanaConfig.Directories.Site, "import.sql")
+	kanaImportFile := path.Join(s.Config.Directories.Site, "import.sql")
 
 	err = copyFile(rawImportFile, kanaImportFile)
-	if err != nil {
-		return err
-	}
-
-	site, err := site.NewSite(kanaConfig)
 	if err != nil {
 		return err
 	}
@@ -49,12 +76,12 @@ func Import(kanaConfig *config.Config, file string, preserve bool, replaceDomain
 			"create",
 		}
 
-		_, err = site.RunWPCli(dropCommand)
+		_, err = s.RunWPCli(dropCommand)
 		if err != nil {
 			return err
 		}
 
-		_, err = site.RunWPCli(createCommand)
+		_, err = s.RunWPCli(createCommand)
 		if err != nil {
 			return err
 		}
@@ -68,7 +95,7 @@ func Import(kanaConfig *config.Config, file string, preserve bool, replaceDomain
 		"/Site/import.sql",
 	}
 
-	_, err = site.RunWPCli(importCommand)
+	_, err = s.RunWPCli(importCommand)
 	if err != nil {
 		return err
 	}
@@ -80,11 +107,11 @@ func Import(kanaConfig *config.Config, file string, preserve bool, replaceDomain
 		replaceCommand := []string{
 			"search-replace",
 			replaceDomain,
-			kanaConfig.Site.Domain,
+			s.Config.Site.Domain,
 			"--all-tables",
 		}
 
-		_, err := site.RunWPCli(replaceCommand)
+		_, err := s.RunWPCli(replaceCommand)
 		if err != nil {
 			return err
 		}

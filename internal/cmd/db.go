@@ -3,9 +3,8 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/ChrisWiegman/kana-cli/internal/config"
 	"github.com/ChrisWiegman/kana-cli/internal/console"
-	"github.com/ChrisWiegman/kana-cli/internal/database"
+	"github.com/ChrisWiegman/kana-cli/internal/site"
 
 	"github.com/spf13/cobra"
 )
@@ -13,7 +12,7 @@ import (
 var flagPreserve bool
 var flagReplaceDomain string
 
-func newDbCommand(kanaConfig *config.Config) *cobra.Command {
+func newDbCommand(kanaSite *site.Site) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "db",
@@ -28,7 +27,7 @@ func newDbCommand(kanaConfig *config.Config) *cobra.Command {
 		Short: "Import a database from an existing WordPress site",
 		Run: func(cmd *cobra.Command, args []string) {
 
-			err := database.Import(kanaConfig, args[0], flagPreserve, flagReplaceDomain)
+			err := kanaSite.ImportDatabase(args[0], flagPreserve, flagReplaceDomain)
 			if err != nil {
 				console.Error(err, flagVerbose)
 			}
@@ -45,7 +44,7 @@ func newDbCommand(kanaConfig *config.Config) *cobra.Command {
 		Short: "Export the site's WordPress database",
 		Run: func(cmd *cobra.Command, args []string) {
 
-			file, err := database.Export(kanaConfig, args)
+			file, err := kanaSite.ExportDatabase(args)
 			if err != nil {
 				console.Error(err, flagVerbose)
 			}

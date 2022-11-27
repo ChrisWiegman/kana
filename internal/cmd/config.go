@@ -1,13 +1,13 @@
 package cmd
 
 import (
-	"github.com/ChrisWiegman/kana-cli/internal/config"
 	"github.com/ChrisWiegman/kana-cli/internal/console"
+	"github.com/ChrisWiegman/kana-cli/internal/site"
 
 	"github.com/spf13/cobra"
 )
 
-func newConfigCommand(kanaConfig *config.Config) *cobra.Command {
+func newConfigCommand(kanaSite *site.Site) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "config",
@@ -18,16 +18,16 @@ func newConfigCommand(kanaConfig *config.Config) *cobra.Command {
 			// This is similar to how setting git options works
 			switch len(args) {
 			case 0:
-				kanaConfig.ListDynamicContent()
+				kanaSite.Config.ListDynamicContent()
 			case 1:
-				value, err := kanaConfig.GetDynamicContentItem(cmd, args)
+				value, err := kanaSite.Config.GetDynamicContentItem(cmd, args)
 				if err != nil {
 					console.Error(err, flagVerbose)
 				}
 
 				console.Println(value)
 			case 2:
-				err := kanaConfig.SetDynamicContent(cmd, args)
+				err := kanaSite.Config.SetDynamicContent(cmd, args)
 				if err != nil {
 					console.Error(err, flagVerbose)
 				}

@@ -3,8 +3,8 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/ChrisWiegman/kana-cli/internal/config"
 	"github.com/ChrisWiegman/kana-cli/internal/console"
+	"github.com/ChrisWiegman/kana-cli/internal/site"
 
 	"github.com/spf13/cobra"
 )
@@ -15,22 +15,7 @@ var commandsRequiringSite []string
 
 func Execute() {
 
-	kanaConfig, err := config.NewConfig()
-	if err != nil {
-		console.Error(err, flagVerbose)
-	}
-
-	err = kanaConfig.EnsureStaticConfigFiles()
-	if err != nil {
-		console.Error(err, flagVerbose)
-	}
-
-	err = kanaConfig.LoadAppConfig()
-	if err != nil {
-		console.Error(err, flagVerbose)
-	}
-
-	err = kanaConfig.LoadSiteConfig()
+	site, err := site.NewSite()
 	if err != nil {
 		console.Error(err, flagVerbose)
 	}
@@ -41,7 +26,7 @@ func Execute() {
 		Short: "Kana is a simple WordPress development tool designed for plugin and theme developers.",
 		Args:  cobra.NoArgs,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			isSite, err := kanaConfig.ProcessNameFlag(cmd)
+			isSite, err := site.Config.ProcessNameFlag(cmd)
 			if err != nil {
 				console.Error(err, flagVerbose)
 			}
@@ -58,15 +43,15 @@ func Execute() {
 
 	// Register the subcommands
 	cmd.AddCommand(
-		newStartCommand(kanaConfig),
-		newStopCommand(kanaConfig),
-		newOpenCommand(kanaConfig),
-		newWPCommand(kanaConfig),
-		newDestroyCommand(kanaConfig),
-		newConfigCommand(kanaConfig),
-		newExportCommand(kanaConfig),
+		newStartCommand(site),
+		newStopCommand(site),
+		newOpenCommand(site),
+		newWPCommand(site),
+		newDestroyCommand(site),
+		newConfigCommand(site),
+		newExportCommand(site),
 		newVersionCommand(),
-		newDbCommand(kanaConfig),
+		newDbCommand(site),
 	)
 
 	// Execute anything we need to

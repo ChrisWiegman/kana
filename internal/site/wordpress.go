@@ -8,7 +8,6 @@ import (
 
 	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/docker"
-	"github.com/ChrisWiegman/kana-cli/internal/traefik"
 
 	"github.com/docker/docker/api/types/mount"
 )
@@ -26,60 +25,98 @@ type PluginInfo struct {
 	Version string `json:"version"`
 }
 
-// GetSiteContainers returns an array of strings containing the container names for the site
-func (s *Site) GetSiteContainers() []string {
+// RunWPCli Runs a wp-cli command returning it's output and any errors
+func (s *Site) RunWPCli(command []string) (string, error) {
 
-	return []string{
-		fmt.Sprintf("kana_%s_database", s.config.Site.Name),
-		fmt.Sprintf("kana_%s_wordpress", s.config.Site.Name),
+	_, _, err := s.dockerClient.EnsureNetwork("kana")
+	if err != nil {
+		return "", err
 	}
-}
 
-// IsSiteRunning Returns true if the site is up and running in Docker or false. Does not verify other errors
-func (s *Site) IsSiteRunning() bool {
+	siteDir := path.Join(s.Config.Directories.App, "sites", s.Config.Site.Name)
+	appDir := path.Join(siteDir, "app")
+	runningConfig := s.getRunningConfig()
 
-	containers, _ := s.dockerClient.ListContainers(s.config.Site.Name)
-
-	return len(containers) != 0
-}
-
-// StopWordPress Stops the site in docker, destroying the containers when they close
-func (s *Site) StopWordPress() error {
-
-	wordPressContainers := s.GetSiteContainers()
-
-	for _, wordPressContainer := range wordPressContainers {
-		_, err := s.dockerClient.ContainerStop(wordPressContainer)
+	if runningConfig.Local {
+		appDir, err = getLocalAppDir()
 		if err != nil {
-			return err
+			return "", err
 		}
 	}
 
-	// If no other sites are running, also shut down the Traefik container
-	traefikClient, err := traefik.NewTraefik(s.config)
+	appVolumes, err := s.getMounts(s.Config.Directories.Site, appDir, runningConfig.Type)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return traefikClient.MaybeStopTraefik()
+	fullCommand := []string{
+		"wp",
+		"--path=/var/www/html",
+	}
+
+	fullCommand = append(fullCommand, command...)
+
+	container := docker.ContainerConfig{
+		Name:        fmt.Sprintf("kana_%s_wordpress_cli", s.Config.Site.Name),
+		Image:       fmt.Sprintf("wordpress:cli-php%s", s.Config.Site.PHP),
+		NetworkName: "kana",
+		HostName:    fmt.Sprintf("kana_%s_wordpress_cli", s.Config.Site.Name),
+		Command:     fullCommand,
+		Env: []string{
+			fmt.Sprintf("WORDPRESS_DB_HOST=kana_%s_database", s.Config.Site.Name),
+			"WORDPRESS_DB_USER=wordpress",
+			"WORDPRESS_DB_PASSWORD=wordpress",
+			"WORDPRESS_DB_NAME=wordpress",
+		},
+		Labels: map[string]string{
+			"kana.site": s.Config.Site.Name,
+		},
+		Volumes: appVolumes,
+	}
+
+	err = s.dockerClient.EnsureImage(container.Image)
+	if err != nil {
+		return "", err
+	}
+
+	_, output, err := s.dockerClient.ContainerRunAndClean(container)
+	if err != nil {
+		return "", err
+	}
+
+	return output, nil
 }
 
-// getLocalAppDir Gets the absolute path to WordPress if the local flag or option has been set
-func getLocalAppDir() (string, error) {
+// getInstalledWordPressPlugins Returns a list of the plugins that have been installed on the site
+func (s *Site) getInstalledWordPressPlugins() ([]string, error) {
 
-	cwd, err := os.Getwd()
-	if err != nil {
-		return "", err
+	commands := []string{
+		"plugin",
+		"list",
+		"--format=json",
 	}
 
-	localAppDir := path.Join(cwd, "wordpress")
-
-	err = os.MkdirAll(localAppDir, 0750)
+	commandOutput, err := s.RunWPCli(commands)
 	if err != nil {
-		return "", err
+		return []string{}, err
 	}
 
-	return localAppDir, nil
+	rawPlugins := []PluginInfo{}
+	plugins := []string{}
+
+	err = json.Unmarshal([]byte(commandOutput), &rawPlugins)
+	if err != nil {
+		return []string{}, err
+	}
+
+	for _, plugin := range rawPlugins {
+
+		if plugin.Status != "dropin" && plugin.Name != s.Config.Site.Name && plugin.Name != "hello" && plugin.Name != "akismet" {
+			plugins = append(plugins, plugin.Name)
+		}
+	}
+
+	return plugins, nil
 }
 
 func (s *Site) getMounts(siteDir, appDir, siteType string) ([]mount.Mount, error) {
@@ -106,7 +143,7 @@ func (s *Site) getMounts(siteDir, appDir, siteType string) ([]mount.Mount, error
 		appVolumes = append(appVolumes, mount.Mount{ // Map's the user's working directory as a plugin
 			Type:   mount.TypeBind,
 			Source: cwd,
-			Target: path.Join("/var/www/html", "wp-content", "plugins", s.config.Site.Name),
+			Target: path.Join("/var/www/html", "wp-content", "plugins", s.Config.Site.Name),
 		})
 	}
 
@@ -114,25 +151,74 @@ func (s *Site) getMounts(siteDir, appDir, siteType string) ([]mount.Mount, error
 		appVolumes = append(appVolumes, mount.Mount{ // Map's the user's working directory as a theme
 			Type:   mount.TypeBind,
 			Source: cwd,
-			Target: path.Join("/var/www/html", "wp-content", "themes", s.config.Site.Name),
+			Target: path.Join("/var/www/html", "wp-content", "themes", s.Config.Site.Name),
 		})
 	}
 
 	return appVolumes, nil
 }
 
-// StartWordPress Starts the WordPress containers
-func (s *Site) StartWordPress() error {
+// getWordPressContainers returns an array of strings containing the container names for the site
+func (s *Site) getWordPressContainers() []string {
+
+	return []string{
+		fmt.Sprintf("kana_%s_database", s.Config.Site.Name),
+		fmt.Sprintf("kana_%s_wordpress", s.Config.Site.Name),
+	}
+}
+
+// installDefaultPlugins Installs a list of WordPress plugins
+func (s *Site) installDefaultPlugins() error {
+
+	for _, plugin := range s.Config.Site.Plugins {
+
+		setupCommand := []string{
+			"plugin",
+			"install",
+			"--activate",
+			plugin,
+		}
+
+		_, err := s.RunWPCli(setupCommand)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// installWordPress Installs and configures WordPress core
+func (s *Site) installWordPress() error {
+
+	console.Println("Finishing WordPress setup...")
+
+	setupCommand := []string{
+		"core",
+		"install",
+		fmt.Sprintf("--url=%s", s.getSiteURL(false)),
+		fmt.Sprintf("--title=Kana Development %s: %s", s.Config.Site.Type, s.Config.Site.Name),
+		fmt.Sprintf("--admin_user=%s", s.Config.App.AdminUsername),
+		fmt.Sprintf("--admin_password=%s", s.Config.App.AdminPassword),
+		fmt.Sprintf("--admin_email=%s", s.Config.App.AdminEmail),
+	}
+
+	_, err := s.RunWPCli(setupCommand)
+	return err
+}
+
+// startWordPress Starts the WordPress containers
+func (s *Site) startWordPress() error {
 
 	_, _, err := s.dockerClient.EnsureNetwork("kana")
 	if err != nil {
 		return err
 	}
 
-	appDir := path.Join(s.config.Directories.Site, "app")
-	databaseDir := path.Join(s.config.Directories.Site, "database")
+	appDir := path.Join(s.Config.Directories.Site, "app")
+	databaseDir := path.Join(s.Config.Directories.Site, "database")
 
-	if s.IsLocalSite() {
+	if s.isLocalSite() {
 
 		appDir, err = getLocalAppDir()
 		if err != nil {
@@ -154,17 +240,17 @@ func (s *Site) StartWordPress() error {
 		return err
 	}
 
-	appVolumes, err := s.getMounts(s.config.Directories.Working, appDir, s.config.Site.Type)
+	appVolumes, err := s.getMounts(s.Config.Directories.Working, appDir, s.Config.Site.Type)
 	if err != nil {
 		return err
 	}
 
 	wordPressContainers := []docker.ContainerConfig{
 		{
-			Name:        fmt.Sprintf("kana_%s_database", s.config.Site.Name),
+			Name:        fmt.Sprintf("kana_%s_database", s.Config.Site.Name),
 			Image:       "mariadb",
 			NetworkName: "kana",
-			HostName:    fmt.Sprintf("kana_%s_database", s.config.Site.Name),
+			HostName:    fmt.Sprintf("kana_%s_database", s.Config.Site.Name),
 			Env: []string{
 				"MARIADB_ROOT_PASSWORD=password",
 				"MARIADB_DATABASE=wordpress",
@@ -172,7 +258,7 @@ func (s *Site) StartWordPress() error {
 				"MARIADB_PASSWORD=wordpress",
 			},
 			Labels: map[string]string{
-				"kana.site": s.config.Site.Name,
+				"kana.site": s.Config.Site.Name,
 			},
 			Volumes: []mount.Mount{
 				{ // Maps a database folder to the MySQL container for persistence
@@ -183,24 +269,24 @@ func (s *Site) StartWordPress() error {
 			},
 		},
 		{
-			Name:        fmt.Sprintf("kana_%s_wordpress", s.config.Site.Name),
-			Image:       fmt.Sprintf("wordpress:php%s", s.config.Site.PHP),
+			Name:        fmt.Sprintf("kana_%s_wordpress", s.Config.Site.Name),
+			Image:       fmt.Sprintf("wordpress:php%s", s.Config.Site.PHP),
 			NetworkName: "kana",
-			HostName:    fmt.Sprintf("kana_%s_wordpress", s.config.Site.Name),
+			HostName:    fmt.Sprintf("kana_%s_wordpress", s.Config.Site.Name),
 			Env: []string{
-				fmt.Sprintf("WORDPRESS_DB_HOST=kana_%s_database", s.config.Site.Name),
+				fmt.Sprintf("WORDPRESS_DB_HOST=kana_%s_database", s.Config.Site.Name),
 				"WORDPRESS_DB_USER=wordpress",
 				"WORDPRESS_DB_PASSWORD=wordpress",
 				"WORDPRESS_DB_NAME=wordpress",
 			},
 			Labels: map[string]string{
 				"traefik.enable": "true",
-				fmt.Sprintf("traefik.http.routers.wordpress-%s-http.entrypoints", s.config.Site.Name): "web",
-				fmt.Sprintf("traefik.http.routers.wordpress-%s-http.rule", s.config.Site.Name):        fmt.Sprintf("Host(`%s`)", s.config.Site.Domain),
-				fmt.Sprintf("traefik.http.routers.wordpress-%s.entrypoints", s.config.Site.Name):      "websecure",
-				fmt.Sprintf("traefik.http.routers.wordpress-%s.rule", s.config.Site.Name):             fmt.Sprintf("Host(`%s`)", s.config.Site.Domain),
-				fmt.Sprintf("traefik.http.routers.wordpress-%s.tls", s.config.Site.Name):              "true",
-				"kana.site": s.config.Site.Name,
+				fmt.Sprintf("traefik.http.routers.wordpress-%s-http.entrypoints", s.Config.Site.Name): "web",
+				fmt.Sprintf("traefik.http.routers.wordpress-%s-http.rule", s.Config.Site.Name):        fmt.Sprintf("Host(`%s`)", s.Config.Site.Domain),
+				fmt.Sprintf("traefik.http.routers.wordpress-%s.entrypoints", s.Config.Site.Name):      "websecure",
+				fmt.Sprintf("traefik.http.routers.wordpress-%s.rule", s.Config.Site.Name):             fmt.Sprintf("Host(`%s`)", s.Config.Site.Domain),
+				fmt.Sprintf("traefik.http.routers.wordpress-%s.tls", s.Config.Site.Name):              "true",
+				"kana.site": s.Config.Site.Name,
 			},
 			Volumes: appVolumes,
 		},
@@ -222,136 +308,17 @@ func (s *Site) StartWordPress() error {
 	return nil
 }
 
-// InstallWordPress Installs and configures WordPress core
-func (s *Site) InstallWordPress() error {
+// stopWordPress Stops the site in docker, destroying the containers when they close
+func (s *Site) stopWordPress() error {
 
-	console.Println("Finishing WordPress setup...")
+	wordPressContainers := s.getWordPressContainers()
 
-	setupCommand := []string{
-		"core",
-		"install",
-		fmt.Sprintf("--url=%s", s.GetURL(false)),
-		fmt.Sprintf("--title=Kana Development %s: %s", s.config.Site.Type, s.config.Site.Name),
-		fmt.Sprintf("--admin_user=%s", s.config.App.AdminUsername),
-		fmt.Sprintf("--admin_password=%s", s.config.App.AdminPassword),
-		fmt.Sprintf("--admin_email=%s", s.config.App.AdminEmail),
-	}
-
-	_, err := s.RunWPCli(setupCommand)
-	return err
-}
-
-// InstallDefaultPlugins Installs a list of WordPress plugins
-func (s *Site) InstallDefaultPlugins() error {
-
-	for _, plugin := range s.config.Site.Plugins {
-
-		setupCommand := []string{
-			"plugin",
-			"install",
-			"--activate",
-			plugin,
-		}
-
-		_, err := s.RunWPCli(setupCommand)
+	for _, wordPressContainer := range wordPressContainers {
+		_, err := s.dockerClient.ContainerStop(wordPressContainer)
 		if err != nil {
 			return err
 		}
 	}
 
 	return nil
-}
-
-// RunWPCli Runs a wp-cli command returning it's output and any errors
-func (s *Site) RunWPCli(command []string) (string, error) {
-
-	_, _, err := s.dockerClient.EnsureNetwork("kana")
-	if err != nil {
-		return "", err
-	}
-
-	siteDir := path.Join(s.config.Directories.App, "sites", s.config.Site.Name)
-	appDir := path.Join(siteDir, "app")
-	runningConfig := s.GetRunningConfig()
-
-	if runningConfig.Local {
-		appDir, err = getLocalAppDir()
-		if err != nil {
-			return "", err
-		}
-	}
-
-	appVolumes, err := s.getMounts(s.config.Directories.Site, appDir, runningConfig.Type)
-	if err != nil {
-		return "", err
-	}
-
-	fullCommand := []string{
-		"wp",
-		"--path=/var/www/html",
-	}
-
-	fullCommand = append(fullCommand, command...)
-
-	container := docker.ContainerConfig{
-		Name:        fmt.Sprintf("kana_%s_wordpress_cli", s.config.Site.Name),
-		Image:       fmt.Sprintf("wordpress:cli-php%s", s.config.Site.PHP),
-		NetworkName: "kana",
-		HostName:    fmt.Sprintf("kana_%s_wordpress_cli", s.config.Site.Name),
-		Command:     fullCommand,
-		Env: []string{
-			fmt.Sprintf("WORDPRESS_DB_HOST=kana_%s_database", s.config.Site.Name),
-			"WORDPRESS_DB_USER=wordpress",
-			"WORDPRESS_DB_PASSWORD=wordpress",
-			"WORDPRESS_DB_NAME=wordpress",
-		},
-		Labels: map[string]string{
-			"kana.site": s.config.Site.Name,
-		},
-		Volumes: appVolumes,
-	}
-
-	err = s.dockerClient.EnsureImage(container.Image)
-	if err != nil {
-		return "", err
-	}
-
-	_, output, err := s.dockerClient.ContainerRunAndClean(container)
-	if err != nil {
-		return "", err
-	}
-
-	return output, nil
-}
-
-// GetInstalledWordPressPlugins Returns a list of the plugins that have been installed on the site
-func (s *Site) GetInstalledWordPressPlugins() ([]string, error) {
-
-	commands := []string{
-		"plugin",
-		"list",
-		"--format=json",
-	}
-
-	commandOutput, err := s.RunWPCli(commands)
-	if err != nil {
-		return []string{}, err
-	}
-
-	rawPlugins := []PluginInfo{}
-	plugins := []string{}
-
-	err = json.Unmarshal([]byte(commandOutput), &rawPlugins)
-	if err != nil {
-		return []string{}, err
-	}
-
-	for _, plugin := range rawPlugins {
-
-		if plugin.Status != "dropin" && plugin.Name != s.config.Site.Name && plugin.Name != "hello" && plugin.Name != "akismet" {
-			plugins = append(plugins, plugin.Name)
-		}
-	}
-
-	return plugins, nil
 }

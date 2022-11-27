@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ChrisWiegman/kana-cli/internal/config"
 	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 	"github.com/logrusorgru/aurora/v4"
@@ -14,7 +13,7 @@ import (
 
 var flagConfirmDestroy bool
 
-func newDestroyCommand(kanaConfig *config.Config) *cobra.Command {
+func newDestroyCommand(kanaSite *site.Site) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "destroy",
@@ -26,29 +25,24 @@ func newDestroyCommand(kanaConfig *config.Config) *cobra.Command {
 			if flagConfirmDestroy {
 				confirmDestroy = true
 			} else {
-				confirmDestroy = console.PromptConfirm(fmt.Sprintf("Are you sure you want to destroy %s? %s", aurora.Bold(aurora.Blue(kanaConfig.Site.Name)), aurora.Bold(aurora.Yellow("This operation is destructive and cannot be undone."))), false)
+				confirmDestroy = console.PromptConfirm(fmt.Sprintf("Are you sure you want to destroy %s? %s", aurora.Bold(aurora.Blue(kanaSite.Config.Site.Name)), aurora.Bold(aurora.Yellow("This operation is destructive and cannot be undone."))), false)
 			}
 
 			if confirmDestroy {
 
-				site, err := site.NewSite(kanaConfig)
-				if err != nil {
-					console.Error(err, flagVerbose)
-				}
-
 				// Stop the WordPress site.
-				err = site.StopWordPress()
+				err := kanaSite.StopSite()
 				if err != nil {
 					console.Error(err, flagVerbose)
 				}
 
 				// Remove the site's folder in the config directory.
-				err = os.RemoveAll(kanaConfig.Directories.Site)
+				err = os.RemoveAll(kanaSite.Config.Directories.Site)
 				if err != nil {
 					console.Error(err, flagVerbose)
 				}
 
-				console.Success(fmt.Sprintf("Your site, %s, has been completely destroyed.", aurora.Bold(aurora.Blue(kanaConfig.Site.Name))))
+				console.Success(fmt.Sprintf("Your site, %s, has been completely destroyed.", aurora.Bold(aurora.Blue(kanaSite.Config.Site.Name))))
 				return
 			}
 
