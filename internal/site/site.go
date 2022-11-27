@@ -50,9 +50,6 @@ func (s *Site) ExportSiteConfig() error {
 		return err
 	}
 
-	fmt.Println(plugins)
-	fmt.Println(config.Local)
-
 	s.Config.Local.Viper.Set("local", config.Local)
 	s.Config.Local.Viper.Set("type", config.Type)
 	s.Config.Local.Viper.Set("xdebug", config.Xdebug)
