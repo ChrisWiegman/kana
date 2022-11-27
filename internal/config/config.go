@@ -15,8 +15,8 @@ type Directories struct {
 
 type Config struct {
 	Directories Directories
-	App         AppConfig
-	Site        SiteConfig
+	Global      GlobalConfig
+	Local       LocalConfig
 }
 
 var validPHPVersions = []string{
@@ -35,7 +35,7 @@ func NewConfig() (*Config, error) {
 
 	kanaConfig := new(Config)
 
-	kanaConfig.App = AppConfig{
+	kanaConfig.Global = GlobalConfig{
 		Domain:   domain,
 		RootKey:  rootKey,
 		RootCert: rootCert,
@@ -62,12 +62,12 @@ func NewConfig() (*Config, error) {
 		return kanaConfig, err
 	}
 
-	err = kanaConfig.LoadAppConfig()
+	err = kanaConfig.loadGlobalConfig()
 	if err != nil {
 		return kanaConfig, err
 	}
 
-	err = kanaConfig.LoadSiteConfig()
+	err = kanaConfig.loadLocalConfig()
 
 	return kanaConfig, err
 }

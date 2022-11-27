@@ -50,22 +50,22 @@ func (s *Site) ExportSiteConfig() error {
 		return err
 	}
 
-	s.Config.Site.Viper.Set("local", config.Local)
-	s.Config.Site.Viper.Set("type", config.Type)
-	s.Config.Site.Viper.Set("xdebug", config.Xdebug)
-	s.Config.Site.Viper.Set("plugins", plugins)
+	s.Config.Local.Viper.Set("local", config.Local)
+	s.Config.Local.Viper.Set("type", config.Type)
+	s.Config.Local.Viper.Set("xdebug", config.Xdebug)
+	s.Config.Local.Viper.Set("plugins", plugins)
 
 	if _, err = os.Stat(path.Join(s.Config.Directories.Working, ".kana.json")); os.IsNotExist(err) {
-		return s.Config.Site.Viper.SafeWriteConfig()
+		return s.Config.Local.Viper.SafeWriteConfig()
 	}
 
-	return s.Config.Site.Viper.WriteConfig()
+	return s.Config.Local.Viper.WriteConfig()
 }
 
 // IsSiteRunning Returns true if the site is up and running in Docker or false. Does not verify other errors
 func (s *Site) IsSiteRunning() bool {
 
-	containers, _ := s.dockerClient.ListContainers(s.Config.Site.Name)
+	containers, _ := s.dockerClient.ListContainers(s.Config.Local.Name)
 
 	return len(containers) != 0
 }
@@ -79,11 +79,11 @@ func (s *Site) OpenSite() error {
 	}
 
 	if runtime.GOOS == "linux" {
-		openCmd := exec.Command("xdg-open", s.Config.Site.SecureURL)
+		openCmd := exec.Command("xdg-open", s.Config.Local.SecureURL)
 		return openCmd.Run()
 	}
 
-	return browser.OpenURL(s.Config.Site.SecureURL)
+	return browser.OpenURL(s.Config.Local.SecureURL)
 }
 
 // StartSite Starts a site, including Traefik if needed
@@ -176,7 +176,7 @@ func (s *Site) getRunningConfig() CurrentConfig {
 		currentConfig.Xdebug = true
 	}
 
-	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana_%s_wordpress", s.Config.Site.Name))
+	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana_%s_wordpress", s.Config.Local.Name))
 
 	if len(mounts) == 1 {
 		currentConfig.Type = "site"
@@ -204,16 +204,16 @@ func (s *Site) getRunningConfig() CurrentConfig {
 func (s *Site) getSiteURL(insecure bool) string {
 
 	if insecure {
-		return s.Config.Site.URL
+		return s.Config.Local.URL
 	}
 
-	return s.Config.Site.SecureURL
+	return s.Config.Local.SecureURL
 }
 
 // installXdebug installs xdebug in the site's PHP container
 func (s *Site) installXdebug() (bool, error) {
 
-	if !s.Config.Site.Xdebug {
+	if !s.Config.Local.Xdebug {
 		return false, nil
 	}
 
@@ -280,7 +280,7 @@ func (s *Site) isLocalSite() bool {
 	}
 
 	// Return the flag for all other conditions
-	return s.Config.Site.Local
+	return s.Config.Local.Local
 }
 
 func (s *Site) loadConfig() error {
@@ -294,7 +294,7 @@ func (s *Site) loadConfig() error {
 // runCli Runs an arbitrary CLI command against the site's WordPress container
 func (s *Site) runCli(command string, restart bool) (docker.ExecResult, error) {
 
-	container := fmt.Sprintf("kana_%s_wordpress", s.Config.Site.Name)
+	container := fmt.Sprintf("kana_%s_wordpress", s.Config.Local.Name)
 
 	output, err := s.dockerClient.ContainerExec(container, []string{command})
 	if err != nil {
@@ -313,7 +313,7 @@ func (s *Site) runCli(command string, restart bool) (docker.ExecResult, error) {
 func (s *Site) verifySite() (bool, error) {
 
 	// Setup other options generated from config items
-	rootCert := path.Join(s.Config.Directories.App, "certs", s.Config.App.RootCert)
+	rootCert := path.Join(s.Config.Directories.App, "certs", s.Config.Global.RootCert)
 
 	caCert, err := os.ReadFile(rootCert)
 	if err != nil {
@@ -328,7 +328,7 @@ func (s *Site) verifySite() (bool, error) {
 		},
 	}
 
-	resp, err := client.Get(s.Config.Site.SecureURL)
+	resp, err := client.Get(s.Config.Local.SecureURL)
 	if err != nil {
 		return false, err
 	}
@@ -337,7 +337,7 @@ func (s *Site) verifySite() (bool, error) {
 
 	for resp.StatusCode != 200 {
 
-		resp, err = client.Get(s.Config.Site.SecureURL)
+		resp, err = client.Get(s.Config.Local.SecureURL)
 		if err != nil {
 			return false, err
 		}

@@ -13,7 +13,7 @@ var siteKey = "kana.site.key"
 var domain = "sites.kana.li"
 var configFolderName = ".config/kana"
 
-type AppConfig struct {
+type GlobalConfig struct {
 	Xdebug        bool
 	Type          string
 	Local         bool
@@ -29,29 +29,28 @@ type AppConfig struct {
 	Viper         *viper.Viper
 }
 
-// LoadAppConfig gets config information that transcends sites such as app and default settings
-func (c *Config) LoadAppConfig() error {
+// loadGlobalConfig gets config information that transcends sites such as app and default settings
+func (c *Config) loadGlobalConfig() error {
 
-	dynamicConfig, err := c.loadAppViper()
+	dynamicConfig, err := c.loadGlobalViper()
 	if err != nil {
 		return err
 	}
 
-	c.App.Viper = dynamicConfig
-	c.App.Xdebug = dynamicConfig.GetBool("xdebug")
-	c.App.Local = dynamicConfig.GetBool("local")
-	c.App.AdminEmail = dynamicConfig.GetString("admin.email")
-	c.App.AdminPassword = dynamicConfig.GetString("admin.password")
-	c.App.AdminUsername = dynamicConfig.GetString("admin.username")
-	c.App.PHP = dynamicConfig.GetString("php")
-	c.App.Type = dynamicConfig.GetString("type")
+	c.Global.Viper = dynamicConfig
+	c.Global.Xdebug = dynamicConfig.GetBool("xdebug")
+	c.Global.Local = dynamicConfig.GetBool("local")
+	c.Global.AdminEmail = dynamicConfig.GetString("admin.email")
+	c.Global.AdminPassword = dynamicConfig.GetString("admin.password")
+	c.Global.AdminUsername = dynamicConfig.GetString("admin.username")
+	c.Global.PHP = dynamicConfig.GetString("php")
+	c.Global.Type = dynamicConfig.GetString("type")
 
 	return err
-
 }
 
-// loadAppViper loads the app config using viper and sets defaults
-func (c *Config) loadAppViper() (*viper.Viper, error) {
+// loadGlobalViper loads the global config using viper and sets defaults
+func (c *Config) loadGlobalViper() (*viper.Viper, error) {
 
 	dynamicConfig := viper.New()
 
@@ -83,13 +82,13 @@ func (c *Config) loadAppViper() (*viper.Viper, error) {
 	changeConfig := false
 
 	// Reset default "site" type if there's an invalid type in the config file
-	if !CheckString(dynamicConfig.GetString("type"), validTypes) {
+	if !isValidString(dynamicConfig.GetString("type"), validTypes) {
 		changeConfig = true
 		dynamicConfig.Set("type", "site")
 	}
 
 	// Reset default php version if there's an invalid version in the config file
-	if !CheckString(dynamicConfig.GetString("php"), validPHPVersions) {
+	if !isValidString(dynamicConfig.GetString("php"), validPHPVersions) {
 		changeConfig = true
 		dynamicConfig.Set("php", "7.4")
 	}

@@ -15,7 +15,7 @@ func (s *Site) ExportDatabase(args []string) (string, error) {
 		return "", err
 	}
 
-	exportFileName := fmt.Sprintf("kana-%s.sql", s.Config.Site.Name)
+	exportFileName := fmt.Sprintf("kana-%s.sql", s.Config.Local.Name)
 	exportFile := path.Join(cwd, exportFileName)
 
 	if len(args) == 1 {
@@ -107,7 +107,7 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string) 
 		replaceCommand := []string{
 			"search-replace",
 			replaceDomain,
-			s.Config.Site.Domain,
+			s.Config.Local.Domain,
 			"--all-tables",
 		}
 

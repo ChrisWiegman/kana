@@ -10,35 +10,35 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func (c *Config) GetDynamicContentItem(md *cobra.Command, args []string) (string, error) {
+
+	if !c.Global.Viper.IsSet(args[0]) {
+		return "", fmt.Errorf("invalid setting. Please enter a valid key to get")
+	}
+
+	return c.Global.Viper.GetString(args[0]), nil
+}
+
 func (c *Config) ListDynamicContent() {
 
 	t := table.New(os.Stdout)
 
 	t.SetHeaders("Key", "Value")
 
-	t.AddRow("admin.email", c.App.Viper.GetString("admin.email"))
-	t.AddRow("admin.password", c.App.Viper.GetString("admin.password"))
-	t.AddRow("admnin.username", c.App.Viper.GetString("admin.username"))
-	t.AddRow("local", c.App.Viper.GetString("local"))
-	t.AddRow("php", c.App.Viper.GetString("php"))
-	t.AddRow("type", c.App.Viper.GetString("type"))
-	t.AddRow("xdebug", c.App.Viper.GetString("xdebug"))
+	t.AddRow("admin.email", c.Global.Viper.GetString("admin.email"))
+	t.AddRow("admin.password", c.Global.Viper.GetString("admin.password"))
+	t.AddRow("admnin.username", c.Global.Viper.GetString("admin.username"))
+	t.AddRow("local", c.Global.Viper.GetString("local"))
+	t.AddRow("php", c.Global.Viper.GetString("php"))
+	t.AddRow("type", c.Global.Viper.GetString("type"))
+	t.AddRow("xdebug", c.Global.Viper.GetString("xdebug"))
 
 	t.Render()
 }
 
-func (c *Config) GetDynamicContentItem(md *cobra.Command, args []string) (string, error) {
-
-	if !c.App.Viper.IsSet(args[0]) {
-		return "", fmt.Errorf("invalid setting. Please enter a valid key to get")
-	}
-
-	return c.App.Viper.GetString(args[0]), nil
-}
-
 func (c *Config) SetDynamicContent(md *cobra.Command, args []string) error {
 
-	if !c.App.Viper.IsSet(args[0]) {
+	if !c.Global.Viper.IsSet(args[0]) {
 		return fmt.Errorf("invalid setting. Please enter a valid key to set")
 	}
 
@@ -55,14 +55,14 @@ func (c *Config) SetDynamicContent(md *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
-		c.App.Viper.Set(args[0], boolVal)
-		return c.App.Viper.WriteConfig()
+		c.Global.Viper.Set(args[0], boolVal)
+		return c.Global.Viper.WriteConfig()
 	case "php":
-		if !CheckString(args[1], validPHPVersions) {
+		if !isValidString(args[1], validPHPVersions) {
 			err = fmt.Errorf("please choose a valid php version")
 		}
 	case "type":
-		if !CheckString(args[1], validTypes) {
+		if !isValidString(args[1], validTypes) {
 			err = fmt.Errorf("please choose a valid project type")
 		}
 	case "admin.email":
@@ -79,7 +79,7 @@ func (c *Config) SetDynamicContent(md *cobra.Command, args []string) error {
 		return err
 	}
 
-	c.App.Viper.Set(args[0], args[1])
+	c.Global.Viper.Set(args[0], args[1])
 
-	return c.App.Viper.WriteConfig()
+	return c.Global.Viper.WriteConfig()
 }
