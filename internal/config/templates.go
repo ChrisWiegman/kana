@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 )
 
-//go:embed source/dynamic.toml
+//go:embed templates/dynamic.toml
 var DYNAMIC_TOML string
 
-//go:embed source/traefik.toml
+//go:embed templates/traefik.toml
 var TRAEFIK_TOML string
 
 type File struct {
