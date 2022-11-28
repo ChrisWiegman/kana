@@ -47,8 +47,7 @@ changelog:
 clean:
 	rm -rf \
 		dist \
-		vendor \
-		internal/config/constants.go
+		vendor
 
 .PHONY: install
 install:
