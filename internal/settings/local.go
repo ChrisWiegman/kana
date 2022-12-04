@@ -23,14 +23,42 @@ type LocalSettings struct {
 	Plugins       []string
 }
 
-// ProcessNameFlag Processes the name flag on the site resetting all appropriate local variables
-func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
+// LoadLocalSettings Loads the config for the current site being called
+func (s *Settings) LoadLocalSettings() error {
 
-	isSite := false // Don't assume we're in a site that has been initialized.
+	siteName := sanitizeSiteName(filepath.Base(s.WorkingDirectory))
+	// Setup other options generated from config items
+	s.SiteDomain = fmt.Sprintf("%s.%s", siteName, s.AppDomain)
+	s.SecureURL = fmt.Sprintf("https://%s/", s.SiteDomain)
+	s.URL = fmt.Sprintf("http://%s/", s.SiteDomain)
+
+	s.Name = siteName
+	s.SiteDirectory = path.Join(s.AppDirectory, "sites", siteName)
+
+	localViper, err := s.loadlocalViper()
+	if err != nil {
+		return err
+	}
+
+	s.local = localViper
+	s.Xdebug = localViper.GetBool("xdebug")
+	s.Local = localViper.GetBool("local")
+	s.PHP = localViper.GetString("php")
+	s.Type = localViper.GetString("type")
+	s.Plugins = localViper.GetStringSlice("plugins")
+
+	return nil
+}
+
+// ProcessNameFlag Processes the name flag on the site resetting all appropriate local variables
+func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, bool, error) {
+
+	isSite := false  // Don't assume we're in a site that has been initialized.
+	useName := false // Return whether the named flag has been used
 
 	// Don't run this on commands that wouldn't possibly use it.
 	if cmd.Use == "config" || cmd.Use == "version" || cmd.Use == "help" {
-		return isSite, nil
+		return isSite, useName, nil
 	}
 
 	// By default the siteLink should be the working directory (assume it's linked)
@@ -39,10 +67,12 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 	// Process the name flag if set
 	if cmd.Flags().Lookup("name").Changed {
 
+		useName = true
+
 		// Check that we're not using invalid start flags for the start command
 		if cmd.Use == "start" {
 			if cmd.Flags().Lookup("plugin").Changed || cmd.Flags().Lookup("theme").Changed || cmd.Flags().Lookup("local").Changed {
-				return isSite, fmt.Errorf("invalid flags detected. 'plugin' 'theme' and 'local' flags are not valid with named sites")
+				return isSite, useName, fmt.Errorf("invalid flags detected. 'plugin' 'theme' and 'local' flags are not valid with named sites")
 			}
 		}
 
@@ -76,18 +106,18 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 			isSite = true
 			err = os.MkdirAll(s.SiteDirectory, 0750)
 			if err != nil {
-				return isSite, err
+				return isSite, useName, err
 			}
 			err = siteLinkConfig.SafeWriteConfig()
 			if err != nil {
-				return isSite, err
+				return isSite, useName, err
 			}
 		}
 	}
 
 	s.WorkingDirectory = siteLinkConfig.GetString("link")
 
-	return isSite, nil
+	return isSite, useName, nil
 }
 
 // ProcessStartFlags Process the start flags and save them to the settings object
@@ -123,33 +153,6 @@ func (s *Settings) WriteLocalSettings(localSettings LocalSettings) error {
 	}
 
 	return s.local.WriteConfig()
-}
-
-// loadLocalSettings Loads the config for the current site being called
-func (s *Settings) loadLocalSettings() error {
-
-	siteName := sanitizeSiteName(filepath.Base(s.WorkingDirectory))
-	// Setup other options generated from config items
-	s.SiteDomain = fmt.Sprintf("%s.%s", siteName, s.AppDomain)
-	s.SecureURL = fmt.Sprintf("https://%s/", s.SiteDomain)
-	s.URL = fmt.Sprintf("http://%s/", s.SiteDomain)
-
-	s.Name = siteName
-	s.SiteDirectory = path.Join(s.AppDirectory, "sites", siteName)
-
-	localViper, err := s.loadlocalViper()
-	if err != nil {
-		return err
-	}
-
-	s.local = localViper
-	s.Xdebug = localViper.GetBool("xdebug")
-	s.Local = localViper.GetBool("local")
-	s.PHP = localViper.GetString("php")
-	s.Type = localViper.GetString("type")
-	s.Plugins = localViper.GetStringSlice("plugins")
-
-	return nil
 }
 
 // loadSiteConfig Get the config items that can be overridden locally with a .kana.json file.

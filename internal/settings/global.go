@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-// loadGlobalSettings gets config information that transcends sites such as app and default settings
-func (s *Settings) loadGlobalSettings() error {
+// LoadGlobalSettings gets config information that transcends sites such as app and default settings
+func (s *Settings) LoadGlobalSettings() error {
 
 	globalViperConfig, err := s.loadGlobalViper()
 	if err != nil {

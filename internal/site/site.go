@@ -65,12 +65,29 @@ func (s *Site) LoadSite(cmd *cobra.Command, commandsRequiringSite []string, star
 		return err
 	}
 
-	// Process the "name" flag for every command
-	isSite, err := s.Settings.ProcessNameFlag(cmd)
+	// Load app-wide settings
+	err = s.Settings.LoadGlobalSettings()
 	if err != nil {
 		return err
 	}
 
+	// Load settings specific to the site
+	err = s.Settings.LoadLocalSettings()
+	if err != nil {
+		return err
+	}
+
+	// Process the "name" flag for every command
+	isSite, useName, err := s.Settings.ProcessNameFlag(cmd)
+	if err != nil {
+		return err
+	}
+
+	if useName {
+		fmt.Println("We're using the name flag")
+	}
+
+	// Fail now if we have a command that requires a completed site and we haven't started it before
 	if !isSite && arrayContains(commandsRequiringSite, cmd.Use) {
 		return fmt.Errorf("the current site you are trying to work with does not exist. Use `kana start` to initialize")
 	}

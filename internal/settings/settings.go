@@ -78,16 +78,6 @@ func NewSettings() (*Settings, error) {
 	kanaSettings.AppDirectory = filepath.Join(home, configFolderName)
 
 	err = kanaSettings.EnsureStaticConfigFiles()
-	if err != nil {
-		return kanaSettings, err
-	}
-
-	err = kanaSettings.loadGlobalSettings()
-	if err != nil {
-		return kanaSettings, err
-	}
-
-	err = kanaSettings.loadLocalSettings()
 
 	return kanaSettings, err
 }
