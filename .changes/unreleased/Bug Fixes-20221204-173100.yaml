@@ -1,0 +1,4 @@
+kind: Bug Fixes
+body: Using the "name" flag now works with sites that had originally been started
+  with the "--local" flag
+time: 2022-12-04T17:31:00.360604879Z
