@@ -16,21 +16,12 @@ import (
 	"github.com/ChrisWiegman/kana-cli/pkg/console"
 	"github.com/ChrisWiegman/kana-cli/pkg/docker"
 	"github.com/pkg/browser"
+	"github.com/spf13/cobra"
 )
 
 type Site struct {
 	dockerClient *docker.DockerClient
 	Settings     *settings.Settings
-}
-
-// NewSite creates a new site object
-func NewSite() (*Site, error) {
-
-	site := new(Site)
-
-	err := site.loadConfig()
-
-	return site, err
 }
 
 // EnsureDocker Ensures Docker is available for commands that need it.
@@ -63,6 +54,39 @@ func (s *Site) IsSiteRunning() bool {
 	containers, _ := s.dockerClient.ListContainers(s.Settings.Name)
 
 	return len(containers) != 0
+}
+
+func (s *Site) LoadSite(cmd *cobra.Command, commandsRequiringSite []string, startFlags settings.StartFlags, flagVerbose bool) error {
+
+	var err error
+
+	s.Settings, err = settings.NewSettings()
+	if err != nil {
+		return err
+	}
+
+	// Process the "name" flag for every command
+	isSite, err := s.Settings.ProcessNameFlag(cmd)
+	if err != nil {
+		return err
+	}
+
+	if !isSite && arrayContains(commandsRequiringSite, cmd.Use) {
+		return fmt.Errorf("the current site you are trying to work with does not exist. Use `kana start` to initialize")
+	}
+
+	// Process the "start" command flags
+	if cmd.Use == "start" {
+
+		// A site shouldn't be both a plugin and a theme so this reports an error if that is the case.
+		if startFlags.IsPlugin && startFlags.IsTheme {
+			return fmt.Errorf("you have set both the plugin and theme flags. Please choose only one option")
+		}
+
+		s.Settings.ProcessStartFlags(cmd, startFlags)
+	}
+
+	return nil
 }
 
 // OpenSite Opens the current site in a browser if it is running
@@ -291,14 +315,6 @@ func (s *Site) isLocalSite() bool {
 
 	// Return the flag for all other conditions
 	return s.Settings.Local
-}
-
-func (s *Site) loadConfig() error {
-
-	var err error
-
-	s.Settings, err = settings.NewSettings()
-	return err
 }
 
 // runCli Runs an arbitrary CLI command against the site's WordPress container

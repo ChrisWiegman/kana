@@ -3,16 +3,14 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/ChrisWiegman/kana-cli/internal/settings"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 	"github.com/ChrisWiegman/kana-cli/pkg/console"
 
 	"github.com/spf13/cobra"
 )
 
-var flagXdebug bool
-var flagLocal bool
-var flagIsTheme bool
-var flagIsPlugin bool
+var startFlags settings.StartFlags
 
 func newStartCommand(kanaSite *site.Site) *cobra.Command {
 
@@ -42,10 +40,10 @@ func newStartCommand(kanaSite *site.Site) *cobra.Command {
 	}
 
 	// Add associated flags to customize the site at runtime.
-	cmd.Flags().BoolVarP(&flagXdebug, "xdebug", "x", false, "Enable Xdebug when starting the container.")
-	cmd.Flags().BoolVarP(&flagIsPlugin, "plugin", "p", false, "Run the site as a plugin using the current folder as the plugin source.")
-	cmd.Flags().BoolVarP(&flagIsTheme, "theme", "t", false, "Run the site as a theme using the current folder as the theme source.")
-	cmd.Flags().BoolVarP(&flagLocal, "local", "l", false, "Installs the WordPress files in your current path at ./wordpress instead of the global app path.")
+	cmd.Flags().BoolVarP(&startFlags.Xdebug, "xdebug", "x", false, "Enable Xdebug when starting the container.")
+	cmd.Flags().BoolVarP(&startFlags.IsPlugin, "plugin", "p", false, "Run the site as a plugin using the current folder as the plugin source.")
+	cmd.Flags().BoolVarP(&startFlags.IsTheme, "theme", "t", false, "Run the site as a theme using the current folder as the theme source.")
+	cmd.Flags().BoolVarP(&startFlags.Local, "local", "l", false, "Installs the WordPress files in your current path at ./wordpress instead of the global app path.")
 
 	return cmd
 }

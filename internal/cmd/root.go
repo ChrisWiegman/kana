@@ -1,9 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
-	"github.com/ChrisWiegman/kana-cli/internal/settings"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 	"github.com/ChrisWiegman/kana-cli/pkg/console"
 
@@ -16,10 +13,7 @@ var commandsRequiringSite []string
 
 func Execute() {
 
-	site, err := site.NewSite()
-	if err != nil {
-		console.Error(err, flagVerbose)
-	}
+	site := new(site.Site)
 
 	// Setup the cobra command
 	cmd := &cobra.Command{
@@ -27,34 +21,9 @@ func Execute() {
 		Short: "Kana is a simple WordPress development tool designed for plugin and theme developers.",
 		Args:  cobra.NoArgs,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-
-			// Process the "name" flag for every command
-			isSite, err := site.Settings.ProcessNameFlag(cmd)
+			err := site.LoadSite(cmd, commandsRequiringSite, startFlags, flagVerbose)
 			if err != nil {
 				console.Error(err, flagVerbose)
-			}
-
-			if !isSite && arrayContains(commandsRequiringSite, cmd.Use) {
-				console.Error(fmt.Errorf("the current site you are trying to work with does not exist. Use `kana start` to initialize"), flagVerbose)
-			}
-
-			// Process the "start" command flags
-			if cmd.Use == "start" {
-
-				// A site shouldn't be both a plugin and a theme so this reports an error if that is the case.
-				if flagIsPlugin && flagIsTheme {
-					console.Error(fmt.Errorf("you have set both the plugin and theme flags. Please choose only one option"), flagVerbose)
-				}
-
-				// Process any overrides set with flags on the start command
-				startFlags := settings.StartFlags{
-					Xdebug:   flagXdebug,
-					IsTheme:  flagIsTheme,
-					IsPlugin: flagIsPlugin,
-					Local:    flagLocal,
-				}
-
-				site.Settings.ProcessStartFlags(cmd, startFlags)
 			}
 		},
 	}
@@ -80,14 +49,4 @@ func Execute() {
 	if err := cmd.Execute(); err != nil {
 		console.Error(err, flagVerbose)
 	}
-}
-
-func arrayContains(array []string, name string) bool {
-	for _, value := range array {
-		if value == name {
-			return true
-		}
-	}
-
-	return false
 }
