@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
@@ -72,19 +73,9 @@ func (s *Site) LoadSite(cmd *cobra.Command, commandsRequiringSite []string, star
 	}
 
 	// Load settings specific to the site
-	err = s.Settings.LoadLocalSettings()
+	isSite, err := s.Settings.LoadLocalSettings(cmd)
 	if err != nil {
 		return err
-	}
-
-	// Process the "name" flag for every command
-	isSite, useName, err := s.Settings.ProcessNameFlag(cmd)
-	if err != nil {
-		return err
-	}
-
-	if useName {
-		fmt.Println("We're using the name flag")
 	}
 
 	// Fail now if we have a command that requires a completed site and we haven't started it before
@@ -120,6 +111,33 @@ func (s *Site) OpenSite() error {
 	}
 
 	return browser.OpenURL(s.Settings.SecureURL)
+}
+
+// PrintSiteSettings Prints all current site settings to the console for debugging
+func (s *Site) PrintSiteSettings() {
+
+	fmt.Printf("Local: %s\n", strconv.FormatBool(s.Settings.Local))
+	fmt.Printf("Xdebug: %s\n", strconv.FormatBool(s.Settings.Xdebug))
+	fmt.Printf("AdminEmail: %s\n", s.Settings.AdminEmail)
+	fmt.Printf("AdminPassword: %s\n", s.Settings.AdminPassword)
+	fmt.Printf("AdminUsername: %s\n", s.Settings.AdminUsername)
+	fmt.Printf("AppDirectory: %s\n", s.Settings.AppDirectory)
+	fmt.Printf("SiteDirectory: %s\n", s.Settings.SiteDirectory)
+	fmt.Printf("WorkingDirectory: %s\n", s.Settings.WorkingDirectory)
+	fmt.Printf("AppDomain: %s\n", s.Settings.AppDomain)
+	fmt.Printf("SiteDomain: %s\n", s.Settings.SiteDomain)
+	fmt.Printf("Name: %s\n", s.Settings.Name)
+	fmt.Printf("PHP: %s\n", s.Settings.PHP)
+	fmt.Printf("RootCert: %s\n", s.Settings.RootCert)
+	fmt.Printf("RootKey: %s\n", s.Settings.RootKey)
+	fmt.Printf("SiteKey: %s\n", s.Settings.SiteKey)
+	fmt.Printf("SecureURL: %s\n", s.Settings.SecureURL)
+	fmt.Printf("URL: %s\n", s.Settings.URL)
+	fmt.Printf("Type: %s\n", s.Settings.Type)
+
+	for _, plugin := range s.Settings.Plugins {
+		fmt.Printf("Plugin: %s\n", plugin)
+	}
 }
 
 // StartSite Starts a site, including Traefik if needed
@@ -181,16 +199,11 @@ func (s *Site) StopSite() error {
 }
 
 // getLocalAppDir Gets the absolute path to WordPress if the local flag or option has been set
-func getLocalAppDir() (string, error) {
+func (s *Site) getLocalAppDir() (string, error) {
 
-	cwd, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
+	localAppDir := path.Join(s.Settings.WorkingDirectory, "wordpress")
 
-	localAppDir := path.Join(cwd, "wordpress")
-
-	err = os.MkdirAll(localAppDir, 0750)
+	err := os.MkdirAll(localAppDir, 0750)
 	if err != nil {
 		return "", err
 	}

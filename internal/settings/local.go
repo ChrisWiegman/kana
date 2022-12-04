@@ -24,7 +24,9 @@ type LocalSettings struct {
 }
 
 // LoadLocalSettings Loads the config for the current site being called
-func (s *Settings) LoadLocalSettings() error {
+func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
+
+	isSite := false // Don't assume we're in a site that has been initialized.
 
 	siteName := sanitizeSiteName(filepath.Base(s.WorkingDirectory))
 	// Setup other options generated from config items
@@ -35,9 +37,14 @@ func (s *Settings) LoadLocalSettings() error {
 	s.Name = siteName
 	s.SiteDirectory = path.Join(s.AppDirectory, "sites", siteName)
 
+	isSite, err := s.ProcessNameFlag(cmd)
+	if err != nil {
+		return isSite, err
+	}
+
 	localViper, err := s.loadlocalViper()
 	if err != nil {
-		return err
+		return isSite, err
 	}
 
 	s.local = localViper
@@ -47,18 +54,17 @@ func (s *Settings) LoadLocalSettings() error {
 	s.Type = localViper.GetString("type")
 	s.Plugins = localViper.GetStringSlice("plugins")
 
-	return nil
+	return isSite, nil
 }
 
 // ProcessNameFlag Processes the name flag on the site resetting all appropriate local variables
-func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, bool, error) {
+func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 
-	isSite := false  // Don't assume we're in a site that has been initialized.
-	useName := false // Return whether the named flag has been used
+	isSite := false // Don't assume we're in a site that has been initialized.
 
 	// Don't run this on commands that wouldn't possibly use it.
 	if cmd.Use == "config" || cmd.Use == "version" || cmd.Use == "help" {
-		return isSite, useName, nil
+		return isSite, nil
 	}
 
 	// By default the siteLink should be the working directory (assume it's linked)
@@ -67,12 +73,10 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, bool, error) {
 	// Process the name flag if set
 	if cmd.Flags().Lookup("name").Changed {
 
-		useName = true
-
 		// Check that we're not using invalid start flags for the start command
 		if cmd.Use == "start" {
 			if cmd.Flags().Lookup("plugin").Changed || cmd.Flags().Lookup("theme").Changed || cmd.Flags().Lookup("local").Changed {
-				return isSite, useName, fmt.Errorf("invalid flags detected. 'plugin' 'theme' and 'local' flags are not valid with named sites")
+				return isSite, fmt.Errorf("invalid flags detected. 'plugin' 'theme' and 'local' flags are not valid with named sites")
 			}
 		}
 
@@ -106,18 +110,18 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, bool, error) {
 			isSite = true
 			err = os.MkdirAll(s.SiteDirectory, 0750)
 			if err != nil {
-				return isSite, useName, err
+				return isSite, err
 			}
 			err = siteLinkConfig.SafeWriteConfig()
 			if err != nil {
-				return isSite, useName, err
+				return isSite, err
 			}
 		}
 	}
 
 	s.WorkingDirectory = siteLinkConfig.GetString("link")
 
-	return isSite, useName, nil
+	return isSite, nil
 }
 
 // ProcessStartFlags Process the start flags and save them to the settings object

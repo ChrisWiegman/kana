@@ -22,21 +22,18 @@ type PluginInfo struct {
 // RunWPCli Runs a wp-cli command returning it's output and any errors
 func (s *Site) RunWPCli(command []string) (string, error) {
 
-	siteDir := path.Join(s.Settings.AppDirectory, "sites", s.Settings.Name)
-	appDir := path.Join(siteDir, "app")
-	runningConfig, err := s.getRunningConfig(false)
-	if err != nil {
-		return "", err
-	}
+	var err error
 
-	if runningConfig.Local {
-		appDir, err = getLocalAppDir()
+	appDir := path.Join(s.Settings.SiteDirectory, "app")
+
+	if s.isLocalSite() {
+		appDir, err = s.getLocalAppDir()
 		if err != nil {
 			return "", err
 		}
 	}
 
-	appVolumes, err := s.getMounts(s.Settings.SiteDirectory, appDir, runningConfig.Type)
+	appVolumes, err := s.getMounts(appDir)
 	if err != nil {
 		return "", err
 	}
@@ -111,7 +108,7 @@ func (s *Site) getInstalledWordPressPlugins() ([]string, error) {
 	return plugins, nil
 }
 
-func (s *Site) getMounts(siteDir, appDir, siteType string) ([]mount.Mount, error) {
+func (s *Site) getMounts(appDir string) ([]mount.Mount, error) {
 
 	appVolumes := []mount.Mount{
 		{ // The root directory of the WordPress site
@@ -121,28 +118,23 @@ func (s *Site) getMounts(siteDir, appDir, siteType string) ([]mount.Mount, error
 		},
 		{ // Kana's primary site directory (used for temp files such as DB import and export)
 			Type:   mount.TypeBind,
-			Source: siteDir,
+			Source: s.Settings.WorkingDirectory,
 			Target: "/Site",
 		},
 	}
 
-	cwd, err := os.Getwd()
-	if err != nil {
-		return appVolumes, err
-	}
-
-	if siteType == "plugin" {
+	if s.Settings.Type == "plugin" {
 		appVolumes = append(appVolumes, mount.Mount{ // Map's the user's working directory as a plugin
 			Type:   mount.TypeBind,
-			Source: cwd,
+			Source: s.Settings.WorkingDirectory,
 			Target: path.Join("/var/www/html", "wp-content", "plugins", s.Settings.Name),
 		})
 	}
 
-	if siteType == "theme" {
+	if s.Settings.Type == "theme" {
 		appVolumes = append(appVolumes, mount.Mount{ // Map's the user's working directory as a theme
 			Type:   mount.TypeBind,
-			Source: cwd,
+			Source: s.Settings.WorkingDirectory,
 			Target: path.Join("/var/www/html", "wp-content", "themes", s.Settings.Name),
 		})
 	}
@@ -212,7 +204,7 @@ func (s *Site) startWordPress() error {
 
 	if s.isLocalSite() {
 
-		appDir, err = getLocalAppDir()
+		appDir, err = s.getLocalAppDir()
 		if err != nil {
 			return err
 		}
@@ -232,7 +224,7 @@ func (s *Site) startWordPress() error {
 		return err
 	}
 
-	appVolumes, err := s.getMounts(s.Settings.WorkingDirectory, appDir, s.Settings.Type)
+	appVolumes, err := s.getMounts(appDir)
 	if err != nil {
 		return err
 	}
