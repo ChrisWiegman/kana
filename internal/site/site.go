@@ -215,9 +215,22 @@ func (s *Site) getLocalAppDir() (string, error) {
 func (s *Site) getRunningConfig(withPlugins bool) (settings.LocalSettings, error) {
 
 	localSettings := settings.LocalSettings{
-		Type:   "site",
-		Local:  false,
-		Xdebug: false,
+		Type:       "site",
+		Local:      false,
+		Xdebug:     false,
+		PhpMyAdmin: false,
+	}
+
+	// We need container details to see if the phpmyadmin container is running
+	containers, err := s.dockerClient.ListContainers(s.Settings.Name)
+	if err != nil {
+		return localSettings, err
+	}
+
+	for _, container := range containers {
+		if container.Image == "phpmyadmin" {
+			localSettings.PhpMyAdmin = true
+		}
 	}
 
 	output, err := s.runCli("pecl list | grep xdebug", false)

@@ -36,7 +36,7 @@ type ExecResult struct {
 }
 
 // ListContainers Lists all running containers for a given site or all sites if no site is specified
-func (d *DockerClient) ListContainers(site string) ([]string, error) {
+func (d *DockerClient) ListContainers(site string) ([]types.Container, error) {
 
 	f := filters.NewArgs()
 
@@ -55,21 +55,9 @@ func (d *DockerClient) ListContainers(site string) ([]string, error) {
 		Filters: f,
 	}
 
-	containers, err := d.client.ContainerList(
-		context.Background(),
-		options)
+	containers, err := d.client.ContainerList(context.Background(), options)
 
-	if err != nil {
-		return []string{}, err
-	}
-
-	containerIds := make([]string, len(containers))
-
-	for i, container := range containers {
-		containerIds[i] = container.ID
-	}
-
-	return containerIds, nil
+	return containers, err
 }
 
 // IsContainerRunning Checks if a given container is running by name
