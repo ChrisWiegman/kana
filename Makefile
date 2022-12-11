@@ -6,13 +6,6 @@ ARGS = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
 %:
 	@:
 
-.PHONY: build
-build:
-	go mod vendor
-	go install \
-		-ldflags "-s -w -X $(PKG)/internal/cmd.Version=$(VERSION) -X $(PKG)/internal/cmd.Timestamp=$(TIMESTAMP)" \
-		./cmd/...
-
 .PHONY: change
 change:
 	docker run \
@@ -60,8 +53,8 @@ install:
 update:
 	go get -u ./...
 
-.PHONY: test-release
-test-release:
+.PHONY: snapshot
+snapshot:
 	echo $(VERSION)
 	docker run --rm \
 	--privileged \
