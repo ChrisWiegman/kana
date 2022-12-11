@@ -104,7 +104,7 @@ func (d *DockerClient) ContainerGetMounts(containerName string) []types.MountPoi
 	return results.Mounts
 }
 
-func (d *DockerClient) ContainerRun(config ContainerConfig) (id string, err error) {
+func (d *DockerClient) ContainerRun(config ContainerConfig, randomPorts bool) (id string, err error) {
 
 	containerID, isRunning := d.IsContainerRunning(config.Name)
 	if isRunning {
@@ -112,7 +112,7 @@ func (d *DockerClient) ContainerRun(config ContainerConfig) (id string, err erro
 	}
 
 	hostConfig := container.HostConfig{}
-	containerPorts := d.getNetworkConfig(config.Ports)
+	containerPorts := d.getNetworkConfig(config.Ports, randomPorts)
 
 	if len(containerPorts.PortBindings) > 0 {
 		hostConfig.PortBindings = containerPorts.PortBindings
@@ -187,7 +187,7 @@ func (d *DockerClient) ContainerLog(id string) (result string, err error) {
 func (d *DockerClient) ContainerRunAndClean(config ContainerConfig) (statusCode int64, body string, err error) {
 
 	// Start the container
-	id, err := d.ContainerRun(config)
+	id, err := d.ContainerRun(config, false)
 	if err != nil {
 		return statusCode, body, err
 	}

@@ -235,6 +235,9 @@ func (s *Site) startWordPress() error {
 			Image:       "mariadb",
 			NetworkName: "kana",
 			HostName:    fmt.Sprintf("kana_%s_database", s.Settings.Name),
+			Ports: []docker.ExposedPorts{
+				{Port: "3306", Protocol: "tcp"},
+			},
 			Env: []string{
 				"MARIADB_ROOT_PASSWORD=password",
 				"MARIADB_DATABASE=wordpress",
@@ -283,7 +286,7 @@ func (s *Site) startWordPress() error {
 			return err
 		}
 
-		_, err = s.dockerClient.ContainerRun(container)
+		_, err = s.dockerClient.ContainerRun(container, true)
 		if err != nil {
 			return err
 		}
