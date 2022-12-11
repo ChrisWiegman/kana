@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"os/user"
 	"strings"
 	"time"
 
@@ -116,6 +117,11 @@ func (d *DockerClient) ContainerRun(config ContainerConfig, randomPorts bool) (i
 
 	hostConfig.Mounts = config.Volumes
 
+	currentUser, err := user.Current()
+	if err != nil {
+		return containerID, err
+	}
+
 	resp, err := d.client.ContainerCreate(context.Background(), &container.Config{
 		Tty:          true,
 		Image:        config.Image,
@@ -124,6 +130,7 @@ func (d *DockerClient) ContainerRun(config ContainerConfig, randomPorts bool) (i
 		Hostname:     config.HostName,
 		Env:          config.Env,
 		Labels:       config.Labels,
+		User:         fmt.Sprintf("%s:%s", currentUser.Uid, currentUser.Gid),
 	}, &hostConfig, &networkConfig, nil, config.Name)
 
 	if err != nil {

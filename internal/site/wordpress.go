@@ -124,6 +124,11 @@ func (s *Site) getMounts(appDir string) ([]mount.Mount, error) {
 	}
 
 	if s.Settings.Type == "plugin" {
+
+		if err := os.MkdirAll(path.Join(".", "wordpress", "wp-content", "plugins", s.Settings.Name), 0750); err != nil {
+			return appVolumes, err
+		}
+
 		appVolumes = append(appVolumes, mount.Mount{ // Map's the user's working directory as a plugin
 			Type:   mount.TypeBind,
 			Source: s.Settings.WorkingDirectory,
@@ -132,6 +137,11 @@ func (s *Site) getMounts(appDir string) ([]mount.Mount, error) {
 	}
 
 	if s.Settings.Type == "theme" {
+
+		if err := os.MkdirAll(path.Join(".", "wordpress", "wp-content", "themes", s.Settings.Name), 0750); err != nil {
+			return appVolumes, err
+		}
+
 		appVolumes = append(appVolumes, mount.Mount{ // Map's the user's working directory as a theme
 			Type:   mount.TypeBind,
 			Source: s.Settings.WorkingDirectory,
