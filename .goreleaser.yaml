@@ -39,7 +39,7 @@ snapshot:
   name_template: "{{ incpatch .Version }}-devel"
 
 changelog:
-  skip: false
+  skip: true
 
 nfpms:
   - vendor: Chris Wiegman
