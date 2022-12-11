@@ -27,6 +27,6 @@ jobs:
         uses: goreleaser/goreleaser-action@v3.2.0
         with:
           version: latest
-          args: --rm-dist --release-notes=${{ env.RELEASE_NOTES_PATH }} --skip-validate --debug
+          args: --rm-dist --release-notes=${{ env.RELEASE_NOTES_PATH }} --skip-validate --debug --snap-shot
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
