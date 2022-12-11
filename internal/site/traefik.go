@@ -82,7 +82,7 @@ func (s *Site) startTraefik() error {
 		},
 	}
 
-	_, err = s.dockerClient.ContainerRun(traefikConfig, false)
+	_, err = s.dockerClient.ContainerRun(traefikConfig, false, false)
 
 	return err
 }

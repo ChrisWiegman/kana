@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os/user"
+	"runtime"
 	"strings"
 	"time"
 
@@ -93,7 +94,7 @@ func (d *DockerClient) ContainerGetMounts(containerName string) []types.MountPoi
 	return results.Mounts
 }
 
-func (d *DockerClient) ContainerRun(config ContainerConfig, randomPorts bool) (id string, err error) {
+func (d *DockerClient) ContainerRun(config ContainerConfig, randomPorts, localUser bool) (id string, err error) {
 
 	containerID, isRunning := d.IsContainerRunning(config.Name)
 	if isRunning {
@@ -117,12 +118,7 @@ func (d *DockerClient) ContainerRun(config ContainerConfig, randomPorts bool) (i
 
 	hostConfig.Mounts = config.Volumes
 
-	currentUser, err := user.Current()
-	if err != nil {
-		return containerID, err
-	}
-
-	resp, err := d.client.ContainerCreate(context.Background(), &container.Config{
+	containerConfig := &container.Config{
 		Tty:          true,
 		Image:        config.Image,
 		ExposedPorts: containerPorts.PortSet,
@@ -130,9 +126,20 @@ func (d *DockerClient) ContainerRun(config ContainerConfig, randomPorts bool) (i
 		Hostname:     config.HostName,
 		Env:          config.Env,
 		Labels:       config.Labels,
-		User:         fmt.Sprintf("%s:%s", currentUser.Uid, currentUser.Gid),
-	}, &hostConfig, &networkConfig, nil, config.Name)
+	}
 
+	// Linux doesn't abstract the user so we have to do it ourselves
+	if localUser && runtime.GOOS == "linux" {
+
+		currentUser, err := user.Current()
+		if err != nil {
+			return containerID, err
+		}
+
+		containerConfig.User = fmt.Sprintf("%s:%s", currentUser.Uid, currentUser.Gid)
+	}
+
+	resp, err := d.client.ContainerCreate(context.Background(), containerConfig, &hostConfig, &networkConfig, nil, config.Name)
 	if err != nil {
 		return "", err
 	}
@@ -182,7 +189,7 @@ func (d *DockerClient) ContainerLog(id string) (result string, err error) {
 func (d *DockerClient) ContainerRunAndClean(config ContainerConfig) (statusCode int64, body string, err error) {
 
 	// Start the container
-	id, err := d.ContainerRun(config, false)
+	id, err := d.ContainerRun(config, false, true)
 	if err != nil {
 		return statusCode, body, err
 	}

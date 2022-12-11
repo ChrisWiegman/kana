@@ -332,7 +332,7 @@ func (s *Site) startWordPress() error {
 			return err
 		}
 
-		_, err = s.dockerClient.ContainerRun(container, true)
+		_, err = s.dockerClient.ContainerRun(container, true, true)
 		if err != nil {
 			return err
 		}
