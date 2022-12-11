@@ -18,9 +18,9 @@ type StartFlags struct {
 }
 
 type LocalSettings struct {
-	Local, Xdebug bool
-	Type          string
-	Plugins       []string
+	Local, PhpMyAdmin, Xdebug bool
+	Type                      string
+	Plugins                   []string
 }
 
 // LoadLocalSettings Loads the config for the current site being called
@@ -49,6 +49,7 @@ func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 
 	s.local = localViper
 	s.Xdebug = localViper.GetBool("xdebug")
+	s.PhpMyAdmin = localViper.GetBool("phpmyadmin")
 	s.Local = localViper.GetBool("local")
 	s.PHP = localViper.GetString("php")
 	s.Type = localViper.GetString("type")
@@ -150,6 +151,7 @@ func (s *Settings) WriteLocalSettings(localSettings LocalSettings) error {
 	s.local.Set("local", localSettings.Local)
 	s.local.Set("type", localSettings.Type)
 	s.local.Set("xdebug", localSettings.Xdebug)
+	s.local.Set("phpmyadmin", localSettings.PhpMyAdmin)
 	s.local.Set("plugins", localSettings.Plugins)
 
 	if _, err := os.Stat(path.Join(s.WorkingDirectory, ".kana.json")); os.IsNotExist(err) {
@@ -168,6 +170,7 @@ func (s *Settings) loadlocalViper() (*viper.Viper, error) {
 	localSettings.SetDefault("type", s.Type)
 	localSettings.SetDefault("local", s.Local)
 	localSettings.SetDefault("xdebug", s.Xdebug)
+	localSettings.SetDefault("phpmyadmin", s.PhpMyAdmin)
 	localSettings.SetDefault("plugins", []string{})
 
 	localSettings.SetConfigName(".kana")

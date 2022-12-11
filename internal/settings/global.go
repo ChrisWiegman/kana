@@ -16,6 +16,7 @@ func (s *Settings) LoadGlobalSettings() error {
 
 	s.global = globalViperConfig
 	s.Xdebug = globalViperConfig.GetBool("xdebug")
+	s.PhpMyAdmin = globalViperConfig.GetBool("phpmyadmin")
 	s.Local = globalViperConfig.GetBool("local")
 	s.AdminEmail = globalViperConfig.GetString("admin.email")
 	s.AdminPassword = globalViperConfig.GetString("admin.password")
@@ -32,6 +33,7 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
 	globalSettings := viper.New()
 
 	globalSettings.SetDefault("xdebug", xdebug)
+	globalSettings.SetDefault("phpmyadmin", phpmyadmin)
 	globalSettings.SetDefault("type", siteType)
 	globalSettings.SetDefault("local", local)
 	globalSettings.SetDefault("php", php)

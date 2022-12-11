@@ -148,6 +148,7 @@ func (s *Site) getWordPressContainers() []string {
 	return []string{
 		fmt.Sprintf("kana_%s_database", s.Settings.Name),
 		fmt.Sprintf("kana_%s_wordpress", s.Settings.Name),
+		fmt.Sprintf("kana_%s_phpmyadmin", s.Settings.Name),
 	}
 }
 
@@ -277,6 +278,41 @@ func (s *Site) startWordPress() error {
 			},
 			Volumes: appVolumes,
 		},
+	}
+
+	if s.Settings.PhpMyAdmin {
+
+		phpMyAdminContainer := docker.ContainerConfig{
+			Name:        fmt.Sprintf("kana_%s_phpmyadmin", s.Settings.Name),
+			Image:       "phpmyadmin",
+			NetworkName: "kana",
+			HostName:    fmt.Sprintf("kana_%s_phpmyadmin", s.Settings.Name),
+			Env: []string{
+				"MYSQL_ROOT_PASSWORD=password",
+				//"PMA_ARBITRARY=1",
+				fmt.Sprintf("PMA_HOST=kana_%s_database", s.Settings.Name),
+				"PMA_USER=wordpress",
+				"PMA_PASSWORD=wordpress",
+			},
+			Volumes: []mount.Mount{
+				{ // Maps a database folder to the MySQL container for persistence
+					Type:   mount.TypeBind,
+					Source: databaseDir,
+					Target: "/var/lib/mysql",
+				},
+			},
+			Labels: map[string]string{
+				"traefik.enable": "true",
+				fmt.Sprintf("traefik.http.routers.wordpress-%s-%s-http.entrypoints", s.Settings.Name, "phpmyadmin"): "web",
+				fmt.Sprintf("traefik.http.routers.wordpress-%s-%s-http.rule", s.Settings.Name, "phpmyadmin"):        fmt.Sprintf("Host(`%s-%s`)", "phpmyadmin", s.Settings.SiteDomain),
+				fmt.Sprintf("traefik.http.routers.wordpress-%s-%s.entrypoints", s.Settings.Name, "phpmyadmin"):      "websecure",
+				fmt.Sprintf("traefik.http.routers.wordpress-%s-%s.rule", s.Settings.Name, "phpmyadmin"):             fmt.Sprintf("Host(`%s-%s`)", "phpmyadmin", s.Settings.SiteDomain),
+				fmt.Sprintf("traefik.http.routers.wordpress-%s-%s.tls", s.Settings.Name, "phpmyadmin"):              "true",
+				"kana.site": s.Settings.Name,
+			},
+		}
+
+		wordPressContainers = append(wordPressContainers, phpMyAdminContainer)
 	}
 
 	for _, container := range wordPressContainers {
