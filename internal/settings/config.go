@@ -37,6 +37,7 @@ func (s *Settings) ListSettings() {
 	t.AddRow("php", console.Bold(s.global.GetString("php")), console.Bold(s.local.GetString("php")))
 	t.AddRow("type", console.Bold(s.global.GetString("type")), console.Bold(s.local.GetString("type")))
 	t.AddRow("xdebug", console.Bold(s.global.GetString("xdebug")), console.Bold(s.local.GetString("xdebug")))
+	t.AddRow("phpmyadmin", console.Bold(s.global.GetString("phpmyadmin")), console.Bold(s.local.GetString("phpmyadmin")))
 
 	boldPlugins := []string{}
 
