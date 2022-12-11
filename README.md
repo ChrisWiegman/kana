@@ -163,7 +163,7 @@ Currently there are two methods to access the database directly. First, use the 
 
 You can also access the database directly by viewing the database port with `docker ps` and using the database port and the following configuration in the app of your choice:
 
-- **Database host**: _kana\_<your site name>\_database_
+- **Database host**: _kana_`your site name`_database_
 - **Database name**: _wordpress_
 - **Database user**: _wordpress_
 - **Database password**: _wordpress_
