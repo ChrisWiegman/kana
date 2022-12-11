@@ -118,7 +118,7 @@ func (s *Site) getMounts(appDir string) ([]mount.Mount, error) {
 		},
 		{ // Kana's primary site directory (used for temp files such as DB import and export)
 			Type:   mount.TypeBind,
-			Source: s.Settings.WorkingDirectory,
+			Source: s.Settings.SiteDirectory,
 			Target: "/Site",
 		},
 	}
