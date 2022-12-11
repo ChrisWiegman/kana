@@ -77,6 +77,8 @@ If you do not specify the `local` flag you can find Kana's site files in `~/.con
 
 `--xdebug` will start Xdebug on the site (see below for usage).
 
+`--phpmyadmin` will start an instance of [phpMyAdmin](https://www.phpmyadmin.net) to allow for easier access to the database without needing external tools.
+
 `--name` The name flag allows you to run an arbitrary site from anywhere. For example, if you already started and stopped a site from a directory called _test_ you can run `kana start --name=test` to start that site from anywhere. If you use the `name` flag on a new site it will create that site without a link to any local folder. This can be handy for testing a plugin or other configuration but not that none of the other start flags will apply.
 
 ## Importing an existing WordPress database
@@ -131,6 +133,7 @@ Kana has a handful of options that apply to all new sites created with the app. 
 - `php` **7.4** - the default PHP version used for new sites (currently 8.0 and 8.1 are also supported)
 - `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
 - `xdebug` **false** - the default usage of the `xdebug` start flag
+- `phpmyadmin` **false** - the default usage of the `phpmyadmin` start flag
 
 You can get or set any of the above options using a similar syntax to GIT's config. For example:
 
@@ -147,11 +150,23 @@ In addition to the global config, certain items above can be overridden for any 
 - `php` **7.4** - the default PHP version used for new sites (currently 8.0 and 8.1 are also supported)
 - `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
 - `xdebug` **false** - the default usage of the `xdebug` start flag
+- `phpmyadmin` **false** - the default usage of the `phpmyadmin` start flag
 - `plugins` **[]** - an array of plugins to install and activate when starting the new site. These are slugs from the Plugins section of WordPress.org.
 
 ### Export
 
 `kana export` will create a _.kana.json_ configuration file in your current folder exporting the configuration of the current site including PHP version, active plugins and associated options as shown above
+
+# Accessing the database directly
+
+Currently there are two methods to access the database directly. First, use the `phpmyadmin` flag or setting (set to true) to add an instance of [phpMyAdmin](https://www.phpmyadmin.net) to your site. You can access this by appending **\*phpmyadmin-** to the beginning of your site domain. For example, if your site can get found at https://mysupersite.sites.kana.li you can access phpMyAdmin at https://phpmyadmin-mysupersite.sites.kana.li if you have enabled phpMyAdmin at site start.
+
+You can also access the database directly by viewing the database port with `docker ps` and using the database port and the following configuration in the app of your choice:
+
+- **Database host**: _kana\_<your site name>\_database_
+- **Database name**: _wordpress_
+- **Database user**: _wordpress_
+- **Database password**: _wordpress_
 
 # Using Xdebug
 
