@@ -60,7 +60,7 @@ brews:
   - tap:
       owner: ChrisWiegman
       name: homebrew-kana
-      branch: main
+      branch: test
     name: kana
     license: GPL-3.0 license
     test: |
