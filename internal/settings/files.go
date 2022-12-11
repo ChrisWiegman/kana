@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"runtime"
 
 	"github.com/ChrisWiegman/kana-cli/pkg/minica"
 )
@@ -68,8 +69,11 @@ func (s *Settings) EnsureSSLCerts() error {
 			return err
 		}
 
-		installCertCommand := exec.Command("sudo", "security", "add-trusted-cert", "-d", "-r", "trustRoot", "-k", "/Library/Keychains/System.keychain", rootCert)
-		return installCertCommand.Run()
+		// If we're on Mac try to add the cert to the system trust
+		if runtime.GOOS == "darwin" {
+			installCertCommand := exec.Command("sudo", "security", "add-trusted-cert", "-d", "-r", "trustRoot", "-k", "/Library/Keychains/System.keychain", rootCert)
+			return installCertCommand.Run()
+		}
 	}
 
 	return nil
