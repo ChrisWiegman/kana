@@ -11,10 +11,11 @@ import (
 )
 
 type StartFlags struct {
-	Xdebug   bool
-	Local    bool
-	IsTheme  bool
-	IsPlugin bool
+	Xdebug     bool
+	PhpMyAdmin bool
+	Local      bool
+	IsTheme    bool
+	IsPlugin   bool
 }
 
 type LocalSettings struct {
@@ -133,7 +134,11 @@ func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
 	}
 
 	if cmd.Flags().Lookup("xdebug").Changed {
-		s.Xdebug = flags.Local
+		s.Xdebug = flags.Xdebug
+	}
+
+	if cmd.Flags().Lookup("phpmyadmin").Changed {
+		s.PhpMyAdmin = flags.PhpMyAdmin
 	}
 
 	if cmd.Flags().Lookup("plugin").Changed && flags.IsPlugin {

@@ -41,6 +41,7 @@ func newStartCommand(kanaSite *site.Site) *cobra.Command {
 
 	// Add associated flags to customize the site at runtime.
 	cmd.Flags().BoolVarP(&startFlags.Xdebug, "xdebug", "x", false, "Enable Xdebug when starting the container.")
+	cmd.Flags().BoolVarP(&startFlags.PhpMyAdmin, "phpmyadmin", "a", false, "Enable phpMyAdmin when starting the container.")
 	cmd.Flags().BoolVarP(&startFlags.IsPlugin, "plugin", "p", false, "Run the site as a plugin using the current folder as the plugin source.")
 	cmd.Flags().BoolVarP(&startFlags.IsTheme, "theme", "t", false, "Run the site as a theme using the current folder as the theme source.")
 	cmd.Flags().BoolVarP(&startFlags.Local, "local", "l", false, "Installs the WordPress files in your current path at ./wordpress instead of the global app path.")
