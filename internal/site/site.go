@@ -16,6 +16,7 @@ import (
 	"github.com/ChrisWiegman/kana-cli/internal/settings"
 	"github.com/ChrisWiegman/kana-cli/pkg/console"
 	"github.com/ChrisWiegman/kana-cli/pkg/docker"
+	"github.com/logrusorgru/aurora/v4"
 	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
 )
@@ -144,7 +145,7 @@ func (s *Site) PrintSiteSettings() {
 func (s *Site) StartSite() error {
 
 	// Let's start everything up
-	fmt.Printf("Starting development site: %s\n", s.getSiteURL(false))
+	fmt.Printf("Starting development site: %s\n", aurora.Bold(aurora.Green(s.getSiteURL(false))))
 
 	// Start Traefik if we need it
 	err := s.startTraefik()

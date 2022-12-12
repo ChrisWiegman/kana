@@ -186,20 +186,32 @@ func (s *Site) installDefaultPlugins() error {
 // installWordPress Installs and configures WordPress core
 func (s *Site) installWordPress() error {
 
-	console.Println("Finishing WordPress setup...")
-
-	setupCommand := []string{
+	checkCommand := []string{
 		"core",
-		"install",
-		fmt.Sprintf("--url=%s", s.getSiteURL(false)),
-		fmt.Sprintf("--title=Kana Development %s: %s", s.Settings.Type, s.Settings.Name),
-		fmt.Sprintf("--admin_user=%s", s.Settings.AdminUsername),
-		fmt.Sprintf("--admin_password=%s", s.Settings.AdminPassword),
-		fmt.Sprintf("--admin_email=%s", s.Settings.AdminEmail),
+		"is-installed",
 	}
 
-	_, err := s.RunWPCli(setupCommand)
-	return err
+	_, err := s.RunWPCli(checkCommand)
+
+	if err != nil {
+
+		console.Println("Finishing WordPress setup...")
+
+		setupCommand := []string{
+			"core",
+			"install",
+			fmt.Sprintf("--url=%s", s.getSiteURL(false)),
+			fmt.Sprintf("--title=Kana Development %s: %s", s.Settings.Type, s.Settings.Name),
+			fmt.Sprintf("--admin_user=%s", s.Settings.AdminUsername),
+			fmt.Sprintf("--admin_password=%s", s.Settings.AdminPassword),
+			fmt.Sprintf("--admin_email=%s", s.Settings.AdminEmail),
+		}
+
+		_, err = s.RunWPCli(setupCommand)
+		return err
+	}
+
+	return nil
 }
 
 // startWordPress Starts the WordPress containers
