@@ -6,6 +6,7 @@ import (
 	"github.com/ChrisWiegman/kana-cli/internal/settings"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 	"github.com/ChrisWiegman/kana-cli/pkg/console"
+	"github.com/logrusorgru/aurora/v4"
 
 	"github.com/spf13/cobra"
 )
@@ -34,7 +35,7 @@ func newStartCommand(kanaSite *site.Site) *cobra.Command {
 				console.Error(err, flagVerbose)
 			}
 
-			console.Success("Your site has started and should be open in your default browser.")
+			console.Success(fmt.Sprintf("Your site, %s, has has started and should be open in your default browser.", aurora.Bold(aurora.Blue(kanaSite.Settings.Name))))
 		},
 		Args: cobra.NoArgs,
 	}
