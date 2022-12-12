@@ -55,7 +55,6 @@ update:
 
 .PHONY: snapshot
 snapshot:
-	echo $(VERSION)
 	docker run --rm \
 	--privileged \
 	-v $(PWD):/go/src/$(PKG) \
