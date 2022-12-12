@@ -18,6 +18,8 @@ builds:
   - id: linux
     goos:
       - linux
+    goarch:
+      - amd64
     main: ./cmd/kana/main.go
     binary: kana
     ldflags:
@@ -51,11 +53,12 @@ nfpms:
     homepage: https://github.com/ChrisWiegman/kana-cli
     maintainer: Chris Wiegman <contact@chriswiegman.com>
     description: A simple, portable CLI for efficient WordPress development.
+    replacements:
+      amd64: x86_64
     formats:
       - apk
       - deb
       - rpm
-      - termux.deb
       - archlinux
 
 brews:
