@@ -119,6 +119,7 @@ func (s *Site) PrintSiteSettings() {
 
 	fmt.Printf("Local: %s\n", strconv.FormatBool(s.Settings.Local))
 	fmt.Printf("Xdebug: %s\n", strconv.FormatBool(s.Settings.Xdebug))
+	fmt.Printf("PhpMyAdmin: %s\n", strconv.FormatBool(s.Settings.PhpMyAdmin))
 	fmt.Printf("AdminEmail: %s\n", s.Settings.AdminEmail)
 	fmt.Printf("AdminPassword: %s\n", s.Settings.AdminPassword)
 	fmt.Printf("AdminUsername: %s\n", s.Settings.AdminUsername)
