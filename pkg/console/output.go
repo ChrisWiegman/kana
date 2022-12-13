@@ -64,3 +64,8 @@ func PromptConfirm(promptText string, def bool) bool {
 func Success(output string) {
 	fmt.Printf("%s %s\n", aurora.Bold(aurora.Green("[Success]")), output)
 }
+
+// Warn displays a formatted warning message
+func Warn(output string) {
+	fmt.Printf("%s %s\n", aurora.Bold(aurora.Yellow("[Warning]")), output)
+}
