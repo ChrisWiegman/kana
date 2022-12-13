@@ -1,0 +1,3 @@
+kind: Features
+body: Warn the user (without failing) if a default plugin cannot be installed
+time: 2022-12-13T00:03:05.354588002Z
