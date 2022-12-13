@@ -26,9 +26,13 @@ func newWPCommand(kanaSite *site.Site) *cobra.Command {
 			}
 
 			// Run the output from wp-cli
-			output, err := kanaSite.RunWPCli(args)
+			code, output, err := kanaSite.RunWPCli(args)
 			if err != nil {
 				console.Error(err, flagVerbose)
+			}
+
+			if code != 0 {
+				console.Error(fmt.Errorf(output), flagVerbose)
 			}
 
 			console.Println(output)

@@ -8,6 +8,7 @@ import (
 
 	"github.com/ChrisWiegman/kana-cli/pkg/console"
 	"github.com/ChrisWiegman/kana-cli/pkg/docker"
+	"github.com/logrusorgru/aurora/v4"
 
 	"github.com/docker/docker/api/types/mount"
 )
@@ -20,7 +21,7 @@ type PluginInfo struct {
 }
 
 // RunWPCli Runs a wp-cli command returning it's output and any errors
-func (s *Site) RunWPCli(command []string) (string, error) {
+func (s *Site) RunWPCli(command []string) (int64, string, error) {
 
 	var err error
 
@@ -29,13 +30,13 @@ func (s *Site) RunWPCli(command []string) (string, error) {
 	if s.isLocalSite() {
 		appDir, err = s.getLocalAppDir()
 		if err != nil {
-			return "", err
+			return 1, "", err
 		}
 	}
 
 	appVolumes, err := s.getMounts(appDir)
 	if err != nil {
-		return "", err
+		return 1, "", err
 	}
 
 	fullCommand := []string{
@@ -65,15 +66,15 @@ func (s *Site) RunWPCli(command []string) (string, error) {
 
 	err = s.dockerClient.EnsureImage(container.Image)
 	if err != nil {
-		return "", err
+		return 1, "", err
 	}
 
-	_, output, err := s.dockerClient.ContainerRunAndClean(container)
+	code, output, err := s.dockerClient.ContainerRunAndClean(container)
 	if err != nil {
-		return "", err
+		return code, "", err
 	}
 
-	return output, nil
+	return code, output, nil
 }
 
 // getInstalledWordPressPlugins Returns a list of the plugins that have been installed on the site
@@ -85,7 +86,7 @@ func (s *Site) getInstalledWordPressPlugins() ([]string, error) {
 		"--format=json",
 	}
 
-	commandOutput, err := s.RunWPCli(commands)
+	_, commandOutput, err := s.RunWPCli(commands)
 	if err != nil {
 		return []string{}, err
 	}
@@ -165,18 +166,40 @@ func (s *Site) getWordPressContainers() []string {
 // installDefaultPlugins Installs a list of WordPress plugins
 func (s *Site) installDefaultPlugins() error {
 
+	installedPlugins, err := s.getInstalledWordPressPlugins()
+	if err != nil {
+		return err
+	}
+
 	for _, plugin := range s.Settings.Plugins {
 
-		setupCommand := []string{
-			"plugin",
-			"install",
-			"--activate",
-			plugin,
+		installPlugin := true
+
+		for _, installedPlugin := range installedPlugins {
+			if installedPlugin == plugin {
+				installPlugin = false
+			}
 		}
 
-		_, err := s.RunWPCli(setupCommand)
-		if err != nil {
-			return err
+		if installPlugin {
+
+			console.Println(fmt.Sprintf("Installing plugin:  %s", aurora.Bold(aurora.Blue(plugin))))
+
+			setupCommand := []string{
+				"plugin",
+				"install",
+				"--activate",
+				plugin,
+			}
+
+			code, _, err := s.RunWPCli(setupCommand)
+			if err != nil {
+				return err
+			}
+
+			if code != 0 {
+				console.Warn(fmt.Sprintf("Unable to install plugin: %s.", aurora.Bold(aurora.Blue(plugin))))
+			}
 		}
 	}
 
@@ -191,9 +214,9 @@ func (s *Site) installWordPress() error {
 		"is-installed",
 	}
 
-	_, err := s.RunWPCli(checkCommand)
+	code, _, err := s.RunWPCli(checkCommand)
 
-	if err != nil {
+	if err != nil || code != 0 {
 
 		console.Println("Finishing WordPress setup...")
 
@@ -207,8 +230,10 @@ func (s *Site) installWordPress() error {
 			fmt.Sprintf("--admin_email=%s", s.Settings.AdminEmail),
 		}
 
-		_, err = s.RunWPCli(setupCommand)
-		return err
+		code, _, err = s.RunWPCli(setupCommand)
+		if err != nil || code != 0 {
+			return fmt.Errorf("installation of WordPress failed: %s", err.Error())
+		}
 	}
 
 	return nil

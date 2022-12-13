@@ -29,9 +29,9 @@ func (s *Site) ExportDatabase(args []string) (string, error) {
 		"/Site/export.sql",
 	}
 
-	_, err = s.RunWPCli(exportCommand)
-	if err != nil {
-		return "", err
+	code, output, err := s.RunWPCli(exportCommand)
+	if err != nil || code != 0 {
+		return "", fmt.Errorf("database export failed: %s\n%s", err.Error(), output)
 	}
 
 	err = copyFile(path.Join(s.Settings.SiteDirectory, "export.sql"), exportFile)
@@ -76,14 +76,14 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string) 
 			"create",
 		}
 
-		_, err = s.RunWPCli(dropCommand)
-		if err != nil {
-			return err
+		code, output, err := s.RunWPCli(dropCommand)
+		if err != nil || code != 0 {
+			return fmt.Errorf("drop database failed: %s\n%s", err.Error(), output)
 		}
 
-		_, err = s.RunWPCli(createCommand)
-		if err != nil {
-			return err
+		code, output, err = s.RunWPCli(createCommand)
+		if err != nil || code != 0 {
+			return fmt.Errorf("create database failed: %s\n%s", err.Error(), output)
 		}
 	}
 
@@ -95,9 +95,9 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string) 
 		"/Site/import.sql",
 	}
 
-	_, err = s.RunWPCli(importCommand)
-	if err != nil {
-		return err
+	code, output, err := s.RunWPCli(importCommand)
+	if err != nil || code != 0 {
+		return fmt.Errorf("database import failed: %s\n%s", err.Error(), output)
 	}
 
 	if replaceDomain != "" {
@@ -111,9 +111,9 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string) 
 			"--all-tables",
 		}
 
-		_, err := s.RunWPCli(replaceCommand)
-		if err != nil {
-			return err
+		code, output, err := s.RunWPCli(replaceCommand)
+		if err != nil || code != 0 {
+			return fmt.Errorf("replace domain failed failed: %s\n%s", err.Error(), output)
 		}
 	}
 
