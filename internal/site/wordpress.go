@@ -218,7 +218,7 @@ func (s *Site) installWordPress() error {
 
 	if err != nil || code != 0 {
 
-		console.Println("Finishing WordPress setup...")
+		console.Println("Finishing WordPress setup.")
 
 		setupCommand := []string{
 			"core",
