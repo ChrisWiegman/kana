@@ -126,7 +126,7 @@ func (s *Site) getMounts(appDir string) ([]mount.Mount, error) {
 
 	if s.Settings.Type == "plugin" {
 
-		if err := os.MkdirAll(path.Join(".", "wordpress", "wp-content", "plugins", s.Settings.Name), 0750); err != nil {
+		if err := os.MkdirAll(path.Join(s.Settings.WorkingDirectory, "wordpress", "wp-content", "plugins", s.Settings.Name), 0750); err != nil {
 			return appVolumes, err
 		}
 
@@ -139,7 +139,7 @@ func (s *Site) getMounts(appDir string) ([]mount.Mount, error) {
 
 	if s.Settings.Type == "theme" {
 
-		if err := os.MkdirAll(path.Join(".", "wordpress", "wp-content", "themes", s.Settings.Name), 0750); err != nil {
+		if err := os.MkdirAll(path.Join(s.Settings.WorkingDirectory, "wordpress", "wp-content", "themes", s.Settings.Name), 0750); err != nil {
 			return appVolumes, err
 		}
 
