@@ -5,6 +5,8 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"os/user"
+	"runtime"
 	"strings"
 	"time"
 
@@ -36,7 +38,7 @@ type ExecResult struct {
 }
 
 // ListContainers Lists all running containers for a given site or all sites if no site is specified
-func (d *DockerClient) ListContainers(site string) ([]string, error) {
+func (d *DockerClient) ListContainers(site string) ([]types.Container, error) {
 
 	f := filters.NewArgs()
 
@@ -55,21 +57,9 @@ func (d *DockerClient) ListContainers(site string) ([]string, error) {
 		Filters: f,
 	}
 
-	containers, err := d.client.ContainerList(
-		context.Background(),
-		options)
+	containers, err := d.client.ContainerList(context.Background(), options)
 
-	if err != nil {
-		return []string{}, err
-	}
-
-	containerIds := make([]string, len(containers))
-
-	for i, container := range containers {
-		containerIds[i] = container.ID
-	}
-
-	return containerIds, nil
+	return containers, err
 }
 
 // IsContainerRunning Checks if a given container is running by name
@@ -104,7 +94,7 @@ func (d *DockerClient) ContainerGetMounts(containerName string) []types.MountPoi
 	return results.Mounts
 }
 
-func (d *DockerClient) ContainerRun(config ContainerConfig) (id string, err error) {
+func (d *DockerClient) ContainerRun(config ContainerConfig, randomPorts, localUser bool) (id string, err error) {
 
 	containerID, isRunning := d.IsContainerRunning(config.Name)
 	if isRunning {
@@ -112,7 +102,7 @@ func (d *DockerClient) ContainerRun(config ContainerConfig) (id string, err erro
 	}
 
 	hostConfig := container.HostConfig{}
-	containerPorts := d.getNetworkConfig(config.Ports)
+	containerPorts := d.getNetworkConfig(config.Ports, randomPorts)
 
 	if len(containerPorts.PortBindings) > 0 {
 		hostConfig.PortBindings = containerPorts.PortBindings
@@ -128,7 +118,7 @@ func (d *DockerClient) ContainerRun(config ContainerConfig) (id string, err erro
 
 	hostConfig.Mounts = config.Volumes
 
-	resp, err := d.client.ContainerCreate(context.Background(), &container.Config{
+	containerConfig := &container.Config{
 		Tty:          true,
 		Image:        config.Image,
 		ExposedPorts: containerPorts.PortSet,
@@ -136,8 +126,20 @@ func (d *DockerClient) ContainerRun(config ContainerConfig) (id string, err erro
 		Hostname:     config.HostName,
 		Env:          config.Env,
 		Labels:       config.Labels,
-	}, &hostConfig, &networkConfig, nil, config.Name)
+	}
 
+	// Linux doesn't abstract the user so we have to do it ourselves
+	if localUser && runtime.GOOS == "linux" {
+
+		currentUser, err := user.Current()
+		if err != nil {
+			return containerID, err
+		}
+
+		containerConfig.User = fmt.Sprintf("%s:%s", currentUser.Uid, currentUser.Gid)
+	}
+
+	resp, err := d.client.ContainerCreate(context.Background(), containerConfig, &hostConfig, &networkConfig, nil, config.Name)
 	if err != nil {
 		return "", err
 	}
@@ -187,7 +189,7 @@ func (d *DockerClient) ContainerLog(id string) (result string, err error) {
 func (d *DockerClient) ContainerRunAndClean(config ContainerConfig) (statusCode int64, body string, err error) {
 
 	// Start the container
-	id, err := d.ContainerRun(config)
+	id, err := d.ContainerRun(config, false, true)
 	if err != nil {
 		return statusCode, body, err
 	}

@@ -13,7 +13,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/ChrisWiegman/kana-cli/internal/console"
+	"github.com/ChrisWiegman/kana-cli/pkg/console"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 )

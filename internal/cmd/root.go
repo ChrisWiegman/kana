@@ -1,12 +1,8 @@
 package cmd
 
 import (
-	"fmt"
-
-	"github.com/ChrisWiegman/kana-cli/internal/appConfig"
-	"github.com/ChrisWiegman/kana-cli/internal/appSetup"
-	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
+	"github.com/ChrisWiegman/kana-cli/pkg/console"
 
 	"github.com/spf13/cobra"
 )
@@ -17,29 +13,7 @@ var commandsRequiringSite []string
 
 func Execute() {
 
-	// Setup the static config items that cannot be overripen
-	staticConfig, err := appConfig.GetStaticConfig()
-	if err != nil {
-		console.Error(err, flagVerbose)
-	}
-
-	// Ensure the static content files are in place and up to date
-	err = appSetup.EnsureStaticConfigFiles(staticConfig)
-	if err != nil {
-		console.Error(err, flagVerbose)
-	}
-
-	// Get the dynamic config that the user might have set themselves
-	dynamicConfig, err := appConfig.GetDynamicContent(staticConfig)
-	if err != nil {
-		console.Error(err, flagVerbose)
-	}
-
-	// Create a site object
-	site, err := site.NewSite(staticConfig, dynamicConfig)
-	if err != nil {
-		console.Error(err, flagVerbose)
-	}
+	site := new(site.Site)
 
 	// Setup the cobra command
 	cmd := &cobra.Command{
@@ -47,13 +21,9 @@ func Execute() {
 		Short: "Kana is a simple WordPress development tool designed for plugin and theme developers.",
 		Args:  cobra.NoArgs,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			isSite, err := site.ProcessNameFlag(cmd)
+			err := site.LoadSite(cmd, commandsRequiringSite, startFlags, flagVerbose)
 			if err != nil {
 				console.Error(err, flagVerbose)
-			}
-
-			if !isSite && arrayContains(commandsRequiringSite, cmd.Use) {
-				console.Error(fmt.Errorf("the current site you are trying to work with does not exist. Use `kana start` to initialize"), flagVerbose)
 			}
 		},
 	}
@@ -71,7 +41,7 @@ func Execute() {
 		newDestroyCommand(site),
 		newConfigCommand(site),
 		newExportCommand(site),
-		newVersionCommand(site),
+		newVersionCommand(),
 		newDbCommand(site),
 	)
 
@@ -79,14 +49,4 @@ func Execute() {
 	if err := cmd.Execute(); err != nil {
 		console.Error(err, flagVerbose)
 	}
-}
-
-func arrayContains(array []string, name string) bool {
-	for _, value := range array {
-		if value == name {
-			return true
-		}
-	}
-
-	return false
 }

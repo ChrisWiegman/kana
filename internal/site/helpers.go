@@ -1,4 +1,4 @@
-package database
+package site
 
 import (
 	"fmt"
@@ -6,6 +6,18 @@ import (
 	"os"
 )
 
+// arrayContains Searches an array of strings for a given string and returns true/false as appropriate
+func arrayContains(array []string, name string) bool {
+	for _, value := range array {
+		if value == name {
+			return true
+		}
+	}
+
+	return false
+}
+
+// copyFile Copies a file on the user's host from one place to another
 func copyFile(src, dest string) error {
 
 	srcStat, err := os.Stat(src)

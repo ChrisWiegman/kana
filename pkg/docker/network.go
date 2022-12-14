@@ -18,7 +18,7 @@ type portConfig struct {
 	PortSet      nat.PortSet
 }
 
-func (d *DockerClient) getNetworkConfig(ports []ExposedPorts) portConfig {
+func (d *DockerClient) getNetworkConfig(ports []ExposedPorts, randomPorts bool) portConfig {
 
 	portBindings := make(nat.PortMap)
 	portSet := make(nat.PortSet)
@@ -30,9 +30,16 @@ func (d *DockerClient) getNetworkConfig(ports []ExposedPorts) portConfig {
 			panic(err)
 		}
 
+		hostPort := port.Port
+
+		// Reassign host port to "0" to chose a random port where applicable
+		if randomPorts {
+			hostPort = "0"
+		}
+
 		portBindings[portName] = []nat.PortBinding{
 			{
-				HostPort: port.Port,
+				HostPort: hostPort,
 			},
 		}
 

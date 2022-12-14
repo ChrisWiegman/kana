@@ -12,10 +12,13 @@ I've gone through many different tools to run WordPress sites over the years. Al
 
 # System requirements
 
-- MacOS
+## MacOS
+
 - [Docker Desktop](https://www.docker.com)
 
-I've built Kana on a Mac and, at least for now, it will probably only run on a Mac. If I can get the time and resources (something to test it on) to expand that to Linux or beyond I will gladly do so.
+## Linux
+
+- [Docker Engine](https://docs.docker.com/engine/install/)
 
 # Installing Kana
 
@@ -23,21 +26,19 @@ There are a few options for installing Kana. You can use [Homebrew](https://brew
 
 ## Install from Homebrew
 
-Installing from [Homebrew](https://brew.sh) is the recommended approach as it allows for automatic updates when needed. To install from Homebrew run the following command:
+Installing from [Homebrew](https://brew.sh) is the recommended approach on both Max and Linux as it allows for automatic updates when needed. To install from Homebrew run the following command:
 
 ```
 brew install ChrisWiegman/kana/kana
 ```
 
-Note that, as there are numerous ways to install Docker, I have chosen, at least for now, to not list it as a dependency when installing via Homebrew. You'll want to make sure Docker is already installed or install it with `brew install --cask docker`.
+Note that, as there are numerous ways to install Docker, I have chosen, at least for now, to not list it as a dependency when installing via Homebrew. You'll want to make sure Docker is already installed or install it with `brew install --cask docker` if you're on Mac (see [this documentation](https://docs.docker.com/engine/install/) if you're in Linux).
 
 ## Download from GitHub releases
 
 Simply download the latest release from our [release page](https://github.com/ChrisWiegman/kana-cli/releases) and extract the CLI to a location accessible by your system PATH
 
-**Note:** I have purchased Apple Developer access to properly sign the binaries however, I'm currently struggling to implement that in the code. In the meantime, if you get the error about not being able to run un-trusted software the first time you use Kana, go to System Preferences -> Security and click to allow the application to run or install the app via Homebrew.
-
-You can track my progress on improving this process on [Issue #2](https://github.com/ChrisWiegman/kana-cli/issues/2).
+**Note for Mac users** I have not signed the download copy so you'll need to manually allow it in your Mac settings if you download it from the releases page. Install it via Homebrew to avoid this step.
 
 ## Build manually
 
@@ -76,6 +77,8 @@ Note: these can be changed in the config. Please see below.
 If you do not specify the `local` flag you can find Kana's site files in `~/.config/kana/sites/<SITE NAME>/app`
 
 `--xdebug` will start Xdebug on the site (see below for usage).
+
+`--phpmyadmin` will start an instance of [phpMyAdmin](https://www.phpmyadmin.net) to allow for easier access to the database without needing external tools.
 
 `--name` The name flag allows you to run an arbitrary site from anywhere. For example, if you already started and stopped a site from a directory called _test_ you can run `kana start --name=test` to start that site from anywhere. If you use the `name` flag on a new site it will create that site without a link to any local folder. This can be handy for testing a plugin or other configuration but not that none of the other start flags will apply.
 
@@ -131,6 +134,7 @@ Kana has a handful of options that apply to all new sites created with the app. 
 - `php` **7.4** - the default PHP version used for new sites (currently 8.0 and 8.1 are also supported)
 - `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
 - `xdebug` **false** - the default usage of the `xdebug` start flag
+- `phpmyadmin` **false** - the default usage of the `phpmyadmin` start flag
 
 You can get or set any of the above options using a similar syntax to GIT's config. For example:
 
@@ -147,11 +151,23 @@ In addition to the global config, certain items above can be overridden for any 
 - `php` **7.4** - the default PHP version used for new sites (currently 8.0 and 8.1 are also supported)
 - `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
 - `xdebug` **false** - the default usage of the `xdebug` start flag
+- `phpmyadmin` **false** - the default usage of the `phpmyadmin` start flag
 - `plugins` **[]** - an array of plugins to install and activate when starting the new site. These are slugs from the Plugins section of WordPress.org.
 
 ### Export
 
 `kana export` will create a _.kana.json_ configuration file in your current folder exporting the configuration of the current site including PHP version, active plugins and associated options as shown above
+
+# Accessing the database directly
+
+Currently there are two methods to access the database directly. First, use the `phpmyadmin` flag or setting (set to true) to add an instance of [phpMyAdmin](https://www.phpmyadmin.net) to your site. You can access this by appending **\*phpmyadmin-** to the beginning of your site domain. For example, if your site can get found at https://mysupersite.sites.kana.li you can access phpMyAdmin at https://phpmyadmin-mysupersite.sites.kana.li if you have enabled phpMyAdmin at site start.
+
+You can also access the database directly by viewing the database port with `docker ps` and using the database port and the following configuration in the app of your choice:
+
+- **Database host**: _kana\_`your site name`\_database_
+- **Database name**: _wordpress_
+- **Database user**: _wordpress_
+- **Database password**: _wordpress_
 
 # Using Xdebug
 
@@ -187,10 +203,9 @@ To trigger step debugging you'll also need the appropriate extension for your br
 
 Note that I am using this project for my own work and it is under active development. Some of the things I'm currently working on include:
 
-- Code signing on Mac to prevent security notices on initial run (see https://github.com/ChrisWiegman/kana-cli/issues/2)
+- Better site management commands
 - Support for more xdebug modes (trace, etc)
 - Much more clear prompts and messages on the commands themselves
-- Other system support (Linux and Windows) (time allowed)
 - Writing a lot more tests (it's a personal project, I start where I can)
 - A proper website for all this documentation (I already bought a domain, after all)
 - Possible support for Docker alternatives
@@ -201,7 +216,7 @@ I hate apps that leave leftovers on your machine. When stopping a site all Docke
 
 1. Delete the application from your $GOBIN or system path (or run `brew uninstall kana` if installed via homebrew)
 2. Delete the `~/.config/kana` folder which contains all site and app configuration
-3. Delete the `Kana Development CA` certificate from the _System_ keychain in the _Keychain Access_ app
+3. (Mac only) Delete the `Kana Development CA` certificate from the _System_ keychain in the _Keychain Access_ app
 4. If installed via homebrew run `brew untap ChrisWiegman/kana` to remove the Homebrew tap
 
 You can also safely remove any new images added however it is not a requirement. Many other apps might share those images leading to your system simply needing to download them again.

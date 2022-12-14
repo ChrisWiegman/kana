@@ -14,11 +14,22 @@ builds:
     main: ./cmd/kana/main.go
     binary: kana
     ldflags:
-      - -s -w -X github.com/ChrisWiegman/kana-cli/internal/cmd.Version={{.Version}} -X github.com/ChrisWiegman/kana-cli/internal/cmd.GitHash={{.Commit}} -X github.com/ChrisWiegman/kana-cli/internal/cmd.Timestamp={{.Date}}
+      - -s -w -X github.com/ChrisWiegman/kana-cli/internal/cmd.Version={{.Version}} -X github.com/ChrisWiegman/kana-cli/internal/cmd.Timestamp={{.Date}}
+  - id: linux
+    goos:
+      - linux
+    goarch:
+      - amd64
+    main: ./cmd/kana/main.go
+    binary: kana
+    ldflags:
+      - -s -w -X github.com/ChrisWiegman/kana-cli/internal/cmd.Version={{.Version}} -X github.com/ChrisWiegman/kana-cli/internal/cmd.Timestamp={{.Date}}
 
 archives:
   - id: macos
-    builds: [macos]
+    builds:
+      - macos
+      - linux
     format: zip
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     replacements:
@@ -34,14 +45,30 @@ snapshot:
 changelog:
   skip: false
 
+nfpms:
+  - vendor: Chris Wiegman
+    builds:
+      - linux
+    license: GPL-3.0 license
+    homepage: https://github.com/ChrisWiegman/kana-cli
+    maintainer: Chris Wiegman <contact@chriswiegman.com>
+    description: A simple, portable CLI for efficient WordPress development.
+    replacements:
+      amd64: x86_64
+    formats:
+      - apk
+      - deb
+      - rpm
+      - archlinux
+
 brews:
   - tap:
       owner: ChrisWiegman
       name: homebrew-kana
       branch: main
     name: kana
-    license: "GPL-3.0 license"
+    license: GPL-3.0 license
     test: |
       system "#{bin}/kana version"
-    homepage: "https://github.com/ChrisWiegman/kana-cli"
-    description: "A simple, portable CLI for efficient WordPress development."
+    homepage: https://github.com/ChrisWiegman/kana-cli
+    description: A simple, portable CLI for efficient WordPress development.
