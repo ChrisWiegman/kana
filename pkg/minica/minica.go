@@ -71,7 +71,6 @@ func getIssuer(keyFile, certFile string) (*issuer, error) {
 	} else if certErr != nil {
 
 		return nil, fmt.Errorf("%s (but %s exists)", certErr, keyFile)
-
 	}
 
 	key, err := readPrivateKey(keyContents)
