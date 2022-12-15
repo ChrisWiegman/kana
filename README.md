@@ -131,7 +131,7 @@ Kana has a handful of options that apply to all new sites created with the app. 
 - `admin.password` **password** - the default password used to login to WordPress
 - `admin.username` **admin** - the default username used to login to WordPress
 - `local` **false** - the default usage of the `local` start flag
-- `php` **7.4** - the default PHP version used for new sites (currently 8.0 and 8.1 are also supported)
+- `php` **7.4** - the default PHP version used for new sites (currently 8.0, 8.1 and 8.2 are also supported)
 - `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
 - `xdebug` **false** - the default usage of the `xdebug` start flag
 - `phpmyadmin` **false** - the default usage of the `phpmyadmin` start flag
@@ -148,7 +148,7 @@ The above syntax will allow you to change the defaults for any of the options li
 In addition to the global config, certain items above can be overridden for any given site. For a site without a `name` flag (as seen in the start command), simply create a _.kana.json_ file in the current directory. You can populate it with the following options:
 
 - `local` **false** - the default usage of the `local` start flag
-- `php` **7.4** - the default PHP version used for new sites (currently 8.0 and 8.1 are also supported)
+- `php` **7.4** - the default PHP version used for new sites (currently 8.0, 8.1 and 8.2 are also supported)
 - `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
 - `xdebug` **false** - the default usage of the `xdebug` start flag
 - `phpmyadmin` **false** - the default usage of the `phpmyadmin` start flag
