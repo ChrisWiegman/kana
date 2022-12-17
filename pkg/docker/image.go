@@ -31,19 +31,6 @@ func (d *DockerClient) EnsureImage(imageName string) (err error) {
 		imageName = fmt.Sprintf("%s:latest", imageName)
 	}
 
-	images, err := d.client.ImageList(context.Background(), types.ImageListOptions{})
-	if err != nil {
-		return err
-	}
-
-	for _, image := range images {
-		for _, imageTag := range image.RepoTags {
-			if imageTag == imageName {
-				return nil
-			}
-		}
-	}
-
 	events, err := d.client.ImagePull(context.Background(), imageName, types.ImagePullOptions{})
 	if err != nil {
 		return err
@@ -60,30 +47,33 @@ func (d *DockerClient) EnsureImage(imageName string) (err error) {
 
 	cursor.Hide()
 
+	downloading := ""
+
 	for {
 
 		err := decoder.Decode(&event)
 		if err != nil {
+
 			if err == io.EOF {
 				break
 			}
 
 			return err
-
 		}
 
 		imageID := event.ID
 
 		// Check if the line is one of the final two ones
-		if strings.HasPrefix(event.Status, "Digest:") || strings.HasPrefix(event.Status, "Status:") {
-			fmt.Printf("%s\n", event.Status)
+		if event.Status != "Downloading" && event.Status != "Extracting" {
 			continue
 		}
 
 		// Check if ID has already passed once
 		index := 0
 		for i, v := range layers {
+
 			if v == imageID {
+
 				index = i + 1
 				break
 			}
@@ -94,15 +84,20 @@ func (d *DockerClient) EnsureImage(imageName string) (err error) {
 			diff := index - oldIndex
 
 			if diff > 1 {
+
 				down := diff - 1
 				cursor.MoveDown(down)
+
 			} else if diff < 1 {
+
 				up := diff*(-1) + 1
 				cursor.MoveUp(up)
 			}
 
 			oldIndex = index
+
 		} else {
+
 			layers = append(layers, event.ID)
 			diff := len(layers) - oldIndex
 
@@ -115,9 +110,14 @@ func (d *DockerClient) EnsureImage(imageName string) (err error) {
 
 		cursor.ClearLine()
 
-		if event.Status == "Pull complete" {
-			fmt.Printf("%s: %s\n", event.ID, event.Status)
-		} else {
+		if event.Status == "Downloading" || event.Status == "Extracting" {
+
+			if downloading != imageName {
+
+				fmt.Printf("Downloading latest docker image: %s\n", imageName)
+				downloading = imageName
+			}
+
 			fmt.Printf("%s: %s %s\n", event.ID, event.Status, event.Progress)
 		}
 	}
