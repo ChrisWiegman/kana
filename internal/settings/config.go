@@ -33,11 +33,12 @@ func (s *Settings) ListSettings() {
 	t.AddRow("admin.email", console.Bold(s.global.GetString("admin.email")))
 	t.AddRow("admin.password", console.Bold(s.global.GetString("admin.password")))
 	t.AddRow("admnin.username", console.Bold(s.global.GetString("admin.username")))
+	t.AddRow("dockerSockFile", console.Bold(s.global.GetString("dockerSockFile")))
 	t.AddRow("local", console.Bold(s.global.GetString("local")), console.Bold(s.local.GetString("local")))
 	t.AddRow("php", console.Bold(s.global.GetString("php")), console.Bold(s.local.GetString("php")))
+	t.AddRow("phpmyadmin", console.Bold(s.global.GetString("phpmyadmin")), console.Bold(s.local.GetString("phpmyadmin")))
 	t.AddRow("type", console.Bold(s.global.GetString("type")), console.Bold(s.local.GetString("type")))
 	t.AddRow("xdebug", console.Bold(s.global.GetString("xdebug")), console.Bold(s.local.GetString("xdebug")))
-	t.AddRow("phpmyadmin", console.Bold(s.global.GetString("phpmyadmin")), console.Bold(s.local.GetString("phpmyadmin")))
 
 	boldPlugins := []string{}
 

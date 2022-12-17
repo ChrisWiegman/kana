@@ -14,6 +14,7 @@ var (
 	rootCert         = "kana.root.pem"
 	siteCert         = "kana.site.pem"
 	siteKey          = "kana.site.key"
+	dockerSockFile   = "/var/run/docker.sock"
 	domain           = "sites.kana.li"
 	configFolderName = ".config/kana"
 	php              = "8.1"
@@ -37,6 +38,7 @@ type Settings struct {
 	RootCert, RootKey, SiteCert, SiteKey          string
 	SecureURL, URL                                string
 	Type                                          string
+	DockerSockFile                                string
 	Plugins                                       []string
 	global                                        *viper.Viper
 	local                                         *viper.Viper
