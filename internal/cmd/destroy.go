@@ -20,7 +20,7 @@ func newDestroyCommand(kanaSite *site.Site) *cobra.Command {
 		Short: "Destroys the current WordPress site. This is a permanent change.",
 		Run: func(cmd *cobra.Command, args []string) {
 
-			var confirmDestroy = false
+			confirmDestroy := false
 
 			if flagConfirmDestroy {
 				confirmDestroy = true
