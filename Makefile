@@ -51,7 +51,7 @@ install:
 
 .PHONY: lint
 lint:
-	docker run --rm -v $(PWD):/app -w /app golangci/golangci-lint:latest golangci-lint run ./...
+	docker run -t --rm -v $(PWD):/app -w /app golangci/golangci-lint:latest golangci-lint run -v ./...
 
 .PHONY: update
 update:
