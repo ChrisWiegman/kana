@@ -5,7 +5,7 @@ import (
 	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
-	"crypto/sha1"
+	"crypto/sha1" //nolint:gosec
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/asn1"
@@ -32,8 +32,13 @@ type CertInfo struct {
 	SiteKey    string
 }
 
-func GenCerts(certInfo CertInfo) error {
+var fileOpenMode = 0600
+var hundredYears = 100
+var twoYears = 2
+var thirtyDays = 30
+var certBytes = 2048
 
+func GenCerts(certInfo *CertInfo) error {
 	caKey := path.Join(certInfo.CertDir, certInfo.RootKey)
 	caCert := path.Join(certInfo.CertDir, certInfo.RootCert)
 	domains := []string{
@@ -51,25 +56,19 @@ func GenCerts(certInfo CertInfo) error {
 }
 
 func getIssuer(keyFile, certFile string) (*issuer, error) {
-
 	keyContents, keyErr := os.ReadFile(keyFile)
 	certContents, certErr := os.ReadFile(certFile)
 
 	if os.IsNotExist(keyErr) && os.IsNotExist(certErr) {
-
 		err := makeIssuer(keyFile, certFile)
 		if err != nil {
 			return nil, err
 		}
 
 		return getIssuer(keyFile, certFile)
-
 	} else if keyErr != nil {
-
 		return nil, fmt.Errorf("%s (but %s exists)", keyErr, certFile)
-
 	} else if certErr != nil {
-
 		return nil, fmt.Errorf("%s (but %s exists)", certErr, keyFile)
 	}
 
@@ -85,11 +84,8 @@ func getIssuer(keyFile, certFile string) (*issuer, error) {
 
 	equal, err := publicKeysEqual(key.Public(), cert.PublicKey)
 	if err != nil {
-
 		return nil, fmt.Errorf("comparing public keys: %s", err)
-
 	} else if !equal {
-
 		return nil, fmt.Errorf("public key in CA certificate %s doesn't match private key in %s",
 			certFile, keyFile)
 	}
@@ -98,39 +94,28 @@ func getIssuer(keyFile, certFile string) (*issuer, error) {
 }
 
 func readPrivateKey(keyContents []byte) (crypto.Signer, error) {
-
 	block, _ := pem.Decode(keyContents)
 	if block == nil {
-
 		return nil, fmt.Errorf("no PEM found")
-
 	} else if block.Type != "RSA PRIVATE KEY" && block.Type != "ECDSA PRIVATE KEY" {
-
 		return nil, fmt.Errorf("incorrect PEM type %s", block.Type)
-
 	}
 
 	return x509.ParsePKCS1PrivateKey(block.Bytes)
 }
 
 func readCert(certContents []byte) (*x509.Certificate, error) {
-
 	block, _ := pem.Decode(certContents)
 	if block == nil {
-
 		return nil, fmt.Errorf("no PEM found")
-
 	} else if block.Type != "CERTIFICATE" {
-
 		return nil, fmt.Errorf("incorrect PEM type %s", block.Type)
-
 	}
 
 	return x509.ParseCertificate(block.Bytes)
 }
 
 func makeIssuer(keyFile, certFile string) error {
-
 	key, err := makeKey(keyFile)
 	if err != nil {
 		return err
@@ -145,8 +130,7 @@ func makeIssuer(keyFile, certFile string) error {
 }
 
 func makeKey(filename string) (*rsa.PrivateKey, error) {
-
-	key, err := rsa.GenerateKey(rand.Reader, 2048)
+	key, err := rsa.GenerateKey(rand.Reader, certBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +140,7 @@ func makeKey(filename string) (*rsa.PrivateKey, error) {
 		return nil, err
 	}
 
-	file, err := os.OpenFile(filename, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	file, err := os.OpenFile(filename, os.O_CREATE|os.O_EXCL|os.O_WRONLY, os.FileMode(fileOpenMode))
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +160,6 @@ func makeKey(filename string) (*rsa.PrivateKey, error) {
 }
 
 func makeRootCert(key crypto.Signer, filename string) (*x509.Certificate, error) {
-
 	serial, err := rand.Int(rand.Reader, big.NewInt(math.MaxInt64))
 
 	if err != nil {
@@ -199,7 +182,7 @@ func makeRootCert(key crypto.Signer, filename string) (*x509.Certificate, error)
 		},
 		SerialNumber: serial,
 		NotBefore:    time.Now(),
-		NotAfter:     time.Now().AddDate(100, 0, 0),
+		NotAfter:     time.Now().AddDate(hundredYears, 0, 0),
 
 		SubjectKeyId:          skid,
 		AuthorityKeyId:        skid,
@@ -215,7 +198,7 @@ func makeRootCert(key crypto.Signer, filename string) (*x509.Certificate, error)
 		return nil, err
 	}
 
-	file, err := os.OpenFile(filename, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	file, err := os.OpenFile(filename, os.O_CREATE|os.O_EXCL|os.O_WRONLY, os.FileMode(fileOpenMode))
 	if err != nil {
 		return nil, err
 	}
@@ -234,7 +217,6 @@ func makeRootCert(key crypto.Signer, filename string) (*x509.Certificate, error)
 }
 
 func publicKeysEqual(a, b interface{}) (bool, error) {
-
 	aBytes, err := x509.MarshalPKIXPublicKey(a)
 	if err != nil {
 		return false, err
@@ -249,7 +231,6 @@ func publicKeysEqual(a, b interface{}) (bool, error) {
 }
 
 func calculateSKID(pubKey crypto.PublicKey) ([]byte, error) {
-
 	spkiASN1, err := x509.MarshalPKIXPublicKey(pubKey)
 	if err != nil {
 		return nil, err
@@ -265,12 +246,11 @@ func calculateSKID(pubKey crypto.PublicKey) ([]byte, error) {
 		return nil, err
 	}
 
-	skid := sha1.Sum(spki.SubjectPublicKey.Bytes)
+	skid := sha1.Sum(spki.SubjectPublicKey.Bytes) //nolint:gosec
 	return skid[:], nil
 }
 
 func sign(iss *issuer, domains []string, certPath, siteCert, siteKey string) (*x509.Certificate, error) {
-
 	cn := domains[0]
 
 	key, err := makeKey(path.Join(certPath, siteKey))
@@ -294,7 +274,7 @@ func sign(iss *issuer, domains []string, certPath, siteCert, siteKey string) (*x
 		// macOS requirements that all server certificates must have validity
 		// shorter than 825 days:
 		// https://derflounder.wordpress.com/2019/06/06/new-tls-security-requirements-for-ios-13-and-macos-catalina-10-15/
-		NotAfter: time.Now().AddDate(2, 0, 30),
+		NotAfter: time.Now().AddDate(twoYears, 0, thirtyDays),
 
 		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
@@ -307,7 +287,7 @@ func sign(iss *issuer, domains []string, certPath, siteCert, siteKey string) (*x
 		return nil, err
 	}
 
-	file, err := os.OpenFile(path.Join(certPath, siteCert), os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	file, err := os.OpenFile(path.Join(certPath, siteCert), os.O_CREATE|os.O_EXCL|os.O_WRONLY, os.FileMode(fileOpenMode))
 	if err != nil {
 		return nil, err
 	}

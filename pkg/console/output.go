@@ -11,12 +11,11 @@ import (
 
 // Bold outputs the requested text as bold
 func Bold(output string) string {
-	return fmt.Sprint(aurora.Bold(output))
+	return aurora.Bold(output).String()
 }
 
 // Error displays the error message and a panic if needed.
 func Error(err error, debugMode bool) {
-
 	fmt.Fprintf(os.Stderr, "%s %s\n", aurora.Bold(aurora.Red("[Error]")), err)
 
 	if debugMode {
@@ -34,7 +33,6 @@ func Println(output string) {
 
 // PromptConfirm asks the user to confirm output.
 func PromptConfirm(promptText string, def bool) bool {
-
 	choices := "Y/n"
 	if !def {
 		choices = "y/N"

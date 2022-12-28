@@ -9,7 +9,6 @@ import (
 )
 
 func (s *Site) ExportDatabase(args []string) (string, error) {
-
 	cwd, err := os.Getwd()
 	if err != nil {
 		return "", err
@@ -43,7 +42,6 @@ func (s *Site) ExportDatabase(args []string) (string, error) {
 }
 
 func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string) error {
-
 	cwd, err := os.Getwd()
 	if err != nil {
 		return err
@@ -62,7 +60,6 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string) 
 	}
 
 	if !preserve {
-
 		console.Println("Dropping the existing database.")
 
 		dropCommand := []string{
@@ -76,7 +73,10 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string) 
 			"create",
 		}
 
-		code, output, err := s.RunWPCli(dropCommand)
+		var code int64
+		var output string
+
+		code, output, err = s.RunWPCli(dropCommand)
 		if err != nil || code != 0 {
 			return fmt.Errorf("drop database failed: %s\n%s", err.Error(), output)
 		}
@@ -101,7 +101,6 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string) 
 	}
 
 	if replaceDomain != "" {
-
 		console.Println("Replacing the old domain name")
 
 		replaceCommand := []string{

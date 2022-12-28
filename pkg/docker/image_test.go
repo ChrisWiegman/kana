@@ -5,7 +5,6 @@ import (
 )
 
 func TestEnsureImage(t *testing.T) {
-
 	d, err := NewController()
 
 	if err != nil {
@@ -21,7 +20,6 @@ func TestEnsureImage(t *testing.T) {
 }
 
 func TestRemoveImage(t *testing.T) {
-
 	d, err := NewController()
 
 	if err != nil {

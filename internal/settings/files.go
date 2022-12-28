@@ -16,29 +16,28 @@ type File struct {
 }
 
 //go:embed templates/dynamic.toml
-var DYNAMIC_TOML string
+var DynamicToml string
 
 //go:embed templates/traefik.toml
-var TRAEFIK_TOML string
+var TraefikToml string
 
 var configFiles = []File{
 	{
 		Name:        "dynamic.toml",
-		Template:    DYNAMIC_TOML,
+		Template:    DynamicToml,
 		LocalPath:   "config/traefik",
-		Permissions: 0644,
+		Permissions: os.FileMode(defaultFilePermissions),
 	},
 	{
 		Name:        "traefik.toml",
-		Template:    TRAEFIK_TOML,
+		Template:    TraefikToml,
 		LocalPath:   "config/traefik",
-		Permissions: 0644,
+		Permissions: os.FileMode(defaultFilePermissions),
 	},
 }
 
 // EnsureSSLCerts Ensures SSL certificates have been generated and are where they need to be
 func (s *Settings) EnsureSSLCerts() error {
-
 	createCert := false
 	certPath := path.Join(s.AppDirectory, "certs")
 	rootCert := path.Join(certPath, s.RootCert)
@@ -49,8 +48,7 @@ func (s *Settings) EnsureSSLCerts() error {
 	}
 
 	if createCert {
-
-		err = os.MkdirAll(certPath, 0750)
+		err = os.MkdirAll(certPath, os.FileMode(defaultDirPermissions))
 		if err != nil {
 			return err
 		}
@@ -64,14 +62,23 @@ func (s *Settings) EnsureSSLCerts() error {
 			SiteKey:    s.SiteKey,
 		}
 
-		err = minica.GenCerts(certInfo)
+		err = minica.GenCerts(&certInfo)
 		if err != nil {
 			return err
 		}
 
 		// If we're on Mac try to add the cert to the system trust
 		if runtime.GOOS == "darwin" {
-			installCertCommand := exec.Command("sudo", "security", "add-trusted-cert", "-d", "-r", "trustRoot", "-k", "/Library/Keychains/System.keychain", rootCert)
+			installCertCommand := exec.Command(
+				"sudo",
+				"security",
+				"add-trusted-cert",
+				"-d",
+				"-r",
+				"trustRoot",
+				"-k",
+				"/Library/Keychains/System.keychain",
+				rootCert)
 			return installCertCommand.Run()
 		}
 	}
@@ -81,13 +88,11 @@ func (s *Settings) EnsureSSLCerts() error {
 
 // EnsureStaticConfigFiles Ensures the application's static config files have been generated and are where they need to be
 func (s *Settings) EnsureStaticConfigFiles() error {
-
 	for _, file := range configFiles {
-
 		filePath := path.Join(s.AppDirectory, file.LocalPath)
 		destFile := path.Join(s.AppDirectory, file.LocalPath, file.Name)
 
-		if err := os.MkdirAll(filePath, 0750); err != nil {
+		if err := os.MkdirAll(filePath, os.FileMode(defaultDirPermissions)); err != nil {
 			return err
 		}
 

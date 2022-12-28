@@ -27,6 +27,9 @@ var (
 	adminEmail       = "admin@sites.kana.li"
 )
 
+var defaultDirPermissions = 0750
+var defaultFilePermissions = 0644
+
 // Individual Settings for use throughout the app lifecycle
 type Settings struct {
 	Local, PhpMyAdmin, Xdebug                     bool
@@ -58,7 +61,6 @@ var validTypes = []string{
 }
 
 func NewSettings() (*Settings, error) {
-
 	kanaSettings := new(Settings)
 
 	kanaSettings.AppDomain = domain

@@ -14,22 +14,26 @@ import (
 var flagConfirmDestroy bool
 
 func newDestroyCommand(kanaSite *site.Site) *cobra.Command {
-
 	cmd := &cobra.Command{
 		Use:   "destroy",
 		Short: "Destroys the current WordPress site. This is a permanent change.",
 		Run: func(cmd *cobra.Command, args []string) {
-
 			confirmDestroy := false
 
 			if flagConfirmDestroy {
 				confirmDestroy = true
 			} else {
-				confirmDestroy = console.PromptConfirm(fmt.Sprintf("Are you sure you want to destroy %s? %s", aurora.Bold(aurora.Blue(kanaSite.Settings.Name)), aurora.Bold(aurora.Yellow("This operation is destructive and cannot be undone."))), false)
+				confirmDestroy = console.PromptConfirm(
+					fmt.Sprintf(
+						"Are you sure you want to destroy %s? %s",
+						aurora.Bold(aurora.Blue(kanaSite.Settings.Name)),
+						aurora.Bold(
+							aurora.Yellow(
+								"This operation is destructive and cannot be undone."))),
+					false)
 			}
 
 			if confirmDestroy {
-
 				err := kanaSite.EnsureDocker()
 				if err != nil {
 					console.Error(err, flagVerbose)
@@ -51,7 +55,7 @@ func newDestroyCommand(kanaSite *site.Site) *cobra.Command {
 				return
 			}
 
-			console.Error(fmt.Errorf("site destruction cancelled. No data has been lost"), flagVerbose)
+			console.Error(fmt.Errorf("site destruction canceled. No data has been lost"), flagVerbose)
 		},
 		Args: cobra.NoArgs,
 	}

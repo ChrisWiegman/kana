@@ -26,7 +26,6 @@ type pullEvent struct {
 // https://gist.github.com/miguelmota/4980b18d750fb3b1eb571c3e207b1b92
 // https://riptutorial.com/docker/example/31980/image-pulling-with-progress-bars--written-in-go
 func (d *DockerClient) EnsureImage(imageName string) (err error) {
-
 	if !strings.Contains(imageName, ":") {
 		imageName = fmt.Sprintf("%s:latest", imageName)
 	}
@@ -38,22 +37,43 @@ func (d *DockerClient) EnsureImage(imageName string) (err error) {
 
 	defer events.Close()
 
+	decoder := json.NewDecoder(events)
+
+	err = displayEventStatus(imageName, decoder)
+
+	return err
+}
+
+func (d *DockerClient) RemoveImage(image string) (removed bool, err error) {
+	removedResponse, err := d.client.ImageRemove(context.Background(), image, types.ImageRemoveOptions{})
+
+	if err != nil {
+		if !strings.Contains(err.Error(), "No such image:") {
+			return false, err
+		}
+	}
+
+	if len(removedResponse) > 0 {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+func displayEventStatus(imageName string, decoder *json.Decoder) error {
 	cursor := console.Cursor{}
 	layers := make([]string, 0)
 	oldIndex := len(layers)
 
 	var event *pullEvent
-	decoder := json.NewDecoder(events)
 
 	cursor.Hide()
 
 	downloading := ""
 
 	for {
-
 		err := decoder.Decode(&event)
 		if err != nil {
-
 			if err == io.EOF {
 				break
 			}
@@ -71,9 +91,7 @@ func (d *DockerClient) EnsureImage(imageName string) (err error) {
 		// Check if ID has already passed once
 		index := 0
 		for i, v := range layers {
-
 			if v == imageID {
-
 				index = i + 1
 				break
 			}
@@ -84,20 +102,15 @@ func (d *DockerClient) EnsureImage(imageName string) (err error) {
 			diff := index - oldIndex
 
 			if diff > 1 {
-
 				down := diff - 1
 				cursor.MoveDown(down)
-
 			} else if diff < 1 {
-
 				up := diff*(-1) + 1
 				cursor.MoveUp(up)
 			}
 
 			oldIndex = index
-
 		} else {
-
 			layers = append(layers, event.ID)
 			diff := len(layers) - oldIndex
 
@@ -111,9 +124,7 @@ func (d *DockerClient) EnsureImage(imageName string) (err error) {
 		cursor.ClearLine()
 
 		if event.Status == "Downloading" || event.Status == "Extracting" {
-
 			if downloading != imageName {
-
 				fmt.Printf("Downloading latest docker image: %s\n", imageName)
 				downloading = imageName
 			}
@@ -125,21 +136,4 @@ func (d *DockerClient) EnsureImage(imageName string) (err error) {
 	cursor.Show()
 
 	return nil
-}
-
-func (d *DockerClient) RemoveImage(image string) (removed bool, err error) {
-
-	removedResponse, err := d.client.ImageRemove(context.Background(), image, types.ImageRemoveOptions{})
-
-	if err != nil {
-		if !strings.Contains(err.Error(), "No such image:") {
-			return false, err
-		}
-	}
-
-	if len(removedResponse) > 0 {
-		return true, nil
-	}
-
-	return false, nil
 }

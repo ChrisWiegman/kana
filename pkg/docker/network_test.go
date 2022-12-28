@@ -5,7 +5,6 @@ import (
 )
 
 func TestNetworkCreate(t *testing.T) {
-
 	d, err := NewController()
 
 	if err != nil {
@@ -29,7 +28,6 @@ func TestNetworkCreate(t *testing.T) {
 }
 
 func TestEnsureNetwork(t *testing.T) {
-
 	d, err := NewController()
 
 	if err != nil {
@@ -56,5 +54,4 @@ func TestEnsureNetwork(t *testing.T) {
 	if removed != true {
 		t.Errorf("Network should have been removed but wasn't")
 	}
-
 }

@@ -39,17 +39,12 @@ type ExecResult struct {
 
 // ListContainers Lists all running containers for a given site or all sites if no site is specified
 func (d *DockerClient) ListContainers(site string) ([]types.Container, error) {
-
 	f := filters.NewArgs()
 
-	if len(site) == 0 {
-
+	if site == "" {
 		f.Add("label", "kana.site")
-
 	} else {
-
 		f.Add("label", fmt.Sprintf("kana.site=%s", site))
-
 	}
 
 	options := types.ContainerListOptions{
@@ -64,16 +59,15 @@ func (d *DockerClient) ListContainers(site string) ([]types.Container, error) {
 
 // IsContainerRunning Checks if a given container is running by name
 func (d *DockerClient) IsContainerRunning(containerName string) (id string, isRunning bool) {
-
 	containers, err := d.client.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
 		return "", false
 	}
 
-	for _, container := range containers {
-		for _, name := range container.Names {
+	for i := range containers {
+		for _, name := range containers[i].Names {
 			if containerName == strings.Trim(name, "/") {
-				return container.ID, true
+				return containers[i].ID, true
 			}
 		}
 	}
@@ -83,7 +77,6 @@ func (d *DockerClient) IsContainerRunning(containerName string) (id string, isRu
 
 // ContainerGetMounts Returns a slice containing all the mounts to the given container
 func (d *DockerClient) ContainerGetMounts(containerName string) []types.MountPoint {
-
 	containerID, isRunning := d.IsContainerRunning(containerName)
 	if !isRunning {
 		return []types.MountPoint{}
@@ -94,8 +87,7 @@ func (d *DockerClient) ContainerGetMounts(containerName string) []types.MountPoi
 	return results.Mounts
 }
 
-func (d *DockerClient) ContainerRun(config ContainerConfig, randomPorts, localUser bool) (id string, err error) {
-
+func (d *DockerClient) ContainerRun(config *ContainerConfig, randomPorts, localUser bool) (id string, err error) {
 	containerID, isRunning := d.IsContainerRunning(config.Name)
 	if isRunning {
 		return containerID, nil
@@ -130,8 +122,9 @@ func (d *DockerClient) ContainerRun(config ContainerConfig, randomPorts, localUs
 
 	// Linux doesn't abstract the user so we have to do it ourselves
 	if localUser && runtime.GOOS == "linux" {
+		var currentUser *user.User
 
-		currentUser, err := user.Current()
+		currentUser, err = user.Current()
 		if err != nil {
 			return containerID, err
 		}
@@ -153,7 +146,6 @@ func (d *DockerClient) ContainerRun(config ContainerConfig, randomPorts, localUs
 }
 
 func (d *DockerClient) ContainerWait(id string) (state int64, err error) {
-
 	containerResult, errorCode := d.client.ContainerWait(context.Background(), id, "")
 
 	select {
@@ -165,8 +157,7 @@ func (d *DockerClient) ContainerWait(id string) (state int64, err error) {
 }
 
 func (d *DockerClient) ContainerLog(id string) (result string, err error) {
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(sleepDuration)*time.Second)
 	defer cancel()
 
 	reader, err := d.client.ContainerLogs(ctx, id, types.ContainerLogsOptions{
@@ -186,8 +177,7 @@ func (d *DockerClient) ContainerLog(id string) (result string, err error) {
 	return string(buffer), nil
 }
 
-func (d *DockerClient) ContainerRunAndClean(config ContainerConfig) (statusCode int64, body string, err error) {
-
+func (d *DockerClient) ContainerRunAndClean(config *ContainerConfig) (statusCode int64, body string, err error) {
 	// Start the container
 	id, err := d.ContainerRun(config, false, true)
 	if err != nil {
@@ -213,7 +203,6 @@ func (d *DockerClient) ContainerRunAndClean(config ContainerConfig) (statusCode 
 }
 
 func (d *DockerClient) ContainerStop(containerName string) (bool, error) {
-
 	containerID, isRunning := d.IsContainerRunning(containerName)
 	if !isRunning {
 		return true, nil
@@ -233,7 +222,6 @@ func (d *DockerClient) ContainerStop(containerName string) (bool, error) {
 }
 
 func (d *DockerClient) ContainerRestart(containerName string) (bool, error) {
-
 	containerID, isRunning := d.IsContainerRunning(containerName)
 	if !isRunning {
 		return true, nil
@@ -253,7 +241,6 @@ func (d *DockerClient) ContainerRestart(containerName string) (bool, error) {
 }
 
 func (d *DockerClient) ContainerExec(containerName string, command []string) (ExecResult, error) {
-
 	containerID, isRunning := d.IsContainerRunning(containerName)
 	if !isRunning {
 		return ExecResult{}, nil
@@ -299,7 +286,7 @@ func (d *DockerClient) ContainerExec(containerName string, command []string) (Ex
 	}()
 
 	select {
-	case err := <-outputDone:
+	case err = <-outputDone:
 		if err != nil {
 			return ExecResult{}, err
 		}

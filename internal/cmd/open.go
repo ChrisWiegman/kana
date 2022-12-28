@@ -11,12 +11,10 @@ import (
 )
 
 func newOpenCommand(kanaSite *site.Site) *cobra.Command {
-
 	cmd := &cobra.Command{
 		Use:   "open",
 		Short: "Open the current site in your browser.",
 		Run: func(cmd *cobra.Command, args []string) {
-
 			err := kanaSite.EnsureDocker()
 			if err != nil {
 				console.Error(err, flagVerbose)

@@ -19,12 +19,10 @@ type portConfig struct {
 }
 
 func (d *DockerClient) getNetworkConfig(ports []ExposedPorts, randomPorts bool) portConfig {
-
 	portBindings := make(nat.PortMap)
 	portSet := make(nat.PortSet)
 
 	for _, port := range ports {
-
 		portName, err := nat.NewPort(port.Protocol, port.Port)
 		if err != nil {
 			panic(err)
@@ -44,7 +42,6 @@ func (d *DockerClient) getNetworkConfig(ports []ExposedPorts, randomPorts bool) 
 		}
 
 		portSet[portName] = struct{}{}
-
 	}
 
 	return portConfig{
@@ -54,7 +51,6 @@ func (d *DockerClient) getNetworkConfig(ports []ExposedPorts, randomPorts bool) 
 }
 
 func (d *DockerClient) EnsureNetwork(name string) (created bool, network types.NetworkResource, err error) {
-
 	hasNetwork, network, err := d.findNetworkByName(name)
 
 	if err != nil {
@@ -73,7 +69,7 @@ func (d *DockerClient) EnsureNetwork(name string) (created bool, network types.N
 		return false, types.NetworkResource{}, err
 	}
 
-	hasNetwork, network, err = d.findNetworkById(networkCreateResults.ID)
+	hasNetwork, network, err = d.findNetworkByID(networkCreateResults.ID)
 
 	if err != nil {
 		return false, types.NetworkResource{}, err
@@ -87,7 +83,6 @@ func (d *DockerClient) EnsureNetwork(name string) (created bool, network types.N
 }
 
 func (d *DockerClient) RemoveNetwork(name string) (removed bool, err error) {
-
 	hasNetwork, network, err := d.findNetworkByName(name)
 
 	if err != nil {
@@ -102,33 +97,31 @@ func (d *DockerClient) RemoveNetwork(name string) (removed bool, err error) {
 }
 
 func (d *DockerClient) findNetworkByName(name string) (found bool, network types.NetworkResource, err error) {
-
 	networks, err := d.client.NetworkList(context.Background(), types.NetworkListOptions{})
 
 	if err != nil {
 		return false, types.NetworkResource{}, err
 	}
 
-	for _, n := range networks {
-		if n.Name == name {
-			return true, n, nil
+	for i := range networks {
+		if networks[i].Name == name {
+			return true, networks[i], nil
 		}
 	}
 
 	return false, types.NetworkResource{}, nil
 }
 
-func (d *DockerClient) findNetworkById(ID string) (found bool, network types.NetworkResource, err error) {
-
+func (d *DockerClient) findNetworkByID(id string) (found bool, network types.NetworkResource, err error) {
 	networks, err := d.client.NetworkList(context.Background(), types.NetworkListOptions{})
 
 	if err != nil {
 		return false, types.NetworkResource{}, err
 	}
 
-	for _, n := range networks {
-		if n.ID == ID {
-			return true, n, nil
+	for i := range networks {
+		if networks[i].ID == id {
+			return true, networks[i], nil
 		}
 	}
 

@@ -8,7 +8,6 @@ import (
 
 // LoadGlobalSettings gets config information that transcends sites such as app and default settings
 func (s *Settings) LoadGlobalSettings() error {
-
 	globalViperConfig, err := s.loadGlobalViper()
 	if err != nil {
 		return err
@@ -30,7 +29,6 @@ func (s *Settings) LoadGlobalSettings() error {
 
 // loadGlobalViper loads the global config using viper and sets defaults
 func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
-
 	globalSettings := viper.New()
 
 	globalSettings.SetDefault("xdebug", xdebug)
