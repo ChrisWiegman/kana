@@ -140,7 +140,7 @@ func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
 	}
 
 	if cmd.Flags().Lookup("plugin").Changed && flags.IsPlugin {
-		s.Type = "plugih"
+		s.Type = "plugin"
 	}
 
 	if cmd.Flags().Lookup("theme").Changed && flags.IsTheme {
