@@ -1,0 +1,3 @@
+kind: Bug Fixes
+body: Fixes the "plugin" flag on new sites so that it will now work as intended
+time: 2022-12-28T22:49:18.539052432Z
