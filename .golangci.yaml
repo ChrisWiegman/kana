@@ -97,6 +97,7 @@ linters:
     - unparam
     - unused
     - whitespace
+    - noctx
 
   # don't enable:
   # - asciicheck
@@ -113,7 +114,6 @@ linters:
   # - testpackage
   # - revive
   # - wsl
-  # - noctx
 
 run:
   timeout: 5m

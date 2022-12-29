@@ -1,0 +1,4 @@
+kind: Breaking Changes
+body: Kana on Mac now requires Docker Desktop 4.14.0 or later or a version prior to
+  4.13.0 due to a breaking change in Docker Desktop 4.13.0 that has since been reversed.
+time: 2022-12-29T15:12:51.717033802Z
