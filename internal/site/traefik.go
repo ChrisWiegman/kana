@@ -12,7 +12,6 @@ var traefikContainerName = "kana_traefik"
 
 // maybeStopTraefik Checks to see if other sites are running and shuts down the traefik instance if none are
 func (s *Site) maybeStopTraefik() error {
-
 	containers, err := s.dockerClient.ListContainers("")
 	if err != nil {
 		return err
@@ -27,7 +26,6 @@ func (s *Site) maybeStopTraefik() error {
 
 // startTraefik Starts the Traefik container
 func (s *Site) startTraefik() error {
-
 	err := s.Settings.EnsureSSLCerts()
 	if err != nil {
 		return err
@@ -82,14 +80,13 @@ func (s *Site) startTraefik() error {
 		},
 	}
 
-	_, err = s.dockerClient.ContainerRun(traefikConfig, false, false)
+	_, err = s.dockerClient.ContainerRun(&traefikConfig, false, false)
 
 	return err
 }
 
 // stopTraefik Stops the Traefik container
 func (s *Site) stopTraefik() error {
-
 	_, err := s.dockerClient.ContainerStop(traefikContainerName)
 	if err != nil {
 		return err

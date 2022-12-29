@@ -8,7 +8,6 @@ import (
 
 // LoadGlobalSettings gets config information that transcends sites such as app and default settings
 func (s *Settings) LoadGlobalSettings() error {
-
 	globalViperConfig, err := s.loadGlobalViper()
 	if err != nil {
 		return err
@@ -23,13 +22,13 @@ func (s *Settings) LoadGlobalSettings() error {
 	s.AdminUsername = globalViperConfig.GetString("admin.username")
 	s.PHP = globalViperConfig.GetString("php")
 	s.Type = globalViperConfig.GetString("type")
+	s.DockerSockFile = globalViperConfig.GetString("dockerSockFile")
 
 	return err
 }
 
 // loadGlobalViper loads the global config using viper and sets defaults
 func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
-
 	globalSettings := viper.New()
 
 	globalSettings.SetDefault("xdebug", xdebug)
@@ -40,6 +39,7 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
 	globalSettings.SetDefault("admin.username", adminUsername)
 	globalSettings.SetDefault("admin.password", adminPassword)
 	globalSettings.SetDefault("admin.email", adminEmail)
+	globalSettings.SetDefault("dockerSockFile", dockerSockFile)
 
 	globalSettings.SetConfigName("kana")
 	globalSettings.SetConfigType("json")

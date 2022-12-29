@@ -49,6 +49,10 @@ install:
 		-ldflags "-s -w -X $(PKG)/internal/cmd.Version=$(VERSION) -X $(PKG)/internal/cmd.Timestamp=$(TIMESTAMP)" \
 		./cmd/...
 
+.PHONY: lint
+lint:
+	docker run -t --rm -v $(PWD):/app -w /app golangci/golangci-lint:latest golangci-lint run -v ./...
+
 .PHONY: update
 update:
 	go get -u ./...

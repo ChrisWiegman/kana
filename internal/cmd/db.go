@@ -12,8 +12,7 @@ import (
 var flagPreserve bool
 var flagReplaceDomain string
 
-func newDbCommand(kanaSite *site.Site) *cobra.Command {
-
+func newDBCommand(kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "db",
 		Short: "Commands to easily import and export a WordPress database from an existing site",
@@ -26,7 +25,6 @@ func newDbCommand(kanaSite *site.Site) *cobra.Command {
 		Use:   "import <sql file>",
 		Short: "Import a database from an existing WordPress site",
 		Run: func(cmd *cobra.Command, args []string) {
-
 			err := kanaSite.EnsureDocker()
 			if err != nil {
 				console.Error(err, flagVerbose)
@@ -48,7 +46,6 @@ func newDbCommand(kanaSite *site.Site) *cobra.Command {
 		Use:   "export [sql file]",
 		Short: "Export the site's WordPress database",
 		Run: func(cmd *cobra.Command, args []string) {
-
 			file, err := kanaSite.ExportDatabase(args)
 			if err != nil {
 				console.Error(err, flagVerbose)
@@ -62,7 +59,12 @@ func newDbCommand(kanaSite *site.Site) *cobra.Command {
 	commandsRequiringSite = append(commandsRequiringSite, exportCmd.Use)
 
 	importCmd.Flags().BoolVarP(&flagPreserve, "preserve", "p", false, "Preserve the existing database (don't drop it before import)")
-	importCmd.Flags().StringVarP(&flagReplaceDomain, "replace-domain", "d", "", "The old site domain to replace automatically with the development site domain")
+	importCmd.Flags().StringVarP(
+		&flagReplaceDomain,
+		"replace-domain",
+		"d",
+		"",
+		"The old site domain to replace automatically with the development site domain")
 
 	cmd.AddCommand(
 		importCmd,

@@ -14,6 +14,7 @@ var (
 	rootCert         = "kana.root.pem"
 	siteCert         = "kana.site.pem"
 	siteKey          = "kana.site.key"
+	dockerSockFile   = "/var/run/docker.sock"
 	domain           = "sites.kana.li"
 	configFolderName = ".config/kana"
 	php              = "8.1"
@@ -26,6 +27,9 @@ var (
 	adminEmail       = "admin@sites.kana.li"
 )
 
+var defaultDirPermissions = 0750
+var defaultFilePermissions = 0644
+
 // Individual Settings for use throughout the app lifecycle
 type Settings struct {
 	Local, PhpMyAdmin, Xdebug                     bool
@@ -37,6 +41,7 @@ type Settings struct {
 	RootCert, RootKey, SiteCert, SiteKey          string
 	SecureURL, URL                                string
 	Type                                          string
+	DockerSockFile                                string
 	Plugins                                       []string
 	global                                        *viper.Viper
 	local                                         *viper.Viper
@@ -56,7 +61,6 @@ var validTypes = []string{
 }
 
 func NewSettings() (*Settings, error) {
-
 	kanaSettings := new(Settings)
 
 	kanaSettings.AppDomain = domain

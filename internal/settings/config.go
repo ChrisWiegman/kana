@@ -15,7 +15,6 @@ import (
 
 // GetGlobalSetting Retrieves a global setting for the "config" command
 func (s *Settings) GetGlobalSetting(md *cobra.Command, args []string) (string, error) {
-
 	if !s.global.IsSet(args[0]) {
 		return "", fmt.Errorf("invalid setting. Please enter a valid key to get")
 	}
@@ -25,7 +24,6 @@ func (s *Settings) GetGlobalSetting(md *cobra.Command, args []string) (string, e
 
 // ListSettings Lists all settings for the config command
 func (s *Settings) ListSettings() {
-
 	t := table.New(os.Stdout)
 
 	t.SetHeaders("Setting", "Global Value", "Local Value")
@@ -33,11 +31,12 @@ func (s *Settings) ListSettings() {
 	t.AddRow("admin.email", console.Bold(s.global.GetString("admin.email")))
 	t.AddRow("admin.password", console.Bold(s.global.GetString("admin.password")))
 	t.AddRow("admnin.username", console.Bold(s.global.GetString("admin.username")))
+	t.AddRow("dockerSockFile", console.Bold(s.global.GetString("dockerSockFile")))
 	t.AddRow("local", console.Bold(s.global.GetString("local")), console.Bold(s.local.GetString("local")))
 	t.AddRow("php", console.Bold(s.global.GetString("php")), console.Bold(s.local.GetString("php")))
+	t.AddRow("phpmyadmin", console.Bold(s.global.GetString("phpmyadmin")), console.Bold(s.local.GetString("phpmyadmin")))
 	t.AddRow("type", console.Bold(s.global.GetString("type")), console.Bold(s.local.GetString("type")))
 	t.AddRow("xdebug", console.Bold(s.global.GetString("xdebug")), console.Bold(s.local.GetString("xdebug")))
-	t.AddRow("phpmyadmin", console.Bold(s.global.GetString("phpmyadmin")), console.Bold(s.local.GetString("phpmyadmin")))
 
 	boldPlugins := []string{}
 
@@ -54,7 +53,6 @@ func (s *Settings) ListSettings() {
 
 // SetGlobalSetting Sets a global setting for the "config" command
 func (s *Settings) SetGlobalSetting(md *cobra.Command, args []string) error {
-
 	if !s.global.IsSet(args[0]) {
 		return fmt.Errorf("invalid setting. Please enter a valid key to set")
 	}
@@ -68,7 +66,10 @@ func (s *Settings) SetGlobalSetting(md *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
-		boolVal, err := strconv.ParseBool(args[1])
+
+		var boolVal bool
+
+		boolVal, err = strconv.ParseBool(args[1])
 		if err != nil {
 			return err
 		}

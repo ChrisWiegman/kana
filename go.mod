@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/aquasecurity/table v1.8.0
-	github.com/docker/docker v20.10.21+incompatible
+	github.com/docker/docker v20.10.22+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/go-playground/validator/v10 v10.11.1
 	github.com/logrusorgru/aurora/v4 v4.0.0

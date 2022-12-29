@@ -11,12 +11,10 @@ import (
 )
 
 func newExportCommand(kanaSite *site.Site) *cobra.Command {
-
 	cmd := &cobra.Command{
 		Use:   "export",
 		Short: "Export the current config to a .kana.json file to save with your repo.",
 		Run: func(cmd *cobra.Command, args []string) {
-
 			err := kanaSite.EnsureDocker()
 			if err != nil {
 				console.Error(err, flagVerbose)

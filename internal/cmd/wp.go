@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/ChrisWiegman/kana-cli/internal/site"
@@ -10,12 +11,10 @@ import (
 )
 
 func newWPCommand(kanaSite *site.Site) *cobra.Command {
-
 	cmd := &cobra.Command{
 		Use:   "wp",
 		Short: "Run a wp-cli command against the current site.",
 		Run: func(cmd *cobra.Command, args []string) {
-
 			err := kanaSite.EnsureDocker()
 			if err != nil {
 				console.Error(err, flagVerbose)
@@ -32,7 +31,7 @@ func newWPCommand(kanaSite *site.Site) *cobra.Command {
 			}
 
 			if code != 0 {
-				console.Error(fmt.Errorf(output), flagVerbose)
+				console.Error(errors.New(output), flagVerbose)
 			}
 
 			console.Println(output)

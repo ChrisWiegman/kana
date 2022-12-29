@@ -3,6 +3,7 @@ package site
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -26,9 +27,10 @@ type Site struct {
 	Settings     *settings.Settings
 }
 
+var maxVerificationRetries = 30
+
 // EnsureDocker Ensures Docker is available for commands that need it.
 func (s *Site) EnsureDocker() error {
-
 	// Add a docker client to the site
 	dockerClient, err := docker.NewController()
 	if err != nil {
@@ -41,7 +43,6 @@ func (s *Site) EnsureDocker() error {
 
 // ExportSiteSConfig Saves the current running config to a file.
 func (s *Site) ExportSiteConfig() error {
-
 	localSettings, err := s.getRunningConfig(true)
 	if err != nil {
 		return err
@@ -52,14 +53,12 @@ func (s *Site) ExportSiteConfig() error {
 
 // IsSiteRunning Returns true if the site is up and running in Docker or false. Does not verify other errors
 func (s *Site) IsSiteRunning() bool {
-
 	containers, _ := s.dockerClient.ListContainers(s.Settings.Name)
 
 	return len(containers) != 0
 }
 
 func (s *Site) LoadSite(cmd *cobra.Command, commandsRequiringSite []string, startFlags settings.StartFlags, flagVerbose bool) error {
-
 	var err error
 
 	s.Settings, err = settings.NewSettings()
@@ -86,7 +85,6 @@ func (s *Site) LoadSite(cmd *cobra.Command, commandsRequiringSite []string, star
 
 	// Process the "start" command flags
 	if cmd.Use == "start" {
-
 		// A site shouldn't be both a plugin and a theme so this reports an error if that is the case.
 		if startFlags.IsPlugin && startFlags.IsTheme {
 			return fmt.Errorf("you have set both the plugin and theme flags. Please choose only one option")
@@ -100,14 +98,13 @@ func (s *Site) LoadSite(cmd *cobra.Command, commandsRequiringSite []string, star
 
 // OpenSite Opens the current site in a browser if it is running
 func (s *Site) OpenSite() error {
-
-	_, err := s.verifySite()
+	err := s.verifySite()
 	if err != nil {
 		return err
 	}
 
 	if runtime.GOOS == "linux" {
-		openCmd := exec.Command("xdg-open", s.Settings.SecureURL)
+		openCmd := exec.Command("xdg-open", s.Settings.SecureURL) //nolint:gosec
 		return openCmd.Run()
 	}
 
@@ -116,7 +113,6 @@ func (s *Site) OpenSite() error {
 
 // PrintSiteSettings Prints all current site settings to the console for debugging
 func (s *Site) PrintSiteSettings() {
-
 	fmt.Printf("Local: %s\n", strconv.FormatBool(s.Settings.Local))
 	fmt.Printf("Xdebug: %s\n", strconv.FormatBool(s.Settings.Xdebug))
 	fmt.Printf("PhpMyAdmin: %s\n", strconv.FormatBool(s.Settings.PhpMyAdmin))
@@ -144,7 +140,6 @@ func (s *Site) PrintSiteSettings() {
 
 // StartSite Starts a site, including Traefik if needed
 func (s *Site) StartSite() error {
-
 	// Let's start everything up
 	fmt.Printf("Starting development site: %s\n", aurora.Bold(aurora.Green(s.getSiteURL(false))))
 
@@ -161,7 +156,7 @@ func (s *Site) StartSite() error {
 	}
 
 	// Make sure the WordPress site is running
-	_, err = s.verifySite()
+	err = s.verifySite()
 	if err != nil {
 		return err
 	}
@@ -190,7 +185,6 @@ func (s *Site) StartSite() error {
 
 // StopSite Stops a full site, including Traefik if needed
 func (s *Site) StopSite() error {
-
 	err := s.stopWordPress()
 	if err != nil {
 		return err
@@ -202,10 +196,9 @@ func (s *Site) StopSite() error {
 
 // getLocalAppDir Gets the absolute path to WordPress if the local flag or option has been set
 func (s *Site) getLocalAppDir() (string, error) {
-
 	localAppDir := path.Join(s.Settings.WorkingDirectory, "wordpress")
 
-	err := os.MkdirAll(localAppDir, 0750)
+	err := os.MkdirAll(localAppDir, os.FileMode(defaultDirPermissions))
 	if err != nil {
 		return "", err
 	}
@@ -215,7 +208,6 @@ func (s *Site) getLocalAppDir() (string, error) {
 
 // getRunningConfig gets various options that were used to start the site
 func (s *Site) getRunningConfig(withPlugins bool) (settings.LocalSettings, error) {
-
 	localSettings := settings.LocalSettings{
 		Type:       "site",
 		Local:      false,
@@ -229,8 +221,8 @@ func (s *Site) getRunningConfig(withPlugins bool) (settings.LocalSettings, error
 		return localSettings, err
 	}
 
-	for _, container := range containers {
-		if container.Image == "phpmyadmin" {
+	for i := range containers {
+		if containers[i].Image == "phpmyadmin" {
 			localSettings.PhpMyAdmin = true
 		}
 	}
@@ -251,7 +243,6 @@ func (s *Site) getRunningConfig(withPlugins bool) (settings.LocalSettings, error
 	}
 
 	for _, mount := range mounts {
-
 		if mount.Source == path.Join(s.Settings.WorkingDirectory, "wordpress") {
 			localSettings.Local = true
 		}
@@ -267,7 +258,6 @@ func (s *Site) getRunningConfig(withPlugins bool) (settings.LocalSettings, error
 
 	// Don't get plugins if we don't need them
 	if withPlugins {
-
 		plugins, err := s.getInstalledWordPressPlugins()
 		if err != nil {
 			return localSettings, err
@@ -281,7 +271,6 @@ func (s *Site) getRunningConfig(withPlugins bool) (settings.LocalSettings, error
 
 // getSiteURL returns the appropriate URL for the site
 func (s *Site) getSiteURL(insecure bool) string {
-
 	if insecure {
 		return s.Settings.URL
 	}
@@ -291,7 +280,6 @@ func (s *Site) getSiteURL(insecure bool) string {
 
 // installXdebug installs xdebug in the site's PHP container
 func (s *Site) installXdebug() (bool, error) {
-
 	if !s.Settings.Xdebug {
 		return false, nil
 	}
@@ -310,7 +298,6 @@ func (s *Site) installXdebug() (bool, error) {
 	}
 
 	for i, command := range commands {
-
 		restart := false
 
 		if i+1 == len(commands) {
@@ -333,7 +320,6 @@ func (s *Site) installXdebug() (bool, error) {
 
 // isLocalSite Determines if a site is a "local" site (started with the "local" flag) so that other commands can work as needed.
 func (s *Site) isLocalSite() bool {
-
 	// If the site is already running, try to make this easier
 	if s.IsSiteRunning() {
 		runningConfig, _ := s.getRunningConfig(false)
@@ -364,7 +350,6 @@ func (s *Site) isLocalSite() bool {
 
 // runCli Runs an arbitrary CLI command against the site's WordPress container
 func (s *Site) runCli(command string, restart bool) (docker.ExecResult, error) {
-
 	container := fmt.Sprintf("kana_%s_wordpress", s.Settings.Name)
 
 	output, err := s.dockerClient.ContainerExec(container, []string{command})
@@ -381,50 +366,63 @@ func (s *Site) runCli(command string, restart bool) (docker.ExecResult, error) {
 }
 
 // verifySite verifies if a site is up and running without error
-func (s *Site) verifySite() (bool, error) {
-
+func (s *Site) verifySite() error {
 	// Setup other options generated from config items
 	rootCert := path.Join(s.Settings.AppDirectory, "certs", s.Settings.RootCert)
 
 	caCert, err := os.ReadFile(rootCert)
 	if err != nil {
-		return false, err
+		return err
 	}
 	caCertPool := x509.NewCertPool()
 	caCertPool.AppendCertsFromPEM(caCert)
 
-	client := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		},
-	}
-
-	resp, err := client.Get(s.Settings.SecureURL)
+	siteOK, err := checkStatusCode(s.Settings.SecureURL)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	tries := 0
 
-	for resp.StatusCode != 200 {
-
-		resp, err = client.Get(s.Settings.SecureURL)
+	for !siteOK {
+		siteOK, err = checkStatusCode(s.Settings.SecureURL)
 		if err != nil {
-			return false, err
+			return err
 		}
 
-		if resp.StatusCode == 200 {
+		if siteOK {
 			break
 		}
 
-		if tries == 30 {
-			return false, fmt.Errorf("timeout reached. unable to open site")
+		if tries == maxVerificationRetries {
+			return errors.New("timeout reached. unable to open site")
 		}
 
 		tries++
-		time.Sleep(1 * time.Second)
-
+		time.Sleep(time.Second)
 	}
 
-	return true, nil
+	return nil
+}
+
+// checkStatusCode returns true on 200 or false
+func checkStatusCode(url string) (bool, error) {
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:gosec
+		},
+	}
+
+	retryResp, err := client.Get(url)
+	if err != nil {
+		return false, err
+	}
+
+	defer retryResp.Body.Close()
+
+	if retryResp.StatusCode == http.StatusOK {
+		return true, nil
+	}
+
+	return false, nil
 }

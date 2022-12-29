@@ -26,22 +26,8 @@ type pullEvent struct {
 // https://gist.github.com/miguelmota/4980b18d750fb3b1eb571c3e207b1b92
 // https://riptutorial.com/docker/example/31980/image-pulling-with-progress-bars--written-in-go
 func (d *DockerClient) EnsureImage(imageName string) (err error) {
-
 	if !strings.Contains(imageName, ":") {
 		imageName = fmt.Sprintf("%s:latest", imageName)
-	}
-
-	images, err := d.client.ImageList(context.Background(), types.ImageListOptions{})
-	if err != nil {
-		return err
-	}
-
-	for _, image := range images {
-		for _, imageTag := range image.RepoTags {
-			if imageTag == imageName {
-				return nil
-			}
-		}
 	}
 
 	events, err := d.client.ImagePull(context.Background(), imageName, types.ImagePullOptions{})
@@ -51,17 +37,41 @@ func (d *DockerClient) EnsureImage(imageName string) (err error) {
 
 	defer events.Close()
 
+	decoder := json.NewDecoder(events)
+
+	err = displayEventStatus(imageName, decoder)
+
+	return err
+}
+
+func (d *DockerClient) RemoveImage(image string) (removed bool, err error) {
+	removedResponse, err := d.client.ImageRemove(context.Background(), image, types.ImageRemoveOptions{})
+
+	if err != nil {
+		if !strings.Contains(err.Error(), "No such image:") {
+			return false, err
+		}
+	}
+
+	if len(removedResponse) > 0 {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+func displayEventStatus(imageName string, decoder *json.Decoder) error {
 	cursor := console.Cursor{}
 	layers := make([]string, 0)
 	oldIndex := len(layers)
 
 	var event *pullEvent
-	decoder := json.NewDecoder(events)
 
 	cursor.Hide()
 
-	for {
+	downloading := ""
 
+	for {
 		err := decoder.Decode(&event)
 		if err != nil {
 			if err == io.EOF {
@@ -69,14 +79,12 @@ func (d *DockerClient) EnsureImage(imageName string) (err error) {
 			}
 
 			return err
-
 		}
 
 		imageID := event.ID
 
 		// Check if the line is one of the final two ones
-		if strings.HasPrefix(event.Status, "Digest:") || strings.HasPrefix(event.Status, "Status:") {
-			fmt.Printf("%s\n", event.Status)
+		if event.Status != "Downloading" && event.Status != "Extracting" {
 			continue
 		}
 
@@ -115,9 +123,12 @@ func (d *DockerClient) EnsureImage(imageName string) (err error) {
 
 		cursor.ClearLine()
 
-		if event.Status == "Pull complete" {
-			fmt.Printf("%s: %s\n", event.ID, event.Status)
-		} else {
+		if event.Status == "Downloading" || event.Status == "Extracting" {
+			if downloading != imageName {
+				fmt.Printf("Downloading latest docker image: %s\n", imageName)
+				downloading = imageName
+			}
+
 			fmt.Printf("%s: %s %s\n", event.ID, event.Status, event.Progress)
 		}
 	}
@@ -125,21 +136,4 @@ func (d *DockerClient) EnsureImage(imageName string) (err error) {
 	cursor.Show()
 
 	return nil
-}
-
-func (d *DockerClient) RemoveImage(image string) (removed bool, err error) {
-
-	removedResponse, err := d.client.ImageRemove(context.Background(), image, types.ImageRemoveOptions{})
-
-	if err != nil {
-		if !strings.Contains(err.Error(), "No such image:") {
-			return false, err
-		}
-	}
-
-	if len(removedResponse) > 0 {
-		return true, nil
-	}
-
-	return false, nil
 }

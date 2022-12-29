@@ -12,8 +12,7 @@ var flagVerbose bool
 var commandsRequiringSite []string
 
 func Execute() {
-
-	site := new(site.Site)
+	kanaSite := new(site.Site)
 
 	// Setup the cobra command
 	cmd := &cobra.Command{
@@ -21,7 +20,7 @@ func Execute() {
 		Short: "Kana is a simple WordPress development tool designed for plugin and theme developers.",
 		Args:  cobra.NoArgs,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			err := site.LoadSite(cmd, commandsRequiringSite, startFlags, flagVerbose)
+			err := kanaSite.LoadSite(cmd, commandsRequiringSite, startFlags, flagVerbose)
 			if err != nil {
 				console.Error(err, flagVerbose)
 			}
@@ -34,15 +33,15 @@ func Execute() {
 
 	// Register the subcommands
 	cmd.AddCommand(
-		newStartCommand(site),
-		newStopCommand(site),
-		newOpenCommand(site),
-		newWPCommand(site),
-		newDestroyCommand(site),
-		newConfigCommand(site),
-		newExportCommand(site),
+		newStartCommand(kanaSite),
+		newStopCommand(kanaSite),
+		newOpenCommand(kanaSite),
+		newWPCommand(kanaSite),
+		newDestroyCommand(kanaSite),
+		newConfigCommand(kanaSite),
+		newExportCommand(kanaSite),
 		newVersionCommand(),
-		newDbCommand(site),
+		newDBCommand(kanaSite),
 	)
 
 	// Execute anything we need to
