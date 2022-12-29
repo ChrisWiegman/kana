@@ -1,7 +1,7 @@
 package site
 
 import (
-	"crypto/tls"
+	"context"
 	"crypto/x509"
 	"errors"
 	"fmt"
@@ -377,7 +377,7 @@ func (s *Site) verifySite() error {
 	caCertPool := x509.NewCertPool()
 	caCertPool.AppendCertsFromPEM(caCert)
 
-	siteOK, err := checkStatusCode(s.Settings.SecureURL)
+	siteOK, err := checkStatusCode(s.Settings.URL)
 	if err != nil {
 		return err
 	}
@@ -385,7 +385,7 @@ func (s *Site) verifySite() error {
 	tries := 0
 
 	for !siteOK {
-		siteOK, err = checkStatusCode(s.Settings.SecureURL)
+		siteOK, err = checkStatusCode(s.Settings.URL)
 		if err != nil {
 			return err
 		}
@@ -407,20 +407,19 @@ func (s *Site) verifySite() error {
 
 // checkStatusCode returns true on 200 or false
 func checkStatusCode(url string) (bool, error) {
-	client := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:gosec
-		},
-	}
-
-	retryResp, err := client.Get(url)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, url, http.NoBody)
 	if err != nil {
 		return false, err
 	}
 
-	defer retryResp.Body.Close()
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return false, err
+	}
 
-	if retryResp.StatusCode == http.StatusOK {
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusOK {
 		return true, nil
 	}
 
