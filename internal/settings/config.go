@@ -89,6 +89,8 @@ func (s *Settings) SetGlobalSetting(md *cobra.Command, args []string) error {
 		err = validate.Var(args[1], "alphanumunicode")
 	case "admin.username":
 		err = validate.Var(args[1], "alpha")
+	case "dockerSocket":
+		err = validate.Var(args[1], "unix_addr")
 	default:
 		err = validate.Var(args[1], "boolean")
 	}
