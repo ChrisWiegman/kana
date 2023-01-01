@@ -26,8 +26,11 @@ var (
 	adminEmail       = "admin@sites.kana.li"
 )
 
-var defaultDirPermissions = 0750
-var defaultFilePermissions = 0644
+// Default permissions for all new files and folders
+var (
+	defaultDirPermissions  = 0750
+	defaultFilePermissions = 0644
+)
 
 // Individual Settings for use throughout the app lifecycle
 type Settings struct {
