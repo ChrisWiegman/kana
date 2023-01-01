@@ -28,6 +28,7 @@ func (s *Settings) ListSettings() {
 
 	t.SetHeaders("Setting", "Global Value", "Local Value")
 
+	t.AddRow("dockerSocket", console.Bold(s.global.GetString("dockerSocket")))
 	t.AddRow("admin.email", console.Bold(s.global.GetString("admin.email")))
 	t.AddRow("admin.password", console.Bold(s.global.GetString("admin.password")))
 	t.AddRow("admnin.username", console.Bold(s.global.GetString("admin.username")))

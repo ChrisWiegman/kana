@@ -21,6 +21,7 @@ func (s *Settings) LoadGlobalSettings() error {
 	s.AdminPassword = globalViperConfig.GetString("admin.password")
 	s.AdminUsername = globalViperConfig.GetString("admin.username")
 	s.PHP = globalViperConfig.GetString("php")
+	s.DockerSocket = globalViperConfig.GetString("dockerSocket")
 	s.Type = globalViperConfig.GetString("type")
 
 	return err
@@ -35,6 +36,7 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
 	globalSettings.SetDefault("type", siteType)
 	globalSettings.SetDefault("local", local)
 	globalSettings.SetDefault("php", php)
+	globalSettings.SetDefault("dockerSocket", dockerSocket)
 	globalSettings.SetDefault("admin.username", adminUsername)
 	globalSettings.SetDefault("admin.password", adminPassword)
 	globalSettings.SetDefault("admin.email", adminEmail)
