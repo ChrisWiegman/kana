@@ -2,6 +2,7 @@ package site
 
 import (
 	"context"
+	"crypto/tls"
 	"crypto/x509"
 	"errors"
 	"fmt"
@@ -377,7 +378,7 @@ func (s *Site) verifySite() error {
 	caCertPool := x509.NewCertPool()
 	caCertPool.AppendCertsFromPEM(caCert)
 
-	siteOK, err := checkStatusCode(s.Settings.URL)
+	siteOK, err := checkStatusCode(s.Settings.SecureURL)
 	if err != nil {
 		return err
 	}
@@ -385,7 +386,7 @@ func (s *Site) verifySite() error {
 	tries := 0
 
 	for !siteOK {
-		siteOK, err = checkStatusCode(s.Settings.URL)
+		siteOK, err = checkStatusCode(s.Settings.SecureURL)
 		if err != nil {
 			return err
 		}
@@ -412,7 +413,14 @@ func checkStatusCode(url string) (bool, error) {
 		return false, err
 	}
 
-	resp, err := http.DefaultClient.Do(req)
+	// Ignore SSL check as we're using our self-signed cert for development
+	clientTransport := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:gosec
+	}
+
+	client := &http.Client{Transport: clientTransport}
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return false, err
 	}
