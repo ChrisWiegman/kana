@@ -49,7 +49,7 @@ func (s *Site) startTraefik() error {
 
 	traefikConfig := docker.ContainerConfig{
 		Name:        traefikContainerName,
-		Image:       "traefik",
+		Image:       "traefik:2.9",
 		Ports:       traefikPorts,
 		NetworkName: "kana",
 		HostName:    "kanatraefik",
@@ -74,7 +74,7 @@ func (s *Site) startTraefik() error {
 			},
 			{
 				Type:   mount.TypeBind,
-				Source: "/var/run/docker.sock",
+				Source: s.Settings.DockerSocket,
 				Target: "/var/run/docker.sock",
 			},
 		},

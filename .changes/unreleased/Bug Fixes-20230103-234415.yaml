@@ -1,0 +1,3 @@
+kind: Bug Fixes
+body: Lock Traefik image to 2.9 instead of "latest" to prevent future issues.
+time: 2023-01-03T23:44:15.340582671Z

@@ -28,6 +28,7 @@ func (s *Settings) ListSettings() {
 
 	t.SetHeaders("Setting", "Global Value", "Local Value")
 
+	t.AddRow("dockerSocket", console.Bold(s.global.GetString("dockerSocket")))
 	t.AddRow("admin.email", console.Bold(s.global.GetString("admin.email")))
 	t.AddRow("admin.password", console.Bold(s.global.GetString("admin.password")))
 	t.AddRow("admnin.username", console.Bold(s.global.GetString("admin.username")))
@@ -88,6 +89,8 @@ func (s *Settings) SetGlobalSetting(md *cobra.Command, args []string) error {
 		err = validate.Var(args[1], "alphanumunicode")
 	case "admin.username":
 		err = validate.Var(args[1], "alpha")
+	case "dockerSocket":
+		err = validate.Var(args[1], "unix_addr")
 	default:
 		err = validate.Var(args[1], "boolean")
 	}

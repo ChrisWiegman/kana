@@ -24,10 +24,14 @@ var (
 	adminUsername    = "admin"
 	adminPassword    = "password"
 	adminEmail       = "admin@sites.kana.li"
+	dockerSocket     = "/var/run/docker.sock"
 )
 
-var defaultDirPermissions = 0750
-var defaultFilePermissions = 0644
+// Default permissions for all new files and folders
+var (
+	defaultDirPermissions  = 0750
+	defaultFilePermissions = 0644
+)
 
 // Individual Settings for use throughout the app lifecycle
 type Settings struct {
@@ -37,6 +41,7 @@ type Settings struct {
 	AppDomain, SiteDomain                         string
 	Name                                          string
 	PHP                                           string
+	DockerSocket                                  string
 	RootCert, RootKey, SiteCert, SiteKey          string
 	SecureURL, URL                                string
 	Type                                          string
