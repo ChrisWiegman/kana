@@ -36,7 +36,7 @@ func (s *Site) startTraefik() error {
 		return err
 	}
 
-	err = s.dockerClient.EnsureImage("traefik")
+	err = s.dockerClient.EnsureImage("traefik:2.9")
 	if err != nil {
 		return err
 	}
