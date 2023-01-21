@@ -28,6 +28,11 @@ type Site struct {
 	Settings     *settings.Settings
 }
 
+type SiteInfo struct {
+	Name, Path string
+	Running    bool
+}
+
 var maxVerificationRetries = 30
 
 // EnsureDocker Ensures Docker is available for commands that need it.
@@ -50,6 +55,20 @@ func (s *Site) ExportSiteConfig() error {
 	}
 
 	return s.Settings.WriteLocalSettings(localSettings)
+}
+
+func GetSiteList(appDir string) error {
+	sites, err := os.ReadDir(path.Join(appDir, "sites"))
+	if err != nil {
+		return err
+	}
+
+	for _, f := range sites {
+
+		fmt.Println(f.Name())
+	}
+
+	return nil
 }
 
 // IsSiteRunning Returns true if the site is up and running in Docker or false. Does not verify other errors
