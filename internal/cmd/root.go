@@ -8,7 +8,7 @@ import (
 )
 
 var flagName string
-var flagVerbose bool
+var flagVerbose, flagJsonOutput bool
 var commandsRequiringSite []string
 
 func Execute() {
@@ -33,6 +33,12 @@ func Execute() {
 	// Add the "name" flag to allow for sites not connected to the local directory
 	cmd.PersistentFlags().StringVarP(&flagName, "name", "n", "", "Specify a name for the site, used to override using the current folder.")
 	cmd.PersistentFlags().BoolVarP(&flagVerbose, "verbose", "v", false, "Display debugging information along with detailed command output")
+	cmd.PersistentFlags().BoolVar(&flagJsonOutput, "output-json", false, "Display all output in JSON format for further processing")
+
+	err := cmd.PersistentFlags().MarkHidden("output-json")
+	if err != nil {
+		console.Error(err, flagVerbose)
+	}
 
 	// Register the subcommands
 	cmd.AddCommand(
