@@ -8,9 +8,9 @@ import (
 
 	"github.com/ChrisWiegman/kana-cli/pkg/console"
 	"github.com/ChrisWiegman/kana-cli/pkg/docker"
-	"github.com/logrusorgru/aurora/v4"
 
 	"github.com/docker/docker/api/types/mount"
+	"github.com/logrusorgru/aurora/v4"
 )
 
 type PluginInfo struct {

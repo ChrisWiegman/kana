@@ -6,10 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	Version   = ""
-	Timestamp = ""
-)
+var Version, Timestamp string
 
 func newVersionCommand() *cobra.Command {
 	cmd := &cobra.Command{

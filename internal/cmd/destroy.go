@@ -6,8 +6,8 @@ import (
 
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 	"github.com/ChrisWiegman/kana-cli/pkg/console"
-	"github.com/logrusorgru/aurora/v4"
 
+	"github.com/logrusorgru/aurora/v4"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )

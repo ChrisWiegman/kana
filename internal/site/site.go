@@ -19,6 +19,7 @@ import (
 	"github.com/ChrisWiegman/kana-cli/internal/settings"
 	"github.com/ChrisWiegman/kana-cli/pkg/console"
 	"github.com/ChrisWiegman/kana-cli/pkg/docker"
+
 	"github.com/logrusorgru/aurora/v4"
 	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
