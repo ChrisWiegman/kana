@@ -92,8 +92,13 @@ func GetSiteList(appDir string) ([]SiteInfo, error) {
 			return sites, err
 		}
 
+		sitePath := fmt.Sprint(jsonLink["link"])
+
+		if !strings.Contains(sitePath, sitesDir) {
+			siteInfo.Path = sitePath
+		}
+
 		siteInfo.Name = f.Name()
-		siteInfo.Path = fmt.Sprint(jsonLink["link"])
 		siteInfo.Running = len(containers) != 0
 
 		sites = append(sites, siteInfo)
