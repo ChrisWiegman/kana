@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -57,18 +58,48 @@ func (s *Site) ExportSiteConfig() error {
 	return s.Settings.WriteLocalSettings(localSettings)
 }
 
-func GetSiteList(appDir string) error {
-	sites, err := os.ReadDir(path.Join(appDir, "sites"))
+// GetSiteList Returns a list of all Kana sites, their location and whether they're running
+func GetSiteList(appDir string) ([]SiteInfo, error) {
+	var sites []SiteInfo
+	sitesDir := path.Join(appDir, "sites")
+
+	appSites, err := os.ReadDir(sitesDir)
 	if err != nil {
-		return err
+		return sites, err
 	}
 
-	for _, f := range sites {
+	for _, f := range appSites {
+		var siteInfo SiteInfo
 
-		fmt.Println(f.Name())
+		content, err := os.ReadFile(path.Join(sitesDir, f.Name(), "link.json"))
+		if err != nil {
+			return sites, err
+		}
+
+		var jsonLink map[string]interface{}
+		err = json.Unmarshal(content, &jsonLink)
+		if err != nil {
+			return sites, err
+		}
+
+		dockerClient, err := docker.NewController()
+		if err != nil {
+			return sites, err
+		}
+
+		containers, err := dockerClient.ListContainers(f.Name())
+		if err != nil {
+			return sites, err
+		}
+
+		siteInfo.Name = f.Name()
+		siteInfo.Path = fmt.Sprint(jsonLink["link"])
+		siteInfo.Running = len(containers) != 0
+
+		sites = append(sites, siteInfo)
 	}
 
-	return nil
+	return sites, nil
 }
 
 // IsSiteRunning Returns true if the site is up and running in Docker or false. Does not verify other errors
