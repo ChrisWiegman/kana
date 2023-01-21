@@ -74,7 +74,7 @@ func (s *Site) startTraefik() error {
 			},
 			{
 				Type:   mount.TypeBind,
-				Source: s.Settings.DockerSocket,
+				Source: "/var/run/docker.sock",
 				Target: "/var/run/docker.sock",
 			},
 		},
