@@ -42,6 +42,7 @@ func Execute() {
 		newExportCommand(kanaSite),
 		newVersionCommand(),
 		newDBCommand(kanaSite),
+		newListCommand(kanaSite),
 	)
 
 	// Execute anything we need to
