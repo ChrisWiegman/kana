@@ -103,6 +103,10 @@ You can also export the database file your Kana site is using with `kana db expo
 
 `kana stop` will stop the current site and, if no other sites are running, will shut down shared containers as well.
 
+## List
+
+`kana list` will list all sites known by Kana and their current running status. Any site listed can then be addressed with the `name` flag in other commands.
+
 ## Destroy
 
 `kana destroy` will stop and destroy the current site. This is different than `stop` in that `stop` will leave the database and files it creates alone so you can start it again later. Once destroyed a site is irrecoverable.
