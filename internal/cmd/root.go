@@ -27,6 +27,9 @@ func Execute() {
 		},
 	}
 
+	// Hide the default completion command
+	cmd.CompletionOptions.HiddenDefaultCmd = true
+
 	// Add the "name" flag to allow for sites not connected to the local directory
 	cmd.PersistentFlags().StringVarP(&flagName, "name", "n", "", "Specify a name for the site, used to override using the current folder.")
 	cmd.PersistentFlags().BoolVarP(&flagVerbose, "verbose", "v", false, "Display debugging information along with detailed command output")
