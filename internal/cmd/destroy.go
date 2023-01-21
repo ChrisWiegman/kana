@@ -9,9 +9,10 @@ import (
 	"github.com/logrusorgru/aurora/v4"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
-var flagConfirmDestroy bool
+var flagForce bool
 
 func newDestroyCommand(kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
@@ -20,7 +21,7 @@ func newDestroyCommand(kanaSite *site.Site) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			confirmDestroy := false
 
-			if flagConfirmDestroy {
+			if flagForce {
 				confirmDestroy = true
 			} else {
 				confirmDestroy = console.PromptConfirm(
@@ -62,7 +63,15 @@ func newDestroyCommand(kanaSite *site.Site) *cobra.Command {
 
 	commandsRequiringSite = append(commandsRequiringSite, cmd.Use)
 
-	cmd.Flags().BoolVar(&flagConfirmDestroy, "confirm-destroy", false, "Confirm destruction of your site (doesn't require a prompt).")
-
+	cmd.Flags().BoolVar(&flagForce, "force", false, "Force destruction of your site (doesn't require a prompt).")
+	cmd.Flags().SetNormalizeFunc(aliasForceFlag)
 	return cmd
+}
+
+func aliasForceFlag(f *pflag.FlagSet, name string) pflag.NormalizedName {
+	if name == "confirm-destroy" {
+		name = "force"
+	}
+
+	return pflag.NormalizedName(name)
 }
