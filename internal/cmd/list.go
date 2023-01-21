@@ -21,15 +21,19 @@ func newListCommand(kanaSite *site.Site) *cobra.Command {
 				console.Error(err, flagVerbose)
 			}
 
-			t := table.New(os.Stdout)
+			if len(sites) > 0 {
+				t := table.New(os.Stdout)
 
-			t.SetHeaders("Name", "Path", "Running")
+				t.SetHeaders("Name", "Path", "Running")
 
-			for _, site := range sites {
-				t.AddRow(site.Name, site.Path, strconv.FormatBool(site.Running))
+				for _, site := range sites {
+					t.AddRow(site.Name, site.Path, strconv.FormatBool(site.Running))
+				}
+
+				t.Render()
+			} else {
+				console.Println("It doesn't look like you have created any sites with Kana yet. Use `kana start` to create a site.")
 			}
-
-			t.Render()
 		},
 		Args: cobra.NoArgs,
 	}

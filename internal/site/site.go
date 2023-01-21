@@ -63,6 +63,11 @@ func GetSiteList(appDir string) ([]SiteInfo, error) {
 	var sites []SiteInfo
 	sitesDir := path.Join(appDir, "sites")
 
+	_, err := os.Stat(sitesDir)
+	if os.IsNotExist(err) {
+		return sites, nil
+	}
+
 	appSites, err := os.ReadDir(sitesDir)
 	if err != nil {
 		return sites, err
