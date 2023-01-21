@@ -1,4 +1,0 @@
-kind: Breaking Changes
-body: The `confirm-destroy` flag on the `destroy` command has been replaced with the
-  `force` flag
-time: 2023-01-21T23:12:22.599296021Z
