@@ -1,6 +1,7 @@
 package settings
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
@@ -24,6 +25,11 @@ func (s *Settings) GetGlobalSetting(md *cobra.Command, args []string) (string, e
 
 // ListSettings Lists all settings for the config command
 func (s *Settings) ListSettings(consoleOutput *console.Console) {
+	if consoleOutput.JSON {
+		s.printJSONSettings()
+		return
+	}
+
 	t := table.New(os.Stdout)
 
 	t.SetHeaders("Setting", "Global Value", "Local Value")
@@ -48,6 +54,22 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 	t.AddRow("plugins", "", plugins)
 
 	t.Render()
+}
+
+// printJSONSettings Prints out all settings in JSON format
+func (s *Settings) printJSONSettings() {
+	type JSONSettings struct {
+		Global, Local map[string]interface{}
+	}
+
+	settings := JSONSettings{
+		Global: s.global.AllSettings(),
+		Local:  s.local.AllSettings(),
+	}
+
+	str, _ := json.Marshal(settings)
+
+	fmt.Println(string(str))
 }
 
 // SetGlobalSetting Sets a global setting for the "config" command
