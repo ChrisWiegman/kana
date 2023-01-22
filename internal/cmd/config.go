@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 	"github.com/ChrisWiegman/kana-cli/pkg/console"
 
@@ -22,8 +25,22 @@ func newConfigCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobr
 				if err != nil {
 					consoleOutput.Error(err)
 				}
+				if consoleOutput.JSON {
+					type JSONSetting struct {
+						Setting, Value string
+					}
 
-				consoleOutput.Println(value)
+					setting := JSONSetting{
+						Setting: args[0],
+						Value:   value,
+					}
+
+					str, _ := json.Marshal(setting)
+
+					fmt.Println(string(str))
+				} else {
+					consoleOutput.Println(value)
+				}
 			case 2:
 				err := kanaSite.Settings.SetGlobalSetting(cmd, args)
 				if err != nil {
