@@ -24,7 +24,7 @@ type DockerClient struct {
 var maxRetries = 12
 var sleepDuration = 5
 
-func NewController() (c *DockerClient, err error) {
+func NewController(consoleOutput *console.Console) (c *DockerClient, err error) {
 	c = new(DockerClient)
 
 	c.client, err = client.NewClientWithOpts(client.FromEnv)
@@ -32,7 +32,7 @@ func NewController() (c *DockerClient, err error) {
 		return nil, err
 	}
 
-	err = c.ensureDockerIsAvailable()
+	err = c.ensureDockerIsAvailable(consoleOutput)
 	if err != nil {
 		return nil, err
 	}
@@ -40,11 +40,11 @@ func NewController() (c *DockerClient, err error) {
 	return c, nil
 }
 
-func (d *DockerClient) ensureDockerIsAvailable() error {
+func (d *DockerClient) ensureDockerIsAvailable(consoleOutput *console.Console) error {
 	_, err := d.client.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
 		if runtime.GOOS == "darwin" {
-			console.Println("Docker doesn't appear to be running. Trying to start Docker.")
+			consoleOutput.Println("Docker doesn't appear to be running. Trying to start Docker.")
 			err = exec.Command("open", "-a", "Docker").Run()
 			if err != nil {
 				return fmt.Errorf("error: unable to start Docker for Mac")
@@ -56,7 +56,7 @@ func (d *DockerClient) ensureDockerIsAvailable() error {
 				retries++
 
 				if retries == maxRetries {
-					console.Println("Restarting Docker is taking too long. We seem to have hit an error")
+					consoleOutput.Println("Restarting Docker is taking too long. We seem to have hit an error")
 					return fmt.Errorf("error: unable to start Docker for Mac")
 				}
 

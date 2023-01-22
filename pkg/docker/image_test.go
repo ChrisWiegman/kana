@@ -2,17 +2,20 @@ package docker
 
 import (
 	"testing"
+
+	"github.com/ChrisWiegman/kana-cli/pkg/console"
 )
 
 func TestEnsureImage(t *testing.T) {
-	d, err := NewController()
+	consoleOutput := new(console.Console)
 
+	d, err := NewController(consoleOutput)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
 	}
 
-	err = d.EnsureImage("alpine")
+	err = d.EnsureImage("alpine", consoleOutput)
 
 	if err != nil {
 		t.Error(err)
@@ -20,14 +23,15 @@ func TestEnsureImage(t *testing.T) {
 }
 
 func TestRemoveImage(t *testing.T) {
-	d, err := NewController()
+	consoleOutput := new(console.Console)
 
+	d, err := NewController(consoleOutput)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
 	}
 
-	err = d.EnsureImage("alpine")
+	err = d.EnsureImage("alpine", consoleOutput)
 
 	if err != nil {
 		t.Error(err)

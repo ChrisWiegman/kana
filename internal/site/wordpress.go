@@ -10,7 +10,6 @@ import (
 	"github.com/ChrisWiegman/kana-cli/pkg/docker"
 
 	"github.com/docker/docker/api/types/mount"
-	"github.com/logrusorgru/aurora/v4"
 )
 
 type PluginInfo struct {
@@ -23,10 +22,10 @@ type PluginInfo struct {
 var defaultDirPermissions = 0750
 
 // RunWPCli Runs a wp-cli command returning it's output and any errors
-func (s *Site) RunWPCli(command []string) (statusCode int64, output string, err error) {
+func (s *Site) RunWPCli(command []string, consoleOutput *console.Console) (statusCode int64, output string, err error) {
 	appDir := path.Join(s.Settings.SiteDirectory, "app")
 
-	if s.isLocalSite() {
+	if s.isLocalSite(consoleOutput) {
 		appDir, err = s.getLocalAppDir()
 		if err != nil {
 			return 1, "", err
@@ -63,7 +62,7 @@ func (s *Site) RunWPCli(command []string) (statusCode int64, output string, err 
 		Volumes: appVolumes,
 	}
 
-	err = s.dockerClient.EnsureImage(container.Image)
+	err = s.dockerClient.EnsureImage(container.Image, consoleOutput)
 	if err != nil {
 		return 1, "", err
 	}
@@ -77,14 +76,14 @@ func (s *Site) RunWPCli(command []string) (statusCode int64, output string, err 
 }
 
 // getInstalledWordPressPlugins Returns a list of the plugins that have been installed on the site
-func (s *Site) getInstalledWordPressPlugins() ([]string, error) {
+func (s *Site) getInstalledWordPressPlugins(consoleOutput *console.Console) ([]string, error) {
 	commands := []string{
 		"plugin",
 		"list",
 		"--format=json",
 	}
 
-	_, commandOutput, err := s.RunWPCli(commands)
+	_, commandOutput, err := s.RunWPCli(commands, consoleOutput)
 	if err != nil {
 		return []string{}, err
 	}
@@ -172,8 +171,8 @@ func (s *Site) getWordPressContainers() []string {
 }
 
 // installDefaultPlugins Installs a list of WordPress plugins
-func (s *Site) installDefaultPlugins() error {
-	installedPlugins, err := s.getInstalledWordPressPlugins()
+func (s *Site) installDefaultPlugins(consoleOutput *console.Console) error {
+	installedPlugins, err := s.getInstalledWordPressPlugins(consoleOutput)
 	if err != nil {
 		return err
 	}
@@ -188,7 +187,7 @@ func (s *Site) installDefaultPlugins() error {
 		}
 
 		if installPlugin {
-			console.Println(fmt.Sprintf("Installing plugin:  %s", aurora.Bold(aurora.Blue(plugin))))
+			consoleOutput.Println(fmt.Sprintf("Installing plugin:  %s", consoleOutput.Bold(consoleOutput.Blue(plugin))))
 
 			setupCommand := []string{
 				"plugin",
@@ -197,13 +196,13 @@ func (s *Site) installDefaultPlugins() error {
 				plugin,
 			}
 
-			code, _, err := s.RunWPCli(setupCommand)
+			code, _, err := s.RunWPCli(setupCommand, consoleOutput)
 			if err != nil {
 				return err
 			}
 
 			if code != 0 {
-				console.Warn(fmt.Sprintf("Unable to install plugin: %s.", aurora.Bold(aurora.Blue(plugin))))
+				consoleOutput.Warn(fmt.Sprintf("Unable to install plugin: %s.", consoleOutput.Bold(consoleOutput.Blue(plugin))))
 			}
 		}
 	}
@@ -212,16 +211,16 @@ func (s *Site) installDefaultPlugins() error {
 }
 
 // installWordPress Installs and configures WordPress core
-func (s *Site) installWordPress() error {
+func (s *Site) installWordPress(consoleOutput *console.Console) error {
 	checkCommand := []string{
 		"core",
 		"is-installed",
 	}
 
-	code, _, err := s.RunWPCli(checkCommand)
+	code, _, err := s.RunWPCli(checkCommand, consoleOutput)
 
 	if err != nil || code != 0 {
-		console.Println("Finishing WordPress setup.")
+		consoleOutput.Println("Finishing WordPress setup.")
 
 		setupCommand := []string{
 			"core",
@@ -233,7 +232,7 @@ func (s *Site) installWordPress() error {
 			fmt.Sprintf("--admin_email=%s", s.Settings.AdminEmail),
 		}
 
-		code, _, err = s.RunWPCli(setupCommand)
+		code, _, err = s.RunWPCli(setupCommand, consoleOutput)
 		if err != nil || code != 0 {
 			return fmt.Errorf("installation of WordPress failed: %s", err.Error())
 		}
@@ -243,7 +242,7 @@ func (s *Site) installWordPress() error {
 }
 
 // startWordPress Starts the WordPress containers
-func (s *Site) startWordPress() error {
+func (s *Site) startWordPress(consoleOutput *console.Console) error {
 	_, _, err := s.dockerClient.EnsureNetwork("kana")
 	if err != nil {
 		return err
@@ -252,7 +251,7 @@ func (s *Site) startWordPress() error {
 	appDir := path.Join(s.Settings.SiteDirectory, "app")
 	databaseDir := path.Join(s.Settings.SiteDirectory, "database")
 
-	if s.isLocalSite() {
+	if s.isLocalSite(consoleOutput) {
 		appDir, err = s.getLocalAppDir()
 		if err != nil {
 			return err
@@ -333,7 +332,7 @@ func (s *Site) startWordPress() error {
 	wordPressContainers = s.getPhpMyAdminContainer(databaseDir, wordPressContainers)
 
 	for i := range wordPressContainers {
-		err := s.dockerClient.EnsureImage(wordPressContainers[i].Image)
+		err := s.dockerClient.EnsureImage(wordPressContainers[i].Image, consoleOutput)
 		if err != nil {
 			return err
 		}

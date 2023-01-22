@@ -2,13 +2,17 @@ package docker
 
 import (
 	"testing"
+
+	"github.com/ChrisWiegman/kana-cli/pkg/console"
 )
 
 func TestNetworkCreate(t *testing.T) {
-	d, err := NewController()
+	consoleOutput := new(console.Console)
 
+	d, err := NewController(consoleOutput)
 	if err != nil {
 		t.Error(err)
+		t.FailNow()
 	}
 
 	created, _, _ := d.EnsureNetwork("mynetwork")
@@ -28,10 +32,12 @@ func TestNetworkCreate(t *testing.T) {
 }
 
 func TestEnsureNetwork(t *testing.T) {
-	d, err := NewController()
+	consoleOutput := new(console.Console)
 
+	d, err := NewController(consoleOutput)
 	if err != nil {
 		t.Error(err)
+		t.FailNow()
 	}
 
 	_, network, err := d.EnsureNetwork("mynetwork")

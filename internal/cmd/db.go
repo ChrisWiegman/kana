@@ -12,7 +12,7 @@ import (
 var flagPreserve bool
 var flagReplaceDomain string
 
-func newDBCommand(kanaSite *site.Site) *cobra.Command {
+func newDBCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "db",
 		Short: "Commands to easily import and export a WordPress database from an existing site",
@@ -25,17 +25,17 @@ func newDBCommand(kanaSite *site.Site) *cobra.Command {
 		Use:   "import <sql file>",
 		Short: "Import a database from an existing WordPress site",
 		Run: func(cmd *cobra.Command, args []string) {
-			err := kanaSite.EnsureDocker()
+			err := kanaSite.EnsureDocker(consoleOutput)
 			if err != nil {
-				console.Error(err, flagVerbose)
+				consoleOutput.Error(err)
 			}
 
-			err = kanaSite.ImportDatabase(args[0], flagPreserve, flagReplaceDomain)
+			err = kanaSite.ImportDatabase(args[0], flagPreserve, flagReplaceDomain, consoleOutput)
 			if err != nil {
-				console.Error(err, flagVerbose)
+				consoleOutput.Error(err)
 			}
 
-			console.Success("Your database file has been successfully imported and processed. Reload your site to see the changes.")
+			consoleOutput.Success("Your database file has been successfully imported and processed. Reload your site to see the changes.")
 		},
 		Args: cobra.ExactArgs(1),
 	}
@@ -46,12 +46,12 @@ func newDBCommand(kanaSite *site.Site) *cobra.Command {
 		Use:   "export [sql file]",
 		Short: "Export the site's WordPress database",
 		Run: func(cmd *cobra.Command, args []string) {
-			file, err := kanaSite.ExportDatabase(args)
+			file, err := kanaSite.ExportDatabase(args, consoleOutput)
 			if err != nil {
-				console.Error(err, flagVerbose)
+				consoleOutput.Error(err)
 			}
 
-			console.Success(fmt.Sprintf("Export complete. Your database has been exported to %s.", file))
+			consoleOutput.Success(fmt.Sprintf("Export complete. Your database has been exported to %s.", file))
 		},
 		Args: cobra.MaximumNArgs(1),
 	}

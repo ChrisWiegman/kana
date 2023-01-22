@@ -3,6 +3,7 @@ package site
 import (
 	"path"
 
+	"github.com/ChrisWiegman/kana-cli/pkg/console"
 	"github.com/ChrisWiegman/kana-cli/pkg/docker"
 
 	"github.com/docker/docker/api/types/mount"
@@ -25,7 +26,7 @@ func (s *Site) maybeStopTraefik() error {
 }
 
 // startTraefik Starts the Traefik container
-func (s *Site) startTraefik() error {
+func (s *Site) startTraefik(consoleOutput *console.Console) error {
 	err := s.Settings.EnsureSSLCerts()
 	if err != nil {
 		return err
@@ -36,7 +37,7 @@ func (s *Site) startTraefik() error {
 		return err
 	}
 
-	err = s.dockerClient.EnsureImage("traefik:2.9")
+	err = s.dockerClient.EnsureImage("traefik:2.9", consoleOutput)
 	if err != nil {
 		return err
 	}

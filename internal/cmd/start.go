@@ -7,36 +7,35 @@ import (
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 	"github.com/ChrisWiegman/kana-cli/pkg/console"
 
-	"github.com/logrusorgru/aurora/v4"
 	"github.com/spf13/cobra"
 )
 
 var startFlags settings.StartFlags
 
-func newStartCommand(kanaSite *site.Site) *cobra.Command {
+func newStartCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "start",
 		Short: "Starts a new environment in the local folder.",
 		Run: func(cmd *cobra.Command, args []string) {
-			err := kanaSite.EnsureDocker()
+			err := kanaSite.EnsureDocker(consoleOutput)
 			if err != nil {
-				console.Error(err, flagVerbose)
+				consoleOutput.Error(err)
 			}
 
 			// Check that the site is already running and show an error if it is.
 			if kanaSite.IsSiteRunning() {
-				console.Error(fmt.Errorf("the site is already running. Please stop your site before running the start command"), flagVerbose)
+				consoleOutput.Error(fmt.Errorf("the site is already running. Please stop your site before running the start command"))
 			}
 
-			err = kanaSite.StartSite()
+			err = kanaSite.StartSite(consoleOutput)
 			if err != nil {
-				console.Error(err, flagVerbose)
+				consoleOutput.Error(err)
 			}
 
-			console.Success(
+			consoleOutput.Success(
 				fmt.Sprintf(
 					"Your site, %s, has has started and should be open in your default browser.",
-					aurora.Bold(aurora.Blue(kanaSite.Settings.Name))))
+					consoleOutput.Bold(consoleOutput.Blue(kanaSite.Settings.Name))))
 		},
 		Args: cobra.NoArgs,
 	}

@@ -12,7 +12,6 @@ import (
 	"os/exec"
 	"path"
 	"runtime"
-	"strconv"
 	"strings"
 	"time"
 
@@ -20,7 +19,6 @@ import (
 	"github.com/ChrisWiegman/kana-cli/pkg/console"
 	"github.com/ChrisWiegman/kana-cli/pkg/docker"
 
-	"github.com/logrusorgru/aurora/v4"
 	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
 )
@@ -38,9 +36,9 @@ type SiteInfo struct {
 var maxVerificationRetries = 30
 
 // EnsureDocker Ensures Docker is available for commands that need it.
-func (s *Site) EnsureDocker() error {
+func (s *Site) EnsureDocker(consoleOutput *console.Console) error {
 	// Add a docker client to the site
-	dockerClient, err := docker.NewController()
+	dockerClient, err := docker.NewController(consoleOutput)
 	if err != nil {
 		return err
 	}
@@ -50,8 +48,8 @@ func (s *Site) EnsureDocker() error {
 }
 
 // ExportSiteSConfig Saves the current running config to a file.
-func (s *Site) ExportSiteConfig() error {
-	localSettings, err := s.getRunningConfig(true)
+func (s *Site) ExportSiteConfig(consoleOutput *console.Console) error {
+	localSettings, err := s.getRunningConfig(true, consoleOutput)
 	if err != nil {
 		return err
 	}
@@ -60,7 +58,7 @@ func (s *Site) ExportSiteConfig() error {
 }
 
 // GetSiteList Returns a list of all Kana sites, their location and whether they're running
-func GetSiteList(appDir string) ([]SiteInfo, error) {
+func GetSiteList(appDir string, consoleOutput *console.Console) ([]SiteInfo, error) {
 	var sites []SiteInfo
 	sitesDir := path.Join(appDir, "sites")
 
@@ -88,7 +86,7 @@ func GetSiteList(appDir string) ([]SiteInfo, error) {
 			return sites, err
 		}
 
-		dockerClient, err := docker.NewController()
+		dockerClient, err := docker.NewController(consoleOutput)
 		if err != nil {
 			return sites, err
 		}
@@ -173,46 +171,19 @@ func (s *Site) OpenSite() error {
 	return browser.OpenURL(s.Settings.SecureURL)
 }
 
-// PrintSiteSettings Prints all current site settings to the console for debugging
-func (s *Site) PrintSiteSettings() {
-	fmt.Printf("Local: %s\n", strconv.FormatBool(s.Settings.Local))
-	fmt.Printf("Xdebug: %s\n", strconv.FormatBool(s.Settings.Xdebug))
-	fmt.Printf("PhpMyAdmin: %s\n", strconv.FormatBool(s.Settings.PhpMyAdmin))
-	fmt.Printf("AdminEmail: %s\n", s.Settings.AdminEmail)
-	fmt.Printf("AdminPassword: %s\n", s.Settings.AdminPassword)
-	fmt.Printf("AdminUsername: %s\n", s.Settings.AdminUsername)
-	fmt.Printf("AppDirectory: %s\n", s.Settings.AppDirectory)
-	fmt.Printf("SiteDirectory: %s\n", s.Settings.SiteDirectory)
-	fmt.Printf("WorkingDirectory: %s\n", s.Settings.WorkingDirectory)
-	fmt.Printf("AppDomain: %s\n", s.Settings.AppDomain)
-	fmt.Printf("SiteDomain: %s\n", s.Settings.SiteDomain)
-	fmt.Printf("Name: %s\n", s.Settings.Name)
-	fmt.Printf("PHP: %s\n", s.Settings.PHP)
-	fmt.Printf("RootCert: %s\n", s.Settings.RootCert)
-	fmt.Printf("RootKey: %s\n", s.Settings.RootKey)
-	fmt.Printf("SiteKey: %s\n", s.Settings.SiteKey)
-	fmt.Printf("SecureURL: %s\n", s.Settings.SecureURL)
-	fmt.Printf("URL: %s\n", s.Settings.URL)
-	fmt.Printf("Type: %s\n", s.Settings.Type)
-
-	for _, plugin := range s.Settings.Plugins {
-		fmt.Printf("Plugin: %s\n", plugin)
-	}
-}
-
 // StartSite Starts a site, including Traefik if needed
-func (s *Site) StartSite() error {
+func (s *Site) StartSite(consoleOutput *console.Console) error {
 	// Let's start everything up
-	fmt.Printf("Starting development site: %s\n", aurora.Bold(aurora.Green(s.getSiteURL(false))))
+	consoleOutput.Printf("Starting development site: %s\n", consoleOutput.Bold(consoleOutput.Green(s.getSiteURL(false))))
 
 	// Start Traefik if we need it
-	err := s.startTraefik()
+	err := s.startTraefik(consoleOutput)
 	if err != nil {
 		return err
 	}
 
 	// Start WordPress
-	err = s.startWordPress()
+	err = s.startWordPress(consoleOutput)
 	if err != nil {
 		return err
 	}
@@ -224,19 +195,19 @@ func (s *Site) StartSite() error {
 	}
 
 	// Setup WordPress
-	err = s.installWordPress()
+	err = s.installWordPress(consoleOutput)
 	if err != nil {
 		return err
 	}
 
 	// Install Xdebug if we need to
-	_, err = s.installXdebug()
+	_, err = s.installXdebug(consoleOutput)
 	if err != nil {
 		return err
 	}
 
 	// Install any configuration plugins if needed
-	err = s.installDefaultPlugins()
+	err = s.installDefaultPlugins(consoleOutput)
 	if err != nil {
 		return err
 	}
@@ -269,7 +240,7 @@ func (s *Site) getLocalAppDir() (string, error) {
 }
 
 // getRunningConfig gets various options that were used to start the site
-func (s *Site) getRunningConfig(withPlugins bool) (settings.LocalSettings, error) {
+func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console) (settings.LocalSettings, error) {
 	localSettings := settings.LocalSettings{
 		Type:       "site",
 		Local:      false,
@@ -320,7 +291,7 @@ func (s *Site) getRunningConfig(withPlugins bool) (settings.LocalSettings, error
 
 	// Don't get plugins if we don't need them
 	if withPlugins {
-		plugins, err := s.getInstalledWordPressPlugins()
+		plugins, err := s.getInstalledWordPressPlugins(consoleOutput)
 		if err != nil {
 			return localSettings, err
 		}
@@ -341,12 +312,12 @@ func (s *Site) getSiteURL(insecure bool) string {
 }
 
 // installXdebug installs xdebug in the site's PHP container
-func (s *Site) installXdebug() (bool, error) {
+func (s *Site) installXdebug(consoleOutput *console.Console) (bool, error) {
 	if !s.Settings.Xdebug {
 		return false, nil
 	}
 
-	console.Println("Installing Xdebug...")
+	consoleOutput.Println("Installing Xdebug...")
 
 	commands := []string{
 		"pecl list | grep xdebug",
@@ -381,10 +352,10 @@ func (s *Site) installXdebug() (bool, error) {
 }
 
 // isLocalSite Determines if a site is a "local" site (started with the "local" flag) so that other commands can work as needed.
-func (s *Site) isLocalSite() bool {
+func (s *Site) isLocalSite(consoleOutput *console.Console) bool {
 	// If the site is already running, try to make this easier
 	if s.IsSiteRunning() {
-		runningConfig, _ := s.getRunningConfig(false)
+		runningConfig, _ := s.getRunningConfig(false, consoleOutput)
 		if runningConfig.Local {
 			return true
 		}

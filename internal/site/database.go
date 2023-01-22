@@ -8,7 +8,7 @@ import (
 	"github.com/ChrisWiegman/kana-cli/pkg/console"
 )
 
-func (s *Site) ExportDatabase(args []string) (string, error) {
+func (s *Site) ExportDatabase(args []string, consoleOutput *console.Console) (string, error) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		return "", err
@@ -28,7 +28,7 @@ func (s *Site) ExportDatabase(args []string) (string, error) {
 		"/Site/export.sql",
 	}
 
-	code, output, err := s.RunWPCli(exportCommand)
+	code, output, err := s.RunWPCli(exportCommand, consoleOutput)
 	if err != nil || code != 0 {
 		return "", fmt.Errorf("database export failed: %s\n%s", err.Error(), output)
 	}
@@ -41,7 +41,7 @@ func (s *Site) ExportDatabase(args []string) (string, error) {
 	return exportFile, nil
 }
 
-func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string) error {
+func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string, consoleOutput *console.Console) error {
 	cwd, err := os.Getwd()
 	if err != nil {
 		return err
@@ -60,7 +60,7 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string) 
 	}
 
 	if !preserve {
-		console.Println("Dropping the existing database.")
+		consoleOutput.Println("Dropping the existing database.")
 
 		dropCommand := []string{
 			"db",
@@ -76,18 +76,18 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string) 
 		var code int64
 		var output string
 
-		code, output, err = s.RunWPCli(dropCommand)
+		code, output, err = s.RunWPCli(dropCommand, consoleOutput)
 		if err != nil || code != 0 {
 			return fmt.Errorf("drop database failed: %s\n%s", err.Error(), output)
 		}
 
-		code, output, err = s.RunWPCli(createCommand)
+		code, output, err = s.RunWPCli(createCommand, consoleOutput)
 		if err != nil || code != 0 {
 			return fmt.Errorf("create database failed: %s\n%s", err.Error(), output)
 		}
 	}
 
-	console.Println("Importing the database file.")
+	consoleOutput.Println("Importing the database file.")
 
 	importCommand := []string{
 		"db",
@@ -95,13 +95,13 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string) 
 		"/Site/import.sql",
 	}
 
-	code, output, err := s.RunWPCli(importCommand)
+	code, output, err := s.RunWPCli(importCommand, consoleOutput)
 	if err != nil || code != 0 {
 		return fmt.Errorf("database import failed: %s\n%s", err.Error(), output)
 	}
 
 	if replaceDomain != "" {
-		console.Println("Replacing the old domain name")
+		consoleOutput.Println("Replacing the old domain name")
 
 		replaceCommand := []string{
 			"search-replace",
@@ -110,7 +110,7 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string) 
 			"--all-tables",
 		}
 
-		code, output, err := s.RunWPCli(replaceCommand)
+		code, output, err := s.RunWPCli(replaceCommand, consoleOutput)
 		if err != nil || code != 0 {
 			return fmt.Errorf("replace domain failed failed: %s\n%s", err.Error(), output)
 		}

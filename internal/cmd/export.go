@@ -10,26 +10,26 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newExportCommand(kanaSite *site.Site) *cobra.Command {
+func newExportCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "export",
 		Short: "Export the current config to a .kana.json file to save with your repo.",
 		Run: func(cmd *cobra.Command, args []string) {
-			err := kanaSite.EnsureDocker()
+			err := kanaSite.EnsureDocker(consoleOutput)
 			if err != nil {
-				console.Error(err, flagVerbose)
+				consoleOutput.Error(err)
 			}
 
 			if !kanaSite.IsSiteRunning() {
-				console.Error(fmt.Errorf("the export command only works on a running site.  Please run 'kana start' to start the site"), flagVerbose)
+				consoleOutput.Error(fmt.Errorf("the export command only works on a running site.  Please run 'kana start' to start the site"))
 			}
 
-			err = kanaSite.ExportSiteConfig()
+			err = kanaSite.ExportSiteConfig(consoleOutput)
 			if err != nil {
-				console.Error(err, flagVerbose)
+				consoleOutput.Error(err)
 			}
 
-			console.Success(fmt.Sprintf("Your config has been exported to %s", path.Join(kanaSite.Settings.WorkingDirectory, ".kana.json")))
+			consoleOutput.Success(fmt.Sprintf("Your config has been exported to %s", path.Join(kanaSite.Settings.WorkingDirectory, ".kana.json")))
 		},
 		Args: cobra.ArbitraryArgs,
 	}

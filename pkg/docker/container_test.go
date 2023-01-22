@@ -2,16 +2,19 @@ package docker
 
 import (
 	"testing"
+
+	"github.com/ChrisWiegman/kana-cli/pkg/console"
 )
 
 func TestContainerRun(t *testing.T) {
-	d, err := NewController()
+	consoleOutput := new(console.Console)
 
+	d, err := NewController(consoleOutput)
 	if err != nil {
 		t.Error(err)
 	}
 
-	err = d.EnsureImage("alpine")
+	err = d.EnsureImage("alpine", consoleOutput)
 	if err != nil {
 		t.Error(err)
 	}

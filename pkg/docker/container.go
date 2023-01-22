@@ -194,11 +194,6 @@ func (d *DockerClient) ContainerRunAndClean(config *ContainerConfig) (statusCode
 	body, _ = d.ContainerLog(id)
 
 	err = d.client.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{})
-
-	if err != nil {
-		fmt.Printf("Unable to remove container %q: %q\n", id, err)
-	}
-
 	return statusCode, body, err
 }
 

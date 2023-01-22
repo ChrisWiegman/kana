@@ -23,27 +23,27 @@ func (s *Settings) GetGlobalSetting(md *cobra.Command, args []string) (string, e
 }
 
 // ListSettings Lists all settings for the config command
-func (s *Settings) ListSettings() {
+func (s *Settings) ListSettings(consoleOutput *console.Console) {
 	t := table.New(os.Stdout)
 
 	t.SetHeaders("Setting", "Global Value", "Local Value")
 
-	t.AddRow("admin.email", console.Bold(s.global.GetString("admin.email")))
-	t.AddRow("admin.password", console.Bold(s.global.GetString("admin.password")))
-	t.AddRow("admnin.username", console.Bold(s.global.GetString("admin.username")))
-	t.AddRow("local", console.Bold(s.global.GetString("local")), console.Bold(s.local.GetString("local")))
-	t.AddRow("php", console.Bold(s.global.GetString("php")), console.Bold(s.local.GetString("php")))
-	t.AddRow("phpmyadmin", console.Bold(s.global.GetString("phpmyadmin")), console.Bold(s.local.GetString("phpmyadmin")))
-	t.AddRow("type", console.Bold(s.global.GetString("type")), console.Bold(s.local.GetString("type")))
-	t.AddRow("xdebug", console.Bold(s.global.GetString("xdebug")), console.Bold(s.local.GetString("xdebug")))
+	t.AddRow("admin.email", consoleOutput.Bold(s.global.GetString("admin.email")))
+	t.AddRow("admin.password", consoleOutput.Bold(s.global.GetString("admin.password")))
+	t.AddRow("admnin.username", consoleOutput.Bold(s.global.GetString("admin.username")))
+	t.AddRow("local", consoleOutput.Bold(s.global.GetString("local")), consoleOutput.Bold(s.local.GetString("local")))
+	t.AddRow("php", consoleOutput.Bold(s.global.GetString("php")), consoleOutput.Bold(s.local.GetString("php")))
+	t.AddRow("phpmyadmin", consoleOutput.Bold(s.global.GetString("phpmyadmin")), consoleOutput.Bold(s.local.GetString("phpmyadmin")))
+	t.AddRow("type", consoleOutput.Bold(s.global.GetString("type")), consoleOutput.Bold(s.local.GetString("type")))
+	t.AddRow("xdebug", consoleOutput.Bold(s.global.GetString("xdebug")), consoleOutput.Bold(s.local.GetString("xdebug")))
 
 	boldPlugins := []string{}
 
 	for _, plugin := range s.Plugins {
-		boldPlugins = append(boldPlugins, console.Bold(plugin))
+		boldPlugins = append(boldPlugins, consoleOutput.Bold(plugin))
 	}
 
-	plugins := console.Bold(strings.Join(boldPlugins, "\n"))
+	plugins := consoleOutput.Bold(strings.Join(boldPlugins, "\n"))
 
 	t.AddRow("plugins", "", plugins)
 

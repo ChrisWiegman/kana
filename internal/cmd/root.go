@@ -13,6 +13,7 @@ var commandsRequiringSite []string
 
 func Execute() {
 	kanaSite := new(site.Site)
+	consoleOutput := new(console.Console)
 
 	// Setup the cobra command
 	cmd := &cobra.Command{
@@ -20,9 +21,12 @@ func Execute() {
 		Short: "Kana is a simple WordPress development tool designed for plugin and theme developers.",
 		Args:  cobra.NoArgs,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			consoleOutput.Debug = flagVerbose
+			consoleOutput.JSON = flagJsonOutput
+
 			err := kanaSite.LoadSite(cmd, commandsRequiringSite, startFlags, flagVerbose)
 			if err != nil {
-				console.Error(err, flagVerbose)
+				consoleOutput.Error(err)
 			}
 		},
 	}
@@ -37,25 +41,25 @@ func Execute() {
 
 	err := cmd.PersistentFlags().MarkHidden("output-json")
 	if err != nil {
-		console.Error(err, flagVerbose)
+		consoleOutput.Error(err)
 	}
 
 	// Register the subcommands
 	cmd.AddCommand(
-		newStartCommand(kanaSite),
-		newStopCommand(kanaSite),
-		newOpenCommand(kanaSite),
-		newWPCommand(kanaSite),
-		newDestroyCommand(kanaSite),
-		newConfigCommand(kanaSite),
-		newExportCommand(kanaSite),
-		newVersionCommand(),
-		newDBCommand(kanaSite),
-		newListCommand(kanaSite),
+		newStartCommand(consoleOutput, kanaSite),
+		newStopCommand(consoleOutput, kanaSite),
+		newOpenCommand(consoleOutput, kanaSite),
+		newWPCommand(consoleOutput, kanaSite),
+		newDestroyCommand(consoleOutput, kanaSite),
+		newConfigCommand(consoleOutput, kanaSite),
+		newExportCommand(consoleOutput, kanaSite),
+		newVersionCommand(consoleOutput),
+		newDBCommand(consoleOutput, kanaSite),
+		newListCommand(consoleOutput, kanaSite),
 	)
 
 	// Execute anything we need to
 	if err := cmd.Execute(); err != nil {
-		console.Error(err, flagVerbose)
+		consoleOutput.Error(err)
 	}
 }

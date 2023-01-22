@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newConfigCommand(kanaSite *site.Site) *cobra.Command {
+func newConfigCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "config",
 		Short: "View and edit the saved configuration for the app or the local site.",
@@ -16,18 +16,18 @@ func newConfigCommand(kanaSite *site.Site) *cobra.Command {
 			// This is similar to how setting git options works
 			switch len(args) {
 			case 0:
-				kanaSite.Settings.ListSettings()
+				kanaSite.Settings.ListSettings(consoleOutput)
 			case 1:
 				value, err := kanaSite.Settings.GetGlobalSetting(cmd, args)
 				if err != nil {
-					console.Error(err, flagVerbose)
+					consoleOutput.Error(err)
 				}
 
-				console.Println(value)
+				consoleOutput.Println(value)
 			case 2:
 				err := kanaSite.Settings.SetGlobalSetting(cmd, args)
 				if err != nil {
-					console.Error(err, flagVerbose)
+					consoleOutput.Error(err)
 				}
 			}
 		},

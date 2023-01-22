@@ -10,31 +10,31 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newWPCommand(kanaSite *site.Site) *cobra.Command {
+func newWPCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "wp",
 		Short: "Run a wp-cli command against the current site.",
 		Run: func(cmd *cobra.Command, args []string) {
-			err := kanaSite.EnsureDocker()
+			err := kanaSite.EnsureDocker(consoleOutput)
 			if err != nil {
-				console.Error(err, flagVerbose)
+				consoleOutput.Error(err)
 			}
 
 			if !kanaSite.IsSiteRunning() {
-				console.Error(fmt.Errorf("the `wp` command only works on a running site. Please run 'kana start' to start the site"), flagVerbose)
+				consoleOutput.Error(fmt.Errorf("the `wp` command only works on a running site. Please run 'kana start' to start the site"))
 			}
 
 			// Run the output from wp-cli
-			code, output, err := kanaSite.RunWPCli(args)
+			code, output, err := kanaSite.RunWPCli(args, consoleOutput)
 			if err != nil {
-				console.Error(err, flagVerbose)
+				consoleOutput.Error(err)
 			}
 
 			if code != 0 {
-				console.Error(errors.New(output), flagVerbose)
+				consoleOutput.Error(errors.New(output))
 			}
 
-			console.Println(output)
+			consoleOutput.Println(output)
 		},
 		Args: cobra.ArbitraryArgs,
 	}
