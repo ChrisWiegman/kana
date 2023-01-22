@@ -1,0 +1,4 @@
+kind: Features
+body: Add hidden, persisten `output-json` flag to allow me to abstract the CLI more
+  easily in other applications
+time: 2023-01-22T00:48:13.635432494Z
