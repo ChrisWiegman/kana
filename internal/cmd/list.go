@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"encoding/json"
+	"fmt"
 	"os"
 	"strconv"
 
@@ -22,6 +24,14 @@ func newListCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.
 			}
 
 			if len(sites) > 0 {
+				if consoleOutput.JSON {
+					str, _ := json.Marshal(sites)
+
+					fmt.Println(string(str))
+
+					return
+				}
+
 				t := table.New(os.Stdout)
 
 				t.SetHeaders("Name", "Path", "Running")
