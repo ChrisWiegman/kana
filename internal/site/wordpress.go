@@ -282,7 +282,7 @@ func (s *Site) startWordPress(consoleOutput *console.Console) error {
 	wordPressContainers := []docker.ContainerConfig{
 		{
 			Name:        fmt.Sprintf("kana_%s_database", s.Settings.Name),
-			Image:       "mariadb",
+			Image:       "mariadb:10",
 			NetworkName: "kana",
 			HostName:    fmt.Sprintf("kana_%s_database", s.Settings.Name),
 			Ports: []docker.ExposedPorts{
