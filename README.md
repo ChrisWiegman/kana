@@ -222,3 +222,9 @@ I hate apps that leave leftovers on your machine. When stopping a site all Docke
 4. If installed via homebrew run `brew untap ChrisWiegman/kana` to remove the Homebrew tap
 
 You can also safely remove any new images added however it is not a requirement. Many other apps might share those images leading to your system simply needing to download them again.
+
+# Using Kana in other projects
+
+While Kana cannot easily be used as a package itself, you can import the binary itself into your project. If you do so, consider using the `output-json` flag on all commands. This will convert all output to JSON format to make consumption easier when the application is embedded in another.
+
+Why do this? This will make it easier for me to work with Kana in a small toolbar app I'm building which will allow me to see what is going on with Kana and control it beyond the terminal.
