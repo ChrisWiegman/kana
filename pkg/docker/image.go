@@ -26,12 +26,17 @@ func (d *DockerClient) EnsureImage(imageName string, consoleOutput *console.Cons
 
 	defer reader.Close()
 
-	if !consoleOutput.JSON {
-		termFd, isTerm := term.GetFdInfo(os.Stderr)
-		return jsonmessage.DisplayJSONMessagesStream(reader, os.Stderr, termFd, isTerm, nil)
+	consoleOutput.Println("Ensuring all images are present and up to date (this may take a few minutes")
+
+	// Discard the download information unless we're debugging
+	out := os.Stdout
+
+	if consoleOutput.JSON || !consoleOutput.Debug {
+		out, _ = os.Open(os.DevNull)
 	}
 
-	return nil
+	termFd, isTerm := term.GetFdInfo(os.Stdout)
+	return jsonmessage.DisplayJSONMessagesStream(reader, out, termFd, isTerm, nil)
 }
 
 func (d *DockerClient) RemoveImage(image string) (removed bool, err error) {
