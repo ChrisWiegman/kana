@@ -280,65 +280,19 @@ func (s *Site) startWordPress(consoleOutput *console.Console) error {
 		return err
 	}
 
-	wordPressContainers := []docker.ContainerConfig{
-		{
-			Name:        fmt.Sprintf("kana_%s_database", s.Settings.Name),
-			Image:       "mariadb:10",
-			NetworkName: "kana",
-			HostName:    fmt.Sprintf("kana_%s_database", s.Settings.Name),
-			Ports: []docker.ExposedPorts{
-				{Port: "3306", Protocol: "tcp"},
-			},
-			Env: []string{
-				"MARIADB_ROOT_PASSWORD=password",
-				"MARIADB_DATABASE=wordpress",
-				"MARIADB_USER=wordpress",
-				"MARIADB_PASSWORD=wordpress",
-			},
-			Labels: map[string]string{
-				"kana.site": s.Settings.Name,
-			},
-			Volumes: []mount.Mount{
-				{ // Maps a database folder to the MySQL container for persistence
-					Type:   mount.TypeBind,
-					Source: databaseDir,
-					Target: "/var/lib/mysql",
-				},
-			},
-		},
-		{
-			Name:        fmt.Sprintf("kana_%s_wordpress", s.Settings.Name),
-			Image:       fmt.Sprintf("wordpress:php%s", s.Settings.PHP),
-			NetworkName: "kana",
-			HostName:    fmt.Sprintf("kana_%s_wordpress", s.Settings.Name),
-			Env: []string{
-				fmt.Sprintf("WORDPRESS_DB_HOST=kana_%s_database", s.Settings.Name),
-				"WORDPRESS_DB_USER=wordpress",
-				"WORDPRESS_DB_PASSWORD=wordpress",
-				"WORDPRESS_DB_NAME=wordpress",
-			},
-			Labels: map[string]string{
-				"traefik.enable": "true",
-				fmt.Sprintf("traefik.http.routers.wordpress-%s-http.entrypoints", s.Settings.Name): "web",
-				fmt.Sprintf("traefik.http.routers.wordpress-%s-http.rule", s.Settings.Name):        fmt.Sprintf("Host(`%s`)", s.Settings.SiteDomain),
-				fmt.Sprintf("traefik.http.routers.wordpress-%s.entrypoints", s.Settings.Name):      "websecure",
-				fmt.Sprintf("traefik.http.routers.wordpress-%s.rule", s.Settings.Name):             fmt.Sprintf("Host(`%s`)", s.Settings.SiteDomain),
-				fmt.Sprintf("traefik.http.routers.wordpress-%s.tls", s.Settings.Name):              "true",
-				"kana.site": s.Settings.Name,
-			},
-			Volumes: appVolumes,
-		},
-	}
+	var appContainers []docker.ContainerConfig
 
-	wordPressContainers = s.getPhpMyAdminContainer(databaseDir, wordPressContainers)
-	wordPressContainers = s.getMailpitContainer(wordPressContainers)
+	appContainers = s.getDatabaseContainer(databaseDir, appContainers)
+	appContainers = s.getWordPressContainer(appVolumes, appContainers)
+	appContainers = s.getPhpMyAdminContainer(databaseDir, appContainers)
+	appContainers = s.getMailpitContainer(appContainers)
 
-	for i := range wordPressContainers {
-		err := s.dockerClient.EnsureImage(wordPressContainers[i].Image, consoleOutput)
+	for i := range appContainers {
+		err := s.dockerClient.EnsureImage(appContainers[i].Image, consoleOutput)
 		if err != nil {
 			return err
 		}
-		_, err = s.dockerClient.ContainerRun(&wordPressContainers[i], true, true)
+		_, err = s.dockerClient.ContainerRun(&appContainers[i], true, true)
 		if err != nil {
 			return err
 		}
@@ -361,7 +315,39 @@ func (s *Site) stopWordPress() error {
 	return nil
 }
 
-func (s *Site) getMailpitContainer(wordPressContainers []docker.ContainerConfig) []docker.ContainerConfig {
+func (s *Site) getDatabaseContainer(databaseDir string, appContainers []docker.ContainerConfig) []docker.ContainerConfig {
+	databaseContainer := docker.ContainerConfig{
+		Name:        fmt.Sprintf("kana_%s_database", s.Settings.Name),
+		Image:       "mariadb:10",
+		NetworkName: "kana",
+		HostName:    fmt.Sprintf("kana_%s_database", s.Settings.Name),
+		Ports: []docker.ExposedPorts{
+			{Port: "3306", Protocol: "tcp"},
+		},
+		Env: []string{
+			"MARIADB_ROOT_PASSWORD=password",
+			"MARIADB_DATABASE=wordpress",
+			"MARIADB_USER=wordpress",
+			"MARIADB_PASSWORD=wordpress",
+		},
+		Labels: map[string]string{
+			"kana.site": s.Settings.Name,
+		},
+		Volumes: []mount.Mount{
+			{ // Maps a database folder to the MySQL container for persistence
+				Type:   mount.TypeBind,
+				Source: databaseDir,
+				Target: "/var/lib/mysql",
+			},
+		},
+	}
+
+	appContainers = append(appContainers, databaseContainer)
+
+	return appContainers
+}
+
+func (s *Site) getMailpitContainer(appContainers []docker.ContainerConfig) []docker.ContainerConfig {
 	if s.Settings.Mailpit {
 		mailpitContainer := docker.ContainerConfig{
 			Name:        fmt.Sprintf("kana_%s_mailpit", s.Settings.Name),
@@ -397,13 +383,13 @@ func (s *Site) getMailpitContainer(wordPressContainers []docker.ContainerConfig)
 			},
 		}
 
-		wordPressContainers = append(wordPressContainers, mailpitContainer)
+		appContainers = append(appContainers, mailpitContainer)
 	}
 
-	return wordPressContainers
+	return appContainers
 }
 
-func (s *Site) getPhpMyAdminContainer(databaseDir string, wordPressContainers []docker.ContainerConfig) []docker.ContainerConfig {
+func (s *Site) getPhpMyAdminContainer(databaseDir string, appContainers []docker.ContainerConfig) []docker.ContainerConfig {
 	if s.Settings.PhpMyAdmin {
 		phpMyAdminContainer := docker.ContainerConfig{
 			Name:        fmt.Sprintf("kana_%s_phpmyadmin", s.Settings.Name),
@@ -446,8 +432,37 @@ func (s *Site) getPhpMyAdminContainer(databaseDir string, wordPressContainers []
 			},
 		}
 
-		wordPressContainers = append(wordPressContainers, phpMyAdminContainer)
+		appContainers = append(appContainers, phpMyAdminContainer)
 	}
 
-	return wordPressContainers
+	return appContainers
+}
+
+func (s *Site) getWordPressContainer(appVolumes []mount.Mount, appContainers []docker.ContainerConfig) []docker.ContainerConfig {
+	wordPressContainer := docker.ContainerConfig{
+		Name:        fmt.Sprintf("kana_%s_wordpress", s.Settings.Name),
+		Image:       fmt.Sprintf("wordpress:php%s", s.Settings.PHP),
+		NetworkName: "kana",
+		HostName:    fmt.Sprintf("kana_%s_wordpress", s.Settings.Name),
+		Env: []string{
+			fmt.Sprintf("WORDPRESS_DB_HOST=kana_%s_database", s.Settings.Name),
+			"WORDPRESS_DB_USER=wordpress",
+			"WORDPRESS_DB_PASSWORD=wordpress",
+			"WORDPRESS_DB_NAME=wordpress",
+		},
+		Labels: map[string]string{
+			"traefik.enable": "true",
+			fmt.Sprintf("traefik.http.routers.wordpress-%s-http.entrypoints", s.Settings.Name): "web",
+			fmt.Sprintf("traefik.http.routers.wordpress-%s-http.rule", s.Settings.Name):        fmt.Sprintf("Host(`%s`)", s.Settings.SiteDomain),
+			fmt.Sprintf("traefik.http.routers.wordpress-%s.entrypoints", s.Settings.Name):      "websecure",
+			fmt.Sprintf("traefik.http.routers.wordpress-%s.rule", s.Settings.Name):             fmt.Sprintf("Host(`%s`)", s.Settings.SiteDomain),
+			fmt.Sprintf("traefik.http.routers.wordpress-%s.tls", s.Settings.Name):              "true",
+			"kana.site": s.Settings.Name,
+		},
+		Volumes: appVolumes,
+	}
+
+	appContainers = append(appContainers, wordPressContainer)
+
+	return appContainers
 }
