@@ -282,7 +282,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 		localSettings.Xdebug = true
 	}
 
-	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana_%s_wordpress", s.Settings.Name))
+	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana-%s-wordpress", s.Settings.Name))
 
 	if len(mounts) == 1 {
 		localSettings.Type = "site"
@@ -396,7 +396,7 @@ func (s *Site) isLocalSite(consoleOutput *console.Console) bool {
 
 // runCli Runs an arbitrary CLI command against the site's WordPress container
 func (s *Site) runCli(command string, restart bool) (docker.ExecResult, error) {
-	container := fmt.Sprintf("kana_%s_wordpress", s.Settings.Name)
+	container := fmt.Sprintf("kana-%s-wordpress", s.Settings.Name)
 
 	output, err := s.dockerClient.ContainerExec(container, []string{command})
 	if err != nil {

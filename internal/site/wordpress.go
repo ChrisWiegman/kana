@@ -45,13 +45,13 @@ func (s *Site) RunWPCli(command []string, consoleOutput *console.Console) (statu
 	fullCommand = append(fullCommand, command...)
 
 	container := docker.ContainerConfig{
-		Name:        fmt.Sprintf("kana_%s_wordpress_cli", s.Settings.Name),
+		Name:        fmt.Sprintf("kana-%s-wordpress_cli", s.Settings.Name),
 		Image:       fmt.Sprintf("wordpress:cli-php%s", s.Settings.PHP),
 		NetworkName: "kana",
-		HostName:    fmt.Sprintf("kana_%s_wordpress_cli", s.Settings.Name),
+		HostName:    fmt.Sprintf("kana-%s-wordpress_cli", s.Settings.Name),
 		Command:     fullCommand,
 		Env: []string{
-			fmt.Sprintf("WORDPRESS_DB_HOST=kana_%s_database", s.Settings.Name),
+			fmt.Sprintf("WORDPRESS_DB_HOST=kana-%s-database", s.Settings.Name),
 			"WORDPRESS_DB_USER=wordpress",
 			"WORDPRESS_DB_PASSWORD=wordpress",
 			"WORDPRESS_DB_NAME=wordpress",
@@ -164,10 +164,10 @@ func (s *Site) getMounts(appDir string) ([]mount.Mount, error) {
 // getWordPressContainers returns an array of strings containing the container names for the site
 func (s *Site) getWordPressContainers() []string {
 	return []string{
-		fmt.Sprintf("kana_%s_database", s.Settings.Name),
-		fmt.Sprintf("kana_%s_wordpress", s.Settings.Name),
-		fmt.Sprintf("kana_%s_phpmyadmin", s.Settings.Name),
-		fmt.Sprintf("kana_%s_mailpit", s.Settings.Name),
+		fmt.Sprintf("kana-%s-database", s.Settings.Name),
+		fmt.Sprintf("kana-%s-wordpress", s.Settings.Name),
+		fmt.Sprintf("kana-%s-phpmyadmin", s.Settings.Name),
+		fmt.Sprintf("kana-%s-mailpit", s.Settings.Name),
 	}
 }
 
@@ -317,10 +317,10 @@ func (s *Site) stopWordPress() error {
 
 func (s *Site) getDatabaseContainer(databaseDir string, appContainers []docker.ContainerConfig) []docker.ContainerConfig {
 	databaseContainer := docker.ContainerConfig{
-		Name:        fmt.Sprintf("kana_%s_database", s.Settings.Name),
+		Name:        fmt.Sprintf("kana-%s-database", s.Settings.Name),
 		Image:       "mariadb:10",
 		NetworkName: "kana",
-		HostName:    fmt.Sprintf("kana_%s_database", s.Settings.Name),
+		HostName:    fmt.Sprintf("kana-%s-database", s.Settings.Name),
 		Ports: []docker.ExposedPorts{
 			{Port: "3306", Protocol: "tcp"},
 		},
@@ -350,14 +350,15 @@ func (s *Site) getDatabaseContainer(databaseDir string, appContainers []docker.C
 func (s *Site) getMailpitContainer(appContainers []docker.ContainerConfig) []docker.ContainerConfig {
 	if s.Settings.Mailpit {
 		mailpitContainer := docker.ContainerConfig{
-			Name:        fmt.Sprintf("kana_%s_mailpit", s.Settings.Name),
+			Name:        fmt.Sprintf("kana-%s-mailpit", s.Settings.Name),
 			Image:       "axllent/mailpit",
 			NetworkName: "kana",
-			HostName:    fmt.Sprintf("kana_%s_mailpit", s.Settings.Name),
+			HostName:    fmt.Sprintf("kana-%s-mailpit", s.Settings.Name),
 			Env:         []string{},
 			Volumes:     []mount.Mount{},
 			Ports: []docker.ExposedPorts{
 				{Port: "8025", Protocol: "tcp"},
+				{Port: "1025", Protocol: "tcp"},
 			},
 			Labels: map[string]string{
 				"traefik.enable": "true",
@@ -392,13 +393,13 @@ func (s *Site) getMailpitContainer(appContainers []docker.ContainerConfig) []doc
 func (s *Site) getPhpMyAdminContainer(databaseDir string, appContainers []docker.ContainerConfig) []docker.ContainerConfig {
 	if s.Settings.PhpMyAdmin {
 		phpMyAdminContainer := docker.ContainerConfig{
-			Name:        fmt.Sprintf("kana_%s_phpmyadmin", s.Settings.Name),
+			Name:        fmt.Sprintf("kana-%s-phpmyadmin", s.Settings.Name),
 			Image:       "phpmyadmin",
 			NetworkName: "kana",
-			HostName:    fmt.Sprintf("kana_%s_phpmyadmin", s.Settings.Name),
+			HostName:    fmt.Sprintf("kana-%s-phpmyadmin", s.Settings.Name),
 			Env: []string{
 				"MYSQL_ROOT_PASSWORD=password",
-				fmt.Sprintf("PMA_HOST=kana_%s_database", s.Settings.Name),
+				fmt.Sprintf("PMA_HOST=kana-%s-database", s.Settings.Name),
 				"PMA_USER=wordpress",
 				"PMA_PASSWORD=wordpress",
 			},
@@ -440,12 +441,12 @@ func (s *Site) getPhpMyAdminContainer(databaseDir string, appContainers []docker
 
 func (s *Site) getWordPressContainer(appVolumes []mount.Mount, appContainers []docker.ContainerConfig) []docker.ContainerConfig {
 	wordPressContainer := docker.ContainerConfig{
-		Name:        fmt.Sprintf("kana_%s_wordpress", s.Settings.Name),
+		Name:        fmt.Sprintf("kana-%s-wordpress", s.Settings.Name),
 		Image:       fmt.Sprintf("wordpress:php%s", s.Settings.PHP),
 		NetworkName: "kana",
-		HostName:    fmt.Sprintf("kana_%s_wordpress", s.Settings.Name),
+		HostName:    fmt.Sprintf("kana-%s-wordpress", s.Settings.Name),
 		Env: []string{
-			fmt.Sprintf("WORDPRESS_DB_HOST=kana_%s_database", s.Settings.Name),
+			fmt.Sprintf("WORDPRESS_DB_HOST=kana-%s-database", s.Settings.Name),
 			"WORDPRESS_DB_USER=wordpress",
 			"WORDPRESS_DB_PASSWORD=wordpress",
 			"WORDPRESS_DB_NAME=wordpress",
