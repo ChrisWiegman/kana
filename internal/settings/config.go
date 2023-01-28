@@ -38,11 +38,9 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 	t.AddRow("admin.password", consoleOutput.Bold(s.global.GetString("admin.password")))
 	t.AddRow("admnin.username", consoleOutput.Bold(s.global.GetString("admin.username")))
 	t.AddRow("local", consoleOutput.Bold(s.global.GetString("local")), consoleOutput.Bold(s.local.GetString("local")))
+	t.AddRow("mailpit", consoleOutput.Bold(s.global.GetString("mailpit")), consoleOutput.Bold(s.local.GetString("mailpit")))
 	t.AddRow("php", consoleOutput.Bold(s.global.GetString("php")), consoleOutput.Bold(s.local.GetString("php")))
 	t.AddRow("phpmyadmin", consoleOutput.Bold(s.global.GetString("phpmyadmin")), consoleOutput.Bold(s.local.GetString("phpmyadmin")))
-	t.AddRow("mailpit", consoleOutput.Bold(s.global.GetString("mailpit")), consoleOutput.Bold(s.local.GetString("mailpit")))
-	t.AddRow("type", consoleOutput.Bold(s.global.GetString("type")), consoleOutput.Bold(s.local.GetString("type")))
-	t.AddRow("xdebug", consoleOutput.Bold(s.global.GetString("xdebug")), consoleOutput.Bold(s.local.GetString("xdebug")))
 
 	boldPlugins := []string{}
 
@@ -53,6 +51,9 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 	plugins := consoleOutput.Bold(strings.Join(boldPlugins, "\n"))
 
 	t.AddRow("plugins", "", plugins)
+
+	t.AddRow("type", consoleOutput.Bold(s.global.GetString("type")), consoleOutput.Bold(s.local.GetString("type")))
+	t.AddRow("xdebug", consoleOutput.Bold(s.global.GetString("xdebug")), consoleOutput.Bold(s.local.GetString("xdebug")))
 
 	t.Render()
 }
