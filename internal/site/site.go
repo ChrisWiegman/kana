@@ -319,7 +319,7 @@ func (s *Site) installXdebug(consoleOutput *console.Console) (bool, error) {
 		return false, nil
 	}
 
-	consoleOutput.Println("Installing Xdebug...")
+	consoleOutput.Println("Installing and configuring Xdebug.")
 
 	commands := []string{
 		"pecl list | grep xdebug",
