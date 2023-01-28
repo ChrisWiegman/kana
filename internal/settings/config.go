@@ -40,6 +40,7 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 	t.AddRow("local", consoleOutput.Bold(s.global.GetString("local")), consoleOutput.Bold(s.local.GetString("local")))
 	t.AddRow("php", consoleOutput.Bold(s.global.GetString("php")), consoleOutput.Bold(s.local.GetString("php")))
 	t.AddRow("phpmyadmin", consoleOutput.Bold(s.global.GetString("phpmyadmin")), consoleOutput.Bold(s.local.GetString("phpmyadmin")))
+	t.AddRow("mailpit", consoleOutput.Bold(s.global.GetString("mailpit")), consoleOutput.Bold(s.local.GetString("mailpit")))
 	t.AddRow("type", consoleOutput.Bold(s.global.GetString("type")), consoleOutput.Bold(s.local.GetString("type")))
 	t.AddRow("xdebug", consoleOutput.Bold(s.global.GetString("xdebug")), consoleOutput.Bold(s.local.GetString("xdebug")))
 

@@ -13,15 +13,16 @@ import (
 type StartFlags struct {
 	Xdebug     bool
 	PhpMyAdmin bool
+	Mailpit    bool
 	Local      bool
 	IsTheme    bool
 	IsPlugin   bool
 }
 
 type LocalSettings struct {
-	Local, PhpMyAdmin, Xdebug bool
-	Type                      string
-	Plugins                   []string
+	Local, PhpMyAdmin, Mailpit, Xdebug bool
+	Type                               string
+	Plugins                            []string
 }
 
 // LoadLocalSettings Loads the config for the current site being called
@@ -48,6 +49,7 @@ func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 	s.local = localViper
 	s.Xdebug = localViper.GetBool("xdebug")
 	s.PhpMyAdmin = localViper.GetBool("phpmyadmin")
+	s.Mailpit = localViper.GetBool("mailpit")
 	s.Local = localViper.GetBool("local")
 	s.PHP = localViper.GetString("php")
 	s.Type = localViper.GetString("type")
@@ -139,6 +141,10 @@ func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
 		s.PhpMyAdmin = flags.PhpMyAdmin
 	}
 
+	if cmd.Flags().Lookup("mailpit").Changed {
+		s.Mailpit = flags.Mailpit
+	}
+
 	if cmd.Flags().Lookup("plugin").Changed && flags.IsPlugin {
 		s.Type = "plugin"
 	}
@@ -154,6 +160,7 @@ func (s *Settings) WriteLocalSettings(localSettings LocalSettings) error {
 	s.local.Set("type", localSettings.Type)
 	s.local.Set("xdebug", localSettings.Xdebug)
 	s.local.Set("phpmyadmin", localSettings.PhpMyAdmin)
+	s.local.Set("mailpit", localSettings.Mailpit)
 	s.local.Set("plugins", localSettings.Plugins)
 
 	if _, err := os.Stat(path.Join(s.WorkingDirectory, ".kana.json")); os.IsNotExist(err) {
@@ -172,6 +179,7 @@ func (s *Settings) loadlocalViper() (*viper.Viper, error) {
 	localSettings.SetDefault("local", s.Local)
 	localSettings.SetDefault("xdebug", s.Xdebug)
 	localSettings.SetDefault("phpmyadmin", s.PhpMyAdmin)
+	localSettings.SetDefault("mailpit", s.Mailpit)
 	localSettings.SetDefault("plugins", []string{})
 
 	localSettings.SetConfigName(".kana")
