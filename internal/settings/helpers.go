@@ -20,5 +20,6 @@ func sanitizeSiteName(rawSiteName string) string {
 	siteName := strings.TrimSpace(rawSiteName)
 	siteName = strings.ToLower(siteName)
 	siteName = strings.ReplaceAll(siteName, " ", "-")
+	siteName = strings.ReplaceAll(siteName, "_", "-")
 	return strings.ToValidUTF8(siteName, "")
 }
