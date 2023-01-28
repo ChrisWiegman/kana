@@ -163,13 +163,13 @@ func (s *Site) OpenSite(app string) error {
 		return err
 	}
 
-	var OpenURL string
+	OpenURL := s.Settings.SecureURL
 
 	switch app {
 	case "site":
-		OpenURL = s.Settings.SecureURL
-	case "phpmyadmin":
-		OpenURL = fmt.Sprintf("https://%s-%s", "phpmyadmin", s.Settings.SiteDomain)
+		break
+	case "phpmyadmin", "mailpit":
+		OpenURL = fmt.Sprintf("https://%s-%s", app, s.Settings.SiteDomain)
 	default:
 		return fmt.Errorf("you used an invalid app flag. Please check the help documentation for more info")
 	}

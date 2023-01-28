@@ -39,7 +39,7 @@ func newOpenCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.
 
 	commandsRequiringSite = append(commandsRequiringSite, cmd.Use)
 
-	cmd.Flags().StringVarP(&openAppFlag, "app", "a", "site", "site = open kana site, phpmyadmin = PhpMyAdmin")
+	cmd.Flags().StringVarP(&openAppFlag, "app", "a", "site", "site = open kana site, phpmyadmin = PhpMyAdmin, mailpit = Mailpit")
 
 	return cmd
 }
