@@ -78,6 +78,8 @@ If you do not specify the `local` flag you can find Kana's site files in `~/.con
 
 `--phpmyadmin` will start an instance of [phpMyAdmin](https://www.phpmyadmin.net) to allow for easier access to the database without needing external tools.
 
+`--mailpit` will start an instance of [Mailpit](https://github.com/axllent/mailpit) to allow for email capture and troubleshooting.
+
 `--name` The name flag allows you to run an arbitrary site from anywhere. For example, if you already started and stopped a site from a directory called _test_ you can run `kana start --name=test` to start that site from anywhere. If you use the `name` flag on a new site it will create that site without a link to any local folder. This can be handy for testing a plugin or other configuration but not that none of the other start flags will apply.
 
 ## Importing an existing WordPress database
@@ -115,6 +117,8 @@ You can also export the database file your Kana site is using with `kana db expo
 
 `kana open` will open the site in your default browser
 
+To open Mailpit or PhpMyAdmin in your default browser use the `app` flag with either `phpmyadmin` or `mailpit`.
+
 ## wp-cli
 
 `kana wp <WP-CLI COMMAND>` will execute a [wp-cli](https://wp-cli.org) command on your site. For example `kana wp plugin list` will list all the plugins on the site and their associated statuses
@@ -137,6 +141,7 @@ Kana has a handful of options that apply to all new sites created with the app. 
 - `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
 - `xdebug` **false** - the default usage of the `xdebug` start flag
 - `phpmyadmin` **false** - the default usage of the `phpmyadmin` start flag
+- `mailpit` **false** - the default usage of the `mailpit` start flag
 
 You can get or set any of the above options using a similar syntax to GIT's config. For example:
 
@@ -154,6 +159,7 @@ In addition to the global config, certain items above can be overridden for any 
 - `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
 - `xdebug` **false** - the default usage of the `xdebug` start flag
 - `phpmyadmin` **false** - the default usage of the `phpmyadmin` start flag
+- `mailpit` **false** - the default usage of the `mailpit` start flag
 - `plugins` **[]** - an array of plugins to install and activate when starting the new site. These are slugs from the Plugins section of WordPress.org.
 
 ### Export
