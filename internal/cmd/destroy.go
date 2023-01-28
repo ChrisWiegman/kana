@@ -69,6 +69,7 @@ func newDestroyCommand(consoleOutput *console.Console, kanaSite *site.Site) *cob
 
 	cmd.Flags().BoolVar(&flagForce, "force", false, "Force destruction of your site (doesn't require a prompt).")
 	cmd.Flags().SetNormalizeFunc(aliasForceFlag)
+
 	return cmd
 }
 

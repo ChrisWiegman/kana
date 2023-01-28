@@ -157,18 +157,29 @@ func (s *Site) LoadSite(cmd *cobra.Command, commandsRequiringSite []string, star
 }
 
 // OpenSite Opens the current site in a browser if it is running
-func (s *Site) OpenSite() error {
+func (s *Site) OpenSite(app string) error {
 	err := s.verifySite()
 	if err != nil {
 		return err
 	}
 
+	var OpenURL string
+
+	switch app {
+	case "site":
+		OpenURL = s.Settings.SecureURL
+	case "phpmyadmin":
+		OpenURL = fmt.Sprintf("https://%s-%s", "phpmyadmin", s.Settings.SiteDomain)
+	default:
+		return fmt.Errorf("you used an invalid app flag. Please check the help documentation for more info")
+	}
+
 	if runtime.GOOS == "linux" {
-		openCmd := exec.Command("xdg-open", s.Settings.SecureURL) //nolint:gosec
+		openCmd := exec.Command("xdg-open", OpenURL)
 		return openCmd.Run()
 	}
 
-	return browser.OpenURL(s.Settings.SecureURL)
+	return browser.OpenURL(OpenURL)
 }
 
 // StartSite Starts a site, including Traefik if needed
@@ -215,7 +226,7 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 	}
 
 	// Open the site in the user's browser
-	return s.OpenSite()
+	return s.OpenSite("site")
 }
 
 // StopSite Stops a full site, including Traefik if needed

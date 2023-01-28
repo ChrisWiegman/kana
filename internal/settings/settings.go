@@ -41,7 +41,7 @@ type Settings struct {
 	Name                                          string
 	PHP                                           string
 	RootCert, RootKey, SiteCert, SiteKey          string
-	SecureURL, URL                                string
+	SecureURL, URL, PhpMyAdminURL                 string
 	Type                                          string
 	Plugins                                       []string
 	global                                        *viper.Viper

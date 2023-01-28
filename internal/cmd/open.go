@@ -9,6 +9,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var openAppFlag string
+
 func newOpenCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "open",
@@ -20,7 +22,7 @@ func newOpenCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.
 			}
 
 			// Open the site in the user's default browser,
-			err = kanaSite.OpenSite()
+			err = kanaSite.OpenSite(openAppFlag)
 			if err != nil {
 				consoleOutput.Error(fmt.Errorf("the site doesn't appear to be running. Please use `kana start` to start the site"))
 			}
@@ -36,6 +38,8 @@ func newOpenCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.
 	}
 
 	commandsRequiringSite = append(commandsRequiringSite, cmd.Use)
+
+	cmd.Flags().StringVarP(&openAppFlag, "app", "a", "site", "site = open kana site, phpmyadmin = PhpMyAdmin")
 
 	return cmd
 }
