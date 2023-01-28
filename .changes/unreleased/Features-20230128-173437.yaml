@@ -1,0 +1,3 @@
+kind: Features
+body: Add "app" flag to `open` command to allow for easily opening phpmyadmin
+time: 2023-01-28T17:34:37.896887093Z
