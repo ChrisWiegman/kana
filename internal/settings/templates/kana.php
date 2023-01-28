@@ -4,10 +4,10 @@
  * Plugin URI: https://github.com/ChrisWiegman/kana-cli
  * Description: Various tweaks to ensure local development is as seamless as possible.
  * Author: Chris Wiegman
- * Version: <INSERT KANA VERSION>
+ * Version: {{ .Version }}
  *
  * @package KanaCLI
- * @version <INSERT KANA VERSION>
+ * @version {{ .Version }}
  **/
 
  namespace KanaCLI;
@@ -36,7 +36,7 @@ add_filter( 'jetpack_offline_mode', '__return_true' );
 function action_phpmailer_init( $phpmailer ) {
 
 	$phpmailer->isSMTP();
-	$phpmailer->Host = '<INSERT SITE NAME>';
+	$phpmailer->Host = '{{ .SiteName }}';
 	$phpmailer->Port = 1025;
 
 }

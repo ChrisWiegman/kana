@@ -2,6 +2,7 @@ package settings
 
 import (
 	_ "embed"
+	"html/template"
 	"os"
 	"os/exec"
 	"path"
@@ -15,11 +16,18 @@ type File struct {
 	Permissions               os.FileMode
 }
 
+type KanaPluginVars struct {
+	SiteName, Version string
+}
+
 //go:embed templates/dynamic.toml
 var DynamicToml string
 
 //go:embed templates/traefik.toml
 var TraefikToml string
+
+//go:embed templates/kana.php
+var KanaWordPressPlugin string
 
 var configFiles = []File{
 	{
@@ -34,6 +42,26 @@ var configFiles = []File{
 		LocalPath:   "config/traefik",
 		Permissions: os.FileMode(defaultFilePermissions),
 	},
+}
+
+// EnsureKanaPlugin ensures the Kana plugin file is in place and ready to go.
+func (s *Settings) EnsureKanaPlugin() error {
+	pluginVars := KanaPluginVars{
+		Version:  "1.0.0",
+		SiteName: "my-site",
+	}
+
+	tmpl, err := template.New("kanaPlugin").Parse(KanaWordPressPlugin)
+	if err != nil {
+		return err
+	}
+
+	myFile, err := os.Create("kana.php")
+	if err != nil {
+		panic(err)
+	}
+
+	return tmpl.Execute(myFile, pluginVars)
 }
 
 // EnsureSSLCerts Ensures SSL certificates have been generated and are where they need to be
