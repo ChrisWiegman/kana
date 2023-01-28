@@ -167,6 +167,7 @@ func (s *Site) getWordPressContainers() []string {
 		fmt.Sprintf("kana_%s_database", s.Settings.Name),
 		fmt.Sprintf("kana_%s_wordpress", s.Settings.Name),
 		fmt.Sprintf("kana_%s_phpmyadmin", s.Settings.Name),
+		fmt.Sprintf("kana_%s_mailpit", s.Settings.Name),
 	}
 }
 
@@ -330,6 +331,7 @@ func (s *Site) startWordPress(consoleOutput *console.Console) error {
 	}
 
 	wordPressContainers = s.getPhpMyAdminContainer(databaseDir, wordPressContainers)
+	wordPressContainers = s.getMailpitContainer(wordPressContainers)
 
 	for i := range wordPressContainers {
 		err := s.dockerClient.EnsureImage(wordPressContainers[i].Image, consoleOutput)
@@ -357,6 +359,48 @@ func (s *Site) stopWordPress() error {
 	}
 
 	return nil
+}
+
+func (s *Site) getMailpitContainer(wordPressContainers []docker.ContainerConfig) []docker.ContainerConfig {
+	if s.Settings.Mailpit {
+		mailpitContainer := docker.ContainerConfig{
+			Name:        fmt.Sprintf("kana_%s_mailpit", s.Settings.Name),
+			Image:       "axllent/mailpit",
+			NetworkName: "kana",
+			HostName:    fmt.Sprintf("kana_%s_mailpit", s.Settings.Name),
+			Env:         []string{},
+			Volumes:     []mount.Mount{},
+			Ports: []docker.ExposedPorts{
+				{Port: "8025", Protocol: "tcp"},
+			},
+			Labels: map[string]string{
+				"traefik.enable": "true",
+				fmt.Sprintf("traefik.http.routers.wordpress-%s-%s-http.entrypoints", s.Settings.Name, "mailpit"): "web",
+				fmt.Sprintf(
+					"traefik.http.routers.wordpress-%s-%s-http.rule",
+					s.Settings.Name,
+					"mailpit"): fmt.Sprintf(
+					"Host(`%s-%s`)",
+					"mailpit",
+					s.Settings.SiteDomain),
+				fmt.Sprintf("traefik.http.routers.wordpress-%s-%s.entrypoints", s.Settings.Name, "mailpit"): "websecure",
+				fmt.Sprintf(
+					"traefik.http.routers.wordpress-%s-%s.rule",
+					s.Settings.Name,
+					"mailpit"): fmt.Sprintf(
+					"Host(`%s-%s`)",
+					"mailpit",
+					s.Settings.SiteDomain),
+				fmt.Sprintf("traefik.http.services.%s-http-svc.loadbalancer.server.port", "mailpit"): "8025",
+				fmt.Sprintf("traefik.http.routers.wordpress-%s-%s.tls", s.Settings.Name, "mailpit"):  "true",
+				"kana.site": s.Settings.Name,
+			},
+		}
+
+		wordPressContainers = append(wordPressContainers, mailpitContainer)
+	}
+
+	return wordPressContainers
 }
 
 func (s *Site) getPhpMyAdminContainer(databaseDir string, wordPressContainers []docker.ContainerConfig) []docker.ContainerConfig {
