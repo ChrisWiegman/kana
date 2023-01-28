@@ -174,7 +174,9 @@ func (s *Site) OpenSite() error {
 // StartSite Starts a site, including Traefik if needed
 func (s *Site) StartSite(consoleOutput *console.Console) error {
 	// Let's start everything up
-	consoleOutput.Printf("Starting development site: %s\n", consoleOutput.Bold(consoleOutput.Green(s.getSiteURL(false))))
+	consoleOutput.Printf("Starting development site: %s.\n", consoleOutput.Bold(consoleOutput.Green(s.getSiteURL(false))))
+
+	consoleOutput.Println("Ensuring all Docker images are present, up to date and running (this may take a few minutes.")
 
 	// Start Traefik if we need it
 	err := s.startTraefik(consoleOutput)

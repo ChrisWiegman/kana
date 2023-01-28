@@ -26,8 +26,6 @@ func (d *DockerClient) EnsureImage(imageName string, consoleOutput *console.Cons
 
 	defer reader.Close()
 
-	consoleOutput.Println("Ensuring all images are present and up to date (this may take a few minutes")
-
 	// Discard the download information unless we're debugging
 	out := os.Stdout
 
