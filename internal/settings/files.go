@@ -2,11 +2,11 @@ package settings
 
 import (
 	_ "embed"
-	"html/template"
 	"os"
 	"os/exec"
 	"path"
 	"runtime"
+	"text/template"
 
 	"github.com/ChrisWiegman/kana-cli/pkg/minica"
 )
@@ -26,7 +26,7 @@ var DynamicToml string
 //go:embed templates/traefik.toml
 var TraefikToml string
 
-//go:embed templates/kana.php
+//go:embed templates/kana-local-development.php
 var KanaWordPressPlugin string
 
 var configFiles = []File{
@@ -45,20 +45,27 @@ var configFiles = []File{
 }
 
 // EnsureKanaPlugin ensures the Kana plugin file is in place and ready to go.
-func (s *Settings) EnsureKanaPlugin() error {
+func (s *Settings) EnsureKanaPlugin(appDir string) error {
 	pluginVars := KanaPluginVars{
 		Version:  "1.0.0",
 		SiteName: "my-site",
 	}
 
-	tmpl, err := template.New("kanaPlugin").Parse(KanaWordPressPlugin)
-	if err != nil {
-		return err
+	tmpl := template.Must(template.New("kanaPlugin").Parse(KanaWordPressPlugin))
+
+	pluginPath := path.Join(appDir, "wp-content", "mu-plugins")
+
+	_, err := os.Stat(pluginPath)
+	if err != nil && os.IsNotExist(err) {
+		err = os.MkdirAll(pluginPath, os.FileMode(defaultDirPermissions))
+		if err != nil {
+			return err
+		}
 	}
 
-	myFile, err := os.Create("kana.php")
+	myFile, err := os.Create(path.Join(pluginPath, "kana-local-development.php"))
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	return tmpl.Execute(myFile, pluginVars)

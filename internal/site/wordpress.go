@@ -23,13 +23,9 @@ var defaultDirPermissions = 0750
 
 // RunWPCli Runs a wp-cli command returning it's output and any errors
 func (s *Site) RunWPCli(command []string, consoleOutput *console.Console) (statusCode int64, output string, err error) {
-	appDir := path.Join(s.Settings.SiteDirectory, "app")
-
-	if s.isLocalSite(consoleOutput) {
-		appDir, err = s.getLocalAppDir()
-		if err != nil {
-			return 1, "", err
-		}
+	appDir, err := s.getAppDirectory(consoleOutput)
+	if err != nil {
+		return 1, "", err
 	}
 
 	appVolumes, err := s.getMounts(appDir)
@@ -97,7 +93,11 @@ func (s *Site) getInstalledWordPressPlugins(consoleOutput *console.Console) ([]s
 	}
 
 	for _, plugin := range rawPlugins {
-		if plugin.Status != "dropin" && plugin.Name != s.Settings.Name && plugin.Name != "hello" && plugin.Name != "akismet" {
+		if plugin.Status != "dropin" &&
+			plugin.Status != "must-use" &&
+			plugin.Name != s.Settings.Name &&
+			plugin.Name != "hello" &&
+			plugin.Name != "akismet" {
 			plugins = append(plugins, plugin.Name)
 		}
 	}
@@ -211,6 +211,16 @@ func (s *Site) installDefaultPlugins(consoleOutput *console.Console) error {
 	return nil
 }
 
+// installKanaPlugin installs the Kana development plugin
+func (s *Site) installKanaPlugin(consoleOutput *console.Console) error {
+	appDir, err := s.getAppDirectory(consoleOutput)
+	if err != nil {
+		return err
+	}
+
+	return s.Settings.EnsureKanaPlugin(appDir)
+}
+
 // installWordPress Installs and configures WordPress core
 func (s *Site) installWordPress(consoleOutput *console.Console) error {
 	checkCommand := []string{
@@ -242,6 +252,20 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 	return nil
 }
 
+func (s *Site) getAppDirectory(consoleOutput *console.Console) (string, error) {
+	var err error
+	appDir := path.Join(s.Settings.SiteDirectory, "app")
+
+	if s.isLocalSite(consoleOutput) {
+		appDir, err = s.getLocalAppDir()
+		if err != nil {
+			return "", err
+		}
+	}
+
+	return appDir, err
+}
+
 // startWordPress Starts the WordPress containers
 func (s *Site) startWordPress(consoleOutput *console.Console) error {
 	_, _, err := s.dockerClient.EnsureNetwork("kana")
@@ -249,21 +273,20 @@ func (s *Site) startWordPress(consoleOutput *console.Console) error {
 		return err
 	}
 
-	appDir := path.Join(s.Settings.SiteDirectory, "app")
-	databaseDir := path.Join(s.Settings.SiteDirectory, "database")
+	appDir, err := s.getAppDirectory(consoleOutput)
+	if err != nil {
+		return err
+	}
 
 	if s.isLocalSite(consoleOutput) {
-		appDir, err = s.getLocalAppDir()
-		if err != nil {
-			return err
-		}
-
 		// Replace wp-config.php with the container's file
 		_, err = os.Stat(path.Join(appDir, "wp-config.php"))
 		if err == nil {
 			os.Remove(path.Join(appDir, "wp-config.php"))
 		}
 	}
+
+	databaseDir := path.Join(s.Settings.SiteDirectory, "database")
 
 	err = os.MkdirAll(appDir, os.FileMode(defaultDirPermissions))
 	if err != nil {

@@ -219,6 +219,12 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 		return err
 	}
 
+	// Install the Kana development plugin
+	err = s.installKanaPlugin(consoleOutput)
+	if err != nil {
+		return err
+	}
+
 	// Install any configuration plugins if needed
 	err = s.installDefaultPlugins(consoleOutput)
 	if err != nil {
