@@ -1,4 +1,0 @@
-kind: Features
-body: By default download progress of images will not be shown unless the `verbose`
-  flag is used for the given command
-time: 2023-01-22T17:10:17.361800546Z
