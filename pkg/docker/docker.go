@@ -66,7 +66,6 @@ func ensureDockerIsAvailable(consoleOutput *console.Console, moby APIClient) err
 				time.Sleep(time.Duration(sleepDuration) * time.Second)
 
 				_, err = moby.ContainerList(context.Background(), types.ContainerListOptions{})
-				fmt.Printf("Error: %s\n", err)
 				if err != nil {
 					return err
 				}

@@ -20,14 +20,30 @@ func TestEnsureDockerIsAvailable(t *testing.T) {
 	maxRetries = 1 // Only retry this once to save time.
 
 	var tests = []struct {
+		name           string
 		goos           string
 		dockerOutput   error
 		expectedResult error
 		exitStatus     int
 	}{
-		{"any", nil, nil, 0},
-		{"linux", outputError, outputError, 0},
-		{"darwin", outputError, fmt.Errorf("error: unable to start Docker for Mac"), 1},
+		{
+			"Test docker is running and no errors on list function.",
+			"any",
+			nil,
+			nil,
+			0},
+		{
+			"Test error on docker list function on Linux",
+			"linux",
+			outputError,
+			outputError,
+			0},
+		{
+			"Test error on first list function and unable to start Docker on Mac",
+			"darwin",
+			outputError,
+			fmt.Errorf("error: unable to start Docker for Mac"),
+			1},
 	}
 
 	for _, test := range tests {
@@ -51,7 +67,7 @@ func TestEnsureDockerIsAvailable(t *testing.T) {
 		mocks.MockedExitStatus = test.exitStatus
 
 		err := ensureDockerIsAvailable(consoleOutput, moby)
-		assert.Equal(t, test.expectedResult, err)
+		assert.Equal(t, test.expectedResult, err, test.name)
 
 		execCommand = exec.Command
 	}
