@@ -231,7 +231,7 @@ func (d *DockerClient) ContainerRun(config *ContainerConfig, randomPorts, localU
 	}
 
 	// Linux doesn't abstract the user so we have to do it ourselves
-	if localUser && runtime.GOOS == "linux" {
+	if localUser && runtime.GOOS == "linux" { //nolint:goconst
 		var currentUser *user.User
 
 		currentUser, err = user.Current()

@@ -46,7 +46,7 @@ func NewDockerClient(consoleOutput *console.Console) (dockerClient *DockerClient
 func ensureDockerIsAvailable(consoleOutput *console.Console, moby APIClient) error {
 	_, err := moby.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
-		if runtime.GOOS == "darwin" {
+		if runtime.GOOS == "darwin" { //nolint:goconst
 			consoleOutput.Println("Docker doesn't appear to be running. Trying to start Docker.")
 			err = execCommand("open", "-a", "Docker").Run()
 			if err != nil {
