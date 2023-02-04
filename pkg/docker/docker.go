@@ -18,7 +18,7 @@ import (
 )
 
 type DockerClient struct {
-	client *client.Client
+	client client.APIClient
 }
 
 var execCommand = exec.Command
