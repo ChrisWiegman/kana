@@ -35,6 +35,8 @@ type SiteInfo struct {
 
 var maxVerificationRetries = 30
 
+var execCommand = exec.Command
+
 // EnsureDocker Ensures Docker is available for commands that need it.
 func (s *Site) EnsureDocker(consoleOutput *console.Console) error {
 	// Add a docker client to the site
@@ -175,7 +177,7 @@ func (s *Site) OpenSite(app string) error {
 	}
 
 	if runtime.GOOS == "linux" {
-		openCmd := exec.Command("xdg-open", OpenURL)
+		openCmd := execCommand("xdg-open", OpenURL)
 		return openCmd.Run()
 	}
 

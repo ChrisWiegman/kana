@@ -29,6 +29,8 @@ var TraefikToml string
 //go:embed templates/kana-local-development.php
 var KanaWordPressPlugin string
 
+var execCommand = exec.Command
+
 var configFiles = []File{
 	{
 		Name:        "dynamic.toml",
@@ -104,7 +106,7 @@ func (s *Settings) EnsureSSLCerts() error {
 
 		// If we're on Mac try to add the cert to the system trust
 		if runtime.GOOS == "darwin" {
-			installCertCommand := exec.Command(
+			installCertCommand := execCommand(
 				"sudo",
 				"security",
 				"add-trusted-cert",

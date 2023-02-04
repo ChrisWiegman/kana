@@ -21,6 +21,8 @@ type DockerClient struct {
 	client *client.Client
 }
 
+var execCommand = exec.Command
+
 var maxRetries = 12
 var sleepDuration = 5
 
@@ -45,7 +47,8 @@ func (d *DockerClient) ensureDockerIsAvailable(consoleOutput *console.Console) e
 	if err != nil {
 		if runtime.GOOS == "darwin" {
 			consoleOutput.Println("Docker doesn't appear to be running. Trying to start Docker.")
-			err = exec.Command("open", "-a", "Docker").Run()
+			err = execCommand("open", "-a", "Docker").Run()
+			fmt.Println(err)
 			if err != nil {
 				return fmt.Errorf("error: unable to start Docker for Mac")
 			}
