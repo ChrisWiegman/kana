@@ -17,10 +17,6 @@ import (
 	"github.com/docker/docker/client"
 )
 
-type DockerClient struct {
-	client client.APIClient
-}
-
 var execCommand = exec.Command
 
 var maxRetries = 12
