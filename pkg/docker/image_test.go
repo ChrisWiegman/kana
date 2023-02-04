@@ -1,9 +1,14 @@
 package docker
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/ChrisWiegman/kana-cli/pkg/console"
+	"github.com/ChrisWiegman/kana-cli/pkg/docker/mocks"
+	"github.com/docker/docker/api/types"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestEnsureImage(t *testing.T) {
@@ -31,27 +36,45 @@ func TestRemoveImage(t *testing.T) {
 		t.FailNow()
 	}
 
-	err = d.EnsureImage("alpine", consoleOutput)
-
-	if err != nil {
-		t.Error(err)
+	var tests = []struct {
+		name                string
+		imageDeleteResponse []types.ImageDeleteResponseItem
+		imageRemoveError    error
+		expectedError       error
+		expectedRemove      bool
+	}{
+		{
+			"image doesn't exist to remove",
+			[]types.ImageDeleteResponseItem{},
+			nil,
+			nil,
+			false},
+		{
+			"image successfully removed",
+			[]types.ImageDeleteResponseItem{
+				{},
+			},
+			nil,
+			nil,
+			true},
+		{
+			"image successfully removed",
+			[]types.ImageDeleteResponseItem{
+				{},
+			},
+			fmt.Errorf("image remove function hit error"),
+			fmt.Errorf("image remove function hit error"),
+			false},
 	}
 
-	removed, err := d.RemoveImage("alpine")
-	if err != nil {
-		t.Error(err)
-	}
+	for _, test := range tests {
+		moby := new(mocks.APIClient)
+		moby.On("ImageRemove", mock.Anything, mock.Anything, mock.Anything).Return(test.imageDeleteResponse, test.imageRemoveError)
 
-	if removed != true {
-		t.Errorf("Image should have been removed but wasn't")
-	}
+		d.moby = moby
 
-	removed, err = d.RemoveImage("alpine")
-	if err != nil {
-		t.Error(err)
-	}
-
-	if removed == true {
-		t.Errorf("Image should not have been removed but was")
+		removed, err := d.RemoveImage("alpine")
+		assert.Equal(t, test.expectedError, err, test.name)
+		assert.Equal(t, test.expectedRemove, removed, test.name)
 	}
 }
