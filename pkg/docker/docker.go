@@ -25,7 +25,7 @@ var sleepDuration = 5
 func NewController(consoleOutput *console.Console) (c *DockerClient, err error) {
 	c = new(DockerClient)
 
-	c.client, err = client.NewClientWithOpts(client.FromEnv)
+	c.mobyClient, err = client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func NewController(consoleOutput *console.Console) (c *DockerClient, err error) 
 }
 
 func (d *DockerClient) ensureDockerIsAvailable(consoleOutput *console.Console) error {
-	_, err := d.client.ContainerList(context.Background(), types.ContainerListOptions{})
+	_, err := d.mobyClient.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
 		if runtime.GOOS == "darwin" {
 			consoleOutput.Println("Docker doesn't appear to be running. Trying to start Docker.")
@@ -61,7 +61,7 @@ func (d *DockerClient) ensureDockerIsAvailable(consoleOutput *console.Console) e
 
 				time.Sleep(time.Duration(sleepDuration) * time.Second)
 
-				_, err = d.client.ContainerList(context.Background(), types.ContainerListOptions{})
+				_, err = d.mobyClient.ContainerList(context.Background(), types.ContainerListOptions{})
 				if err != nil {
 					return err
 				}

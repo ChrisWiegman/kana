@@ -17,7 +17,7 @@ func TestEnsureDockerIsAvailable(t *testing.T) {
 
 	c := new(DockerClient)
 
-	c.client, err = client.NewClientWithOpts(client.FromEnv)
+	c.mobyClient, err = client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()

@@ -14,7 +14,7 @@ import (
 
 // DockerClient is an interface the must be implemented to provide Docker services through this package.
 type DockerClient struct {
-	client APIClient
+	mobyClient APIClient
 }
 
 // APIClient is an interface that clients that talk with a docker server must implement.

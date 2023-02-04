@@ -61,7 +61,7 @@ func (d *DockerClient) EnsureNetwork(name string) (created bool, network types.N
 		return false, network, nil
 	}
 
-	networkCreateResults, err := d.client.NetworkCreate(context.Background(), name, types.NetworkCreate{
+	networkCreateResults, err := d.mobyClient.NetworkCreate(context.Background(), name, types.NetworkCreate{
 		Driver: "bridge",
 	})
 
@@ -93,11 +93,11 @@ func (d *DockerClient) RemoveNetwork(name string) (removed bool, err error) {
 		return false, nil
 	}
 
-	return true, d.client.NetworkRemove(context.Background(), network.ID)
+	return true, d.mobyClient.NetworkRemove(context.Background(), network.ID)
 }
 
 func (d *DockerClient) findNetworkByName(name string) (found bool, network types.NetworkResource, err error) {
-	networks, err := d.client.NetworkList(context.Background(), types.NetworkListOptions{})
+	networks, err := d.mobyClient.NetworkList(context.Background(), types.NetworkListOptions{})
 
 	if err != nil {
 		return false, types.NetworkResource{}, err
@@ -113,7 +113,7 @@ func (d *DockerClient) findNetworkByName(name string) (found bool, network types
 }
 
 func (d *DockerClient) findNetworkByID(id string) (found bool, network types.NetworkResource, err error) {
-	networks, err := d.client.NetworkList(context.Background(), types.NetworkListOptions{})
+	networks, err := d.mobyClient.NetworkList(context.Background(), types.NetworkListOptions{})
 
 	if err != nil {
 		return false, types.NetworkResource{}, err
