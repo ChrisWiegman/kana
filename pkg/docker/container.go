@@ -37,29 +37,91 @@ type ExecResult struct {
 	ExitCode int
 }
 
-// ListContainers Lists all running containers for a given site or all sites if no site is specified
-func (d *DockerClient) ListContainers(site string) ([]types.Container, error) {
-	f := filters.NewArgs()
-
-	if site == "" {
-		f.Add("label", "kana.site")
-	} else {
-		f.Add("label", fmt.Sprintf("kana.site=%s", site))
+func (d *DockerClient) ContainerExec(containerName string, command []string) (ExecResult, error) {
+	containerID, isRunning := d.ContainerIsRunning(containerName)
+	if !isRunning {
+		return ExecResult{}, nil
 	}
 
-	options := types.ContainerListOptions{
-		All:     true,
-		Filters: f,
+	fullCommand := []string{
+		"sh",
+		"-c",
 	}
 
-	containers, err := d.mobyClient.ContainerList(context.Background(), options)
+	fullCommand = append(fullCommand, command...)
 
-	return containers, err
+	// prepare exec
+	execConfig := types.ExecConfig{
+		AttachStdout: true,
+		AttachStderr: true,
+		Cmd:          strslice.StrSlice(fullCommand),
+	}
+
+	containerResponse, err := d.moby.ContainerExecCreate(context.Background(), containerID, execConfig)
+	if err != nil {
+		return ExecResult{}, err
+	}
+
+	execID := containerResponse.ID
+
+	// run it, with stdout/stderr attached
+	aresp, err := d.moby.ContainerExecAttach(context.Background(), execID, types.ExecStartCheck{})
+	if err != nil {
+		return ExecResult{}, err
+	}
+
+	defer aresp.Close()
+
+	// read the output
+	var outBuf, errBuf bytes.Buffer
+	outputDone := make(chan error)
+
+	go func() {
+		// StdCopy demultiplexes the stream into two buffers
+		_, err = stdcopy.StdCopy(&outBuf, &errBuf, aresp.Reader)
+		outputDone <- err
+	}()
+
+	select {
+	case err = <-outputDone:
+		if err != nil {
+			return ExecResult{}, err
+		}
+		break
+
+	case <-context.Background().Done():
+		return ExecResult{}, context.Background().Err()
+	}
+
+	// get the exit code
+	iresp, err := d.moby.ContainerExecInspect(context.Background(), execID)
+	if err != nil {
+		return ExecResult{}, err
+	}
+
+	return ExecResult{
+			ExitCode: iresp.ExitCode,
+			StdOut:   outBuf.String(),
+			StdErr:   errBuf.String(),
+		},
+		nil
 }
 
-// IsContainerRunning Checks if a given container is running by name
-func (d *DockerClient) IsContainerRunning(containerName string) (id string, isRunning bool) {
-	containers, err := d.mobyClient.ContainerList(context.Background(), types.ContainerListOptions{})
+// ContainerGetMounts Returns a slice containing all the mounts to the given container
+func (d *DockerClient) ContainerGetMounts(containerName string) []types.MountPoint {
+	containerID, isRunning := d.ContainerIsRunning(containerName)
+	if !isRunning {
+		return []types.MountPoint{}
+	}
+
+	results, _ := d.moby.ContainerInspect(context.Background(), containerID)
+
+	return results.Mounts
+}
+
+// ContainerIsRunning Checks if a given container is running by name
+func (d *DockerClient) ContainerIsRunning(containerName string) (id string, isRunning bool) {
+	containers, err := d.moby.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
 		return "", false
 	}
@@ -75,26 +137,74 @@ func (d *DockerClient) IsContainerRunning(containerName string) (id string, isRu
 	return "", false
 }
 
-// ContainerGetMounts Returns a slice containing all the mounts to the given container
-func (d *DockerClient) ContainerGetMounts(containerName string) []types.MountPoint {
-	containerID, isRunning := d.IsContainerRunning(containerName)
-	if !isRunning {
-		return []types.MountPoint{}
+// ContainerList Lists all running containers for a given site or all sites if no site is specified
+func (d *DockerClient) ContainerList(site string) ([]types.Container, error) {
+	f := filters.NewArgs()
+
+	if site == "" {
+		f.Add("label", "kana.site")
+	} else {
+		f.Add("label", fmt.Sprintf("kana.site=%s", site))
 	}
 
-	results, _ := d.mobyClient.ContainerInspect(context.Background(), containerID)
+	options := types.ContainerListOptions{
+		All:     true,
+		Filters: f,
+	}
 
-	return results.Mounts
+	containers, err := d.moby.ContainerList(context.Background(), options)
+
+	return containers, err
+}
+
+func (d *DockerClient) ContainerLog(id string) (result string, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(sleepDuration)*time.Second)
+	defer cancel()
+
+	reader, err := d.moby.ContainerLogs(ctx, id, types.ContainerLogsOptions{
+		ShowStdout: true,
+		ShowStderr: true})
+
+	if err != nil {
+		return "", err
+	}
+
+	buffer, err := io.ReadAll(reader)
+
+	if err != nil && err != io.EOF {
+		return "", err
+	}
+
+	return string(buffer), nil
+}
+
+func (d *DockerClient) ContainerRestart(containerName string) (bool, error) {
+	containerID, isRunning := d.ContainerIsRunning(containerName)
+	if !isRunning {
+		return true, nil
+	}
+
+	err := d.moby.ContainerStop(context.Background(), containerID, nil)
+	if err != nil {
+		return false, err
+	}
+
+	err = d.moby.ContainerStart(context.Background(), containerID, types.ContainerStartOptions{})
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 func (d *DockerClient) ContainerRun(config *ContainerConfig, randomPorts, localUser bool) (id string, err error) {
-	containerID, isRunning := d.IsContainerRunning(config.Name)
+	containerID, isRunning := d.ContainerIsRunning(config.Name)
 	if isRunning {
 		return containerID, nil
 	}
 
 	hostConfig := container.HostConfig{}
-	containerPorts := d.getNetworkConfig(config.Ports, randomPorts)
+	containerPorts := getNetworkConfig(config.Ports, randomPorts)
 
 	if len(containerPorts.PortBindings) > 0 {
 		hostConfig.PortBindings = containerPorts.PortBindings
@@ -132,49 +242,17 @@ func (d *DockerClient) ContainerRun(config *ContainerConfig, randomPorts, localU
 		containerConfig.User = fmt.Sprintf("%s:%s", currentUser.Uid, currentUser.Gid)
 	}
 
-	resp, err := d.mobyClient.ContainerCreate(context.Background(), containerConfig, &hostConfig, &networkConfig, nil, config.Name)
+	resp, err := d.moby.ContainerCreate(context.Background(), containerConfig, &hostConfig, &networkConfig, nil, config.Name)
 	if err != nil {
 		return "", err
 	}
 
-	err = d.mobyClient.ContainerStart(context.Background(), resp.ID, types.ContainerStartOptions{})
+	err = d.moby.ContainerStart(context.Background(), resp.ID, types.ContainerStartOptions{})
 	if err != nil {
 		return "", err
 	}
 
 	return resp.ID, nil
-}
-
-func (d *DockerClient) ContainerWait(id string) (state int64, err error) {
-	containerResult, errorCode := d.mobyClient.ContainerWait(context.Background(), id, "")
-
-	select {
-	case err := <-errorCode:
-		return 0, err
-	case result := <-containerResult:
-		return result.StatusCode, nil
-	}
-}
-
-func (d *DockerClient) ContainerLog(id string) (result string, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(sleepDuration)*time.Second)
-	defer cancel()
-
-	reader, err := d.mobyClient.ContainerLogs(ctx, id, types.ContainerLogsOptions{
-		ShowStdout: true,
-		ShowStderr: true})
-
-	if err != nil {
-		return "", err
-	}
-
-	buffer, err := io.ReadAll(reader)
-
-	if err != nil && err != io.EOF {
-		return "", err
-	}
-
-	return string(buffer), nil
 }
 
 func (d *DockerClient) ContainerRunAndClean(config *ContainerConfig) (statusCode int64, body string, err error) {
@@ -193,22 +271,22 @@ func (d *DockerClient) ContainerRunAndClean(config *ContainerConfig) (statusCode
 	// Get the log
 	body, _ = d.ContainerLog(id)
 
-	err = d.mobyClient.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{})
+	err = d.moby.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{})
 	return statusCode, body, err
 }
 
 func (d *DockerClient) ContainerStop(containerName string) (bool, error) {
-	containerID, isRunning := d.IsContainerRunning(containerName)
+	containerID, isRunning := d.ContainerIsRunning(containerName)
 	if !isRunning {
 		return true, nil
 	}
 
-	err := d.mobyClient.ContainerStop(context.Background(), containerID, nil)
+	err := d.moby.ContainerStop(context.Background(), containerID, nil)
 	if err != nil {
 		return false, err
 	}
 
-	err = d.mobyClient.ContainerRemove(context.Background(), containerID, types.ContainerRemoveOptions{})
+	err = d.moby.ContainerRemove(context.Background(), containerID, types.ContainerRemoveOptions{})
 	if err != nil {
 		return false, err
 	}
@@ -216,91 +294,13 @@ func (d *DockerClient) ContainerStop(containerName string) (bool, error) {
 	return true, nil
 }
 
-func (d *DockerClient) ContainerRestart(containerName string) (bool, error) {
-	containerID, isRunning := d.IsContainerRunning(containerName)
-	if !isRunning {
-		return true, nil
-	}
-
-	err := d.mobyClient.ContainerStop(context.Background(), containerID, nil)
-	if err != nil {
-		return false, err
-	}
-
-	err = d.mobyClient.ContainerStart(context.Background(), containerID, types.ContainerStartOptions{})
-	if err != nil {
-		return false, err
-	}
-
-	return true, nil
-}
-
-func (d *DockerClient) ContainerExec(containerName string, command []string) (ExecResult, error) {
-	containerID, isRunning := d.IsContainerRunning(containerName)
-	if !isRunning {
-		return ExecResult{}, nil
-	}
-
-	fullCommand := []string{
-		"sh",
-		"-c",
-	}
-
-	fullCommand = append(fullCommand, command...)
-
-	// prepare exec
-	execConfig := types.ExecConfig{
-		AttachStdout: true,
-		AttachStderr: true,
-		Cmd:          strslice.StrSlice(fullCommand),
-	}
-
-	cresp, err := d.mobyClient.ContainerExecCreate(context.Background(), containerID, execConfig)
-	if err != nil {
-		return ExecResult{}, err
-	}
-
-	execID := cresp.ID
-
-	// run it, with stdout/stderr attached
-	aresp, err := d.mobyClient.ContainerExecAttach(context.Background(), execID, types.ExecStartCheck{})
-	if err != nil {
-		return ExecResult{}, err
-	}
-
-	defer aresp.Close()
-
-	// read the output
-	var outBuf, errBuf bytes.Buffer
-	outputDone := make(chan error)
-
-	go func() {
-		// StdCopy demultiplexes the stream into two buffers
-		_, err = stdcopy.StdCopy(&outBuf, &errBuf, aresp.Reader)
-		outputDone <- err
-	}()
+func (d *DockerClient) ContainerWait(id string) (state int64, err error) {
+	containerResult, errorCode := d.moby.ContainerWait(context.Background(), id, "")
 
 	select {
-	case err = <-outputDone:
-		if err != nil {
-			return ExecResult{}, err
-		}
-		break
-
-	case <-context.Background().Done():
-		return ExecResult{}, context.Background().Err()
+	case err := <-errorCode:
+		return 0, err
+	case result := <-containerResult:
+		return result.StatusCode, nil
 	}
-
-	// get the exit code
-	iresp, err := d.mobyClient.ContainerExecInspect(context.Background(), execID)
-	if err != nil {
-		return ExecResult{}, err
-	}
-
-	return ExecResult{
-			ExitCode: iresp.ExitCode,
-			StdOut:   outBuf.String(),
-			StdErr:   errBuf.String(),
-		},
-		nil
 }

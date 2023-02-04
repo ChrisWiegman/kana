@@ -12,11 +12,6 @@ import (
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
 )
 
-// DockerClient is an interface the must be implemented to provide Docker services through this package.
-type DockerClient struct {
-	mobyClient APIClient
-}
-
 // APIClient is an interface that clients that talk with a docker server must implement.
 type APIClient interface {
 	ContainerAPIClient

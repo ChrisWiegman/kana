@@ -19,7 +19,7 @@ func (d *DockerClient) EnsureImage(imageName string, consoleOutput *console.Cons
 		imageName = fmt.Sprintf("%s:latest", imageName)
 	}
 
-	reader, err := d.mobyClient.ImagePull(context.Background(), imageName, types.ImagePullOptions{})
+	reader, err := d.moby.ImagePull(context.Background(), imageName, types.ImagePullOptions{})
 	if err != nil {
 		return err
 	}
@@ -38,7 +38,7 @@ func (d *DockerClient) EnsureImage(imageName string, consoleOutput *console.Cons
 }
 
 func (d *DockerClient) RemoveImage(image string) (removed bool, err error) {
-	removedResponse, err := d.mobyClient.ImageRemove(context.Background(), image, types.ImageRemoveOptions{})
+	removedResponse, err := d.moby.ImageRemove(context.Background(), image, types.ImageRemoveOptions{})
 
 	if err != nil {
 		if !strings.Contains(err.Error(), "No such image:") {

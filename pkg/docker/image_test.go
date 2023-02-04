@@ -9,7 +9,7 @@ import (
 func TestEnsureImage(t *testing.T) {
 	consoleOutput := new(console.Console)
 
-	d, err := NewController(consoleOutput)
+	d, err := NewDockerClient(consoleOutput)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -25,7 +25,7 @@ func TestEnsureImage(t *testing.T) {
 func TestRemoveImage(t *testing.T) {
 	consoleOutput := new(console.Console)
 
-	d, err := NewController(consoleOutput)
+	d, err := NewDockerClient(consoleOutput)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()

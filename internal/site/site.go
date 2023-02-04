@@ -40,7 +40,7 @@ var execCommand = exec.Command
 // EnsureDocker Ensures Docker is available for commands that need it.
 func (s *Site) EnsureDocker(consoleOutput *console.Console) error {
 	// Add a docker client to the site
-	dockerClient, err := docker.NewController(consoleOutput)
+	dockerClient, err := docker.NewDockerClient(consoleOutput)
 	if err != nil {
 		return err
 	}
@@ -88,12 +88,12 @@ func GetSiteList(appDir string, consoleOutput *console.Console) ([]SiteInfo, err
 			return sites, err
 		}
 
-		dockerClient, err := docker.NewController(consoleOutput)
+		dockerClient, err := docker.NewDockerClient(consoleOutput)
 		if err != nil {
 			return sites, err
 		}
 
-		containers, err := dockerClient.ListContainers(f.Name())
+		containers, err := dockerClient.ContainerList(f.Name())
 		if err != nil {
 			return sites, err
 		}
@@ -115,7 +115,7 @@ func GetSiteList(appDir string, consoleOutput *console.Console) ([]SiteInfo, err
 
 // IsSiteRunning Returns true if the site is up and running in Docker or false. Does not verify other errors
 func (s *Site) IsSiteRunning() bool {
-	containers, _ := s.dockerClient.ListContainers(s.Settings.Name)
+	containers, _ := s.dockerClient.ContainerList(s.Settings.Name)
 
 	return len(containers) != 0
 }
@@ -270,7 +270,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 	}
 
 	// We need container details to see if the phpmyadmin container is running
-	containers, err := s.dockerClient.ListContainers(s.Settings.Name)
+	containers, err := s.dockerClient.ContainerList(s.Settings.Name)
 	if err != nil {
 		return localSettings, err
 	}

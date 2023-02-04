@@ -15,9 +15,9 @@ func TestEnsureDockerIsAvailable(t *testing.T) {
 	consoleOutput := new(console.Console)
 	var err error
 
-	c := new(DockerClient)
+	dockerClient := new(DockerClient)
 
-	c.mobyClient, err = client.NewClientWithOpts(client.FromEnv)
+	dockerClient.moby, err = client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -28,7 +28,7 @@ func TestEnsureDockerIsAvailable(t *testing.T) {
 	mocks.MockedStdout = "this is an error"
 	defer func() { execCommand = exec.Command }()
 
-	err = c.ensureDockerIsAvailable(consoleOutput)
+	err = ensureDockerIsAvailable(consoleOutput, dockerClient.moby)
 	fmt.Println(err)
 	if err != nil {
 		t.Error(err)

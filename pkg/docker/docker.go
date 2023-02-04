@@ -22,24 +22,29 @@ var execCommand = exec.Command
 var maxRetries = 12
 var sleepDuration = 5
 
-func NewController(consoleOutput *console.Console) (c *DockerClient, err error) {
-	c = new(DockerClient)
-
-	c.mobyClient, err = client.NewClientWithOpts(client.FromEnv)
-	if err != nil {
-		return nil, err
-	}
-
-	err = c.ensureDockerIsAvailable(consoleOutput)
-	if err != nil {
-		return nil, err
-	}
-
-	return c, nil
+// DockerClient is an interface the must be implemented to provide Docker services through this package.
+type DockerClient struct {
+	moby APIClient
 }
 
-func (d *DockerClient) ensureDockerIsAvailable(consoleOutput *console.Console) error {
-	_, err := d.mobyClient.ContainerList(context.Background(), types.ContainerListOptions{})
+func NewDockerClient(consoleOutput *console.Console) (dockerClient *DockerClient, err error) {
+	dockerClient = new(DockerClient)
+
+	dockerClient.moby, err = client.NewClientWithOpts(client.FromEnv)
+	if err != nil {
+		return nil, err
+	}
+
+	err = ensureDockerIsAvailable(consoleOutput, dockerClient.moby)
+	if err != nil {
+		return nil, err
+	}
+
+	return dockerClient, nil
+}
+
+func ensureDockerIsAvailable(consoleOutput *console.Console, moby APIClient) error {
+	_, err := moby.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
 		if runtime.GOOS == "darwin" {
 			consoleOutput.Println("Docker doesn't appear to be running. Trying to start Docker.")
@@ -61,7 +66,7 @@ func (d *DockerClient) ensureDockerIsAvailable(consoleOutput *console.Console) e
 
 				time.Sleep(time.Duration(sleepDuration) * time.Second)
 
-				_, err = d.mobyClient.ContainerList(context.Background(), types.ContainerListOptions{})
+				_, err = moby.ContainerList(context.Background(), types.ContainerListOptions{})
 				if err != nil {
 					return err
 				}
