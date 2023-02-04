@@ -15,17 +15,19 @@ import (
 
 func TestEnsureDockerIsAvailable(t *testing.T) {
 	consoleOutput := new(console.Console)
+	outputError := fmt.Errorf("we have an error")
+
+	maxRetries = 1 // Only retry this once to save time.
 
 	var tests = []struct {
-		goos       string
-		output     error
-		expected   error
-		exitStatus int
-		stdOut     string
+		goos           string
+		dockerOutput   error
+		expectedResult error
+		exitStatus     int
 	}{
-		{"any", nil, nil, 0, ""},
-		{"any", fmt.Errorf("we have an error"), fmt.Errorf("we have an error"), 0, ""},
-		{"darwin", nil, fmt.Errorf("we have an error"), 1, "we have an error"},
+		{"any", nil, nil, 0},
+		{"linux", outputError, outputError, 0},
+		{"darwin", outputError, fmt.Errorf("error: unable to start Docker for Mac"), 1},
 	}
 
 	for _, test := range tests {
@@ -33,15 +35,24 @@ func TestEnsureDockerIsAvailable(t *testing.T) {
 			continue
 		}
 
+		if test.goos == "linux" && runtime.GOOS != "linux" {
+			continue
+		}
+
 		moby := new(mocks.APIClient)
-		moby.On("ContainerList", context.Background(), types.ContainerListOptions{}).Return([]types.Container{}, test.output)
+
+		if test.exitStatus == 0 {
+			moby.On("ContainerList", context.Background(), types.ContainerListOptions{}).Return([]types.Container{}, test.dockerOutput).Once()
+		} else {
+			moby.On("ContainerList", context.Background(), types.ContainerListOptions{}).Return([]types.Container{}, fmt.Errorf(""))
+		}
 
 		execCommand = mocks.MockExecCommand
 		mocks.MockedExitStatus = test.exitStatus
-		mocks.MockedStdout = test.stdOut
-		execCommand = exec.Command
 
 		err := ensureDockerIsAvailable(consoleOutput, moby)
-		assert.Equal(t, test.expected, err)
+		assert.Equal(t, test.expectedResult, err)
+
+		execCommand = exec.Command
 	}
 }

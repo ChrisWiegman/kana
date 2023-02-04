@@ -1,7 +1,6 @@
 package mocks
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"strconv"
@@ -11,7 +10,6 @@ var MockedExitStatus = 0
 var MockedStdout string
 
 func MockExecCommand(command string, args ...string) *exec.Cmd {
-	fmt.Println("mocking")
 	cs := []string{"-test.run=TestExecCommandHelper", "--", command}
 	cs = append(cs, args...)
 
