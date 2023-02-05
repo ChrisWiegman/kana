@@ -7,10 +7,13 @@ import (
 	"strings"
 
 	"github.com/ChrisWiegman/kana-cli/pkg/console"
+
 	"github.com/docker/docker/api/types"
 	"github.com/moby/moby/pkg/jsonmessage"
 	"github.com/moby/term"
 )
+
+var displayJSONMessagesStream = jsonmessage.DisplayJSONMessagesStream
 
 // https://gist.github.com/miguelmota/4980b18d750fb3b1eb571c3e207b1b92
 // https://riptutorial.com/docker/example/31980/image-pulling-with-progress-bars--written-in-go
@@ -34,7 +37,7 @@ func (d *DockerClient) EnsureImage(imageName string, consoleOutput *console.Cons
 	}
 
 	termFd, isTerm := term.GetFdInfo(os.Stdout)
-	return jsonmessage.DisplayJSONMessagesStream(reader, out, termFd, isTerm, nil)
+	return displayJSONMessagesStream(reader, out, termFd, isTerm, nil)
 }
 
 func (d *DockerClient) RemoveImage(image string) (removed bool, err error) {

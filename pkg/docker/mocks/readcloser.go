@@ -1,13 +1,13 @@
 package mocks
 
 type ReadCloser struct {
-	expectedData []byte
-	expectedErr  error
+	ExpectedData []byte
+	ExpectedErr  error
 }
 
 func (m *ReadCloser) Read(p []byte) (n int, err error) {
-	copy(p, m.expectedData)
-	return 0, m.expectedErr
+	copy(p, m.ExpectedData)
+	return 0, m.ExpectedErr
 }
 
 func (m *ReadCloser) Close() error {

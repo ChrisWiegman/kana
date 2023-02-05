@@ -7,12 +7,14 @@ import (
 	"github.com/ChrisWiegman/kana-cli/pkg/console"
 	"github.com/ChrisWiegman/kana-cli/pkg/docker/mocks"
 	"github.com/docker/docker/api/types"
+	"github.com/moby/moby/pkg/jsonmessage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
 func TestEnsureImage(t *testing.T) {
 	consoleOutput := new(console.Console)
+	consoleOutput.JSON = true
 
 	d, err := NewDockerClient(consoleOutput)
 	if err != nil {
@@ -20,11 +22,22 @@ func TestEnsureImage(t *testing.T) {
 		t.FailNow()
 	}
 
-	err = d.EnsureImage("alpine", consoleOutput)
-
-	if err != nil {
-		t.Error(err)
+	moby := new(mocks.APIClient)
+	readCloser := &mocks.ReadCloser{
+		ExpectedData: []byte(`{}`),
+		ExpectedErr:  nil,
 	}
+	moby.On("ImagePull", mock.Anything, mock.Anything, mock.Anything).Return(readCloser, nil)
+
+	d.moby = moby
+
+	displayJSONMessagesStream = mocks.MockDisplayJSONMessagesStream
+	mocks.MockedDisplayJSONMessagesStreamReturn = nil //nolint:gocritic
+
+	err = d.EnsureImage("alpine", consoleOutput)
+	assert.Equal(t, nil, err)
+
+	displayJSONMessagesStream = jsonmessage.DisplayJSONMessagesStream
 }
 
 func TestRemoveImage(t *testing.T) {
