@@ -78,3 +78,11 @@ snapshot:
 		--rm-dist \
 		--release-notes=./.changes/$(VERSION).md \
 		--snapshot
+
+.PHONY: test
+test:
+	go \
+		test \
+		-timeout 30s\
+		-cover \
+		./...
