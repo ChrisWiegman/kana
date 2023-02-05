@@ -17,10 +17,7 @@ func TestEnsureImage(t *testing.T) {
 	consoleOutput.JSON = true
 
 	d, err := NewDockerClient(consoleOutput)
-	if err != nil {
-		t.Error(err)
-		t.FailNow()
-	}
+	assert.NoError(t, err)
 
 	moby := new(mocks.APIClient)
 	readCloser := &mocks.ReadCloser{
@@ -44,10 +41,7 @@ func TestRemoveImage(t *testing.T) {
 	consoleOutput := new(console.Console)
 
 	d, err := NewDockerClient(consoleOutput)
-	if err != nil {
-		t.Error(err)
-		t.FailNow()
-	}
+	assert.NoError(t, err)
 
 	var tests = []struct {
 		name                string
