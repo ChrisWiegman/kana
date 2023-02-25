@@ -229,14 +229,6 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 		return err
 	}
 
-	// Start PhpMyAdmin
-	if s.Settings.PhpMyAdmin {
-		err = s.startPHPMyAdmin(consoleOutput)
-		if err != nil {
-			return err
-		}
-	}
-
 	// Start Mailpit
 	if s.Settings.Mailpit {
 		err = s.startMailpit(consoleOutput)
@@ -305,22 +297,22 @@ func (s *Site) getLocalAppDir() (string, error) {
 // getRunningConfig gets various options that were used to start the site
 func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console) (settings.LocalSettings, error) {
 	localSettings := settings.LocalSettings{
-		Type:       "site",
-		Local:      false,
-		Xdebug:     false,
-		PhpMyAdmin: false,
-		SSL:        false,
+		Type:    "site",
+		Local:   false,
+		Xdebug:  false,
+		SSL:     false,
+		Mailpit: false,
 	}
 
-	// We need container details to see if the phpmyadmin container is running
+	// We need container details to see if the mailpit container is running
 	containers, err := s.dockerClient.ContainerList(s.Settings.Name)
 	if err != nil {
 		return localSettings, err
 	}
 
 	for i := range containers {
-		if containers[i].Image == "phpmyadmin" {
-			localSettings.PhpMyAdmin = true
+		if containers[i].Image == "axllent/mailpit" {
+			localSettings.Mailpit = true
 		}
 	}
 

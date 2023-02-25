@@ -19,7 +19,6 @@ var (
 	php              = "8.1"
 	siteType         = "site"
 	xdebug           = false
-	phpmyadmin       = false
 	mailpit          = false
 	local            = false
 	ssl              = false
@@ -36,7 +35,7 @@ var (
 
 // Individual Settings for use throughout the app lifecycle
 type Settings struct {
-	Local, PhpMyAdmin, Xdebug, Mailpit, SSL       bool
+	Local, Xdebug, Mailpit, SSL                   bool
 	AdminEmail, AdminPassword, AdminUsername      string
 	AppDirectory, SiteDirectory, WorkingDirectory string
 	AppDomain, SiteDomain                         string
