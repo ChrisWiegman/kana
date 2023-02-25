@@ -160,7 +160,7 @@ func (s *Site) LoadSite(cmd *cobra.Command, commandsRequiringSite []string, star
 
 // OpenSite Opens the current site in a browser if it is running
 func (s *Site) OpenSite(app string) error {
-	err := s.verifySite()
+	err := s.verifySite(s.Settings.URL)
 	if err != nil {
 		return err
 	}
@@ -172,6 +172,11 @@ func (s *Site) OpenSite(app string) error {
 		break
 	case "phpmyadmin", "mailpit":
 		OpenURL = fmt.Sprintf("https://%s-%s", app, s.Settings.SiteDomain)
+
+		err := s.verifySite(OpenURL)
+		if err != nil {
+			return err
+		}
 	default:
 		return fmt.Errorf("you used an invalid app flag. Please check the help documentation for more info")
 	}
@@ -204,7 +209,7 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 	}
 
 	// Make sure the WordPress site is running
-	err = s.verifySite()
+	err = s.verifySite(s.Settings.URL)
 	if err != nil {
 		return err
 	}
@@ -420,7 +425,7 @@ func (s *Site) runCli(command string, restart bool) (docker.ExecResult, error) {
 }
 
 // verifySite verifies if a site is up and running without error
-func (s *Site) verifySite() error {
+func (s *Site) verifySite(url string) error {
 	// Setup other options generated from config items
 	rootCert := path.Join(s.Settings.AppDirectory, "certs", s.Settings.RootCert)
 
@@ -431,7 +436,7 @@ func (s *Site) verifySite() error {
 	caCertPool := x509.NewCertPool()
 	caCertPool.AppendCertsFromPEM(caCert)
 
-	siteOK, err := checkStatusCode(s.Settings.SecureURL)
+	siteOK, err := checkStatusCode(url)
 	if err != nil {
 		return err
 	}
@@ -439,7 +444,7 @@ func (s *Site) verifySite() error {
 	tries := 0
 
 	for !siteOK {
-		siteOK, err = checkStatusCode(s.Settings.SecureURL)
+		siteOK, err = checkStatusCode(url)
 		if err != nil {
 			return err
 		}
