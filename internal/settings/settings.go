@@ -22,6 +22,7 @@ var (
 	phpmyadmin       = false
 	mailpit          = false
 	local            = false
+	ssl              = false
 	adminUsername    = "admin"
 	adminPassword    = "password"
 	adminEmail       = "admin@sites.kana.li"
@@ -35,7 +36,7 @@ var (
 
 // Individual Settings for use throughout the app lifecycle
 type Settings struct {
-	Local, PhpMyAdmin, Xdebug, Mailpit            bool
+	Local, PhpMyAdmin, Xdebug, Mailpit, SSL       bool
 	AdminEmail, AdminPassword, AdminUsername      string
 	AppDirectory, SiteDirectory, WorkingDirectory string
 	AppDomain, SiteDomain                         string

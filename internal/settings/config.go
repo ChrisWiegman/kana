@@ -52,6 +52,7 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 
 	t.AddRow("plugins", "", plugins)
 
+	t.AddRow("ssl", consoleOutput.Bold(s.global.GetString("ssl")), consoleOutput.Bold(s.local.GetString("ssl")))
 	t.AddRow("type", consoleOutput.Bold(s.global.GetString("type")), consoleOutput.Bold(s.local.GetString("type")))
 	t.AddRow("xdebug", consoleOutput.Bold(s.global.GetString("xdebug")), consoleOutput.Bold(s.local.GetString("xdebug")))
 
@@ -84,7 +85,7 @@ func (s *Settings) SetGlobalSetting(md *cobra.Command, args []string) error {
 	var err error
 
 	switch args[0] {
-	case "local", "xdebug":
+	case "local", "xdebug", "ssl":
 		err = validate.Var(args[1], "boolean")
 		if err != nil {
 			return err
