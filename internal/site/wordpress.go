@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/ChrisWiegman/kana-cli/pkg/console"
 	"github.com/ChrisWiegman/kana-cli/pkg/docker"
@@ -224,11 +225,12 @@ func (s *Site) installKanaPlugin(consoleOutput *console.Console) error {
 // installWordPress Installs and configures WordPress core
 func (s *Site) installWordPress(consoleOutput *console.Console) error {
 	checkCommand := []string{
-		"core",
-		"is-installed",
+		"option",
+		"get",
+		"siteurl",
 	}
 
-	code, _, err := s.RunWPCli(checkCommand, consoleOutput)
+	code, checkURL, err := s.RunWPCli(checkCommand, consoleOutput)
 
 	if err != nil || code != 0 {
 		consoleOutput.Println("Finishing WordPress setup.")
@@ -246,6 +248,29 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 		code, _, err = s.RunWPCli(setupCommand, consoleOutput)
 		if err != nil || code != 0 {
 			return fmt.Errorf("installation of WordPress failed: %s", err.Error())
+		}
+	} else if strings.TrimSpace(checkURL) != s.Settings.URL {
+		consoleOutput.Println("The SSL config has changed. Updating the site URL accordingly.")
+
+		// update the home and siteurl to ensure correct ssl usage
+		options := []string{
+			"siteurl",
+			"home",
+		}
+
+		for _, option := range options {
+
+			setSiteURLCommand := []string{
+				"option",
+				"update",
+				option,
+				s.Settings.URL,
+			}
+
+			code, _, err = s.RunWPCli(setSiteURLCommand, consoleOutput)
+			if err != nil || code != 0 {
+				return fmt.Errorf("installation of WordPress failed: %s", err.Error())
+			}
 		}
 	}
 

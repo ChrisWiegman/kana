@@ -31,7 +31,7 @@ func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 	// Setup other options generated from config items
 	s.SiteDomain = fmt.Sprintf("%s.%s", siteName, s.AppDomain)
 	s.Protocol = s.getProtocol()
-	s.URL = fmt.Sprintf("%s://%s/", s.Protocol, s.SiteDomain)
+	s.URL = fmt.Sprintf("%s://%s", s.Protocol, s.SiteDomain)
 
 	s.Name = siteName
 	s.SiteDirectory = path.Join(s.AppDirectory, "sites", siteName)
@@ -84,7 +84,7 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 		s.SiteDirectory = (path.Join(s.AppDirectory, "sites", s.Name))
 
 		s.SiteDomain = fmt.Sprintf("%s.%s", s.Name, s.AppDomain)
-		s.URL = fmt.Sprintf("%s://%s/", s.Protocol, s.SiteDomain)
+		s.URL = fmt.Sprintf("%s://%s", s.Protocol, s.SiteDomain)
 
 		siteLink = s.SiteDirectory
 	}
