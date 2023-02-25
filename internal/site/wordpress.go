@@ -259,7 +259,6 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 		}
 
 		for _, option := range options {
-
 			setSiteURLCommand := []string{
 				"option",
 				"update",
