@@ -45,11 +45,11 @@ You will need [Go](https://go.dev) installed locally to build the application fo
 1. Clone this repo `git clone git@github.com:ChrisWiegman/kana-cli.git`
 2. CD into the repo and run `make install`
 
-Assuming you have Go properly setup with GOBIN in your system path, you should now be able to use Kana. Run `kana version` to test.
+Assuming you have Go properly setup with `GOBIN` in your system path, you should now be able to use Kana. Run `kana version` to test.
 
 # Using Kana
 
-At it's most basic you can start a zero-config Kana site by running `kana start` in your terminal. This will create a new Kana site based on your current directory name and open it in your default browser. If it is the first time you've run Kana it will also install it's root CA in your Mac's system store.
+At it's most basic you can start a zero-config Kana site by running `kana start` in your terminal. This will create a new Kana site based on your current directory and open it in your default browser. If you're on Mac and it is the first time you've run Kana it will also install it's root CA in your Mac's system store.
 
 Kana relies on [Traefik](https://traefik.io) to map real domains to local sites. You can run as many sites as you need and each will be mapped to a subdomain of _sites.kana.li_.
 
@@ -113,6 +113,8 @@ You can also export the database file your Kana site is using with `kana db expo
 
 `kana destroy` will stop and destroy the current site. This is different than `stop` in that `stop` will leave the database and files it creates alone so you can start it again later. Once destroyed a site is irrecoverable.
 
+By default Kana will prompt you to confirm any site you wish to destroy. You can bypass the prompt by adding the `--force` flag to the destroy command.
+
 ## Open
 
 `kana open` will open the site in your default browser
@@ -162,13 +164,13 @@ In addition to the global config, certain items above can be overridden for any 
 - `plugins` **[]** - an array of plugins to install and activate when starting the new site. These are slugs from the Plugins section of WordPress.org.
 - `ssl` **false** - the default usage of the `ssl` start flag
 
-### Export
+### Export a sites Kana config automatically
 
 `kana export` will create a _.kana.json_ configuration file in your current folder exporting the configuration of the current site including PHP version, active plugins and associated options as shown above
 
 # Accessing the database directly
 
-Currently there are two methods to access the database directly. First, use the `phpmyadmin` flag or setting (set to true) to add an instance of [phpMyAdmin](https://www.phpmyadmin.net) to your site. You can access this by appending **\*phpmyadmin-** to the beginning of your site domain. For example, if your site can get found at https://mysupersite.sites.kana.li you can access phpMyAdmin at https://phpmyadmin-mysupersite.sites.kana.li if you have enabled phpMyAdmin at site start.
+Currently there are two methods to access the database directly. First you can access the database via PhpMyAdmin by running `kana open --phpmyadmin` for the site in question.
 
 You can also access the database directly by viewing the database port with `docker ps` and using the database port and the following configuration in the app of your choice:
 
@@ -212,11 +214,11 @@ To trigger step debugging you'll also need the appropriate extension for your br
 Note that I am using this project for my own work and it is under active development. Some of the things I'm currently working on include:
 
 - Better site management commands
-- Support for more xdebug modes (trace, etc)
+- Support for more Xdebug modes and a more robust Xdebug configuration.
 - Much more clear prompts and messages on the commands themselves
 - Writing a lot more tests (it's a personal project, I start where I can)
 - A proper website for all this documentation (I already bought a domain, after all)
-- Possible support for Docker alternatives
+- Bugfixes and other tweaks as I find them necessary for my own use
 
 # Completely Uninstalling Kana
 
@@ -231,6 +233,6 @@ You can also safely remove any new images added however it is not a requirement.
 
 # Using Kana in other projects
 
-While Kana cannot easily be used as a package itself, you can import the binary itself into your project. If you do so, consider using the `output-json` flag on all commands. This will convert all output to JSON format to make consumption easier when the application is embedded in another.
+While Kana cannot easily be used as a package itself, you can import the binary itself into your project. If you do so, consider using the `output-json` flag on all commands. This will convert all output to JSON format to make consumption easier when the Kana application is embedded elsewhere.
 
-Why do this? This will make it easier for me to work with Kana in a small toolbar app I'm building which will allow me to see what is going on with Kana and control it beyond the terminal.
+Why do this? This will make it easier for me to work with Kana in a small toolbar app I'm building as well as with a [Visual Studio Code](https://code.visualstudio.com/) extension I have planned which will allow me to see what is going on with Kana and control it beyond the terminal.
