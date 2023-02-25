@@ -335,17 +335,23 @@ func (s *Site) startWordPress(consoleOutput *console.Console) error {
 	appContainers = s.getMailpitContainer(appContainers)
 
 	for i := range appContainers {
-		err := s.dockerClient.EnsureImage(appContainers[i].Image, consoleOutput)
-		if err != nil {
-			return err
-		}
-		_, err = s.dockerClient.ContainerRun(&appContainers[i], true, true)
+		err := s.startContainer(&appContainers[i], consoleOutput)
 		if err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+
+func (s *Site) startContainer(container *docker.ContainerConfig, consoleOutput *console.Console) error {
+	err := s.dockerClient.EnsureImage(container.Image, consoleOutput)
+	if err != nil {
+		return err
+	}
+	_, err = s.dockerClient.ContainerRun(container, true, true)
+
+	return err
 }
 
 // stopWordPress Stops the site in docker, destroying the containers when they close
