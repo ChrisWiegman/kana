@@ -198,6 +198,13 @@ func (s *Site) OpenSite(openPhpMyAdminFlag, openMailpitFlag, openSiteFlag bool, 
 	}
 
 	if openMailpitFlag {
+		if !s.isMailpitRunning() {
+			err := s.startMailpit(consoleOutput)
+			if err != nil {
+				return err
+			}
+		}
+
 		mailpitURL := fmt.Sprintf("%s://mailpit-%s", s.Settings.Protocol, s.Settings.SiteDomain)
 		openUrls = append(openUrls, mailpitURL)
 	}
@@ -317,16 +324,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 	}
 
 	// We need container details to see if the mailpit container is running
-	containers, err := s.dockerClient.ContainerList(s.Settings.Name)
-	if err != nil {
-		return localSettings, err
-	}
-
-	for i := range containers {
-		if containers[i].Image == "axllent/mailpit" {
-			localSettings.Mailpit = true
-		}
-	}
+	localSettings.Mailpit = s.isMailpitRunning()
 
 	output, err := s.runCli("pecl list | grep xdebug", false)
 	if err != nil {
@@ -368,6 +366,22 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 	}
 
 	return localSettings, nil
+}
+
+func (s *Site) isMailpitRunning() bool {
+	// We need container details to see if the mailpit container is running
+	containers, err := s.dockerClient.ContainerList(s.Settings.Name)
+	if err != nil {
+		return false
+	}
+
+	for i := range containers {
+		if containers[i].Image == "axllent/mailpit" {
+			return true
+		}
+	}
+
+	return false
 }
 
 // installXdebug installs xdebug in the site's PHP container
