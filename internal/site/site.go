@@ -438,7 +438,7 @@ func (s *Site) runCli(command string, restart bool) (docker.ExecResult, error) {
 }
 
 // verifySite verifies if a site is up and running without error
-func (s *Site) verifySite(url string) error {
+func (s *Site) verifySite(siteURL string) error {
 	// Setup other options generated from config items
 	rootCert := path.Join(s.Settings.AppDirectory, "certs", s.Settings.RootCert)
 
@@ -449,7 +449,7 @@ func (s *Site) verifySite(url string) error {
 	caCertPool := x509.NewCertPool()
 	caCertPool.AppendCertsFromPEM(caCert)
 
-	siteOK, err := checkStatusCode(url)
+	siteOK, err := checkStatusCode(siteURL)
 	if err != nil {
 		return err
 	}
@@ -457,7 +457,7 @@ func (s *Site) verifySite(url string) error {
 	tries := 0
 
 	for !siteOK {
-		siteOK, err = checkStatusCode(url)
+		siteOK, err = checkStatusCode(siteURL)
 		if err != nil {
 			return err
 		}
@@ -478,8 +478,8 @@ func (s *Site) verifySite(url string) error {
 }
 
 // checkStatusCode returns true on 200 or false
-func checkStatusCode(url string) (bool, error) {
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, url, http.NoBody)
+func checkStatusCode(checkURL string) (bool, error) {
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, checkURL, http.NoBody)
 	if err != nil {
 		return false, err
 	}
