@@ -17,6 +17,7 @@ type StartFlags struct {
 	Local      bool
 	IsTheme    bool
 	IsPlugin   bool
+	SSL        bool
 }
 
 type LocalSettings struct {
@@ -143,6 +144,10 @@ func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
 
 	if cmd.Flags().Lookup("xdebug").Changed {
 		s.Xdebug = flags.Xdebug
+	}
+
+	if cmd.Flags().Lookup("ssl").Changed {
+		s.SSL = flags.SSL
 	}
 
 	if cmd.Flags().Lookup("phpmyadmin").Changed {
