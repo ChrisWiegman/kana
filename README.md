@@ -158,12 +158,13 @@ The above syntax will allow you to change the defaults for any of the options li
 In addition to the global config, certain items above can be overridden for any given site. For a site without a `name` flag (as seen in the start command), simply create a _.kana.json_ file in the current directory. You can populate it with the following options:
 
 - `local` **false** - the default usage of the `local` start flag
-- `php` **7.4** - the default PHP version used for new sites (currently 8.0, 8.1 and 8.2 are also supported)
+- `php` **8.1** - the default PHP version used for new sites (currently 8.0, 8.1 and 8.2 are also supported)
 - `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
 - `xdebug` **false** - the default usage of the `xdebug` start flag
 - `phpmyadmin` **false** - the default usage of the `phpmyadmin` start flag
 - `mailpit` **false** - the default usage of the `mailpit` start flag
 - `plugins` **[]** - an array of plugins to install and activate when starting the new site. These are slugs from the Plugins section of WordPress.org.
+- `ssl` **false** - the default usage of the `ssl` start flag
 
 ### Export
 
