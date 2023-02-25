@@ -80,6 +80,8 @@ If you do not specify the `local` flag you can find Kana's site files in `~/.con
 
 `--mailpit` will start an instance of [Mailpit](https://github.com/axllent/mailpit) to allow for email capture and troubleshooting.
 
+`--ssl` will set the site's default URLs to use SSL.
+
 `--name` The name flag allows you to run an arbitrary site from anywhere. For example, if you already started and stopped a site from a directory called _test_ you can run `kana start --name=test` to start that site from anywhere. If you use the `name` flag on a new site it will create that site without a link to any local folder. This can be handy for testing a plugin or other configuration but not that none of the other start flags will apply.
 
 ## Importing an existing WordPress database
@@ -142,6 +144,7 @@ Kana has a handful of options that apply to all new sites created with the app. 
 - `xdebug` **false** - the default usage of the `xdebug` start flag
 - `phpmyadmin` **false** - the default usage of the `phpmyadmin` start flag
 - `mailpit` **false** - the default usage of the `mailpit` start flag
+- `ssl` **false** - the default usage of the `ssl` start flag
 
 You can get or set any of the above options using a similar syntax to GIT's config. For example:
 
