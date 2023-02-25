@@ -165,13 +165,13 @@ func (s *Site) OpenSite(app string) error {
 		return err
 	}
 
-	OpenURL := s.Settings.SecureURL
+	OpenURL := s.Settings.URL
 
 	switch app {
 	case "site":
 		break
 	case "phpmyadmin", "mailpit":
-		OpenURL = fmt.Sprintf("https://%s-%s", app, s.Settings.SiteDomain)
+		OpenURL = fmt.Sprintf("%s://%s-%s", s.Settings.Protocol, app, s.Settings.SiteDomain)
 
 		err := s.verifySite(OpenURL)
 		if err != nil {
@@ -192,7 +192,7 @@ func (s *Site) OpenSite(app string) error {
 // StartSite Starts a site, including Traefik if needed
 func (s *Site) StartSite(consoleOutput *console.Console) error {
 	// Let's start everything up
-	consoleOutput.Printf("Starting development site: %s.\n", consoleOutput.Bold(consoleOutput.Green(s.getSiteURL(false))))
+	consoleOutput.Printf("Starting development site: %s.\n", consoleOutput.Bold(consoleOutput.Green(s.Settings.URL)))
 
 	consoleOutput.Println("Ensuring all Docker images are present, up to date and running (this may take a few minutes.")
 
@@ -326,15 +326,6 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 	}
 
 	return localSettings, nil
-}
-
-// getSiteURL returns the appropriate URL for the site
-func (s *Site) getSiteURL(insecure bool) string {
-	if insecure {
-		return s.Settings.URL
-	}
-
-	return s.Settings.SecureURL
 }
 
 // installXdebug installs xdebug in the site's PHP container

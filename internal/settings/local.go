@@ -30,8 +30,8 @@ func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 	siteName := sanitizeSiteName(filepath.Base(s.WorkingDirectory))
 	// Setup other options generated from config items
 	s.SiteDomain = fmt.Sprintf("%s.%s", siteName, s.AppDomain)
-	s.SecureURL = fmt.Sprintf("https://%s/", s.SiteDomain)
-	s.URL = fmt.Sprintf("http://%s/", s.SiteDomain)
+	s.Protocol = s.getProtocol()
+	s.URL = fmt.Sprintf("%s://%s/", s.Protocol, s.SiteDomain)
 
 	s.Name = siteName
 	s.SiteDirectory = path.Join(s.AppDirectory, "sites", siteName)
@@ -84,8 +84,7 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 		s.SiteDirectory = (path.Join(s.AppDirectory, "sites", s.Name))
 
 		s.SiteDomain = fmt.Sprintf("%s.%s", s.Name, s.AppDomain)
-		s.SecureURL = fmt.Sprintf("https://%s/", s.SiteDomain)
-		s.URL = fmt.Sprintf("http://%s/", s.SiteDomain)
+		s.URL = fmt.Sprintf("%s://%s/", s.Protocol, s.SiteDomain)
 
 		siteLink = s.SiteDirectory
 	}
@@ -96,6 +95,14 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 	}
 
 	return s.saveLinkConfig(isSite, cmd, siteLink)
+}
+
+func (s *Settings) getProtocol() string {
+	if s.SSL {
+		return "https"
+	}
+
+	return "http"
 }
 
 func (s *Settings) saveLinkConfig(isSite bool, cmd *cobra.Command, siteLink string) (bool, error) {

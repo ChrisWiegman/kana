@@ -236,7 +236,7 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 		setupCommand := []string{
 			"core",
 			"install",
-			fmt.Sprintf("--url=%s", s.getSiteURL(false)),
+			fmt.Sprintf("--url=%s", s.Settings.URL),
 			fmt.Sprintf("--title=Kana Development %s: %s", s.Settings.Type, s.Settings.Name),
 			fmt.Sprintf("--admin_user=%s", s.Settings.AdminUsername),
 			fmt.Sprintf("--admin_password=%s", s.Settings.AdminPassword),
