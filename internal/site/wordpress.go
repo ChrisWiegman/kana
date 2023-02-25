@@ -321,7 +321,7 @@ func (s *Site) startWordPress(consoleOutput *console.Console) error {
 	appContainers = s.getWordPressContainer(appVolumes, appContainers)
 
 	for i := range appContainers {
-		err := s.startContainer(&appContainers[i], consoleOutput)
+		err := s.startContainer(&appContainers[i], true, true, consoleOutput)
 		if err != nil {
 			return err
 		}
@@ -352,23 +352,23 @@ func (s *Site) getDirectories(consoleOutput *console.Console) (appDir, databaseD
 func (s *Site) startMailpit(consoleOutput *console.Console) error {
 	mailpitContainer := s.getMailpitContainer()
 
-	return s.startContainer(&mailpitContainer, consoleOutput)
+	return s.startContainer(&mailpitContainer, true, true, consoleOutput)
 }
 
 // startPHPMyAdmin Starts the PhpMyAdmin container
 func (s *Site) startPHPMyAdmin(consoleOutput *console.Console) error {
 	phpMyAdminContainer := s.getPhpMyAdminContainer()
 
-	return s.startContainer(&phpMyAdminContainer, consoleOutput)
+	return s.startContainer(&phpMyAdminContainer, true, false, consoleOutput)
 }
 
 // startContainer Starts a given container configuration
-func (s *Site) startContainer(container *docker.ContainerConfig, consoleOutput *console.Console) error {
+func (s *Site) startContainer(container *docker.ContainerConfig, randomPorts, localUser bool, consoleOutput *console.Console) error {
 	err := s.dockerClient.EnsureImage(container.Image, consoleOutput)
 	if err != nil {
 		return err
 	}
-	_, err = s.dockerClient.ContainerRun(container, true, true)
+	_, err = s.dockerClient.ContainerRun(container, randomPorts, localUser)
 
 	return err
 }
