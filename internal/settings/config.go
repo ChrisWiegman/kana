@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/ChrisWiegman/kana-cli/pkg/console"
@@ -85,20 +84,6 @@ func (s *Settings) SetGlobalSetting(md *cobra.Command, args []string) error {
 	var err error
 
 	switch args[0] {
-	case "local", "xdebug", "ssl":
-		err = validate.Var(args[1], "boolean")
-		if err != nil {
-			return err
-		}
-
-		var boolVal bool
-
-		boolVal, err = strconv.ParseBool(args[1])
-		if err != nil {
-			return err
-		}
-		s.global.Set(args[0], boolVal)
-		return s.global.WriteConfig()
 	case "php":
 		if !isValidString(args[1], validPHPVersions) {
 			err = fmt.Errorf("please choose a valid php version")
@@ -115,6 +100,9 @@ func (s *Settings) SetGlobalSetting(md *cobra.Command, args []string) error {
 		err = validate.Var(args[1], "alpha")
 	default:
 		err = validate.Var(args[1], "boolean")
+		if err != nil {
+			err = fmt.Errorf("the setting, %s, must be either true or false", args[0])
+		}
 	}
 
 	if err != nil {
