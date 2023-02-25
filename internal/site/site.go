@@ -229,6 +229,22 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 		return err
 	}
 
+	// Start PhpMyAdmin
+	if s.Settings.PhpMyAdmin {
+		err = s.startPHPMyAdmin(consoleOutput)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Start Mailpit
+	if s.Settings.Mailpit {
+		err = s.startMailpit(consoleOutput)
+		if err != nil {
+			return err
+		}
+	}
+
 	// Make sure the WordPress site is running
 	err = s.verifySite(s.Settings.URL)
 	if err != nil {
