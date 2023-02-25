@@ -76,8 +76,6 @@ If you do not specify the `local` flag you can find Kana's site files in `~/.con
 
 `--xdebug` will start Xdebug on the site (see below for usage).
 
-`--phpmyadmin` will start an instance of [phpMyAdmin](https://www.phpmyadmin.net) to allow for easier access to the database without needing external tools.
-
 `--mailpit` will start an instance of [Mailpit](https://github.com/axllent/mailpit) to allow for email capture and troubleshooting.
 
 `--ssl` will set the site's default URLs to use SSL.
@@ -119,7 +117,7 @@ You can also export the database file your Kana site is using with `kana db expo
 
 `kana open` will open the site in your default browser
 
-To open Mailpit or PhpMyAdmin in your default browser use the `app` flag with either `phpmyadmin` or `mailpit`.
+By default Kana will open the appropriate WordPress site. To open PhpMyAdmin or Mailpit simply append the appropriate flag to the open command ie `kana open --phpmyadmin`.
 
 ## wp-cli
 
@@ -142,7 +140,6 @@ Kana has a handful of options that apply to all new sites created with the app. 
 - `php` **8.1** - the default PHP version used for new sites (currently 8.0, 8.1 and 8.2 are also supported)
 - `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
 - `xdebug` **false** - the default usage of the `xdebug` start flag
-- `phpmyadmin` **false** - the default usage of the `phpmyadmin` start flag
 - `mailpit` **false** - the default usage of the `mailpit` start flag
 - `ssl` **false** - the default usage of the `ssl` start flag
 
@@ -161,7 +158,6 @@ In addition to the global config, certain items above can be overridden for any 
 - `php` **8.1** - the default PHP version used for new sites (currently 8.0, 8.1 and 8.2 are also supported)
 - `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
 - `xdebug` **false** - the default usage of the `xdebug` start flag
-- `phpmyadmin` **false** - the default usage of the `phpmyadmin` start flag
 - `mailpit` **false** - the default usage of the `mailpit` start flag
 - `plugins` **[]** - an array of plugins to install and activate when starting the new site. These are slugs from the Plugins section of WordPress.org.
 - `ssl` **false** - the default usage of the `ssl` start flag
