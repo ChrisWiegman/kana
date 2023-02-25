@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"path"
@@ -54,6 +55,26 @@ func (s *Site) ExportSiteConfig(consoleOutput *console.Console) error {
 	localSettings, err := s.getRunningConfig(true, consoleOutput)
 	if err != nil {
 		return err
+	}
+
+	checkCommand := []string{
+		"option",
+		"get",
+		"siteurl",
+	}
+
+	code, checkURL, err := s.RunWPCli(checkCommand, consoleOutput)
+	if err != nil || code != 0 {
+		return fmt.Errorf("unable to determine SSL status")
+	}
+
+	parsedURL, err := url.Parse(strings.TrimSpace(checkURL))
+	if err != nil {
+		return err
+	}
+
+	if parsedURL.Scheme == "https" {
+		localSettings.SSL = true
 	}
 
 	return s.Settings.WriteLocalSettings(localSettings)
@@ -272,6 +293,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 		Local:      false,
 		Xdebug:     false,
 		PhpMyAdmin: false,
+		SSL:        false,
 	}
 
 	// We need container details to see if the phpmyadmin container is running
