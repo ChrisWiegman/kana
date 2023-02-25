@@ -180,34 +180,46 @@ func (s *Site) LoadSite(cmd *cobra.Command, commandsRequiringSite []string, star
 }
 
 // OpenSite Opens the current site in a browser if it is running
-func (s *Site) OpenSite(app string) error {
-	err := s.verifySite(s.Settings.URL)
-	if err != nil {
-		return err
+func (s *Site) OpenSite(openPhpMyAdminFlag, openMailpitFlag, openSiteFlag bool, consoleOutput *console.Console) error {
+	openUrls := []string{}
+
+	if openSiteFlag {
+		openUrls = append(openUrls, s.Settings.URL)
 	}
 
-	OpenURL := s.Settings.URL
-
-	switch app {
-	case "site":
-		break
-	case "phpmyadmin", "mailpit":
-		OpenURL = fmt.Sprintf("%s://%s-%s", s.Settings.Protocol, app, s.Settings.SiteDomain)
-
-		err := s.verifySite(OpenURL)
+	if openPhpMyAdminFlag {
+		err := s.startPHPMyAdmin(consoleOutput)
 		if err != nil {
 			return err
 		}
-	default:
-		return fmt.Errorf("you used an invalid app flag. Please check the help documentation for more info")
+
+		phpmyAdminURL := fmt.Sprintf("%s://phpmyadmin-%s", s.Settings.Protocol, s.Settings.SiteDomain)
+		openUrls = append(openUrls, phpmyAdminURL)
 	}
 
-	if runtime.GOOS == "linux" {
-		openCmd := execCommand("xdg-open", OpenURL)
-		return openCmd.Run()
+	if openMailpitFlag {
+		mailpitURL := fmt.Sprintf("%s://mailpit-%s", s.Settings.Protocol, s.Settings.SiteDomain)
+		openUrls = append(openUrls, mailpitURL)
 	}
 
-	return browser.OpenURL(OpenURL)
+	for _, openURL := range openUrls {
+		err := s.verifySite(openURL)
+		if err != nil {
+			return err
+		}
+
+		if runtime.GOOS == "linux" {
+			openCmd := execCommand("xdg-open", openURL)
+			return openCmd.Run()
+		}
+
+		err = browser.OpenURL(openURL)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // StartSite Starts a site, including Traefik if needed
@@ -268,7 +280,7 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 	}
 
 	// Open the site in the user's browser
-	return s.OpenSite("site")
+	return s.OpenSite(false, false, true, consoleOutput)
 }
 
 // StopSite Stops a full site, including Traefik if needed

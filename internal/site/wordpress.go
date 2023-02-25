@@ -357,12 +357,7 @@ func (s *Site) startMailpit(consoleOutput *console.Console) error {
 
 // startPHPMyAdmin Starts the PhpMyAdmin container
 func (s *Site) startPHPMyAdmin(consoleOutput *console.Console) error {
-	_, databaseDir, err := s.getDirectories(consoleOutput)
-	if err != nil {
-		return err
-	}
-
-	phpMyAdminContainer := s.getPhpMyAdminContainer(databaseDir)
+	phpMyAdminContainer := s.getPhpMyAdminContainer()
 
 	return s.startContainer(&phpMyAdminContainer, consoleOutput)
 }
@@ -463,7 +458,7 @@ func (s *Site) getMailpitContainer() docker.ContainerConfig {
 	return mailpitContainer
 }
 
-func (s *Site) getPhpMyAdminContainer(databaseDir string) docker.ContainerConfig {
+func (s *Site) getPhpMyAdminContainer() docker.ContainerConfig {
 	phpMyAdminContainer := docker.ContainerConfig{
 		Name:        fmt.Sprintf("kana-%s-phpmyadmin", s.Settings.Name),
 		Image:       "phpmyadmin",
@@ -474,13 +469,6 @@ func (s *Site) getPhpMyAdminContainer(databaseDir string) docker.ContainerConfig
 			fmt.Sprintf("PMA_HOST=kana-%s-database", s.Settings.Name),
 			"PMA_USER=wordpress",
 			"PMA_PASSWORD=wordpress",
-		},
-		Volumes: []mount.Mount{
-			{ // Maps a database folder to the MySQL container for persistence
-				Type:   mount.TypeBind,
-				Source: databaseDir,
-				Target: "/var/lib/mysql",
-			},
 		},
 		Labels: map[string]string{
 			"traefik.enable": "true",

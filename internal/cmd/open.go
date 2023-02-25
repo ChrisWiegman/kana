@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var openAppFlag string
+var openPhpMyAdminFlag, openMailpitFlag, openSiteFlag bool
 
 func newOpenCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
@@ -21,8 +21,15 @@ func newOpenCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.
 				consoleOutput.Error(err)
 			}
 
+			// Default to opening the site if no flags are specified
+			if !cmd.Flags().Lookup("phpmyadmin").Changed &&
+				!cmd.Flags().Lookup("mailpit").Changed &&
+				!cmd.Flags().Lookup("site").Changed {
+				openSiteFlag = true
+			}
+
 			// Open the site in the user's default browser,
-			err = kanaSite.OpenSite(openAppFlag)
+			err = kanaSite.OpenSite(openPhpMyAdminFlag, openMailpitFlag, openSiteFlag, consoleOutput)
 			if err != nil {
 				consoleOutput.Error(fmt.Errorf("the site doesn't appear to be running. Please use `kana start` to start the site"))
 			}
@@ -38,8 +45,19 @@ func newOpenCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.
 	}
 
 	commandsRequiringSite = append(commandsRequiringSite, cmd.Use)
-
-	cmd.Flags().StringVarP(&openAppFlag, "app", "a", "site", "site = open kana site, phpmyadmin = PhpMyAdmin, mailpit = Mailpit")
+	cmd.Flags().BoolVarP(
+		&openPhpMyAdminFlag,
+		"phpmyadmin",
+		"p",
+		false,
+		"Opens the PhpMyAdmin UI for the current or specified Kana site in your default browser")
+	cmd.Flags().BoolVarP(
+		&openMailpitFlag,
+		"mailpit",
+		"m",
+		false,
+		"Opens the Mailpit UI for the current or specified Kana site in your default browser")
+	cmd.Flags().BoolVarP(&openSiteFlag, "site", "s", false, "Opens the current or specified Kana site in your default browser")
 
 	return cmd
 }
