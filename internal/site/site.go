@@ -397,10 +397,12 @@ func (s *Site) installXdebug(consoleOutput *console.Console) (bool, error) {
 		"pecl install xdebug",
 		"docker-php-ext-enable xdebug",
 		"echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini",
-		"echo 'xdebug.mode=debug' >> /usr/local/etc/php/php.ini",
+		"echo 'xdebug.mode=debug,develop,trace' >> /usr/local/etc/php/php.ini",
 		"echo 'xdebug.client_host=host.docker.internal' >> /usr/local/etc/php/php.ini",
 		"echo 'xdebug.discover_client_host=on' >> /usr/local/etc/php/php.ini",
 		"echo 'xdebug.start_with_request=trigger' >> /usr/local/etc/php/php.ini",
+		"echo 'xdebug.show_local_vars=1' >> /usr/local/etc/php/php.ini",
+		"echo 'html_errors = On' >> /usr/local/etc/php/conf.d/z-custom.ini", // Ensure custom overrides happen
 	}
 
 	for i, command := range commands {
