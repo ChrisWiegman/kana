@@ -1,3 +1,0 @@
-kind: Breaking Changes
-body: Remove PhpMyAdmin configuration and flag. It will now open on demand
-time: 2023-02-25T20:58:20.484792333Z

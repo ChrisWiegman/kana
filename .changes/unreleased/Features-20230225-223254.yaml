@@ -1,4 +1,0 @@
-kind: Features
-body: Kana will no longer error out when running the open command on Mailpit of PhpMyAdmin
-  if the apps haven't been started. Instead it will start the apps and open as appropriate.
-time: 2023-02-25T22:32:54.808450858Z
