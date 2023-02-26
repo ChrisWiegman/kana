@@ -76,6 +76,8 @@ If you do not specify the `local` flag you can find Kana's site files in `~/.con
 
 `--xdebug` will start Xdebug on the site (see below for usage).
 
+`--wpdebug` will enable `WP_DEBUG` on the site.
+
 `--mailpit` will start an instance of [Mailpit](https://github.com/axllent/mailpit) to allow for email capture and troubleshooting.
 
 `--ssl` will set the site's default URLs to use SSL.
@@ -142,6 +144,7 @@ Kana has a handful of options that apply to all new sites created with the app. 
 - `php` **8.1** - the default PHP version used for new sites (currently 8.0, 8.1 and 8.2 are also supported)
 - `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
 - `xdebug` **false** - the default usage of the `xdebug` start flag
+- `wpdebug` **false** - the default usage of the `wpdebug` start flag
 - `mailpit` **false** - the default usage of the `mailpit` start flag
 - `ssl` **false** - the default usage of the `ssl` start flag
 
@@ -160,6 +163,7 @@ In addition to the global config, certain items above can be overridden for any 
 - `php` **8.1** - the default PHP version used for new sites (currently 8.0, 8.1 and 8.2 are also supported)
 - `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
 - `xdebug` **false** - the default usage of the `xdebug` start flag
+- `wpdebug` **false** - the default usage of the `wpdebug` start flag
 - `mailpit` **false** - the default usage of the `mailpit` start flag
 - `plugins` **[]** - an array of plugins to install and activate when starting the new site. These are slugs from the Plugins section of WordPress.org.
 - `ssl` **false** - the default usage of the `ssl` start flag
@@ -214,11 +218,11 @@ To trigger step debugging you'll also need the appropriate extension for your br
 Note that I am using this project for my own work and it is under active development. Some of the things I'm currently working on include:
 
 - Better site management commands
-- Support for more Xdebug modes and a more robust Xdebug configuration.
 - Much more clear prompts and messages on the commands themselves
 - Writing a lot more tests (it's a personal project, I start where I can)
 - A proper website for all this documentation (I already bought a domain, after all)
 - Bugfixes and other tweaks as I find them necessary for my own use
+- Better integration with tools like VSCode and others
 
 # Completely Uninstalling Kana
 
