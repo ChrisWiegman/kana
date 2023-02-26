@@ -336,6 +336,15 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 		localSettings.Xdebug = true
 	}
 
+	output, err = s.runCli("echo $WORDPRESS_DEBUG", false)
+	if err != nil {
+		return localSettings, err
+	}
+
+	if strings.Contains(output.StdOut, "1") {
+		localSettings.WPDebug = true
+	}
+
 	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana-%s-wordpress", s.Settings.Name))
 
 	if len(mounts) == 1 {
