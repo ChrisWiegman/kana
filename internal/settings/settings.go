@@ -22,6 +22,7 @@ var (
 	mailpit          = false
 	local            = false
 	ssl              = false
+	wpdebug          = false
 	adminUsername    = "admin"
 	adminPassword    = "password"
 	adminEmail       = "admin@sites.kana.li"
@@ -35,7 +36,7 @@ var (
 
 // Individual Settings for use throughout the app lifecycle
 type Settings struct {
-	Local, Xdebug, Mailpit, SSL                   bool
+	Local, Xdebug, Mailpit, SSL, WPDebug          bool
 	AdminEmail, AdminPassword, AdminUsername      string
 	AppDirectory, SiteDirectory, WorkingDirectory string
 	AppDomain, SiteDomain                         string

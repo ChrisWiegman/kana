@@ -52,6 +52,7 @@ func (s *Site) RunWPCli(command []string, consoleOutput *console.Console) (statu
 			"WORDPRESS_DB_USER=wordpress",
 			"WORDPRESS_DB_PASSWORD=wordpress",
 			"WORDPRESS_DB_NAME=wordpress",
+			"WORDPRESS_DEBUG=0",
 		},
 		Labels: map[string]string{
 			"kana.site": s.Settings.Name,
@@ -518,6 +519,10 @@ func (s *Site) getWordPressContainer(appVolumes []mount.Mount, appContainers []d
 			"kana.site": s.Settings.Name,
 		},
 		Volumes: appVolumes,
+	}
+
+	if s.Settings.WPDebug {
+		wordPressContainer.Env = append(wordPressContainer.Env, "WORDPRESS_DEBUG=1")
 	}
 
 	appContainers = append(appContainers, wordPressContainer)
