@@ -58,22 +58,6 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 	t.Render()
 }
 
-// printJSONSettings Prints out all settings in JSON format
-func (s *Settings) printJSONSettings() {
-	type JSONSettings struct {
-		Global, Local map[string]interface{}
-	}
-
-	settings := JSONSettings{
-		Global: s.global.AllSettings(),
-		Local:  s.local.AllSettings(),
-	}
-
-	str, _ := json.Marshal(settings)
-
-	fmt.Println(string(str))
-}
-
 // SetGlobalSetting Sets a global setting for the "config" command
 func (s *Settings) SetGlobalSetting(md *cobra.Command, args []string) error {
 	if !s.global.IsSet(args[0]) {
@@ -112,4 +96,20 @@ func (s *Settings) SetGlobalSetting(md *cobra.Command, args []string) error {
 	s.global.Set(args[0], args[1])
 
 	return s.global.WriteConfig()
+}
+
+// printJSONSettings Prints out all settings in JSON format
+func (s *Settings) printJSONSettings() {
+	type JSONSettings struct {
+		Global, Local map[string]interface{}
+	}
+
+	settings := JSONSettings{
+		Global: s.global.AllSettings(),
+		Local:  s.local.AllSettings(),
+	}
+
+	str, _ := json.Marshal(settings)
+
+	fmt.Println(string(str))
 }

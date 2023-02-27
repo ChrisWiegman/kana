@@ -301,6 +301,34 @@ func (s *Site) StopSite() error {
 	return s.maybeStopTraefik()
 }
 
+// checkStatusCode returns true on 200 or false
+func checkStatusCode(checkURL string) (bool, error) {
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, checkURL, http.NoBody)
+	if err != nil {
+		return false, err
+	}
+
+	// Ignore SSL check as we're using our self-signed cert for development
+	clientTransport := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:gosec
+	}
+
+	client := &http.Client{Transport: clientTransport}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return false, err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusOK {
+		return true, nil
+	}
+
+	return false, nil
+}
+
 // getLocalAppDir Gets the absolute path to WordPress if the local flag or option has been set
 func (s *Site) getLocalAppDir() (string, error) {
 	localAppDir := path.Join(s.Settings.WorkingDirectory, "wordpress")
@@ -521,32 +549,4 @@ func (s *Site) verifySite(siteURL string) error {
 	}
 
 	return nil
-}
-
-// checkStatusCode returns true on 200 or false
-func checkStatusCode(checkURL string) (bool, error) {
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, checkURL, http.NoBody)
-	if err != nil {
-		return false, err
-	}
-
-	// Ignore SSL check as we're using our self-signed cert for development
-	clientTransport := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:gosec
-	}
-
-	client := &http.Client{Transport: clientTransport}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return false, err
-	}
-
-	defer resp.Body.Close()
-
-	if resp.StatusCode == http.StatusOK {
-		return true, nil
-	}
-
-	return false, nil
 }

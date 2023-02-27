@@ -98,44 +98,6 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 	return s.saveLinkConfig(isSite, cmd, siteLink)
 }
 
-func (s *Settings) getProtocol() string {
-	if s.SSL {
-		return "https"
-	}
-
-	return "http"
-}
-
-func (s *Settings) saveLinkConfig(isSite bool, cmd *cobra.Command, siteLink string) (bool, error) {
-	siteLinkConfig := viper.New()
-
-	siteLinkConfig.SetDefault("link", siteLink)
-
-	siteLinkConfig.SetConfigName("link")
-	siteLinkConfig.SetConfigType("json")
-	siteLinkConfig.AddConfigPath(s.SiteDirectory)
-
-	err := siteLinkConfig.ReadInConfig()
-	if err != nil {
-		_, ok := err.(viper.ConfigFileNotFoundError)
-		if ok && cmd.Use == "start" {
-			isSite = true
-			err = os.MkdirAll(s.SiteDirectory, os.FileMode(defaultDirPermissions))
-			if err != nil {
-				return isSite, err
-			}
-			err = siteLinkConfig.SafeWriteConfig()
-			if err != nil {
-				return isSite, err
-			}
-		}
-	}
-
-	s.WorkingDirectory = siteLinkConfig.GetString("link")
-
-	return isSite, nil
-}
-
 // ProcessStartFlags Process the start flags and save them to the settings object
 func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
 	if cmd.Flags().Lookup("local").Changed {
@@ -184,6 +146,14 @@ func (s *Settings) WriteLocalSettings(localSettings LocalSettings) error {
 	return s.local.WriteConfig()
 }
 
+func (s *Settings) getProtocol() string {
+	if s.SSL {
+		return "https"
+	}
+
+	return "http"
+}
+
 // loadSiteConfig Get the config items that can be overridden locally with a .kana.json file.
 func (s *Settings) loadlocalViper() (*viper.Viper, error) {
 	localSettings := viper.New()
@@ -210,4 +180,34 @@ func (s *Settings) loadlocalViper() (*viper.Viper, error) {
 	}
 
 	return localSettings, nil
+}
+
+func (s *Settings) saveLinkConfig(isSite bool, cmd *cobra.Command, siteLink string) (bool, error) {
+	siteLinkConfig := viper.New()
+
+	siteLinkConfig.SetDefault("link", siteLink)
+
+	siteLinkConfig.SetConfigName("link")
+	siteLinkConfig.SetConfigType("json")
+	siteLinkConfig.AddConfigPath(s.SiteDirectory)
+
+	err := siteLinkConfig.ReadInConfig()
+	if err != nil {
+		_, ok := err.(viper.ConfigFileNotFoundError)
+		if ok && cmd.Use == "start" {
+			isSite = true
+			err = os.MkdirAll(s.SiteDirectory, os.FileMode(defaultDirPermissions))
+			if err != nil {
+				return isSite, err
+			}
+			err = siteLinkConfig.SafeWriteConfig()
+			if err != nil {
+				return isSite, err
+			}
+		}
+	}
+
+	s.WorkingDirectory = siteLinkConfig.GetString("link")
+
+	return isSite, nil
 }
