@@ -32,10 +32,6 @@ func (d *DockerClient) EnsureImage(imageName string, consoleOutput *console.Cons
 	// Discard the download information unless we're debugging
 	out := os.Stdout
 
-	if consoleOutput.JSON || !consoleOutput.Debug {
-		out, _ = os.Open(os.DevNull)
-	}
-
 	termFd, isTerm := term.GetFdInfo(os.Stdout)
 	return displayJSONMessagesStream(reader, out, termFd, isTerm, nil)
 }
