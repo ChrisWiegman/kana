@@ -29,6 +29,7 @@ func newStartCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra
 				consoleOutput.Error(fmt.Errorf("the site is already running. Please stop your site before running the start command"))
 			}
 
+			// Check that we're not using our home directory as the working directory as that could cause security or other issues.
 			home, err := homedir.Dir()
 			if err != nil {
 				consoleOutput.Error(err)
