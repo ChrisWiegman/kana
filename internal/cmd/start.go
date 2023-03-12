@@ -44,8 +44,6 @@ func newStartCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra
 				consoleOutput.Error(fmt.Errorf("you are attempting to start a new site from your home directory. This could create security issues. Please create a folder and start a site from there")) //nolint:lll
 			}
 
-			os.Exit(0)
-
 			err = kanaSite.StartSite(consoleOutput)
 			if err != nil {
 				consoleOutput.Error(err)
