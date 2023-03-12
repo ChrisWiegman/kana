@@ -2,10 +2,12 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/ChrisWiegman/kana-cli/internal/settings"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 	"github.com/ChrisWiegman/kana-cli/pkg/console"
+	"github.com/mitchellh/go-homedir"
 
 	"github.com/spf13/cobra"
 )
@@ -26,6 +28,23 @@ func newStartCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra
 			if kanaSite.IsSiteRunning() {
 				consoleOutput.Error(fmt.Errorf("the site is already running. Please stop your site before running the start command"))
 			}
+
+			home, err := homedir.Dir()
+			if err != nil {
+				consoleOutput.Error(err)
+			}
+
+			if home == kanaSite.Settings.WorkingDirectory {
+				// Remove the site's folder in the config directory.
+				err = os.RemoveAll(kanaSite.Settings.SiteDirectory)
+				if err != nil {
+					consoleOutput.Error(err)
+				}
+
+				consoleOutput.Error(fmt.Errorf("you are attempting to start a new site from your home directory. This could create security issues. Please create a folder and start a site from there")) //nolint:lll
+			}
+
+			os.Exit(0)
 
 			err = kanaSite.StartSite(consoleOutput)
 			if err != nil {
