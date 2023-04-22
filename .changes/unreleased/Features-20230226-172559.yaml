@@ -1,5 +1,0 @@
-kind: Features
-body: Improve Xdebug output by setting PHP's `html_errors` to `true` and setting `xdebug.mode`
-  to `debug,develop,trace`. This will give much more informative and readable debugging
-  output.
-time: 2023-02-26T17:25:59.288390253Z

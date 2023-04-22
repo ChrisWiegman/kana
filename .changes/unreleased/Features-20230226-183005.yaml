@@ -1,3 +1,0 @@
-kind: Features
-body: Introduced `wpdebug` setting to ensure WP_DEBUG is always available when needed.
-time: 2023-02-26T18:30:05.568772883Z
