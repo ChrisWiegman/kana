@@ -1,0 +1,3 @@
+kind: Security Fixes
+body: Update Go's Docker module per Dependabot (https://github.com/ChrisWiegman/kana-cli/pull/18)
+time: 2023-05-13T14:23:25.48194188Z
