@@ -36,6 +36,10 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 	t.AddRow("admin.email", consoleOutput.Bold(s.global.GetString("admin.email")))
 	t.AddRow("admin.password", consoleOutput.Bold(s.global.GetString("admin.password")))
 	t.AddRow("admnin.username", consoleOutput.Bold(s.global.GetString("admin.username")))
+	t.AddRow(
+		"imageUpdateDays",
+		consoleOutput.Bold(s.global.GetString("imageUpdateDays")),
+		consoleOutput.Bold(s.local.GetString("imageUpdateDays")))
 	t.AddRow("local", consoleOutput.Bold(s.global.GetString("local")), consoleOutput.Bold(s.local.GetString("local")))
 	t.AddRow("mailpit", consoleOutput.Bold(s.global.GetString("mailpit")), consoleOutput.Bold(s.local.GetString("mailpit")))
 	t.AddRow("php", consoleOutput.Bold(s.global.GetString("php")), consoleOutput.Bold(s.local.GetString("php")))
@@ -82,6 +86,8 @@ func (s *Settings) SetGlobalSetting(md *cobra.Command, args []string) error {
 		err = validate.Var(args[1], "alphanumunicode")
 	case "admin.username":
 		err = validate.Var(args[1], "alpha")
+	case "imageUpdateDays":
+		err = validate.Var(args[1], "gte=0")
 	default:
 		err = validate.Var(args[1], "boolean")
 		if err != nil {

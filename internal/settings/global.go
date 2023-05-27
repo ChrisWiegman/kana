@@ -24,6 +24,7 @@ func (s *Settings) LoadGlobalSettings() error {
 	s.PHP = globalViperConfig.GetString("php")
 	s.Type = globalViperConfig.GetString("type")
 	s.SSL = globalViperConfig.GetBool("ssl")
+	s.ImageUpdateDays = globalViperConfig.GetInt("imageUpdateDays")
 
 	return err
 }
@@ -33,6 +34,7 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
 	globalSettings := viper.New()
 
 	globalSettings.SetDefault("xdebug", xdebug)
+	globalSettings.SetDefault("imageUpdateDays", imageUpdateDays)
 	globalSettings.SetDefault("wpdebug", wpdebug)
 	globalSettings.SetDefault("mailpit", mailpit)
 	globalSettings.SetDefault("type", siteType)

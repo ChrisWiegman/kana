@@ -20,7 +20,7 @@ var displayJSONMessagesStream = jsonmessage.DisplayJSONMessagesStream
 
 // https://gist.github.com/miguelmota/4980b18d750fb3b1eb571c3e207b1b92
 // https://riptutorial.com/docker/example/31980/image-pulling-with-progress-bars--written-in-go
-func (d *DockerClient) EnsureImage(imageName string, consoleOutput *console.Console) (err error) {
+func (d *DockerClient) EnsureImage(imageName string, updateDays int, consoleOutput *console.Console) (err error) {
 	if !strings.Contains(imageName, ":") {
 		imageName = fmt.Sprintf("%s:latest", imageName)
 	}
@@ -30,6 +30,7 @@ func (d *DockerClient) EnsureImage(imageName string, consoleOutput *console.Cons
 	imageList, err := d.moby.ImageList(context.Background(), types.ImageListOptions{})
 
 	hasImage := false
+	checkForUpdate := false
 
 	for i := range imageList {
 		imageRepoLabel := imageList[i]
@@ -40,8 +41,12 @@ func (d *DockerClient) EnsureImage(imageName string, consoleOutput *console.Cons
 		}
 	}
 
-	if !hasImage || lastUpdated.Compare(time.Now().Add(time.Duration(-24)*time.Hour)) == -1 {
-		fmt.Println("Pulling Image: " + imageName)
+	if updateDays > 0 {
+		hours := 24 * updateDays
+		checkForUpdate = lastUpdated.Compare(time.Now().Add(time.Duration(-hours)*time.Hour)) == -1
+	}
+
+	if !hasImage || checkForUpdate {
 		reader, err := d.moby.ImagePull(context.Background(), imageName, types.ImagePullOptions{})
 		if err != nil {
 			return err

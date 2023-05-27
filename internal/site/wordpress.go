@@ -60,7 +60,7 @@ func (s *Site) RunWPCli(command []string, consoleOutput *console.Console) (statu
 		Volumes: appVolumes,
 	}
 
-	err = s.dockerClient.EnsureImage(container.Image, consoleOutput)
+	err = s.dockerClient.EnsureImage(container.Image, s.Settings.ImageUpdateDays, consoleOutput)
 	if err != nil {
 		return 1, "", err
 	}
@@ -453,7 +453,7 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 
 // startContainer Starts a given container configuration
 func (s *Site) startContainer(container *docker.ContainerConfig, randomPorts, localUser bool, consoleOutput *console.Console) error {
-	err := s.dockerClient.EnsureImage(container.Image, consoleOutput)
+	err := s.dockerClient.EnsureImage(container.Image, s.Settings.ImageUpdateDays, consoleOutput)
 	if err != nil {
 		return err
 	}

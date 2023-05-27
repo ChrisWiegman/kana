@@ -26,6 +26,7 @@ var (
 	adminUsername    = "admin"
 	adminPassword    = "password"
 	adminEmail       = "admin@sites.kana.li"
+	imageUpdateDays  = 1
 )
 
 // Default permissions for all new files and folders
@@ -37,6 +38,7 @@ var (
 // Individual Settings for use throughout the app lifecycle
 type Settings struct {
 	Local, Xdebug, Mailpit, SSL, WPDebug          bool
+	ImageUpdateDays                               int
 	AdminEmail, AdminPassword, AdminUsername      string
 	AppDirectory, SiteDirectory, WorkingDirectory string
 	AppDomain, SiteDomain                         string

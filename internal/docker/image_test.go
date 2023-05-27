@@ -31,7 +31,7 @@ func TestEnsureImage(t *testing.T) {
 	displayJSONMessagesStream = mocks.MockDisplayJSONMessagesStream
 	mocks.MockedDisplayJSONMessagesStreamReturn = nil //nolint:gocritic
 
-	err = d.EnsureImage("alpine", consoleOutput)
+	err = d.EnsureImage("alpine", 1, consoleOutput)
 	assert.Equal(t, nil, err)
 
 	displayJSONMessagesStream = jsonmessage.DisplayJSONMessagesStream
