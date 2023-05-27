@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ChrisWiegman/kana-cli/pkg/console"
+	"github.com/ChrisWiegman/kana-cli/internal/console"
 
 	"github.com/docker/docker/api/types"
 	"github.com/moby/moby/pkg/jsonmessage"

@@ -7,8 +7,8 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/ChrisWiegman/kana-cli/pkg/console"
-	"github.com/ChrisWiegman/kana-cli/pkg/docker/mocks"
+	"github.com/ChrisWiegman/kana-cli/internal/console"
+	"github.com/ChrisWiegman/kana-cli/internal/docker/mocks"
 	"github.com/docker/docker/api/types"
 	"github.com/stretchr/testify/assert"
 )

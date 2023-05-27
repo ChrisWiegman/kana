@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
-	"github.com/ChrisWiegman/kana-cli/pkg/console"
 
 	"github.com/spf13/cobra"
 )

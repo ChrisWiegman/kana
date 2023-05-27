@@ -16,9 +16,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ChrisWiegman/kana-cli/internal/console"
+	"github.com/ChrisWiegman/kana-cli/internal/docker"
 	"github.com/ChrisWiegman/kana-cli/internal/settings"
-	"github.com/ChrisWiegman/kana-cli/pkg/console"
-	"github.com/ChrisWiegman/kana-cli/pkg/docker"
 
 	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
