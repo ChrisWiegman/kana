@@ -15,6 +15,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
+	"github.com/spf13/viper"
 )
 
 var execCommand = exec.Command
@@ -24,10 +25,11 @@ var sleepDuration = 5
 
 // DockerClient is an interface the must be implemented to provide Docker services through this package.
 type DockerClient struct {
-	moby APIClient
+	moby            APIClient
+	imageUpdateData *viper.Viper
 }
 
-func NewDockerClient(consoleOutput *console.Console) (dockerClient *DockerClient, err error) {
+func NewDockerClient(consoleOutput *console.Console, appDirectory string) (dockerClient *DockerClient, err error) {
 	dockerClient = new(DockerClient)
 
 	dockerClient.moby, err = client.NewClientWithOpts(client.FromEnv)
@@ -39,6 +41,8 @@ func NewDockerClient(consoleOutput *console.Console) (dockerClient *DockerClient
 	if err != nil {
 		return nil, err
 	}
+
+	dockerClient.imageUpdateData, _ = dockerClient.loadImageUpdateData(appDirectory)
 
 	return dockerClient, nil
 }

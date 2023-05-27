@@ -41,7 +41,7 @@ var execCommand = exec.Command
 // EnsureDocker Ensures Docker is available for commands that need it.
 func (s *Site) EnsureDocker(consoleOutput *console.Console) error {
 	// Add a docker client to the site
-	dockerClient, err := docker.NewDockerClient(consoleOutput)
+	dockerClient, err := docker.NewDockerClient(consoleOutput, s.Settings.AppDirectory)
 	if err != nil {
 		return err
 	}
@@ -81,7 +81,7 @@ func (s *Site) ExportSiteConfig(consoleOutput *console.Console) error {
 }
 
 // GetSiteList Returns a list of all Kana sites, their location and whether they're running
-func GetSiteList(appDir string, consoleOutput *console.Console) ([]SiteInfo, error) {
+func (s *Site) GetSiteList(appDir string, consoleOutput *console.Console) ([]SiteInfo, error) {
 	var sites []SiteInfo
 	sitesDir := path.Join(appDir, "sites")
 
@@ -109,12 +109,7 @@ func GetSiteList(appDir string, consoleOutput *console.Console) ([]SiteInfo, err
 			return sites, err
 		}
 
-		dockerClient, err := docker.NewDockerClient(consoleOutput)
-		if err != nil {
-			return sites, err
-		}
-
-		containers, err := dockerClient.ContainerList(f.Name())
+		containers, err := s.dockerClient.ContainerList(f.Name())
 		if err != nil {
 			return sites, err
 		}
@@ -233,8 +228,6 @@ func (s *Site) OpenSite(openPhpMyAdminFlag, openMailpitFlag, openSiteFlag bool, 
 func (s *Site) StartSite(consoleOutput *console.Console) error {
 	// Let's start everything up
 	consoleOutput.Printf("Starting development site: %s.\n", consoleOutput.Bold(consoleOutput.Green(s.Settings.URL)))
-
-	consoleOutput.Println("Ensuring all Docker images are present, up to date and running (this may take a few minutes.")
 
 	// Start Traefik if we need it
 	err := s.startTraefik(consoleOutput)

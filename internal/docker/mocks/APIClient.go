@@ -265,6 +265,32 @@ func (_m *APIClient) ContainerWait(ctx context.Context, _a1 string, condition co
 	return r0, r1
 }
 
+// ImageList provides a mock function with given fields: ctx, options
+func (_m *APIClient) ImageList(ctx context.Context, options types.ImageListOptions) ([]types.ImageSummary, error) {
+	ret := _m.Called(ctx, options)
+
+	var r0 []types.ImageSummary
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, types.ImageListOptions) ([]types.ImageSummary, error)); ok {
+		return rf(ctx, options)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, types.ImageListOptions) []types.ImageSummary); ok {
+		r0 = rf(ctx, options)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]types.ImageSummary)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, types.ImageListOptions) error); ok {
+		r1 = rf(ctx, options)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ImagePull provides a mock function with given fields: ctx, ref, options
 func (_m *APIClient) ImagePull(ctx context.Context, ref string, options types.ImagePullOptions) (io.ReadCloser, error) {
 	ret := _m.Called(ctx, ref, options)

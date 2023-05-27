@@ -4,9 +4,12 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path"
 	"strings"
+	"time"
 
 	"github.com/ChrisWiegman/kana-cli/internal/console"
+	"github.com/spf13/viper"
 
 	"github.com/docker/docker/api/types"
 	"github.com/moby/moby/pkg/jsonmessage"
@@ -22,18 +25,44 @@ func (d *DockerClient) EnsureImage(imageName string, consoleOutput *console.Cons
 		imageName = fmt.Sprintf("%s:latest", imageName)
 	}
 
-	reader, err := d.moby.ImagePull(context.Background(), imageName, types.ImagePullOptions{})
-	if err != nil {
-		return err
+	lastUpdated := d.imageUpdateData.GetTime(imageName)
+
+	imageList, err := d.moby.ImageList(context.Background(), types.ImageListOptions{})
+
+	hasImage := false
+
+	for i := range imageList {
+		imageRepoLabel := imageList[i]
+		for _, repoTag := range imageRepoLabel.RepoTags {
+			if repoTag == imageName {
+				hasImage = true
+			}
+		}
 	}
 
-	defer reader.Close()
+	if !hasImage || lastUpdated.Compare(time.Now().Add(time.Duration(-24)*time.Hour)) == -1 {
+		fmt.Println("Pulling Image: " + imageName)
+		reader, err := d.moby.ImagePull(context.Background(), imageName, types.ImagePullOptions{})
+		if err != nil {
+			return err
+		}
 
-	// Discard the download information unless we're debugging
-	out := os.Stdout
+		defer reader.Close()
 
-	termFd, isTerm := term.GetFdInfo(os.Stdout)
-	return displayJSONMessagesStream(reader, out, termFd, isTerm, nil)
+		// Discard the download information unless we're debugging
+		out := os.Stdout
+
+		d.imageUpdateData.Set(imageName, time.Now())
+		err = d.imageUpdateData.WriteConfig()
+		if err != nil {
+			return err
+		}
+
+		termFd, isTerm := term.GetFdInfo(os.Stdout)
+		return displayJSONMessagesStream(reader, out, termFd, isTerm, nil)
+	}
+
+	return nil
 }
 
 func (d *DockerClient) RemoveImage(image string) (removed bool, err error) {
@@ -50,4 +79,27 @@ func (d *DockerClient) RemoveImage(image string) (removed bool, err error) {
 	}
 
 	return false, nil
+}
+
+func (d *DockerClient) loadImageUpdateData(appDirectory string) (*viper.Viper, error) {
+	imageUpdateData := viper.New()
+
+	imageUpdateData.SetConfigName("images")
+	imageUpdateData.SetConfigType("json")
+	imageUpdateData.AddConfigPath(path.Join(appDirectory, "config"))
+
+	err := imageUpdateData.ReadInConfig()
+	if err != nil {
+		_, ok := err.(viper.ConfigFileNotFoundError)
+		if !ok {
+			err = imageUpdateData.SafeWriteConfig()
+			if err != nil {
+				return imageUpdateData, err
+			}
+		} else {
+			return imageUpdateData, err
+		}
+	}
+
+	return imageUpdateData, nil
 }

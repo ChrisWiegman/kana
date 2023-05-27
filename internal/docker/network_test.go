@@ -9,7 +9,7 @@ import (
 func TestNetworkCreate(t *testing.T) {
 	consoleOutput := new(console.Console)
 
-	d, err := NewDockerClient(consoleOutput)
+	d, err := NewDockerClient(consoleOutput, "")
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -34,7 +34,7 @@ func TestNetworkCreate(t *testing.T) {
 func TestEnsureNetwork(t *testing.T) {
 	consoleOutput := new(console.Console)
 
-	d, err := NewDockerClient(consoleOutput)
+	d, err := NewDockerClient(consoleOutput, "")
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
