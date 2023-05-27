@@ -3,6 +3,7 @@ package docker
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/docker/mocks"
@@ -20,13 +21,30 @@ func TestEnsureImage(t *testing.T) {
 	assert.NoError(t, err)
 
 	moby := new(mocks.APIClient)
+
 	readCloser := &mocks.ReadCloser{
 		ExpectedData: []byte(`{}`),
 		ExpectedErr:  nil,
 	}
+
+	imageList := []types.ImageSummary{
+		{RepoTags: []string{
+			"alpine:latest",
+		}},
+	}
+
 	moby.On("ImagePull", mock.Anything, mock.Anything, mock.Anything).Return(readCloser, nil)
+	moby.On("ImageList", mock.Anything, mock.Anything).Return(imageList, nil)
 
 	d.moby = moby
+
+	viper := new(mocks.ViperClient)
+	viper.On("ReadInConfig").Return(nil)
+	viper.On("GetTime", mock.Anything).Return(time.Now())
+	viper.On("Set", mock.Anything, mock.Anything).Return()
+	viper.On("WriteConfig").Return(nil)
+
+	d.imageUpdateData = viper
 
 	displayJSONMessagesStream = mocks.MockDisplayJSONMessagesStream
 	mocks.MockedDisplayJSONMessagesStreamReturn = nil //nolint:gocritic

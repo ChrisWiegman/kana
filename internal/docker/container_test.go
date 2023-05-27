@@ -6,7 +6,6 @@ import (
 
 	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/docker/mocks"
-	"github.com/docker/docker/api/types"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -17,24 +16,6 @@ func TestContainerRun(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
-	moby := new(mocks.APIClient)
-	readCloser := &mocks.ReadCloser{
-		ExpectedData: []byte(`{}`),
-		ExpectedErr:  nil,
-	}
-	imageList := []types.ImageSummary{
-		{RepoTags: []string{
-			"alpine:latest",
-		}},
-	}
-	containerList := []types.Container{}
-
-	moby.On("ImagePull", mock.Anything, mock.Anything, mock.Anything).Return(readCloser, nil)
-	moby.On("ImageList", mock.Anything, mock.Anything).Return(imageList, nil)
-	moby.On("ContainerList", mock.Anything, mock.Anything).Return(containerList, nil)
-
-	d.moby = moby
 
 	viper := new(mocks.ViperClient)
 	viper.On("ReadInConfig").Return(nil)
