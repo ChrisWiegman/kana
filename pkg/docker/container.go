@@ -12,6 +12,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	containertypes "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
@@ -184,7 +185,7 @@ func (d *DockerClient) ContainerRestart(containerName string) (bool, error) {
 		return true, nil
 	}
 
-	err := d.moby.ContainerStop(context.Background(), containerID, nil)
+	err := d.moby.ContainerStop(context.Background(), containerID, containertypes.StopOptions{})
 	if err != nil {
 		return false, err
 	}
@@ -281,7 +282,7 @@ func (d *DockerClient) ContainerStop(containerName string) (bool, error) {
 		return true, nil
 	}
 
-	err := d.moby.ContainerStop(context.Background(), containerID, nil)
+	err := d.moby.ContainerStop(context.Background(), containerID, containertypes.StopOptions{})
 	if err != nil {
 		return false, err
 	}

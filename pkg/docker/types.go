@@ -3,7 +3,6 @@ package docker
 import (
 	"context"
 	"io"
-	"time"
 
 	"github.com/docker/docker/api/types"
 	containertypes "github.com/docker/docker/api/types/container"
@@ -30,7 +29,7 @@ type ContainerAPIClient interface {
 		hostConfig *containertypes.HostConfig,
 		networkingConfig *networktypes.NetworkingConfig,
 		platform *specs.Platform,
-		containerName string) (containertypes.ContainerCreateCreatedBody, error)
+		containerName string) (containertypes.CreateResponse, error)
 	ContainerExecAttach(ctx context.Context, execID string, config types.ExecStartCheck) (types.HijackedResponse, error)
 	ContainerExecCreate(ctx context.Context, container string, config types.ExecConfig) (types.IDResponse, error)
 	ContainerExecInspect(ctx context.Context, execID string) (types.ContainerExecInspect, error)
@@ -39,11 +38,11 @@ type ContainerAPIClient interface {
 	ContainerLogs(ctx context.Context, container string, options types.ContainerLogsOptions) (io.ReadCloser, error)
 	ContainerRemove(ctx context.Context, container string, options types.ContainerRemoveOptions) error
 	ContainerStart(ctx context.Context, container string, options types.ContainerStartOptions) error
-	ContainerStop(ctx context.Context, container string, timeout *time.Duration) error
+	ContainerStop(ctx context.Context, name string, options containertypes.StopOptions) error
 	ContainerWait(
 		ctx context.Context,
 		container string,
-		condition containertypes.WaitCondition) (<-chan containertypes.ContainerWaitOKBody, <-chan error)
+		condition containertypes.WaitCondition) (<-chan containertypes.WaitResponse, <-chan error)
 }
 
 // ImageAPIClient defines API client methods for the images
