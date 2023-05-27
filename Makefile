@@ -93,6 +93,7 @@ snapshot:
 test:
 	go \
 		test \
+		-v \
 		-timeout 30s\
 		-cover \
 		./...
