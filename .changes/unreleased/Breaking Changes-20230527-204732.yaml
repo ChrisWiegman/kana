@@ -1,0 +1,3 @@
+kind: Breaking Changes
+body: Kana now requires Docker Desktop 4.19.0 or greateer or Docker Engine 23 or greater
+time: 2023-05-27T20:47:32.090623624Z
