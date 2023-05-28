@@ -1,7 +1,8 @@
-PKG       := github.com/ChrisWiegman/kana-cli
-VERSION   := $(shell git describe --tags || echo "0.0.1")
-TIMESTAMP := $(shell date -u '+%Y-%m-%d_%I:%M:%S%p')
-ARGS = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
+PKG          := github.com/ChrisWiegman/kana-cli
+VERSION      := $(shell git describe --tags || echo "0.0.1")
+TIMESTAMP    := $(shell date -u '+%Y-%m-%d_%I:%M:%S%p')
+ARGS          = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
+MOBY_VERSION  = 23.0.6
 
 %:
 	@:
@@ -76,6 +77,8 @@ mockery:
 .PHONY: update
 update:
 	go get -u ./...
+	go get github.com/moby/moby@v$(MOBY_VERSION)
+	go get github.com/docker/docker@v$(MOBY_VERSION)
 
 .PHONY: snapshot
 snapshot:
