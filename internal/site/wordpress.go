@@ -29,6 +29,18 @@ func (s *Site) RunWPCli(command []string, consoleOutput *console.Console) (statu
 		return 1, "", err
 	}
 
+	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana-%s-wordpress", s.Settings.Name))
+
+	for _, mount := range mounts {
+		if strings.Contains(mount.Destination, "/var/www/html/wp-content/plugins/") {
+			s.Settings.Type = "plugin"
+		}
+
+		if strings.Contains(mount.Destination, "/var/www/html/wp-content/themes/") {
+			s.Settings.Type = "theme"
+		}
+	}
+
 	appVolumes, err := s.getMounts(appDir)
 	if err != nil {
 		return 1, "", err
