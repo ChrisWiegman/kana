@@ -26,6 +26,7 @@ var sleepDuration = 5
 type DockerClient struct {
 	moby            APIClient
 	imageUpdateData ViperClient
+	checkedImages   []string
 }
 
 func NewDockerClient(consoleOutput *console.Console, appDirectory string) (dockerClient *DockerClient, err error) {

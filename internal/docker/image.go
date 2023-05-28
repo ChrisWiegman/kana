@@ -25,13 +25,29 @@ func (d *DockerClient) EnsureImage(imageName string, updateDays int, consoleOutp
 		imageName = fmt.Sprintf("%s:latest", imageName)
 	}
 
+	// Skip more complicated checks if we can
+	for _, checkedImage := range d.checkedImages {
+		if checkedImage == imageName {
+			return nil
+		}
+	}
+
+	return d.maybeUpdateImage(imageName, updateDays)
+
+}
+
+func (d *DockerClient) maybeUpdateImage(imageName string, updateDays int) error {
 	lastUpdated := d.imageUpdateData.GetTime(imageName)
 
 	imageList, err := d.moby.ImageList(context.Background(), types.ImageListOptions{})
+	if err != nil {
+		return err
+	}
 
 	hasImage := false
 	checkForUpdate := false
 
+	// Make sure we've actually downloaded the image
 	for i := range imageList {
 		imageRepoLabel := imageList[i]
 		for _, repoTag := range imageRepoLabel.RepoTags {
@@ -41,11 +57,13 @@ func (d *DockerClient) EnsureImage(imageName string, updateDays int, consoleOutp
 		}
 	}
 
+	// Check the image for updates if needed
 	if updateDays > 0 {
 		hours := 24 * updateDays
 		checkForUpdate = lastUpdated.Compare(time.Now().Add(time.Duration(-hours)*time.Hour)) == -1
 	}
 
+	// Pull the image or a newer image if needed
 	if !hasImage || checkForUpdate {
 		reader, err := d.moby.ImagePull(context.Background(), imageName, types.ImagePullOptions{})
 		if err != nil {
@@ -64,8 +82,13 @@ func (d *DockerClient) EnsureImage(imageName string, updateDays int, consoleOutp
 		}
 
 		termFd, isTerm := term.GetFdInfo(os.Stdout)
+
+		d.checkedImages = append(d.checkedImages, imageName)
+
 		return displayJSONMessagesStream(reader, out, termFd, isTerm, nil)
 	}
+
+	d.checkedImages = append(d.checkedImages, imageName)
 
 	return nil
 }
