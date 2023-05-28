@@ -33,7 +33,6 @@ func (d *DockerClient) EnsureImage(imageName string, updateDays int, consoleOutp
 	}
 
 	return d.maybeUpdateImage(imageName, updateDays)
-
 }
 
 func (d *DockerClient) maybeUpdateImage(imageName string, updateDays int) error {
