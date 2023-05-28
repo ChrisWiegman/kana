@@ -27,6 +27,7 @@ var (
 	adminPassword    = "password"
 	adminEmail       = "admin@sites.kana.li"
 	imageUpdateDays  = 1
+	activate         = false
 )
 
 // Default permissions for all new files and folders
@@ -37,19 +38,19 @@ var (
 
 // Individual Settings for use throughout the app lifecycle
 type Settings struct {
-	Local, Xdebug, Mailpit, SSL, WPDebug          bool
-	ImageUpdateDays                               int
-	AdminEmail, AdminPassword, AdminUsername      string
-	AppDirectory, SiteDirectory, WorkingDirectory string
-	AppDomain, SiteDomain                         string
-	Name                                          string
-	PHP                                           string
-	RootCert, RootKey, SiteCert, SiteKey          string
-	URL, Protocol                                 string
-	Type                                          string
-	Plugins                                       []string
-	global                                        *viper.Viper
-	local                                         *viper.Viper
+	Local, Xdebug, Mailpit, SSL, WPDebug, Activate bool
+	ImageUpdateDays                                int
+	AdminEmail, AdminPassword, AdminUsername       string
+	AppDirectory, SiteDirectory, WorkingDirectory  string
+	AppDomain, SiteDomain                          string
+	Name                                           string
+	PHP                                            string
+	RootCert, RootKey, SiteCert, SiteKey           string
+	URL, Protocol                                  string
+	Type                                           string
+	Plugins                                        []string
+	global                                         *viper.Viper
+	local                                          *viper.Viper
 }
 
 var validPHPVersions = []string{

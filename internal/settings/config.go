@@ -56,6 +56,7 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 
 	t.AddRow("ssl", consoleOutput.Bold(s.global.GetString("ssl")), consoleOutput.Bold(s.local.GetString("ssl")))
 	t.AddRow("type", consoleOutput.Bold(s.global.GetString("type")), consoleOutput.Bold(s.local.GetString("type")))
+	t.AddRow("activate", consoleOutput.Bold(s.global.GetString("activate")), consoleOutput.Bold(s.local.GetString("activate")))
 	t.AddRow("wpdebug", consoleOutput.Bold(s.global.GetString("wpdebug")), consoleOutput.Bold(s.local.GetString("wpdebug")))
 	t.AddRow("xdebug", consoleOutput.Bold(s.global.GetString("xdebug")), consoleOutput.Bold(s.local.GetString("xdebug")))
 

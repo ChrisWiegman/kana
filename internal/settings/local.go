@@ -18,12 +18,13 @@ type StartFlags struct {
 	IsTheme  bool
 	IsPlugin bool
 	SSL      bool
+	Activate bool
 }
 
 type LocalSettings struct {
-	Local, Mailpit, Xdebug, SSL, WPDebug bool
-	Type                                 string
-	Plugins                              []string
+	Local, Mailpit, Xdebug, SSL, WPDebug, Activate bool
+	Type                                           string
+	Plugins                                        []string
 }
 
 // LoadLocalSettings Loads the config for the current site being called
@@ -56,6 +57,7 @@ func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 	s.Type = localViper.GetString("type")
 	s.Plugins = localViper.GetStringSlice("plugins")
 	s.SSL = localViper.GetBool("ssl")
+	s.Activate = localViper.GetBool("activate")
 
 	return isSite, nil
 }
@@ -127,6 +129,10 @@ func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
 	if cmd.Flags().Lookup("theme").Changed && flags.IsTheme {
 		s.Type = "theme"
 	}
+
+	if cmd.Flags().Lookup("activate").Changed {
+		s.Activate = flags.Activate
+	}
 }
 
 // WriteLocalSettings Writes all appropriate local settings to the local config file
@@ -138,6 +144,7 @@ func (s *Settings) WriteLocalSettings(localSettings LocalSettings) error {
 	s.local.Set("plugins", localSettings.Plugins)
 	s.local.Set("ssl", localSettings.SSL)
 	s.local.Set("wpdebug", localSettings.WPDebug)
+	s.local.Set("activate", localSettings.Activate)
 
 	if _, err := os.Stat(path.Join(s.WorkingDirectory, ".kana.json")); os.IsNotExist(err) {
 		return s.local.SafeWriteConfig()
@@ -166,6 +173,7 @@ func (s *Settings) loadlocalViper() (*viper.Viper, error) {
 	localSettings.SetDefault("mailpit", s.Mailpit)
 	localSettings.SetDefault("plugins", []string{})
 	localSettings.SetDefault("ssl", s.SSL)
+	localSettings.SetDefault("activate", s.Activate)
 
 	localSettings.SetConfigName(".kana")
 	localSettings.SetConfigType("json")

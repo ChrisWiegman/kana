@@ -40,6 +40,7 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
 	globalSettings.SetDefault("type", siteType)
 	globalSettings.SetDefault("local", local)
 	globalSettings.SetDefault("ssl", ssl)
+	globalSettings.SetDefault("activate", activate)
 	globalSettings.SetDefault("php", php)
 	globalSettings.SetDefault("admin.username", adminUsername)
 	globalSettings.SetDefault("admin.password", adminPassword)
