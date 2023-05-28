@@ -27,7 +27,7 @@ var (
 	adminPassword    = "password"
 	adminEmail       = "admin@sites.kana.li"
 	imageUpdateDays  = 1
-	activate         = false
+	activate         = true
 )
 
 // Default permissions for all new files and folders
