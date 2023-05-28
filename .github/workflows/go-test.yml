@@ -14,18 +14,12 @@ jobs:
   go-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Check Docker Version
-        run: docker --version
-
       - name: Install Latest Docker
         run: |
           curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
           sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs)  stable"
           sudo apt-get update
           sudo apt-get install docker-ce
-
-      - name: Check Docker Version
-        run: docker --version
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -35,5 +29,5 @@ jobs:
         with:
           go-version: "1.20"
 
-      - name: Run Go Tests
-        run: go test -timeout 30s -v -cover ./...
+      - name: Test
+        uses: robherley/go-test-action@v0.1.0
