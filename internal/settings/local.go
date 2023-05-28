@@ -131,6 +131,7 @@ func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
 	}
 
 	if cmd.Flags().Lookup("activate").Changed {
+		fmt.Println("changed")
 		s.Activate = flags.Activate
 	}
 }

@@ -25,6 +25,7 @@ func (s *Settings) LoadGlobalSettings() error {
 	s.Type = globalViperConfig.GetString("type")
 	s.SSL = globalViperConfig.GetBool("ssl")
 	s.ImageUpdateDays = globalViperConfig.GetInt("imageUpdateDays")
+	s.Activate = globalViperConfig.GetBool("activate")
 
 	return err
 }
