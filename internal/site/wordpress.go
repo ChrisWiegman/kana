@@ -227,8 +227,7 @@ func (s *Site) getMounts(appDir string) ([]mount.Mount, error) {
 	if s.Settings.Type == "plugin" {
 		err := os.MkdirAll(
 			path.Join(
-				s.Settings.WorkingDirectory,
-				"wordpress",
+				appDir,
 				"wp-content",
 				"plugins",
 				s.Settings.Name),
@@ -246,8 +245,7 @@ func (s *Site) getMounts(appDir string) ([]mount.Mount, error) {
 
 	if s.Settings.Type == "theme" {
 		err := os.MkdirAll(
-			path.Join(s.Settings.WorkingDirectory,
-				"wordpress",
+			path.Join(appDir,
 				"wp-content",
 				"themes",
 				s.Settings.Name),
