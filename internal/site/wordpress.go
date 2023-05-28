@@ -362,7 +362,7 @@ func (s *Site) activateProject(consoleOutput *console.Console) error {
 		consoleOutput.Println(fmt.Sprintf("Activating %s:  %s", s.Settings.Type, consoleOutput.Bold(consoleOutput.Blue(s.Settings.Name))))
 
 		setupCommand := []string{
-			"plugin",
+			s.Settings.Type,
 			"activate",
 			s.Settings.Name,
 		}
