@@ -170,7 +170,7 @@ In addition to the global config, certain items above can be overridden for any 
 - `mailpit` **false** - the default usage of the `mailpit` start flag
 - `plugins` **[]** - an array of plugins to install and activate when starting the new site. These are slugs from the Plugins section of WordPress.org.
 - `ssl` **false** - the default usage of the `ssl` start flag
-- `activate` **true** - if the project site is set to `theme` or `plugin`
+- `activate` **true** - if the project site is set to `theme` or `plugin` this will activate the project on first load
 
 ### Export a sites Kana config automatically
 
