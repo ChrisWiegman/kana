@@ -38,7 +38,7 @@ type ExecResult struct {
 }
 
 func (d *DockerClient) ContainerExec(containerName string, command []string) (ExecResult, error) {
-	containerID, isRunning := d.ContainerIsRunning(containerName)
+	containerID, isRunning := d.containerIsRunning(containerName)
 	if !isRunning {
 		return ExecResult{}, nil
 	}
@@ -109,7 +109,7 @@ func (d *DockerClient) ContainerExec(containerName string, command []string) (Ex
 
 // ContainerGetMounts Returns a slice containing all the mounts to the given container
 func (d *DockerClient) ContainerGetMounts(containerName string) []types.MountPoint {
-	containerID, isRunning := d.ContainerIsRunning(containerName)
+	containerID, isRunning := d.containerIsRunning(containerName)
 	if !isRunning {
 		return []types.MountPoint{}
 	}
@@ -119,8 +119,8 @@ func (d *DockerClient) ContainerGetMounts(containerName string) []types.MountPoi
 	return results.Mounts
 }
 
-// ContainerIsRunning Checks if a given container is running by name
-func (d *DockerClient) ContainerIsRunning(containerName string) (id string, isRunning bool) {
+// containerIsRunning Checks if a given container is running by name
+func (d *DockerClient) containerIsRunning(containerName string) (id string, isRunning bool) {
 	containers, err := d.moby.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
 		return "", false
@@ -157,7 +157,7 @@ func (d *DockerClient) ContainerList(site string) ([]types.Container, error) {
 	return containers, err
 }
 
-func (d *DockerClient) ContainerLog(id string) (result string, err error) {
+func (d *DockerClient) containerLog(id string) (result string, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(sleepDuration)*time.Second)
 	defer cancel()
 
@@ -179,7 +179,7 @@ func (d *DockerClient) ContainerLog(id string) (result string, err error) {
 }
 
 func (d *DockerClient) ContainerRestart(containerName string) (bool, error) {
-	containerID, isRunning := d.ContainerIsRunning(containerName)
+	containerID, isRunning := d.containerIsRunning(containerName)
 	if !isRunning {
 		return true, nil
 	}
@@ -198,7 +198,7 @@ func (d *DockerClient) ContainerRestart(containerName string) (bool, error) {
 }
 
 func (d *DockerClient) ContainerRun(config *ContainerConfig, randomPorts, localUser bool) (id string, err error) {
-	containerID, isRunning := d.ContainerIsRunning(config.Name)
+	containerID, isRunning := d.containerIsRunning(config.Name)
 	if isRunning {
 		return containerID, nil
 	}
@@ -263,20 +263,20 @@ func (d *DockerClient) ContainerRunAndClean(config *ContainerConfig) (statusCode
 	}
 
 	// Wait for it to finish
-	statusCode, err = d.ContainerWait(id)
+	statusCode, err = d.containerWait(id)
 	if err != nil {
 		return statusCode, body, err
 	}
 
 	// Get the log
-	body, _ = d.ContainerLog(id)
+	body, _ = d.containerLog(id)
 
 	err = d.moby.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{})
 	return statusCode, body, err
 }
 
 func (d *DockerClient) ContainerStop(containerName string) (bool, error) {
-	containerID, isRunning := d.ContainerIsRunning(containerName)
+	containerID, isRunning := d.containerIsRunning(containerName)
 	if !isRunning {
 		return true, nil
 	}
@@ -294,7 +294,7 @@ func (d *DockerClient) ContainerStop(containerName string) (bool, error) {
 	return true, nil
 }
 
-func (d *DockerClient) ContainerWait(id string) (state int64, err error) {
+func (d *DockerClient) containerWait(id string) (state int64, err error) {
 	containerResult, errorCode := d.moby.ContainerWait(context.Background(), id, "")
 
 	select {

@@ -52,7 +52,7 @@ func TestContainerRun(t *testing.T) {
 		t.Errorf("Expect status to be 0; received %q\n", statusCode)
 	}
 
-	_, err = d.RemoveImage("alpine")
+	_, err = d.removeImage("alpine")
 	if err != nil {
 		t.Error(err)
 	}

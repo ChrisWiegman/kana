@@ -98,7 +98,7 @@ func TestRemoveImage(t *testing.T) {
 
 		d.moby = moby
 
-		removed, err := d.RemoveImage("alpine")
+		removed, err := d.removeImage("alpine")
 		assert.Equal(t, test.expectedError, err, test.name)
 		assert.Equal(t, test.expectedRemove, removed, test.name)
 	}

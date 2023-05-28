@@ -70,7 +70,7 @@ func (d *DockerClient) EnsureImage(imageName string, updateDays int, consoleOutp
 	return nil
 }
 
-func (d *DockerClient) RemoveImage(image string) (removed bool, err error) {
+func (d *DockerClient) removeImage(image string) (removed bool, err error) {
 	removedResponse, err := d.moby.ImageRemove(context.Background(), image, types.ImageRemoveOptions{})
 
 	if err != nil {
