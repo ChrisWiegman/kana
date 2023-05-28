@@ -279,6 +279,12 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 		return err
 	}
 
+	// Activate the current project if asked
+	err = s.activateProject(consoleOutput)
+	if err != nil {
+		return err
+	}
+
 	// Open the site in the user's browser
 	return s.OpenSite(false, false, true, consoleOutput)
 }

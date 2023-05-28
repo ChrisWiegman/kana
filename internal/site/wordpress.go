@@ -357,6 +357,29 @@ func (s *Site) getWordPressContainers() []string {
 	}
 }
 
+func (s *Site) activateProject(consoleOutput *console.Console) error {
+	if s.Settings.Activate && s.Settings.Type != "site" {
+		consoleOutput.Println(fmt.Sprintf("Activating %s:  %s", s.Settings.Type, consoleOutput.Bold(consoleOutput.Blue(s.Settings.Name))))
+
+		setupCommand := []string{
+			"plugin",
+			"activate",
+			s.Settings.Name,
+		}
+
+		code, _, err := s.RunWPCli(setupCommand, consoleOutput)
+		if err != nil {
+			return err
+		}
+
+		if code != 0 {
+			consoleOutput.Warn(fmt.Sprintf("Unable to activate %s: %s.", s.Settings.Type, consoleOutput.Bold(consoleOutput.Blue(s.Settings.Name))))
+		}
+	}
+
+	return nil
+}
+
 // installDefaultPlugins Installs a list of WordPress plugins
 func (s *Site) installDefaultPlugins(consoleOutput *console.Console) error {
 	installedPlugins, err := s.getInstalledWordPressPlugins(consoleOutput)
