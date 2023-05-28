@@ -12,11 +12,13 @@ I've gone through many different tools to run WordPress sites over the years. Al
 
 - [Docker Desktop](https://www.docker.com)
 
-Note: Docker Desktop should be either version 4.14.0 or later or below 4.13.0 due to a change in Docker 4.13.0 that broke many tools by trying to move the docker.sock file. See [the 4.14.0 changelog](https://docs.docker.com/desktop/release-notes/#4140) for more details.
+Note: Docker Desktop 4.19 or greater is required due to updates in the core Docker library this is built around
 
 ## Linux
 
 - [Docker Engine](https://docs.docker.com/engine/install/)
+
+Note: Docker Engine 23 or greater is required due to updates in the core Docker library this is built around
 
 # Installing Kana
 
@@ -147,6 +149,7 @@ Kana has a handful of options that apply to all new sites created with the app. 
 - `wpdebug` **false** - the default usage of the `wpdebug` start flag
 - `mailpit` **false** - the default usage of the `mailpit` start flag
 - `ssl` **false** - the default usage of the `ssl` start flag
+- `imageUpdateDays` **1** - the number of days Kana will wait between checking for updated Docker images. Set this to `0` to disable the check for newer images altogether (Kana will only download missing images)
 
 You can get or set any of the above options using a similar syntax to GIT's config. For example:
 
