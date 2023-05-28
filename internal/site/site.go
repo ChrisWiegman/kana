@@ -378,11 +378,11 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 		}
 
 		if strings.Contains(mount.Destination, "/var/www/html/wp-content/plugins/") {
-			localSettings.Type = "plugin"
+			localSettings.Type = "plugin" //nolint:goconst
 		}
 
 		if strings.Contains(mount.Destination, "/var/www/html/wp-content/themes/") {
-			localSettings.Type = "theme"
+			localSettings.Type = "theme" //nolint:goconst
 		}
 	}
 

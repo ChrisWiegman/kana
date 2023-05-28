@@ -65,7 +65,12 @@ func newStartCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra
 	cmd.Flags().BoolVarP(&startFlags.IsPlugin, "plugin", "p", false, "Run the site as a plugin using the current folder as the plugin source.")
 	cmd.Flags().BoolVarP(&startFlags.IsTheme, "theme", "t", false, "Run the site as a theme using the current folder as the theme source.")
 	cmd.Flags().BoolVarP(&startFlags.SSL, "ssl", "s", false, "Whether the site should default to SSL (https) or not.")
-	cmd.Flags().BoolVarP(&startFlags.Activate, "activate", "a", false, "Activate the current plugin or theme (only works when used with the 'plugin' or 'theme' flags).")
+	cmd.Flags().BoolVarP(
+		&startFlags.Activate,
+		"activate",
+		"a",
+		false,
+		"Activate the current plugin or theme (only works when used with the 'plugin' or 'theme' flags).")
 	cmd.Flags().BoolVarP(
 		&startFlags.Local,
 		"local",
