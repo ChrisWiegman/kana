@@ -150,6 +150,7 @@ Kana has a handful of options that apply to all new sites created with the app. 
 - `mailpit` **false** - the default usage of the `mailpit` start flag
 - `ssl` **false** - the default usage of the `ssl` start flag
 - `imageUpdateDays` **1** - the number of days Kana will wait between checking for updated Docker images. Set this to `0` to disable the check for newer images altogether (Kana will only download missing images)
+- `activate` **true** - if the project site is set to `theme` or `plugin` this will activate the project on first load
 
 You can get or set any of the above options using a similar syntax to GIT's config. For example:
 
