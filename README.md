@@ -12,13 +12,13 @@ I've gone through many different tools to run WordPress sites over the years. Al
 
 - [Docker Desktop](https://www.docker.com)
 
-Note: Docker Desktop 4.19 or greater is required due to updates in the core Docker library this is built around
+Note: Docker Desktop 4.20 or greater is required due to updates in the core Docker library this is built around
 
 ## Linux
 
 - [Docker Engine](https://docs.docker.com/engine/install/)
 
-Note: Docker Engine 23 or greater is required due to updates in the core Docker library this is built around
+Note: Docker Engine 24 or greater is required due to updates in the core Docker library this is built around
 
 # Installing Kana
 
