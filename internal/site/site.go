@@ -343,12 +343,13 @@ func (s *Site) getLocalAppDir() (string, error) {
 // getRunningConfig gets various options that were used to start the site
 func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console) (settings.LocalSettings, error) {
 	localSettings := settings.LocalSettings{
-		Type:    "site",
-		Local:   false,
-		Xdebug:  false,
-		SSL:     false,
-		Mailpit: false,
-		WPDebug: false,
+		Type:     "site",
+		Local:    false,
+		Xdebug:   false,
+		SSL:      false,
+		Mailpit:  false,
+		WPDebug:  false,
+		Activate: true,
 	}
 
 	// We need container details to see if the mailpit container is running
