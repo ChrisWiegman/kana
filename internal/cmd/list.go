@@ -18,6 +18,11 @@ func newListCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.
 		Use:   "list",
 		Short: "Lists all Kana sites and their associated status.",
 		Run: func(cmd *cobra.Command, args []string) {
+			err := kanaSite.EnsureDocker(consoleOutput)
+			if err != nil {
+				consoleOutput.Error(err)
+			}
+
 			sites, err := kanaSite.GetSiteList(kanaSite.Settings.AppDirectory, consoleOutput)
 			if err != nil {
 				consoleOutput.Error(err)
