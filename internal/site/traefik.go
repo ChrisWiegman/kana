@@ -9,7 +9,10 @@ import (
 	"github.com/docker/docker/api/types/mount"
 )
 
-var traefikContainerName = "kana_traefik"
+const (
+	traefikContainerName = "kana_traefik"
+	traefikVersion       = "2.10"
+)
 
 // maybeStopTraefik Checks to see if other sites are running and shuts down the traefik instance if none are
 func (s *Site) maybeStopTraefik() error {
@@ -37,7 +40,7 @@ func (s *Site) startTraefik(consoleOutput *console.Console) error {
 		return err
 	}
 
-	err = s.dockerClient.EnsureImage("traefik:2.9", s.Settings.ImageUpdateDays, consoleOutput)
+	err = s.dockerClient.EnsureImage("traefik:"+traefikVersion, s.Settings.ImageUpdateDays, consoleOutput)
 	if err != nil {
 		return err
 	}
@@ -50,7 +53,7 @@ func (s *Site) startTraefik(consoleOutput *console.Console) error {
 
 	traefikConfig := docker.ContainerConfig{
 		Name:        traefikContainerName,
-		Image:       "traefik:2.9",
+		Image:       "traefik:" + traefikVersion,
 		Ports:       traefikPorts,
 		NetworkName: "kana",
 		HostName:    "kanatraefik",
