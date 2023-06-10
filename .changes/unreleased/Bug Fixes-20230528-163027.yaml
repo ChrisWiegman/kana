@@ -1,4 +1,0 @@
-kind: Bug Fixes
-body: Ensure project is available for wp-cli commands if type is set as "plugin" or
-  "theme"
-time: 2023-05-28T16:30:27.783949304Z

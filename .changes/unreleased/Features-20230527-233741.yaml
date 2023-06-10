@@ -1,4 +1,0 @@
-kind: Features
-body: Add ability to only check for image updates with configurable `ImageUpdateDays`
-  config setting
-time: 2023-05-27T23:37:41.535521349Z

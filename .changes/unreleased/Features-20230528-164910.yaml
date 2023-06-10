@@ -1,4 +1,0 @@
-kind: Features
-body: Kana will automatically activate `plugin` or `theme` projects when starting
-  a new site. This can be turned off with the `activate` config option
-time: 2023-05-28T16:49:10.068766636Z
