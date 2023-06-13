@@ -29,9 +29,13 @@ func newListCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.
 			}
 
 			if consoleOutput.JSON {
-				str, _ := json.Marshal(sites)
+				if len(sites) > 0 {
+					str, _ := json.Marshal(sites)
 
-				fmt.Println(string(str))
+					fmt.Println(string(str))
+				} else {
+					fmt.Println("[]")
+				}
 
 				return
 			}
