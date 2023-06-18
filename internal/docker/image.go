@@ -32,10 +32,10 @@ func (d *DockerClient) EnsureImage(imageName string, updateDays int, consoleOutp
 		}
 	}
 
-	return d.maybeUpdateImage(imageName, updateDays)
+	return d.maybeUpdateImage(imageName, updateDays, consoleOutput.JSON)
 }
 
-func (d *DockerClient) maybeUpdateImage(imageName string, updateDays int) error {
+func (d *DockerClient) maybeUpdateImage(imageName string, updateDays int, suppressOutput bool) error {
 	lastUpdated := d.imageUpdateData.GetTime(imageName)
 
 	imageList, err := d.moby.ImageList(context.Background(), types.ImageListOptions{})
@@ -71,8 +71,12 @@ func (d *DockerClient) maybeUpdateImage(imageName string, updateDays int) error 
 
 		defer reader.Close()
 
-		// Discard the download information unless we're debugging
 		out := os.Stdout
+
+		// Discard the download information if set to suppress
+		if suppressOutput {
+			out, _ = os.Open(os.DevNull)
+		}
 
 		d.imageUpdateData.Set(imageName, time.Now())
 		err = d.imageUpdateData.WriteConfig()
