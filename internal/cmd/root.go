@@ -56,6 +56,7 @@ func Execute() {
 		newVersionCommand(consoleOutput),
 		newDBCommand(consoleOutput, kanaSite),
 		newListCommand(consoleOutput, kanaSite),
+		newXdebugCommand(consoleOutput, kanaSite),
 	)
 
 	// Execute anything we need to
