@@ -190,6 +190,12 @@ You can also access the database directly by viewing the database port with `doc
 
 # Using Xdebug
 
+You can setup [Xdebug](https://xdebug.org) when starting a site in Kana using the `--xdebug` flag with the start command or by setting the `xdebug` setting globally or at the site level.
+
+Once a site is running you can see if Xdebug is running by using the `kana xdebug` command which will return _on_ if Xdebug is running or _off_ if it is not.
+
+To start or stop Xdebug on a running site use `xdebug on` or `xdebug off` as appropriate. The output of this command will be either _on_ or _off_ to indicate the status of Xdebug when the command is complete.
+
 Currently Kana only supports step debugging in xdebug. To use this with VSCode create a _.vscode/launch.json_ file with the following:
 
 ```{
