@@ -1,4 +1,0 @@
-kind: Features
-body: Suppress non-JSON output when downloading new images if `--output-json` flag
-  is set on the command.
-time: 2023-06-18T15:57:11.946009553Z

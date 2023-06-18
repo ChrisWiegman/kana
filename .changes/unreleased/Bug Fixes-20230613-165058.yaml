@@ -1,4 +1,0 @@
-kind: Bug Fixes
-body: Show an empty array rather than `null` when there are no sites and the `kana
-  list` command is used with the `--output-json` flag
-time: 2023-06-13T16:50:58.123417166Z
