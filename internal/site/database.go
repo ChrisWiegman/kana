@@ -6,6 +6,8 @@ import (
 	"path"
 
 	"github.com/ChrisWiegman/kana-cli/internal/console"
+	"github.com/ChrisWiegman/kana-cli/internal/docker"
+	"github.com/docker/docker/api/types/mount"
 )
 
 func (s *Site) ExportDatabase(args []string, consoleOutput *console.Console) (string, error) {
@@ -117,4 +119,36 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string, 
 	}
 
 	return nil
+}
+
+func (s *Site) getDatabaseContainer(databaseDir string, appContainers []docker.ContainerConfig) []docker.ContainerConfig {
+	databaseContainer := docker.ContainerConfig{
+		Name:        fmt.Sprintf("kana-%s-database", s.Settings.Name),
+		Image:       "mariadb:10",
+		NetworkName: "kana",
+		HostName:    fmt.Sprintf("kana-%s-database", s.Settings.Name),
+		Ports: []docker.ExposedPorts{
+			{Port: "3306", Protocol: "tcp"},
+		},
+		Env: []string{
+			"MARIADB_ROOT_PASSWORD=password",
+			"MARIADB_DATABASE=wordpress",
+			"MARIADB_USER=wordpress",
+			"MARIADB_PASSWORD=wordpress",
+		},
+		Labels: map[string]string{
+			"kana.site": s.Settings.Name,
+		},
+		Volumes: []mount.Mount{
+			{ // Maps a database folder to the MySQL container for persistence
+				Type:   mount.TypeBind,
+				Source: databaseDir,
+				Target: "/var/lib/mysql",
+			},
+		},
+	}
+
+	appContainers = append(appContainers, databaseContainer)
+
+	return appContainers
 }

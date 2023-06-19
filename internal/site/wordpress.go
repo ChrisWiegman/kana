@@ -99,38 +99,6 @@ func (s *Site) getAppDirectory(consoleOutput *console.Console) (string, error) {
 	return appDir, err
 }
 
-func (s *Site) getDatabaseContainer(databaseDir string, appContainers []docker.ContainerConfig) []docker.ContainerConfig {
-	databaseContainer := docker.ContainerConfig{
-		Name:        fmt.Sprintf("kana-%s-database", s.Settings.Name),
-		Image:       "mariadb:10",
-		NetworkName: "kana",
-		HostName:    fmt.Sprintf("kana-%s-database", s.Settings.Name),
-		Ports: []docker.ExposedPorts{
-			{Port: "3306", Protocol: "tcp"},
-		},
-		Env: []string{
-			"MARIADB_ROOT_PASSWORD=password",
-			"MARIADB_DATABASE=wordpress",
-			"MARIADB_USER=wordpress",
-			"MARIADB_PASSWORD=wordpress",
-		},
-		Labels: map[string]string{
-			"kana.site": s.Settings.Name,
-		},
-		Volumes: []mount.Mount{
-			{ // Maps a database folder to the MySQL container for persistence
-				Type:   mount.TypeBind,
-				Source: databaseDir,
-				Target: "/var/lib/mysql",
-			},
-		},
-	}
-
-	appContainers = append(appContainers, databaseContainer)
-
-	return appContainers
-}
-
 // getDirectories Returns the correct appDir and databaseDir for the current site
 func (s *Site) getDirectories(consoleOutput *console.Console) (appDir, databaseDir string, err error) {
 	appDir, err = s.getAppDirectory(consoleOutput)
@@ -181,45 +149,6 @@ func (s *Site) getInstalledWordPressPlugins(consoleOutput *console.Console) ([]s
 	}
 
 	return plugins, nil
-}
-
-func (s *Site) getMailpitContainer() docker.ContainerConfig {
-	mailpitContainer := docker.ContainerConfig{
-		Name:        fmt.Sprintf("kana-%s-mailpit", s.Settings.Name),
-		Image:       "axllent/mailpit",
-		NetworkName: "kana",
-		HostName:    fmt.Sprintf("kana-%s-mailpit", s.Settings.Name),
-		Env:         []string{},
-		Volumes:     []mount.Mount{},
-		Ports: []docker.ExposedPorts{
-			{Port: "8025", Protocol: "tcp"},
-			{Port: "1025", Protocol: "tcp"},
-		},
-		Labels: map[string]string{
-			"traefik.enable": "true",
-			fmt.Sprintf("traefik.http.routers.wordpress-%s-%s-http.entrypoints", s.Settings.Name, "mailpit"): "web",
-			fmt.Sprintf(
-				"traefik.http.routers.wordpress-%s-%s-http.rule",
-				s.Settings.Name,
-				"mailpit"): fmt.Sprintf(
-				"Host(`%s-%s`)",
-				"mailpit",
-				s.Settings.SiteDomain),
-			fmt.Sprintf("traefik.http.routers.wordpress-%s-%s.entrypoints", s.Settings.Name, "mailpit"): "websecure",
-			fmt.Sprintf(
-				"traefik.http.routers.wordpress-%s-%s.rule",
-				s.Settings.Name,
-				"mailpit"): fmt.Sprintf(
-				"Host(`%s-%s`)",
-				"mailpit",
-				s.Settings.SiteDomain),
-			fmt.Sprintf("traefik.http.services.%s-http-svc.loadbalancer.server.port", "mailpit"): "8025",
-			fmt.Sprintf("traefik.http.routers.wordpress-%s-%s.tls", s.Settings.Name, "mailpit"):  "true",
-			"kana.site": s.Settings.Name,
-		},
-	}
-
-	return mailpitContainer
 }
 
 func (s *Site) getMounts(appDir string) ([]mount.Mount, error) {
@@ -274,44 +203,6 @@ func (s *Site) getMounts(appDir string) ([]mount.Mount, error) {
 	}
 
 	return appVolumes, nil
-}
-
-func (s *Site) getPhpMyAdminContainer() docker.ContainerConfig {
-	phpMyAdminContainer := docker.ContainerConfig{
-		Name:        fmt.Sprintf("kana-%s-phpmyadmin", s.Settings.Name),
-		Image:       "phpmyadmin",
-		NetworkName: "kana",
-		HostName:    fmt.Sprintf("kana-%s-phpmyadmin", s.Settings.Name),
-		Env: []string{
-			"MYSQL_ROOT_PASSWORD=password",
-			fmt.Sprintf("PMA_HOST=kana-%s-database", s.Settings.Name),
-			"PMA_USER=wordpress",
-			"PMA_PASSWORD=wordpress",
-		},
-		Labels: map[string]string{
-			"traefik.enable": "true",
-			fmt.Sprintf("traefik.http.routers.wordpress-%s-%s-http.entrypoints", s.Settings.Name, "phpmyadmin"): "web",
-			fmt.Sprintf(
-				"traefik.http.routers.wordpress-%s-%s-http.rule",
-				s.Settings.Name,
-				"phpmyadmin"): fmt.Sprintf(
-				"Host(`%s-%s`)",
-				"phpmyadmin",
-				s.Settings.SiteDomain),
-			fmt.Sprintf("traefik.http.routers.wordpress-%s-%s.entrypoints", s.Settings.Name, "phpmyadmin"): "websecure",
-			fmt.Sprintf(
-				"traefik.http.routers.wordpress-%s-%s.rule",
-				s.Settings.Name,
-				"phpmyadmin"): fmt.Sprintf(
-				"Host(`%s-%s`)",
-				"phpmyadmin",
-				s.Settings.SiteDomain),
-			fmt.Sprintf("traefik.http.routers.wordpress-%s-%s.tls", s.Settings.Name, "phpmyadmin"): "true",
-			"kana.site": s.Settings.Name,
-		},
-	}
-
-	return phpMyAdminContainer
 }
 
 func (s *Site) getWordPressContainer(appVolumes []mount.Mount, appContainers []docker.ContainerConfig) []docker.ContainerConfig {
@@ -493,20 +384,6 @@ func (s *Site) startContainer(container *docker.ContainerConfig, randomPorts, lo
 	_, err = s.dockerClient.ContainerRun(container, randomPorts, localUser)
 
 	return err
-}
-
-// startMailpit Starts the Mailpit container
-func (s *Site) startMailpit(consoleOutput *console.Console) error {
-	mailpitContainer := s.getMailpitContainer()
-
-	return s.startContainer(&mailpitContainer, true, true, consoleOutput)
-}
-
-// startPHPMyAdmin Starts the PhpMyAdmin container
-func (s *Site) startPHPMyAdmin(consoleOutput *console.Console) error {
-	phpMyAdminContainer := s.getPhpMyAdminContainer()
-
-	return s.startContainer(&phpMyAdminContainer, true, false, consoleOutput)
 }
 
 // startWordPress Starts the WordPress containers

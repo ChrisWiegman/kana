@@ -410,22 +410,6 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 	return localSettings, nil
 }
 
-func (s *Site) isMailpitRunning() bool {
-	// We need container details to see if the mailpit container is running
-	containers, err := s.dockerClient.ContainerList(s.Settings.Name)
-	if err != nil {
-		return false
-	}
-
-	for i := range containers {
-		if containers[i].Image == "axllent/mailpit" {
-			return true
-		}
-	}
-
-	return false
-}
-
 // isLocalSite Determines if a site is a "local" site (started with the "local" flag) so that other commands can work as needed.
 func (s *Site) isLocalSite(consoleOutput *console.Console) bool {
 	// If the site is already running, try to make this easier
