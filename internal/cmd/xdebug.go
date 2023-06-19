@@ -18,7 +18,7 @@ func newXdebugCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobr
 				consoleOutput.Error(err)
 			}
 
-			status := kanaSite.XdebugStatus(consoleOutput)
+			status := kanaSite.IsXdebugRunning(consoleOutput)
 
 			consoleOutput.Println(outputXdebugStatus(status))
 		},
@@ -41,7 +41,7 @@ func newXdebugCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobr
 				consoleOutput.Error(err)
 			}
 
-			status := kanaSite.XdebugStatus(consoleOutput)
+			status := kanaSite.IsXdebugRunning(consoleOutput)
 
 			consoleOutput.Println(outputXdebugStatus(status))
 		},
@@ -59,7 +59,7 @@ func newXdebugCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobr
 				consoleOutput.Error(err)
 			}
 
-			status := kanaSite.XdebugStatus(consoleOutput)
+			status := kanaSite.IsXdebugRunning(consoleOutput)
 
 			if status {
 				err = kanaSite.StopXdebug(consoleOutput)
@@ -67,7 +67,7 @@ func newXdebugCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobr
 					consoleOutput.Error(err)
 				}
 
-				status = kanaSite.XdebugStatus(consoleOutput)
+				status = kanaSite.IsXdebugRunning(consoleOutput)
 			}
 
 			consoleOutput.Println(outputXdebugStatus(status))
