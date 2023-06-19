@@ -37,7 +37,7 @@ type ExecResult struct {
 	ExitCode int
 }
 
-func (d *DockerClient) ContainerExec(containerName string, command []string) (ExecResult, error) {
+func (d *DockerClient) ContainerExec(containerName string, rootUser bool, command []string) (ExecResult, error) {
 	containerID, isRunning := d.containerIsRunning(containerName)
 	if !isRunning {
 		return ExecResult{}, nil
@@ -55,6 +55,10 @@ func (d *DockerClient) ContainerExec(containerName string, command []string) (Ex
 		AttachStdout: true,
 		AttachStderr: true,
 		Cmd:          strslice.StrSlice(fullCommand),
+	}
+
+	if rootUser {
+		execConfig.User = "root"
 	}
 
 	containerResponse, err := d.moby.ContainerExecCreate(context.Background(), containerID, execConfig)

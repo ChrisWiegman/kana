@@ -28,7 +28,7 @@ func (s *Site) StartXdebug(consoleOutput *console.Console) error {
 			restart = true
 		}
 
-		output, err := s.runCli(command, restart)
+		output, err := s.runCli(command, restart, true)
 		if err != nil {
 			return err
 		}
@@ -54,7 +54,7 @@ func (s *Site) StopXdebug(consoleOutput *console.Console) error {
 
 // XdebugStatus returns true if Xdebug is already running or false if not
 func (s *Site) XdebugStatus(consoleOutput *console.Console) bool {
-	output, err := s.runCli("pecl list | grep xdebug", false)
+	output, err := s.runCli("pecl list | grep xdebug", false, false)
 	if err != nil {
 		return false
 	}

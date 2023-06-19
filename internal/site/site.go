@@ -359,7 +359,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 	// We need container details to see if the mailpit container is running
 	localSettings.Mailpit = s.isMailpitRunning()
 
-	output, err := s.runCli("pecl list | grep xdebug", false)
+	output, err := s.runCli("pecl list | grep xdebug", false, false)
 	if err != nil {
 		return localSettings, err
 	}
@@ -368,7 +368,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 		localSettings.Xdebug = true
 	}
 
-	output, err = s.runCli("echo $WORDPRESS_DEBUG", false)
+	output, err = s.runCli("echo $WORDPRESS_DEBUG", false, false)
 	if err != nil {
 		return localSettings, err
 	}
@@ -457,10 +457,10 @@ func (s *Site) isLocalSite(consoleOutput *console.Console) bool {
 }
 
 // runCli Runs an arbitrary CLI command against the site's WordPress container
-func (s *Site) runCli(command string, restart bool) (docker.ExecResult, error) {
+func (s *Site) runCli(command string, restart, root bool) (docker.ExecResult, error) {
 	container := fmt.Sprintf("kana-%s-wordpress", s.Settings.Name)
 
-	output, err := s.dockerClient.ContainerExec(container, []string{command})
+	output, err := s.dockerClient.ContainerExec(container, root, []string{command})
 	if err != nil {
 		return docker.ExecResult{}, err
 	}
