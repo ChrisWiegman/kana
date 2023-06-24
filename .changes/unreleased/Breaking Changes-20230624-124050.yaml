@@ -1,0 +1,4 @@
+kind: Breaking Changes
+body: Renamed `phpmyadmin` flag to `database` on the _open_ command to better reflect
+  its operation.
+time: 2023-06-24T12:40:50.180885418Z
