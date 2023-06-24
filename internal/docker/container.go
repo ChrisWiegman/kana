@@ -208,7 +208,10 @@ func (d *DockerClient) ContainerRun(config *ContainerConfig, randomPorts, localU
 	}
 
 	hostConfig := container.HostConfig{}
-	containerPorts := getNetworkConfig(config.Ports, randomPorts)
+	containerPorts, err := getNetworkConfig(config.Ports, randomPorts)
+	if err != nil {
+		return containerID, err
+	}
 
 	if len(containerPorts.PortBindings) > 0 {
 		hostConfig.PortBindings = containerPorts.PortBindings

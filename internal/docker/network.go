@@ -99,14 +99,14 @@ func findNetworkByName(name string, moby APIClient) (found bool, network types.N
 	return false, types.NetworkResource{}, nil
 }
 
-func getNetworkConfig(ports []ExposedPorts, randomPorts bool) portConfig {
+func getNetworkConfig(ports []ExposedPorts, randomPorts bool) (portConfig, error) {
 	portBindings := make(nat.PortMap)
 	portSet := make(nat.PortSet)
 
 	for _, port := range ports {
 		portName, err := nat.NewPort(port.Protocol, port.Port)
 		if err != nil {
-			panic(err)
+			return portConfig{}, err
 		}
 
 		hostPort := port.Port
@@ -114,7 +114,7 @@ func getNetworkConfig(ports []ExposedPorts, randomPorts bool) portConfig {
 		if randomPorts {
 			port, err := getRandomPort()
 			if err != nil {
-				panic(err)
+				return portConfig{}, err
 			}
 
 			hostPort = port
@@ -132,7 +132,7 @@ func getNetworkConfig(ports []ExposedPorts, randomPorts bool) portConfig {
 	return portConfig{
 		PortBindings: portBindings,
 		PortSet:      portSet,
-	}
+	}, nil
 }
 
 // getRandomPort Returns an open, ephemeral port for mapping a container
