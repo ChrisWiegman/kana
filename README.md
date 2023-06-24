@@ -123,7 +123,7 @@ By default Kana will prompt you to confirm any site you wish to destroy. You can
 
 `kana open` will open the site in your default browser
 
-By default Kana will open the appropriate WordPress site. To open PhpMyAdmin or Mailpit simply append the appropriate flag to the open command ie `kana open --phpmyadmin`.
+By default Kana will open the appropriate WordPress site. To open PhpMyAdmin or Mailpit simply append the appropriate flag to the open command ie `kana open --database`.
 
 ## wp-cli
 
@@ -179,7 +179,7 @@ In addition to the global config, certain items above can be overridden for any 
 
 # Accessing the database directly
 
-Currently there are two methods to access the database directly. First you can access the database via PhpMyAdmin by running `kana open --phpmyadmin` for the site in question.
+Currently there are two methods to access the database directly. First you can access the database via PhpMyAdmin by running `kana open --database` for the site in question.
 
 You can also access the database directly by viewing the database port with `docker ps` and using the database port and the following configuration in the app of your choice:
 
