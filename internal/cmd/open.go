@@ -7,6 +7,7 @@ import (
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 var openPhpMyAdminFlag, openMailpitFlag, openSiteFlag bool
@@ -47,10 +48,10 @@ func newOpenCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.
 	commandsRequiringSite = append(commandsRequiringSite, cmd.Use)
 	cmd.Flags().BoolVarP(
 		&openPhpMyAdminFlag,
-		"phpmyadmin",
-		"p",
+		"database",
+		"d",
 		false,
-		"Opens the PhpMyAdmin UI for the current or specified Kana site in your default browser")
+		"Opens the database for the current or specified Kana site with phpMyAdmin in your default browser")
 	cmd.Flags().BoolVarP(
 		&openMailpitFlag,
 		"mailpit",
@@ -59,5 +60,15 @@ func newOpenCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.
 		"Opens the Mailpit UI for the current or specified Kana site in your default browser")
 	cmd.Flags().BoolVarP(&openSiteFlag, "site", "s", false, "Opens the current or specified Kana site in your default browser")
 
+	cmd.Flags().SetNormalizeFunc(aliasPhpMyAdminFlag)
+
 	return cmd
+}
+
+func aliasPhpMyAdminFlag(f *pflag.FlagSet, name string) pflag.NormalizedName {
+	if name == "phpmyadmin" {
+		name = "database"
+	}
+
+	return pflag.NormalizedName(name)
 }
