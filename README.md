@@ -164,7 +164,8 @@ The above syntax will allow you to change the defaults for any of the options li
 In addition to the global config, certain items above can be overridden for any given site. For a site without a `name` flag (as seen in the start command), simply create a _.kana.json_ file in the current directory. You can populate it with the following options:
 
 - `local` **false** - the default usage of the `local` start flag
-- `php` **8.1** - the default PHP version used for new sites (currently 8.0, 8.1 and 8.2 are also supported)
+- `php` **8.1** - the default PHP version used for sites (currently 7.4, 8.0, 8.1 and 8.2 are supported)
+- `mariadb` **11** - the default MariaDB version used for sites (currently 10 and 11 are supported)
 - `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
 - `xdebug` **false** - the default usage of the `xdebug` start flag
 - `wpdebug` **false** - the default usage of the `wpdebug` start flag
