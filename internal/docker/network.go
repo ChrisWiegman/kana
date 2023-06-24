@@ -3,6 +3,9 @@ package docker
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/go-connections/nat"
@@ -108,9 +111,13 @@ func getNetworkConfig(ports []ExposedPorts, randomPorts bool) portConfig {
 
 		hostPort := port.Port
 
-		// Reassign host port to "0" to chose a random port where applicable
 		if randomPorts {
-			hostPort = "0"
+			port, err := getRandomPort()
+			if err != nil {
+				panic(err)
+			}
+
+			hostPort = port
 		}
 
 		portBindings[portName] = []nat.PortBinding{
@@ -126,4 +133,22 @@ func getNetworkConfig(ports []ExposedPorts, randomPorts bool) portConfig {
 		PortBindings: portBindings,
 		PortSet:      portSet,
 	}
+}
+
+// getRandomPort Returns an open, ephemeral port for mapping a container
+func getRandomPort() (string, error) {
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	server := httptest.NewServer(handler)
+	urlParts, err := url.ParseRequestURI(server.URL)
+
+	server.Close()
+
+	if err != nil {
+		return "", err
+	}
+
+	return urlParts.Port(), nil
 }
