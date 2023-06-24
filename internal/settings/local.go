@@ -54,6 +54,7 @@ func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 	s.Mailpit = localViper.GetBool("mailpit")
 	s.Local = localViper.GetBool("local")
 	s.PHP = localViper.GetString("php")
+	s.MariaDB = localViper.GetString("mariadb")
 	s.Type = localViper.GetString("type")
 	s.Plugins = localViper.GetStringSlice("plugins")
 	s.SSL = localViper.GetBool("ssl")
@@ -167,6 +168,7 @@ func (s *Settings) loadlocalViper() (*viper.Viper, error) {
 	localSettings := viper.New()
 
 	localSettings.SetDefault("php", s.PHP)
+	localSettings.SetDefault("mariadb", s.MariaDB)
 	localSettings.SetDefault("type", s.Type)
 	localSettings.SetDefault("local", s.Local)
 	localSettings.SetDefault("xdebug", s.Xdebug)

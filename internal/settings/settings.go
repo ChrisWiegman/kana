@@ -17,6 +17,7 @@ var (
 	domain           = "sites.kana.li"
 	configFolderName = ".config/kana"
 	php              = "8.1"
+	mariadb          = "11"
 	siteType         = "site"
 	xdebug           = false
 	mailpit          = false
@@ -45,6 +46,7 @@ type Settings struct {
 	AppDomain, SiteDomain                          string
 	Name                                           string
 	PHP                                            string
+	MariaDB                                        string
 	RootCert, RootKey, SiteCert, SiteKey           string
 	URL, Protocol                                  string
 	Type                                           string
@@ -58,6 +60,11 @@ var validPHPVersions = []string{
 	"8.0",
 	"8.1",
 	"8.2",
+}
+
+var validMariaDBVersions = []string{
+	"10",
+	"11",
 }
 
 var validTypes = []string{

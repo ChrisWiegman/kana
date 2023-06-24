@@ -1,0 +1,3 @@
+kind: Breaking Changes
+body: Changed default MariaDB version from 10 to 11.
+time: 2023-06-24T12:49:42.207991887Z

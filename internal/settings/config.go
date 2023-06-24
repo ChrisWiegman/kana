@@ -43,6 +43,7 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 	t.AddRow("local", consoleOutput.Bold(s.global.GetString("local")), consoleOutput.Bold(s.local.GetString("local")))
 	t.AddRow("mailpit", consoleOutput.Bold(s.global.GetString("mailpit")), consoleOutput.Bold(s.local.GetString("mailpit")))
 	t.AddRow("php", consoleOutput.Bold(s.global.GetString("php")), consoleOutput.Bold(s.local.GetString("php")))
+	t.AddRow("mariadb", consoleOutput.Bold(s.global.GetString("mariadb")), consoleOutput.Bold(s.local.GetString("mariadb")))
 
 	boldPlugins := []string{}
 
@@ -76,6 +77,10 @@ func (s *Settings) SetGlobalSetting(md *cobra.Command, args []string) error {
 	case "php":
 		if !isValidString(args[1], validPHPVersions) {
 			err = fmt.Errorf("please choose a valid php version")
+		}
+	case "mariadb":
+		if !isValidString(args[1], validMariaDBVersions) {
+			err = fmt.Errorf("please choose a valid MariaDB version")
 		}
 	case "type":
 		if !isValidString(args[1], validTypes) {

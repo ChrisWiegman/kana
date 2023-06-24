@@ -22,6 +22,7 @@ func (s *Settings) LoadGlobalSettings() error {
 	s.AdminPassword = globalViperConfig.GetString("admin.password")
 	s.AdminUsername = globalViperConfig.GetString("admin.username")
 	s.PHP = globalViperConfig.GetString("php")
+	s.MariaDB = globalViperConfig.GetString("mariadb")
 	s.Type = globalViperConfig.GetString("type")
 	s.SSL = globalViperConfig.GetBool("ssl")
 	s.ImageUpdateDays = globalViperConfig.GetInt("imageUpdateDays")
@@ -43,6 +44,7 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
 	globalSettings.SetDefault("ssl", ssl)
 	globalSettings.SetDefault("activate", activate)
 	globalSettings.SetDefault("php", php)
+	globalSettings.SetDefault("mariadb", mariadb)
 	globalSettings.SetDefault("admin.username", adminUsername)
 	globalSettings.SetDefault("admin.password", adminPassword)
 	globalSettings.SetDefault("admin.email", adminEmail)
@@ -75,7 +77,13 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
 	// Reset default php version if there's an invalid version in the config file
 	if !isValidString(globalSettings.GetString("php"), validPHPVersions) {
 		changeConfig = true
-		globalSettings.Set("php", "7.4")
+		globalSettings.Set("php", php)
+	}
+
+	// Reset default mariadb version if there's an invalid version in the config file
+	if !isValidString(globalSettings.GetString("mariadb"), validMariaDBVersions) {
+		changeConfig = true
+		globalSettings.Set("mariadb", mariadb)
 	}
 
 	if changeConfig {

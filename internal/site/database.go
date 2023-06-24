@@ -10,8 +10,6 @@ import (
 	"github.com/docker/docker/api/types/mount"
 )
 
-var mariadbVersion = "11"
-
 func (s *Site) ExportDatabase(args []string, consoleOutput *console.Console) (string, error) {
 	cwd, err := os.Getwd()
 	if err != nil {
@@ -126,7 +124,7 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string, 
 func (s *Site) getDatabaseContainer(databaseDir string, appContainers []docker.ContainerConfig) []docker.ContainerConfig {
 	databaseContainer := docker.ContainerConfig{
 		Name:        fmt.Sprintf("kana-%s-database", s.Settings.Name),
-		Image:       "mariadb:" + mariadbVersion,
+		Image:       fmt.Sprintf("mariadb:%s", s.Settings.MariaDB),
 		NetworkName: "kana",
 		HostName:    fmt.Sprintf("kana-%s-database", s.Settings.Name),
 		Ports: []docker.ExposedPorts{
