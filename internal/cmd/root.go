@@ -57,6 +57,7 @@ func Execute() {
 		newDBCommand(consoleOutput, kanaSite),
 		newListCommand(consoleOutput, kanaSite),
 		newXdebugCommand(consoleOutput, kanaSite),
+		newFlushCommand(consoleOutput, kanaSite),
 	)
 
 	// Execute anything we need to
