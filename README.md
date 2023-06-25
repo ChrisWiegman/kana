@@ -225,6 +225,10 @@ To trigger step debugging you'll also need the appropriate extension for your br
 - [Xdebug Helper for Chrome](https://chrome.google.com/extensions/detail/eadndfjplgieldjbigjakmdgkmoaaaoc) ([source](https://github.com/mac-cain13/xdebug-helper-for-chrome)).
 - [XDebugToggle for Safari](https://apps.apple.com/app/safari-xdebug-toggle/id1437227804?mt=12) ([source](https://github.com/kampfq/SafariXDebugToggle)).
 
+# Flushing cache and transients
+
+Two wp-cli commands I find myself using regularly when working on WordPress are `wp transient delete --all` and `wp cache flush`. I use them so often that it seemed like a good idea to make them easier to access with Kana. As a result I've added the `kana flush` command which will call both on the specified site.
+
 # This project is under active development
 
 Note that I am using this project for my own work and it is under active development. Some of the things I'm currently working on include:
