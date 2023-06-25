@@ -1,0 +1,3 @@
+kind: Features
+body: Added `flush` command which flushes the cache and deletes all transients
+time: 2023-06-25T20:33:53.577233959Z
