@@ -1,4 +1,0 @@
-kind: Bug Fixes
-body: PHP version will properly revert to default if an invalid configuration is entered
-  into settings
-time: 2023-06-24T12:59:33.302369091Z
