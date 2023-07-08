@@ -31,10 +31,13 @@ archives:
       - macos
       - linux
     format: zip
-    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-    replacements:
-      amd64: x86_64
-      darwin: macos
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- if eq .Os "darwin" }}macos
+      {{- else }}{{ .Os }}{{ end }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
     files:
       - LICENSE.txt
       - CHANGELOG.md
@@ -53,8 +56,12 @@ nfpms:
     homepage: https://github.com/ChrisWiegman/kana-cli
     maintainer: Chris Wiegman <contact@chriswiegman.com>
     description: A simple, portable CLI for efficient WordPress development.
-    replacements:
-      amd64: x86_64
+    file_name_template: >-
+      {{ .ProjectName }}_
+      {{-  .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
     formats:
       - apk
       - deb
@@ -62,7 +69,7 @@ nfpms:
       - archlinux
 
 brews:
-  - tap:
+  - repository:
       owner: ChrisWiegman
       name: homebrew-kana
       branch: main

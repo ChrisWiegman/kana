@@ -88,7 +88,7 @@ snapshot:
 	-w /go/src/$(PKG) \
 	goreleaser/goreleaser \
 		release \
-		--rm-dist \
+		--clean \
 		--release-notes=./.changes/$(VERSION).md \
 		--snapshot
 
