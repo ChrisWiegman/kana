@@ -175,14 +175,14 @@ func (s *Site) LoadSite(cmd *cobra.Command, commandsRequiringSite []string, star
 }
 
 // OpenSite Opens the current site in a browser if it is running
-func (s *Site) OpenSite(openPhpMyAdminFlag, openMailpitFlag, openSiteFlag bool, consoleOutput *console.Console) error {
+func (s *Site) OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag bool, consoleOutput *console.Console) error {
 	openUrls := []string{}
 
 	if openSiteFlag {
 		openUrls = append(openUrls, s.Settings.URL)
 	}
 
-	if openPhpMyAdminFlag {
+	if openDatabaseFlag {
 		err := s.startPHPMyAdmin(consoleOutput)
 		if err != nil {
 			return err

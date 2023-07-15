@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/pflag"
 )
 
-var openPhpMyAdminFlag, openMailpitFlag, openSiteFlag bool
+var openDatabaseFlag, openMailpitFlag, openSiteFlag bool
 
 func newOpenCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
@@ -30,7 +30,7 @@ func newOpenCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.
 			}
 
 			// Open the site in the user's default browser,
-			err = kanaSite.OpenSite(openPhpMyAdminFlag, openMailpitFlag, openSiteFlag, consoleOutput)
+			err = kanaSite.OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag, consoleOutput)
 			if err != nil {
 				consoleOutput.Error(fmt.Errorf("the site doesn't appear to be running. Please use `kana start` to start the site"))
 			}
@@ -47,7 +47,7 @@ func newOpenCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.
 
 	commandsRequiringSite = append(commandsRequiringSite, cmd.Use)
 	cmd.Flags().BoolVarP(
-		&openPhpMyAdminFlag,
+		&openDatabaseFlag,
 		"database",
 		"d",
 		false,
