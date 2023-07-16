@@ -44,6 +44,7 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 	t.AddRow("mailpit", consoleOutput.Bold(s.global.GetString("mailpit")), consoleOutput.Bold(s.local.GetString("mailpit")))
 	t.AddRow("php", consoleOutput.Bold(s.global.GetString("php")), consoleOutput.Bold(s.local.GetString("php")))
 	t.AddRow("mariadb", consoleOutput.Bold(s.global.GetString("mariadb")), consoleOutput.Bold(s.local.GetString("mariadb")))
+	t.AddRow("databaseClient", consoleOutput.Bold(s.global.GetString("databaseClient")), consoleOutput.Bold(s.local.GetString("databaseClient")))
 
 	boldPlugins := []string{}
 
@@ -95,6 +96,11 @@ func (s *Settings) SetGlobalSetting(md *cobra.Command, args []string) error {
 	case "imageUpdateDays":
 	case "imageupdatedays":
 		err = validate.Var(args[1], "gte=0")
+	case "databaseClient":
+	case "databaseclient":
+		if !isValidString(args[1], validDatabaseClients) {
+			err = fmt.Errorf("the database client, %s, is not a valid client. You must use either `phpmyadmin` or `tableplus`", args[0])
+		}
 	default:
 		err = validate.Var(args[1], "boolean")
 		if err != nil {

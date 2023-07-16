@@ -23,7 +23,7 @@ type StartFlags struct {
 
 type LocalSettings struct {
 	Local, Mailpit, Xdebug, SSL, WPDebug, Activate bool
-	Type                                           string
+	Type, DatabaseClient                           string
 	Plugins                                        []string
 }
 
@@ -56,6 +56,7 @@ func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 	s.PHP = localViper.GetString("php")
 	s.MariaDB = localViper.GetString("mariadb")
 	s.Type = localViper.GetString("type")
+	s.DatabaseClient = localViper.GetString("databaseClient")
 	s.Plugins = localViper.GetStringSlice("plugins")
 	s.SSL = localViper.GetBool("ssl")
 	s.Activate = localViper.GetBool("activate")
@@ -147,6 +148,7 @@ func (s *Settings) WriteLocalSettings(localSettings LocalSettings) error {
 	s.local.Set("ssl", localSettings.SSL)
 	s.local.Set("wpdebug", localSettings.WPDebug)
 	s.local.Set("activate", localSettings.Activate)
+	s.local.Set("databaseClient", localSettings.DatabaseClient)
 
 	if _, err := os.Stat(path.Join(s.WorkingDirectory, ".kana.json")); os.IsNotExist(err) {
 		return s.local.SafeWriteConfig()
@@ -177,6 +179,7 @@ func (s *Settings) loadlocalViper() (*viper.Viper, error) {
 	localSettings.SetDefault("plugins", []string{})
 	localSettings.SetDefault("ssl", s.SSL)
 	localSettings.SetDefault("activate", s.Activate)
+	localSettings.SetDefault("databaseClient", s.DatabaseClient)
 
 	localSettings.SetConfigName(".kana")
 	localSettings.SetConfigType("json")

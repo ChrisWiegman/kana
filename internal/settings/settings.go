@@ -29,6 +29,7 @@ var (
 	adminEmail       = "admin@sites.kana.li"
 	imageUpdateDays  = 1
 	activate         = true
+	databaseClient   = "phpmyadmin"
 )
 
 // Default permissions for all new files and folders
@@ -50,6 +51,7 @@ type Settings struct {
 	RootCert, RootKey, SiteCert, SiteKey           string
 	URL, Protocol                                  string
 	Type                                           string
+	DatabaseClient                                 string
 	Plugins                                        []string
 	global                                         *viper.Viper
 	local                                          *viper.Viper
@@ -71,6 +73,11 @@ var validTypes = []string{
 	"site",
 	"plugin",
 	"theme",
+}
+
+var validDatabaseClients = []string{
+	"phpmyadmin",
+	"tableplus",
 }
 
 func NewSettings() (*Settings, error) {

@@ -27,6 +27,7 @@ func (s *Settings) LoadGlobalSettings() error {
 	s.SSL = globalViperConfig.GetBool("ssl")
 	s.ImageUpdateDays = globalViperConfig.GetInt("imageUpdateDays")
 	s.Activate = globalViperConfig.GetBool("activate")
+	s.DatabaseClient = globalViperConfig.GetString("databaseClient")
 
 	return err
 }
@@ -37,6 +38,7 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
 
 	globalSettings.SetDefault("xdebug", xdebug)
 	globalSettings.SetDefault("imageUpdateDays", imageUpdateDays)
+	globalSettings.SetDefault("databaseClient", databaseClient)
 	globalSettings.SetDefault("wpdebug", wpdebug)
 	globalSettings.SetDefault("mailpit", mailpit)
 	globalSettings.SetDefault("type", siteType)
@@ -84,6 +86,12 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
 	if !isValidString(globalSettings.GetString("mariadb"), validMariaDBVersions) {
 		changeConfig = true
 		globalSettings.Set("mariadb", mariadb)
+	}
+
+	// Reset default database client if there's an invalid client in the config file
+	if !isValidString(globalSettings.GetString("databaseClient"), validDatabaseClients) {
+		changeConfig = true
+		globalSettings.Set("databaseClient", databaseClient)
 	}
 
 	if changeConfig {
