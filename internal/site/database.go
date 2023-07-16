@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strconv"
 
 	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/docker"
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/mount"
 )
 
@@ -151,4 +153,18 @@ func (s *Site) getDatabaseContainer(databaseDir string, appContainers []docker.C
 	appContainers = append(appContainers, databaseContainer)
 
 	return appContainers
+}
+
+// getDatabasePort returns the public port for the database attached to the current site.
+func (s *Site) getDatabasePort() string {
+	containers, _ := s.dockerClient.ContainerList(s.Settings.Name)
+	var databasePort types.Port
+
+	for i := range containers {
+		if containers[i].Image == fmt.Sprintf("mariadb:%s", s.Settings.MariaDB) {
+			databasePort = containers[i].Ports[0]
+		}
+	}
+
+	return strconv.Itoa(int(databasePort.PublicPort))
 }
