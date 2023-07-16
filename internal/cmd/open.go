@@ -23,7 +23,7 @@ func newOpenCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.
 			}
 
 			// Default to opening the site if no flags are specified
-			if !cmd.Flags().Lookup("phpmyadmin").Changed &&
+			if !cmd.Flags().Lookup("database").Changed &&
 				!cmd.Flags().Lookup("mailpit").Changed &&
 				!cmd.Flags().Lookup("site").Changed {
 				openSiteFlag = true
