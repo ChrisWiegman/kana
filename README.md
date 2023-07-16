@@ -123,7 +123,9 @@ By default Kana will prompt you to confirm any site you wish to destroy. You can
 
 `kana open` will open the site in your default browser
 
-By default Kana will open the appropriate WordPress site. To open PhpMyAdmin or Mailpit simply append the appropriate flag to the open command ie `kana open --database`.
+By default Kana will open the appropriate WordPress site. To open the database or Mailpit simply append the appropriate flag to the open command ie `kana open --database`.
+
+Note that by default Kana will open the database in [phpMyAdmin](https://www.phpmyadmin.net). You can also tell Kana to open the database in [TablePlus](https://tableplus.com) instead by setting the `databaseClient` configuration setting to `tableplus`.
 
 ## wp-cli
 
@@ -144,6 +146,8 @@ Kana has a handful of options that apply to all new sites created with the app. 
 - `admin.username` **admin** - the default username used to login to WordPress
 - `local` **false** - the default usage of the `local` start flag
 - `php` **8.1** - the default PHP version used for new sites (currently 8.0, 8.1 and 8.2 are also supported)
+- `mariadb` **11** - the default MariaDB version used for sites (currently 10 and 11 are supported)
+- `databaseClient` **phpmyadmin** - the default database client for accessing the database directly (currently `phpmyadmin` and `tableplus` are supported)
 - `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
 - `xdebug` **false** - the default usage of the `xdebug` start flag
 - `wpdebug` **false** - the default usage of the `wpdebug` start flag
@@ -166,6 +170,7 @@ In addition to the global config, certain items above can be overridden for any 
 - `local` **false** - the default usage of the `local` start flag
 - `php` **8.1** - the default PHP version used for sites (currently 7.4, 8.0, 8.1 and 8.2 are supported)
 - `mariadb` **11** - the default MariaDB version used for sites (currently 10 and 11 are supported)
+- `databaseClient` **phpmyadmin** - the default database client for accessing the database directly (currently `phpmyadmin` and `tableplus` are supported)
 - `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
 - `xdebug` **false** - the default usage of the `xdebug` start flag
 - `wpdebug` **false** - the default usage of the `wpdebug` start flag
@@ -180,7 +185,9 @@ In addition to the global config, certain items above can be overridden for any 
 
 # Accessing the database directly
 
-Currently there are two methods to access the database directly. First you can access the database via PhpMyAdmin by running `kana open --database` for the site in question.
+Currently there are two methods to access the database directly. First you can access the database via phpMyAdmin or TablePlus by running `kana open --database` for the site in question.
+
+Note that by default Kana will open the database in [phpMyAdmin](https://www.phpmyadmin.net). You can also tell Kana to open the database in [TablePlus](https://tableplus.com) instead by setting the `databaseClient` configuration setting to `tableplus`.
 
 You can also access the database directly by viewing the database port with `docker ps` and using the database port and the following configuration in the app of your choice:
 
