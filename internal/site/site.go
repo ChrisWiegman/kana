@@ -182,14 +182,23 @@ func (s *Site) OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag bool, co
 		openUrls = append(openUrls, s.Settings.URL)
 	}
 
+	databasePort := s.getDatabasePort()
+
+	databaseURL := fmt.Sprintf(
+		"mysql://wordpress:wordpress@127.0.0.1:%s/wordpress?enviroment=local&name=$database&safeModeLevel=0&advancedSafeModeLevel=0",
+		databasePort)
+
 	if openDatabaseFlag {
-		err := s.startPHPMyAdmin(consoleOutput)
-		if err != nil {
-			return err
+		if s.Settings.DatabaseClient == "phpmyadmin" {
+			err := s.startPHPMyAdmin(consoleOutput)
+			if err != nil {
+				return err
+			}
+
+			databaseURL = fmt.Sprintf("%s://phpmyadmin-%s", s.Settings.Protocol, s.Settings.SiteDomain)
 		}
 
-		phpmyAdminURL := fmt.Sprintf("%s://phpmyadmin-%s", s.Settings.Protocol, s.Settings.SiteDomain)
-		openUrls = append(openUrls, phpmyAdminURL)
+		openUrls = append(openUrls, databaseURL)
 	}
 
 	if openMailpitFlag {
@@ -205,9 +214,13 @@ func (s *Site) OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag bool, co
 	}
 
 	for _, openURL := range openUrls {
-		err := s.verifySite(openURL)
-		if err != nil {
-			return err
+		var err error
+
+		if strings.HasPrefix(openURL, "http") {
+			err = s.verifySite(openURL)
+			if err != nil {
+				return err
+			}
 		}
 
 		if runtime.GOOS == "linux" {
