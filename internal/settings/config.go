@@ -93,6 +93,7 @@ func (s *Settings) SetGlobalSetting(md *cobra.Command, args []string) error {
 	case "admin.username":
 		err = validate.Var(args[1], "alpha")
 	case "imageUpdateDays":
+	case "imageupdatedays":
 		err = validate.Var(args[1], "gte=0")
 	default:
 		err = validate.Var(args[1], "boolean")
