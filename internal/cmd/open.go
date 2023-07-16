@@ -32,7 +32,7 @@ func newOpenCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.
 			// Open the site in the user's default browser,
 			err = kanaSite.OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag, consoleOutput)
 			if err != nil {
-				consoleOutput.Error(fmt.Errorf("the site doesn't appear to be running. Please use `kana start` to start the site"))
+				consoleOutput.Error(fmt.Errorf("an error occurred and we can't open the requested resource: %s", err))
 			}
 
 			consoleOutput.Success(
