@@ -44,7 +44,10 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 	t.AddRow("mailpit", consoleOutput.Bold(s.global.GetString("mailpit")), consoleOutput.Bold(s.local.GetString("mailpit")))
 	t.AddRow("php", consoleOutput.Bold(s.global.GetString("php")), consoleOutput.Bold(s.local.GetString("php")))
 	t.AddRow("mariadb", consoleOutput.Bold(s.global.GetString("mariadb")), consoleOutput.Bold(s.local.GetString("mariadb")))
-	t.AddRow("databaseClient", consoleOutput.Bold(s.global.GetString("databaseClient")), consoleOutput.Bold(s.local.GetString("databaseClient")))
+	t.AddRow(
+		"databaseClient",
+		consoleOutput.Bold(s.global.GetString("databaseClient")),
+		consoleOutput.Bold(s.local.GetString("databaseClient")))
 
 	boldPlugins := []string{}
 
@@ -71,43 +74,7 @@ func (s *Settings) SetGlobalSetting(md *cobra.Command, args []string) error {
 		return fmt.Errorf("invalid setting. Please enter a valid key to set")
 	}
 
-	validate := validator.New()
-	var err error
-
-	switch args[0] {
-	case "php":
-		if !isValidString(args[1], validPHPVersions) {
-			err = fmt.Errorf("please choose a valid php version")
-		}
-	case "mariadb":
-		if !isValidString(args[1], validMariaDBVersions) {
-			err = fmt.Errorf("please choose a valid MariaDB version")
-		}
-	case "type":
-		if !isValidString(args[1], validTypes) {
-			err = fmt.Errorf("please choose a valid project type")
-		}
-	case "admin.email":
-		err = validate.Var(args[1], "email")
-	case "admin.password":
-		err = validate.Var(args[1], "alphanumunicode")
-	case "admin.username":
-		err = validate.Var(args[1], "alpha")
-	case "imageUpdateDays":
-	case "imageupdatedays":
-		err = validate.Var(args[1], "gte=0")
-	case "databaseClient":
-	case "databaseclient":
-		if !isValidString(args[1], validDatabaseClients) {
-			err = fmt.Errorf("the database client, %s, is not a valid client. You must use either `phpmyadmin` or `tableplus`", args[0])
-		}
-	default:
-		err = validate.Var(args[1], "boolean")
-		if err != nil {
-			err = fmt.Errorf("the setting, %s, must be either true or false", args[0])
-		}
-	}
-
+	err := s.validateSetting(args[0], args[1])
 	if err != nil {
 		return err
 	}
@@ -131,4 +98,45 @@ func (s *Settings) printJSONSettings() {
 	str, _ := json.Marshal(settings)
 
 	fmt.Println(string(str))
+}
+
+// validateSetting validates the values in saved settings
+func (s *Settings) validateSetting(setting, value string) error { //nolint:gocyclo
+	validate := validator.New()
+
+	switch setting {
+	case "php":
+		if !isValidString(value, validPHPVersions) {
+			return fmt.Errorf("please choose a valid php version")
+		}
+	case "mariadb":
+		if !isValidString(value, validMariaDBVersions) {
+			return fmt.Errorf("please choose a valid MariaDB version")
+		}
+	case "type":
+		if !isValidString(value, validTypes) {
+			return fmt.Errorf("please choose a valid project type")
+		}
+	case "admin.email":
+		return validate.Var(value, "email")
+	case "admin.password":
+		return validate.Var(value, "alphanumunicode")
+	case "admin.username":
+		return validate.Var(value, "alpha")
+	case "imageUpdateDays":
+	case "imageupdatedays":
+		return validate.Var(value, "gte=0")
+	case "databaseClient":
+	case "databaseclient":
+		if !isValidString(value, validDatabaseClients) {
+			return fmt.Errorf("the database client, %s, is not a valid client. You must use either `phpmyadmin` or `tableplus`", setting)
+		}
+	default:
+		err := validate.Var(value, "boolean")
+		if err != nil {
+			return fmt.Errorf("the setting, %s, must be either true or false", setting)
+		}
+	}
+
+	return nil
 }
