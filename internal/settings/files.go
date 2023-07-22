@@ -20,6 +20,12 @@ type KanaPluginVars struct {
 	SiteName, Version string
 }
 
+//go:embed templates/subdomain.htaccess
+var SubDomainMultisiteHtaccess string
+
+//go:embed templates/subdirectory.htaccess
+var SubDirectoryMultisiteHtaccess string
+
 //go:embed templates/dynamic.toml
 var DynamicToml string
 
@@ -142,4 +148,12 @@ func (s *Settings) EnsureStaticConfigFiles() error {
 	}
 
 	return nil
+}
+
+func (s *Settings) GetHtaccess() string {
+	if s.Multisite == "subdomain" {
+		return SubDomainMultisiteHtaccess
+	}
+
+	return SubDirectoryMultisiteHtaccess
 }

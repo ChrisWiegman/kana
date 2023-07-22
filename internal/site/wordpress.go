@@ -362,6 +362,13 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 		if err != nil || code != 0 {
 			return fmt.Errorf("installation of WordPress failed: %s", output)
 		}
+
+		if installCommand == "multisite-install" {
+			err = s.writeHtaccess(consoleOutput)
+			if err != nil {
+				return err
+			}
+		}
 	} else if strings.TrimSpace(checkURL) != s.Settings.URL {
 		consoleOutput.Println("The SSL config has changed. Updating the site URL accordingly.")
 
@@ -452,4 +459,14 @@ func (s *Site) stopWordPress() error {
 	}
 
 	return nil
+}
+
+func (s *Site) writeHtaccess(consoleOutput *console.Console) error {
+	appDir, err := s.getAppDirectory(consoleOutput)
+	if err != nil {
+		return err
+	}
+	fmt.Println(appDir)
+	htaccessContents := s.Settings.GetHtaccess()
+	return os.WriteFile(path.Join(appDir, ".htaccess"), []byte(htaccessContents), os.FileMode(0644))
 }
