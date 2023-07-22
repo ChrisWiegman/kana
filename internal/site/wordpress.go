@@ -206,6 +206,8 @@ func (s *Site) getMounts(appDir string) ([]mount.Mount, error) {
 }
 
 func (s *Site) getWordPressContainer(appVolumes []mount.Mount, appContainers []docker.ContainerConfig) []docker.ContainerConfig {
+	hostRule := fmt.Sprintf("HostRegexp(`%[1]s`, `{subdomain:.*}.%[1]s`)", s.Settings.SiteDomain)
+
 	wordPressContainer := docker.ContainerConfig{
 		Name:        fmt.Sprintf("kana-%s-wordpress", s.Settings.Name),
 		Image:       fmt.Sprintf("wordpress:php%s", s.Settings.PHP),
@@ -220,9 +222,9 @@ func (s *Site) getWordPressContainer(appVolumes []mount.Mount, appContainers []d
 		Labels: map[string]string{
 			"traefik.enable": "true",
 			fmt.Sprintf("traefik.http.routers.wordpress-%s-http.entrypoints", s.Settings.Name): "web",
-			fmt.Sprintf("traefik.http.routers.wordpress-%s-http.rule", s.Settings.Name):        fmt.Sprintf("Host(`%s`)", s.Settings.SiteDomain),
+			fmt.Sprintf("traefik.http.routers.wordpress-%s-http.rule", s.Settings.Name):        hostRule,
 			fmt.Sprintf("traefik.http.routers.wordpress-%s.entrypoints", s.Settings.Name):      "websecure",
-			fmt.Sprintf("traefik.http.routers.wordpress-%s.rule", s.Settings.Name):             fmt.Sprintf("Host(`%s`)", s.Settings.SiteDomain),
+			fmt.Sprintf("traefik.http.routers.wordpress-%s.rule", s.Settings.Name):             hostRule,
 			fmt.Sprintf("traefik.http.routers.wordpress-%s.tls", s.Settings.Name):              "true",
 			"kana.site": s.Settings.Name,
 		},
