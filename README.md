@@ -86,6 +86,8 @@ If you do not specify the `local` flag you can find Kana's site files in `~/.con
 
 `--name` The name flag allows you to run an arbitrary site from anywhere. For example, if you already started and stopped a site from a directory called _test_ you can run `kana start --name=test` to start that site from anywhere. If you use the `name` flag on a new site it will create that site without a link to any local folder. This can be handy for testing a plugin or other configuration but not that none of the other start flags will apply.
 
+`--multisite` Use the multisite flag to setup a WordPress Multisite installation. The optional `subdomain` and `subdirectory` flags will allow for either type of installation.
+
 ## Importing an existing WordPress database
 
 Kana offers a simple way to import an existing WordPress database. Just use the `kana db import <your database file>` to get started.
@@ -155,6 +157,7 @@ Kana has a handful of options that apply to all new sites created with the app. 
 - `ssl` **false** - the default usage of the `ssl` start flag
 - `imageUpdateDays` **1** - the number of days Kana will wait between checking for updated Docker images. Set this to `0` to disable the check for newer images altogether (Kana will only download missing images)
 - `activate` **true** - if the project site is set to `theme` or `plugin` this will activate the project on first load
+- `multisite` **none** - set to either `subdirectory` or `subdomain` to create the site as the appropriate type of Multisite installation.
 
 You can get or set any of the above options using a similar syntax to GIT's config. For example:
 
@@ -178,6 +181,7 @@ In addition to the global config, certain items above can be overridden for any 
 - `plugins` **[]** - an array of plugins to install and activate when starting the new site. These are slugs from the Plugins section of WordPress.org.
 - `ssl` **false** - the default usage of the `ssl` start flag
 - `activate` **true** - if the project site is set to `theme` or `plugin` this will activate the project on first load
+- `multisite` **none** - set to either `subdirectory` or `subdomain` to create the site as the appropriate type of Multisite installation.
 
 ### Export a sites Kana config automatically
 
