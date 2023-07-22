@@ -11,14 +11,15 @@ import (
 )
 
 type StartFlags struct {
-	Xdebug   bool
-	WPDebug  bool
-	Mailpit  bool
-	Local    bool
-	IsTheme  bool
-	IsPlugin bool
-	SSL      bool
-	Activate bool
+	Xdebug    bool
+	WPDebug   bool
+	Mailpit   bool
+	Local     bool
+	IsTheme   bool
+	IsPlugin  bool
+	SSL       bool
+	Activate  bool
+	Multisite string
 }
 
 type LocalSettings struct {

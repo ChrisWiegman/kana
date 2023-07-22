@@ -24,6 +24,10 @@ func newStartCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra
 				consoleOutput.Error(err)
 			}
 
+			fmt.Println(startFlags)
+			fmt.Println(startFlags.Multisite)
+			os.Exit(0)
+
 			// Check that the site is already running and show an error if it is.
 			if kanaSite.IsSiteRunning() {
 				consoleOutput.Error(fmt.Errorf("the site is already running. Please stop your site before running the start command"))
@@ -77,6 +81,8 @@ func newStartCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra
 		"l",
 		false,
 		"Installs the WordPress files in your current path at ./wordpress instead of the global app path.")
+	cmd.Flags().StringVarP(&startFlags.Multisite, "multisite", "u", "none", "Creates your new site as a multisite installation.")
+	cmd.Flags().Lookup("network").NoOptDefVal = "subdomain"
 
 	return cmd
 }
