@@ -28,6 +28,7 @@ func (s *Settings) LoadGlobalSettings() error {
 	s.ImageUpdateDays = globalViperConfig.GetInt("imageUpdateDays")
 	s.Activate = globalViperConfig.GetBool("activate")
 	s.DatabaseClient = globalViperConfig.GetString("databaseClient")
+	s.Multisite = globalViperConfig.GetString("multisite")
 
 	return err
 }
@@ -50,6 +51,7 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
 	globalSettings.SetDefault("admin.username", adminUsername)
 	globalSettings.SetDefault("admin.password", adminPassword)
 	globalSettings.SetDefault("admin.email", adminEmail)
+	globalSettings.SetDefault("multisite", multisite)
 
 	globalSettings.SetConfigName("kana")
 	globalSettings.SetConfigType("json")
@@ -92,6 +94,12 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
 	if !isValidString(globalSettings.GetString("databaseClient"), validDatabaseClients) {
 		changeConfig = true
 		globalSettings.Set("databaseClient", databaseClient)
+	}
+
+	// Reset default multisite type if there's an invalid type in the config file
+	if !isValidString(globalSettings.GetString("multisite"), validMultisiteTypes) {
+		changeConfig = true
+		globalSettings.Set("multisite", multisite)
 	}
 
 	if changeConfig {

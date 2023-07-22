@@ -77,7 +77,7 @@ func (s *Site) ExportSiteConfig(consoleOutput *console.Console) error {
 		localSettings.SSL = true
 	}
 
-	return s.Settings.WriteLocalSettings(localSettings)
+	return s.Settings.WriteLocalSettings(&localSettings)
 }
 
 // GetSiteList Returns a list of all Kana sites, their location and whether they're running

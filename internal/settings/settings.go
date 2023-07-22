@@ -30,6 +30,7 @@ var (
 	imageUpdateDays  = 1
 	activate         = true
 	databaseClient   = "phpmyadmin"
+	multisite        = "none"
 )
 
 // Default permissions for all new files and folders
@@ -52,6 +53,7 @@ type Settings struct {
 	URL, Protocol                                  string
 	Type                                           string
 	DatabaseClient                                 string
+	Multisite                                      string
 	Plugins                                        []string
 	global                                         *viper.Viper
 	local                                          *viper.Viper
@@ -78,6 +80,11 @@ var validTypes = []string{
 var validDatabaseClients = []string{
 	"phpmyadmin",
 	"tableplus",
+}
+
+var validMultisiteTypes = []string{
+	"none",
+	"subdomain",
 }
 
 func NewSettings() (*Settings, error) {

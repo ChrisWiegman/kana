@@ -24,7 +24,7 @@ type StartFlags struct {
 
 type LocalSettings struct {
 	Local, Mailpit, Xdebug, SSL, WPDebug, Activate bool
-	Type, DatabaseClient                           string
+	Type, DatabaseClient, Multisite                string
 	Plugins                                        []string
 }
 
@@ -61,6 +61,7 @@ func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 	s.Plugins = localViper.GetStringSlice("plugins")
 	s.SSL = localViper.GetBool("ssl")
 	s.Activate = localViper.GetBool("activate")
+	s.Multisite = localViper.GetString("multisite")
 
 	return isSite, nil
 }
@@ -72,6 +73,13 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 	// Don't run this on commands that wouldn't possibly use it.
 	if cmd.Use == "config" || cmd.Use == "version" || cmd.Use == "help" {
 		return isSite, nil
+	}
+
+	if cmd.Flags().Lookup("multisite").Changed {
+		multisiteValue, err := cmd.Flags().GetString("multisite")
+		if !isValidString(multisiteValue, validMultisiteTypes) || err != nil {
+			return isSite, fmt.Errorf("the multisite type, %s, is not a valid type. You must use either `none` or `subdomain`", multisiteValue)
+		}
 	}
 
 	// By default the siteLink should be the working directory (assume it's linked)
@@ -133,13 +141,17 @@ func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
 		s.Type = "theme"
 	}
 
+	if cmd.Flags().Lookup("multisite").Changed {
+		s.Multisite = flags.Multisite
+	}
+
 	if cmd.Flags().Lookup("activate").Changed {
 		s.Activate = flags.Activate
 	}
 }
 
 // WriteLocalSettings Writes all appropriate local settings to the local config file
-func (s *Settings) WriteLocalSettings(localSettings LocalSettings) error {
+func (s *Settings) WriteLocalSettings(localSettings *LocalSettings) error {
 	s.local.Set("local", localSettings.Local)
 	s.local.Set("type", localSettings.Type)
 	s.local.Set("xdebug", localSettings.Xdebug)
@@ -149,6 +161,7 @@ func (s *Settings) WriteLocalSettings(localSettings LocalSettings) error {
 	s.local.Set("wpdebug", localSettings.WPDebug)
 	s.local.Set("activate", localSettings.Activate)
 	s.local.Set("databaseClient", localSettings.DatabaseClient)
+	s.local.Set("multisite", localSettings.Multisite)
 
 	if _, err := os.Stat(path.Join(s.WorkingDirectory, ".kana.json")); os.IsNotExist(err) {
 		return s.local.SafeWriteConfig()
@@ -180,6 +193,7 @@ func (s *Settings) loadlocalViper() (*viper.Viper, error) {
 	localSettings.SetDefault("ssl", s.SSL)
 	localSettings.SetDefault("activate", s.Activate)
 	localSettings.SetDefault("databaseClient", s.DatabaseClient)
+	localSettings.SetDefault("multisite", s.Multisite)
 
 	localSettings.SetConfigName(".kana")
 	localSettings.SetConfigType("json")
