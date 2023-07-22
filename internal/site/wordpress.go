@@ -336,14 +336,24 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 	if err != nil || code != 0 {
 		consoleOutput.Println("Finishing WordPress setup.")
 
+		installCommand := "install"
+
+		if s.Settings.Multisite == "subdomain" {
+			installCommand = "multisite-install"
+		}
+
 		setupCommand := []string{
 			"core",
-			"install",
+			installCommand,
 			fmt.Sprintf("--url=%s", s.Settings.URL),
 			fmt.Sprintf("--title=Kana Development %s: %s", s.Settings.Type, s.Settings.Name),
 			fmt.Sprintf("--admin_user=%s", s.Settings.AdminUsername),
 			fmt.Sprintf("--admin_password=%s", s.Settings.AdminPassword),
 			fmt.Sprintf("--admin_email=%s", s.Settings.AdminEmail),
+		}
+
+		if installCommand == "multisite-install" {
+			setupCommand = append(setupCommand, "--subdomains")
 		}
 
 		var output string
