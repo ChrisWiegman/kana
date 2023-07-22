@@ -344,9 +344,11 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 			fmt.Sprintf("--admin_email=%s", s.Settings.AdminEmail),
 		}
 
-		code, _, err = s.RunWPCli(setupCommand, consoleOutput)
+		var output string
+
+		code, output, err = s.RunWPCli(setupCommand, consoleOutput)
 		if err != nil || code != 0 {
-			return fmt.Errorf("installation of WordPress failed: %s", err.Error())
+			return fmt.Errorf("installation of WordPress failed: %s", output)
 		}
 	} else if strings.TrimSpace(checkURL) != s.Settings.URL {
 		consoleOutput.Println("The SSL config has changed. Updating the site URL accordingly.")
