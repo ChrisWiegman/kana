@@ -9,6 +9,7 @@ import (
 
 	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/docker"
+	"github.com/ChrisWiegman/kana-cli/internal/settings"
 
 	"github.com/docker/docker/api/types/mount"
 )
@@ -466,7 +467,9 @@ func (s *Site) writeHtaccess(consoleOutput *console.Console) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(appDir)
+
+	_, filePerms := settings.GetDefaultPermissions()
 	htaccessContents := s.Settings.GetHtaccess()
-	return os.WriteFile(path.Join(appDir, ".htaccess"), []byte(htaccessContents), os.FileMode(0644))
+
+	return os.WriteFile(path.Join(appDir, ".htaccess"), []byte(htaccessContents), os.FileMode(filePerms))
 }

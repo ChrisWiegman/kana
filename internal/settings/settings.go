@@ -115,3 +115,8 @@ func NewSettings() (*Settings, error) {
 
 	return kanaSettings, err
 }
+
+// GetDefaultPermissions returns the default directory permissions and the default file permissions
+func GetDefaultPermissions() (dirPerms, filePerms int) {
+	return defaultDirPermissions, defaultFilePermissions
+}
