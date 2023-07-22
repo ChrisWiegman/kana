@@ -134,7 +134,7 @@ func (s *Settings) validateSetting(setting, value string) error { //nolint:gocyc
 		}
 	case "multisite":
 		if !isValidString(value, validMultisiteTypes) {
-			return fmt.Errorf("the multisite type, %s, is not a valid type. You must use either `none` or `subdomain`", setting)
+			return fmt.Errorf("the multisite type, %s, is not a valid type. You must use either `none`, `subdomain` or `subdirectory`", setting)
 		}
 	default:
 		err := validate.Var(value, "boolean")

@@ -79,7 +79,8 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 	if isStartCommand && cmd.Flags().Lookup("multisite").Changed {
 		multisiteValue, err := cmd.Flags().GetString("multisite")
 		if !isValidString(multisiteValue, validMultisiteTypes) || err != nil {
-			return isSite, fmt.Errorf("the multisite type, %s, is not a valid type. You must use either `none` or `subdomain`", multisiteValue)
+			return isSite,
+				fmt.Errorf("the multisite type, %s, is not a valid type. You must use either `none`, `subdomain` or `subdirectory`", multisiteValue)
 		}
 	}
 

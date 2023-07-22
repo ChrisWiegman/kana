@@ -338,7 +338,7 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 
 		installCommand := "install"
 
-		if s.Settings.Multisite == "subdomain" {
+		if s.Settings.Multisite != "none" {
 			installCommand = "multisite-install"
 		}
 
@@ -353,21 +353,23 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 		}
 
 		if installCommand == "multisite-install" {
-			setupCommand = append(setupCommand, "--subdomains")
+			if s.Settings.Multisite == "subdomain" {
+				setupCommand = append(setupCommand, "--subdomains")
+			}
+
+			err = s.writeHtaccess(consoleOutput)
+			if err != nil {
+				return err
+			}
 		}
+
+		fmt.Println(setupCommand)
 
 		var output string
 
 		code, output, err = s.RunWPCli(setupCommand, consoleOutput)
 		if err != nil || code != 0 {
 			return fmt.Errorf("installation of WordPress failed: %s", output)
-		}
-
-		if installCommand == "multisite-install" {
-			err = s.writeHtaccess(consoleOutput)
-			if err != nil {
-				return err
-			}
 		}
 	} else if strings.TrimSpace(checkURL) != s.Settings.URL {
 		consoleOutput.Println("The SSL config has changed. Updating the site URL accordingly.")

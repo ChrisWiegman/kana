@@ -85,6 +85,7 @@ var validDatabaseClients = []string{
 var validMultisiteTypes = []string{
 	"none",
 	"subdomain",
+	"subdirectory",
 }
 
 func NewSettings() (*Settings, error) {
