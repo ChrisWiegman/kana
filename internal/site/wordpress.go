@@ -363,8 +363,6 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 			}
 		}
 
-		fmt.Println(setupCommand)
-
 		var output string
 
 		code, output, err = s.RunWPCli(setupCommand, consoleOutput)
