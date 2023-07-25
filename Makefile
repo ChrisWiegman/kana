@@ -3,7 +3,7 @@ VERSION      := $(shell git describe --tags || echo "0.0.1")
 TIMESTAMP    := $(shell date -u '+%Y-%m-%d_%I:%M:%S%p')
 ARGS          = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
 MOBY_VERSION  = 24.0.4
-GO_VERSION    = 1.20.5
+GO_VERSION    =
 
 %:
 	@:
