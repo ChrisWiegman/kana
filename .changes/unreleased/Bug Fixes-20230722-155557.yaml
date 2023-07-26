@@ -1,3 +1,0 @@
-kind: Bug Fixes
-body: Ensure the proper error message is displayed when a CLI command fails
-time: 2023-07-22T15:55:57.887618384Z
