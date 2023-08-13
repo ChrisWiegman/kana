@@ -1,0 +1,13 @@
+{
+    "cSpell.ignoreWords": [
+        "gocyclo",
+        "nolint",
+        "mailpit",
+        "Mailpit",
+        "multisite",
+        "Multisite",
+        "wpdebug",
+        "xdebug",
+        "Xdebug"
+    ]
+}
