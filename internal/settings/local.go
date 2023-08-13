@@ -44,7 +44,7 @@ func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 		return isSite, err
 	}
 
-	localViper, err := s.loadlocalViper()
+	localViper, err := s.loadLocalViper()
 	if err != nil {
 		return isSite, err
 	}
@@ -180,8 +180,8 @@ func (s *Settings) getProtocol() string {
 	return "http"
 }
 
-// loadSiteConfig Get the config items that can be overridden locally with a .kana.json file.
-func (s *Settings) loadlocalViper() (*viper.Viper, error) {
+// loadLocalViper Get the config items that can be overridden locally with a .kana.json file.
+func (s *Settings) loadLocalViper() (*viper.Viper, error) {
 	localSettings := viper.New()
 
 	localSettings.SetDefault("php", s.PHP)
