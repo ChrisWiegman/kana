@@ -49,10 +49,6 @@ func newListCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.
 			}
 
 			t.Render()
-
-			if len(sites) == 0 {
-				consoleOutput.Println("You have not created any sites with Kana yet. Use `kana start` to create a site.")
-			}
 		},
 		Args: cobra.NoArgs,
 	}
