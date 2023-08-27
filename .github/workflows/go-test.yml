@@ -34,5 +34,9 @@ jobs:
         with:
           go-version: "1.21"
 
+      - name: Test Contexts
+        run: |
+          docker context ls --format=json
+
       - name: Test
         uses: robherley/go-test-action@v0.1.0
