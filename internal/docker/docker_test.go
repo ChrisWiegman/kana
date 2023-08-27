@@ -66,16 +66,9 @@ func TestEnsureDockerIsAvailable(t *testing.T) {
 		execCommand = mocks.MockExecCommand
 		mocks.MockedExitStatus = test.exitStatus
 
-		getContextFunction = mockGetContextFunction
-
 		err := ensureDockerIsAvailable(consoleOutput, apiClient)
 		assert.Equal(t, test.expectedResult, err, test.name)
 
 		execCommand = exec.Command
-		getContextFunction = getCurrentDockerContext
 	}
-}
-
-func mockGetContextFunction() (DockerContext, error) {
-	return DockerContext{}, nil
 }

@@ -20,7 +20,6 @@ import (
 )
 
 var execCommand = exec.Command
-var getContextFunction = getCurrentDockerContext
 
 var maxRetries = 12
 var sleepDuration = 5
@@ -34,17 +33,16 @@ type DockerClient struct {
 
 type DockerContext struct {
 	Current        bool   `json:"Current"`
-	Description    string `json:"Description"`
 	DockerEndpoint string `json:"DockerEndpoint"`
 }
 
 func NewDockerClient(consoleOutput *console.Console, appDirectory string) (dockerClient *DockerClient, err error) {
 	dockerClient = new(DockerClient)
 
-	var dockerContext DockerContext
+	var dockerEndpoint string
 	useDefaultHost := false
 
-	dockerContext, err = getContextFunction()
+	dockerEndpoint, err = getCurrentDockerEndpoint()
 	if err != nil {
 		if err.Error() == "docker context was not found" {
 			useDefaultHost = true
@@ -56,8 +54,9 @@ func NewDockerClient(consoleOutput *console.Console, appDirectory string) (docke
 	if useDefaultHost {
 		dockerClient.apiClient, err = client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	} else {
-		dockerClient.apiClient, err = client.NewClientWithOpts(client.WithHost(dockerContext.DockerEndpoint), client.WithAPIVersionNegotiation())
+		dockerClient.apiClient, err = client.NewClientWithOpts(client.WithHost(dockerEndpoint), client.WithAPIVersionNegotiation())
 	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +71,7 @@ func NewDockerClient(consoleOutput *console.Console, appDirectory string) (docke
 	return dockerClient, nil
 }
 
-func getCurrentDockerContext() (DockerContext, error) {
+func getCurrentDockerEndpoint() (string, error) {
 	dockerContexts := execCommand(
 		"docker",
 		"context",
@@ -85,7 +84,7 @@ func getCurrentDockerContext() (DockerContext, error) {
 
 	err := dockerContexts.Run()
 	if err != nil {
-		return DockerContext{}, err
+		return "", err
 	}
 
 	var contexts []DockerContext
@@ -96,19 +95,19 @@ func getCurrentDockerContext() (DockerContext, error) {
 
 		err = json.Unmarshal(out.Bytes(), &singleContext)
 		if err != nil {
-			return DockerContext{}, err
+			return "", err
 		}
 
-		return singleContext, nil
+		return singleContext.DockerEndpoint, nil
 	}
 
 	for _, context := range contexts {
 		if context.Current {
-			return context, nil
+			return context.DockerEndpoint, nil
 		}
 	}
 
-	return DockerContext{}, fmt.Errorf("docker context was not found")
+	return "", fmt.Errorf("docker context was not found")
 }
 
 func ensureDockerIsAvailable(consoleOutput *console.Console, apiClient APIClient) error {
