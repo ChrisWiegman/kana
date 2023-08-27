@@ -5,7 +5,9 @@ package docker
  **/
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"os/exec"
 	"runtime"
@@ -29,10 +31,23 @@ type DockerClient struct {
 	checkedImages   []string
 }
 
+type DockerContext struct {
+	Current        bool   `json:"Current"`
+	Description    string `json:"Description"`
+	DockerEndpoint string `json:"DockerEndpoint"`
+}
+
 func NewDockerClient(consoleOutput *console.Console, appDirectory string) (dockerClient *DockerClient, err error) {
 	dockerClient = new(DockerClient)
 
-	dockerClient.apiClient, err = client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	var dockerContext DockerContext
+
+	dockerContext, err = getCurrentDockerContext()
+	if err != nil {
+		return nil, err
+	}
+
+	dockerClient.apiClient, err = client.NewClientWithOpts(client.WithHost(dockerContext.DockerEndpoint), client.WithAPIVersionNegotiation())
 	if err != nil {
 		return nil, err
 	}
@@ -45,6 +60,38 @@ func NewDockerClient(consoleOutput *console.Console, appDirectory string) (docke
 	dockerClient.imageUpdateData, _ = dockerClient.loadImageUpdateData(appDirectory)
 
 	return dockerClient, nil
+}
+
+func getCurrentDockerContext() (DockerContext, error) {
+	dockerContexts := execCommand(
+		"docker",
+		"context",
+		"ls",
+		"--format",
+		"json")
+
+	var out bytes.Buffer
+	dockerContexts.Stdout = &out
+
+	err := dockerContexts.Run()
+	if err != nil {
+		return DockerContext{}, err
+	}
+
+	var contexts []DockerContext
+
+	err = json.Unmarshal(out.Bytes(), &contexts)
+	if err != nil {
+		return DockerContext{}, err
+	}
+
+	for _, context := range contexts {
+		if context.Current {
+			return context, nil
+		}
+	}
+
+	return DockerContext{}, fmt.Errorf("docker context was not found")
 }
 
 func ensureDockerIsAvailable(consoleOutput *console.Console, apiClient APIClient) error {
