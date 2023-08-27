@@ -92,7 +92,14 @@ func getCurrentDockerContext() (DockerContext, error) {
 
 	err = json.Unmarshal(out.Bytes(), &contexts)
 	if err != nil {
-		return DockerContext{}, err
+		var singleContext DockerContext
+
+		err = json.Unmarshal(out.Bytes(), &singleContext)
+		if err != nil {
+			return DockerContext{}, err
+		}
+
+		return singleContext, nil
 	}
 
 	for _, context := range contexts {
