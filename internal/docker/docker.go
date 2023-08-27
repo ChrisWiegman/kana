@@ -20,6 +20,7 @@ import (
 )
 
 var execCommand = exec.Command
+var getContextFunction = getCurrentDockerContext
 
 var maxRetries = 12
 var sleepDuration = 5
@@ -41,13 +42,22 @@ func NewDockerClient(consoleOutput *console.Console, appDirectory string) (docke
 	dockerClient = new(DockerClient)
 
 	var dockerContext DockerContext
+	useDefaultHost := false
 
-	dockerContext, err = getCurrentDockerContext()
+	dockerContext, err = getContextFunction()
 	if err != nil {
-		return nil, err
+		if err.Error() == "docker context was not found" {
+			useDefaultHost = true
+		} else {
+			return nil, err
+		}
 	}
 
-	dockerClient.apiClient, err = client.NewClientWithOpts(client.WithHost(dockerContext.DockerEndpoint), client.WithAPIVersionNegotiation())
+	if useDefaultHost {
+		dockerClient.apiClient, err = client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	} else {
+		dockerClient.apiClient, err = client.NewClientWithOpts(client.WithHost(dockerContext.DockerEndpoint), client.WithAPIVersionNegotiation())
+	}
 	if err != nil {
 		return nil, err
 	}
