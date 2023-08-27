@@ -40,22 +40,13 @@ func NewDockerClient(consoleOutput *console.Console, appDirectory string) (docke
 	dockerClient = new(DockerClient)
 
 	var dockerEndpoint string
-	useDefaultHost := false
 
 	dockerEndpoint, err = getCurrentDockerEndpoint()
-	if err != nil {
-		if err.Error() == "docker context was not found" {
-			useDefaultHost = true
-		} else {
-			return nil, err
-		}
+	if err != nil && err.Error() != "docker context was not found. using default" {
+		return nil, err
 	}
 
-	if useDefaultHost {
-		dockerClient.apiClient, err = client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-	} else {
-		dockerClient.apiClient, err = client.NewClientWithOpts(client.WithHost(dockerEndpoint), client.WithAPIVersionNegotiation())
-	}
+	dockerClient.apiClient, err = client.NewClientWithOpts(client.WithHost(dockerEndpoint), client.WithAPIVersionNegotiation())
 
 	if err != nil {
 		return nil, err
@@ -84,7 +75,7 @@ func getCurrentDockerEndpoint() (string, error) {
 
 	err := dockerContexts.Run()
 	if err != nil {
-		return "", err
+		return client.DefaultDockerHost, err
 	}
 
 	var contexts []DockerContext
@@ -95,7 +86,7 @@ func getCurrentDockerEndpoint() (string, error) {
 
 		err = json.Unmarshal(out.Bytes(), &singleContext)
 		if err != nil {
-			return "", err
+			return client.DefaultDockerHost, err
 		}
 
 		return singleContext.DockerEndpoint, nil
@@ -107,7 +98,7 @@ func getCurrentDockerEndpoint() (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf("docker context was not found")
+	return client.DefaultDockerHost, fmt.Errorf("docker context was not found. using default")
 }
 
 func ensureDockerIsAvailable(consoleOutput *console.Console, apiClient APIClient) error {
