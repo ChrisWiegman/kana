@@ -32,7 +32,7 @@ type DockerClient struct {
 func NewDockerClient(consoleOutput *console.Console, appDirectory string) (dockerClient *DockerClient, err error) {
 	dockerClient = new(DockerClient)
 
-	dockerClient.apiClient, err = client.NewClientWithOpts(client.FromEnv)
+	dockerClient.apiClient, err = client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		return nil, err
 	}
