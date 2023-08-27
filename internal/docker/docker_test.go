@@ -55,18 +55,18 @@ func TestEnsureDockerIsAvailable(t *testing.T) {
 			continue
 		}
 
-		moby := new(mocks.APIClient)
+		apiClient := new(mocks.APIClient)
 
 		if test.exitStatus == 0 {
-			moby.On("ContainerList", context.Background(), types.ContainerListOptions{}).Return([]types.Container{}, test.dockerOutput).Once()
+			apiClient.On("ContainerList", context.Background(), types.ContainerListOptions{}).Return([]types.Container{}, test.dockerOutput).Once()
 		} else {
-			moby.On("ContainerList", context.Background(), types.ContainerListOptions{}).Return([]types.Container{}, fmt.Errorf(""))
+			apiClient.On("ContainerList", context.Background(), types.ContainerListOptions{}).Return([]types.Container{}, fmt.Errorf(""))
 		}
 
 		execCommand = mocks.MockExecCommand
 		mocks.MockedExitStatus = test.exitStatus
 
-		err := ensureDockerIsAvailable(consoleOutput, moby)
+		err := ensureDockerIsAvailable(consoleOutput, apiClient)
 		assert.Equal(t, test.expectedResult, err, test.name)
 
 		execCommand = exec.Command

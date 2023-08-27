@@ -67,8 +67,8 @@ func (d *DockerClient) RemoveNetwork(name string) (removed bool, err error) {
 	return true, d.apiClient.NetworkRemove(context.Background(), network.ID)
 }
 
-func findNetworkByID(id string, moby APIClient) (found bool, network types.NetworkResource, err error) {
-	networks, err := moby.NetworkList(context.Background(), types.NetworkListOptions{})
+func findNetworkByID(id string, apiClient APIClient) (found bool, network types.NetworkResource, err error) {
+	networks, err := apiClient.NetworkList(context.Background(), types.NetworkListOptions{})
 
 	if err != nil {
 		return false, types.NetworkResource{}, err
@@ -83,8 +83,8 @@ func findNetworkByID(id string, moby APIClient) (found bool, network types.Netwo
 	return false, types.NetworkResource{}, nil
 }
 
-func findNetworkByName(name string, moby APIClient) (found bool, network types.NetworkResource, err error) {
-	networks, err := moby.NetworkList(context.Background(), types.NetworkListOptions{})
+func findNetworkByName(name string, apiClient APIClient) (found bool, network types.NetworkResource, err error) {
+	networks, err := apiClient.NetworkList(context.Background(), types.NetworkListOptions{})
 
 	if err != nil {
 		return false, types.NetworkResource{}, err
