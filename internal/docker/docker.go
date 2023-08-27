@@ -24,7 +24,7 @@ var sleepDuration = 5
 
 // DockerClient is an interface the must be implemented to provide Docker services through this package.
 type DockerClient struct {
-	moby            APIClient
+	apiClient       APIClient
 	imageUpdateData ViperClient
 	checkedImages   []string
 }
@@ -32,12 +32,12 @@ type DockerClient struct {
 func NewDockerClient(consoleOutput *console.Console, appDirectory string) (dockerClient *DockerClient, err error) {
 	dockerClient = new(DockerClient)
 
-	dockerClient.moby, err = client.NewClientWithOpts(client.FromEnv)
+	dockerClient.apiClient, err = client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		return nil, err
 	}
 
-	err = ensureDockerIsAvailable(consoleOutput, dockerClient.moby)
+	err = ensureDockerIsAvailable(consoleOutput, dockerClient.apiClient)
 	if err != nil {
 		return nil, err
 	}

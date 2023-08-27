@@ -22,7 +22,7 @@ type portConfig struct {
 }
 
 func (d *DockerClient) EnsureNetwork(name string) (created bool, network types.NetworkResource, err error) {
-	hasNetwork, network, err := findNetworkByName(name, d.moby)
+	hasNetwork, network, err := findNetworkByName(name, d.apiClient)
 
 	if err != nil {
 		return false, types.NetworkResource{}, err
@@ -32,7 +32,7 @@ func (d *DockerClient) EnsureNetwork(name string) (created bool, network types.N
 		return false, network, nil
 	}
 
-	networkCreateResults, err := d.moby.NetworkCreate(context.Background(), name, types.NetworkCreate{
+	networkCreateResults, err := d.apiClient.NetworkCreate(context.Background(), name, types.NetworkCreate{
 		Driver: "bridge",
 	})
 
@@ -40,7 +40,7 @@ func (d *DockerClient) EnsureNetwork(name string) (created bool, network types.N
 		return false, types.NetworkResource{}, err
 	}
 
-	hasNetwork, network, err = findNetworkByID(networkCreateResults.ID, d.moby)
+	hasNetwork, network, err = findNetworkByID(networkCreateResults.ID, d.apiClient)
 
 	if err != nil {
 		return false, types.NetworkResource{}, err
@@ -54,7 +54,7 @@ func (d *DockerClient) EnsureNetwork(name string) (created bool, network types.N
 }
 
 func (d *DockerClient) RemoveNetwork(name string) (removed bool, err error) {
-	hasNetwork, network, err := findNetworkByName(name, d.moby)
+	hasNetwork, network, err := findNetworkByName(name, d.apiClient)
 
 	if err != nil {
 		return false, err
@@ -64,7 +64,7 @@ func (d *DockerClient) RemoveNetwork(name string) (removed bool, err error) {
 		return false, nil
 	}
 
-	return true, d.moby.NetworkRemove(context.Background(), network.ID)
+	return true, d.apiClient.NetworkRemove(context.Background(), network.ID)
 }
 
 func findNetworkByID(id string, moby APIClient) (found bool, network types.NetworkResource, err error) {

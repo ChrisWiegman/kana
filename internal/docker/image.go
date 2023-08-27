@@ -38,7 +38,7 @@ func (d *DockerClient) EnsureImage(imageName string, updateDays int, consoleOutp
 func (d *DockerClient) maybeUpdateImage(imageName string, updateDays int, suppressOutput bool) error {
 	lastUpdated := d.imageUpdateData.GetTime(imageName)
 
-	imageList, err := d.moby.ImageList(context.Background(), types.ImageListOptions{})
+	imageList, err := d.apiClient.ImageList(context.Background(), types.ImageListOptions{})
 	if err != nil {
 		return err
 	}
@@ -64,7 +64,7 @@ func (d *DockerClient) maybeUpdateImage(imageName string, updateDays int, suppre
 
 	// Pull the image or a newer image if needed
 	if !hasImage || checkForUpdate {
-		reader, err := d.moby.ImagePull(context.Background(), imageName, types.ImagePullOptions{})
+		reader, err := d.apiClient.ImagePull(context.Background(), imageName, types.ImagePullOptions{})
 		if err != nil {
 			return err
 		}
@@ -97,7 +97,7 @@ func (d *DockerClient) maybeUpdateImage(imageName string, updateDays int, suppre
 }
 
 func (d *DockerClient) removeImage(image string) (removed bool, err error) {
-	removedResponse, err := d.moby.ImageRemove(context.Background(), image, types.ImageRemoveOptions{})
+	removedResponse, err := d.apiClient.ImageRemove(context.Background(), image, types.ImageRemoveOptions{})
 
 	if err != nil {
 		if !strings.Contains(err.Error(), "No such image:") {

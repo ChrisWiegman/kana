@@ -61,7 +61,7 @@ func (d *DockerClient) ContainerExec(containerName string, rootUser bool, comman
 		execConfig.User = "root"
 	}
 
-	containerResponse, err := d.moby.ContainerExecCreate(context.Background(), containerID, execConfig)
+	containerResponse, err := d.apiClient.ContainerExecCreate(context.Background(), containerID, execConfig)
 	if err != nil {
 		return ExecResult{}, err
 	}
@@ -69,7 +69,7 @@ func (d *DockerClient) ContainerExec(containerName string, rootUser bool, comman
 	execID := containerResponse.ID
 
 	// run it, with stdout/stderr attached
-	aresp, err := d.moby.ContainerExecAttach(context.Background(), execID, types.ExecStartCheck{})
+	aresp, err := d.apiClient.ContainerExecAttach(context.Background(), execID, types.ExecStartCheck{})
 	if err != nil {
 		return ExecResult{}, err
 	}
@@ -98,7 +98,7 @@ func (d *DockerClient) ContainerExec(containerName string, rootUser bool, comman
 	}
 
 	// get the exit code
-	iresp, err := d.moby.ContainerExecInspect(context.Background(), execID)
+	iresp, err := d.apiClient.ContainerExecInspect(context.Background(), execID)
 	if err != nil {
 		return ExecResult{}, err
 	}
@@ -118,14 +118,14 @@ func (d *DockerClient) ContainerGetMounts(containerName string) []types.MountPoi
 		return []types.MountPoint{}
 	}
 
-	results, _ := d.moby.ContainerInspect(context.Background(), containerID)
+	results, _ := d.apiClient.ContainerInspect(context.Background(), containerID)
 
 	return results.Mounts
 }
 
 // containerIsRunning Checks if a given container is running by name
 func (d *DockerClient) containerIsRunning(containerName string) (id string, isRunning bool) {
-	containers, err := d.moby.ContainerList(context.Background(), types.ContainerListOptions{})
+	containers, err := d.apiClient.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
 		return "", false
 	}
@@ -156,7 +156,7 @@ func (d *DockerClient) ContainerList(site string) ([]types.Container, error) {
 		Filters: f,
 	}
 
-	containers, err := d.moby.ContainerList(context.Background(), options)
+	containers, err := d.apiClient.ContainerList(context.Background(), options)
 
 	return containers, err
 }
@@ -165,7 +165,7 @@ func (d *DockerClient) containerLog(id string) (result string, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(sleepDuration)*time.Second)
 	defer cancel()
 
-	reader, err := d.moby.ContainerLogs(ctx, id, types.ContainerLogsOptions{
+	reader, err := d.apiClient.ContainerLogs(ctx, id, types.ContainerLogsOptions{
 		ShowStdout: true,
 		ShowStderr: true})
 
@@ -188,12 +188,12 @@ func (d *DockerClient) ContainerRestart(containerName string) (bool, error) {
 		return true, nil
 	}
 
-	err := d.moby.ContainerStop(context.Background(), containerID, container.StopOptions{})
+	err := d.apiClient.ContainerStop(context.Background(), containerID, container.StopOptions{})
 	if err != nil {
 		return false, err
 	}
 
-	err = d.moby.ContainerStart(context.Background(), containerID, types.ContainerStartOptions{})
+	err = d.apiClient.ContainerStart(context.Background(), containerID, types.ContainerStartOptions{})
 	if err != nil {
 		return false, err
 	}
@@ -249,12 +249,12 @@ func (d *DockerClient) ContainerRun(config *ContainerConfig, randomPorts, localU
 		containerConfig.User = fmt.Sprintf("%s:%s", currentUser.Uid, currentUser.Gid)
 	}
 
-	resp, err := d.moby.ContainerCreate(context.Background(), containerConfig, &hostConfig, &networkConfig, nil, config.Name)
+	resp, err := d.apiClient.ContainerCreate(context.Background(), containerConfig, &hostConfig, &networkConfig, nil, config.Name)
 	if err != nil {
 		return "", err
 	}
 
-	err = d.moby.ContainerStart(context.Background(), resp.ID, types.ContainerStartOptions{})
+	err = d.apiClient.ContainerStart(context.Background(), resp.ID, types.ContainerStartOptions{})
 	if err != nil {
 		return "", err
 	}
@@ -278,7 +278,7 @@ func (d *DockerClient) ContainerRunAndClean(config *ContainerConfig) (statusCode
 	// Get the log
 	body, _ = d.containerLog(id)
 
-	err = d.moby.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{})
+	err = d.apiClient.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{})
 	return statusCode, body, err
 }
 
@@ -288,12 +288,12 @@ func (d *DockerClient) ContainerStop(containerName string) (bool, error) {
 		return true, nil
 	}
 
-	err := d.moby.ContainerStop(context.Background(), containerID, container.StopOptions{})
+	err := d.apiClient.ContainerStop(context.Background(), containerID, container.StopOptions{})
 	if err != nil {
 		return false, err
 	}
 
-	err = d.moby.ContainerRemove(context.Background(), containerID, types.ContainerRemoveOptions{})
+	err = d.apiClient.ContainerRemove(context.Background(), containerID, types.ContainerRemoveOptions{})
 	if err != nil {
 		return false, err
 	}
@@ -302,7 +302,7 @@ func (d *DockerClient) ContainerStop(containerName string) (bool, error) {
 }
 
 func (d *DockerClient) containerWait(id string) (state int64, err error) {
-	containerResult, errorCode := d.moby.ContainerWait(context.Background(), id, "")
+	containerResult, errorCode := d.apiClient.ContainerWait(context.Background(), id, "")
 
 	select {
 	case err := <-errorCode:

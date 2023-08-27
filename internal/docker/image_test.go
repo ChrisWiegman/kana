@@ -20,7 +20,7 @@ func TestEnsureImage(t *testing.T) {
 	d, err := NewDockerClient(consoleOutput, "")
 	assert.NoError(t, err)
 
-	moby := new(mocks.APIClient)
+	apiClient := new(mocks.APIClient)
 
 	readCloser := &mocks.ReadCloser{
 		ExpectedData: []byte(`{}`),
@@ -33,10 +33,10 @@ func TestEnsureImage(t *testing.T) {
 		}},
 	}
 
-	moby.On("ImagePull", mock.Anything, mock.Anything, mock.Anything).Return(readCloser, nil)
-	moby.On("ImageList", mock.Anything, mock.Anything).Return(imageList, nil)
+	apiClient.On("ImagePull", mock.Anything, mock.Anything, mock.Anything).Return(readCloser, nil)
+	apiClient.On("ImageList", mock.Anything, mock.Anything).Return(imageList, nil)
 
-	d.moby = moby
+	d.apiClient = apiClient
 
 	viper := new(mocks.ViperClient)
 	viper.On("ReadInConfig").Return(nil)
@@ -93,10 +93,10 @@ func TestRemoveImage(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		moby := new(mocks.APIClient)
-		moby.On("ImageRemove", mock.Anything, mock.Anything, mock.Anything).Return(test.imageDeleteResponse, test.imageRemoveError)
+		apiClient := new(mocks.APIClient)
+		apiClient.On("ImageRemove", mock.Anything, mock.Anything, mock.Anything).Return(test.imageDeleteResponse, test.imageRemoveError)
 
-		d.moby = moby
+		d.apiClient = apiClient
 
 		removed, err := d.removeImage("alpine")
 		assert.Equal(t, test.expectedError, err, test.name)
