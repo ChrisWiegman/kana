@@ -69,12 +69,12 @@ func (d *DockerClient) ContainerExec(containerName string, rootUser bool, comman
 	execID := containerResponse.ID
 
 	// run it, with stdout/stderr attached
-	aresp, err := d.apiClient.ContainerExecAttach(context.Background(), execID, types.ExecStartCheck{})
+	apiResponse, err := d.apiClient.ContainerExecAttach(context.Background(), execID, types.ExecStartCheck{})
 	if err != nil {
 		return ExecResult{}, err
 	}
 
-	defer aresp.Close()
+	defer apiResponse.Close()
 
 	// read the output
 	var outBuf, errBuf bytes.Buffer
@@ -82,7 +82,7 @@ func (d *DockerClient) ContainerExec(containerName string, rootUser bool, comman
 
 	go func() {
 		// StdCopy demultiplexes the stream into two buffers
-		_, err = stdcopy.StdCopy(&outBuf, &errBuf, aresp.Reader)
+		_, err = stdcopy.StdCopy(&outBuf, &errBuf, apiResponse.Reader)
 		outputDone <- err
 	}()
 
@@ -98,13 +98,13 @@ func (d *DockerClient) ContainerExec(containerName string, rootUser bool, comman
 	}
 
 	// get the exit code
-	iresp, err := d.apiClient.ContainerExecInspect(context.Background(), execID)
+	inspectResponse, err := d.apiClient.ContainerExecInspect(context.Background(), execID)
 	if err != nil {
 		return ExecResult{}, err
 	}
 
 	return ExecResult{
-			ExitCode: iresp.ExitCode,
+			ExitCode: inspectResponse.ExitCode,
 			StdOut:   outBuf.String(),
 			StdErr:   errBuf.String(),
 		},

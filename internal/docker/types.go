@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
-	containertypes "github.com/docker/docker/api/types/container"
-	networktypes "github.com/docker/docker/api/types/network"
+	containerTypes "github.com/docker/docker/api/types/container"
+	networkTypes "github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
 )
@@ -26,11 +26,11 @@ var _ APIClient = &client.Client{}
 type ContainerAPIClient interface {
 	ContainerCreate(
 		ctx context.Context,
-		config *containertypes.Config,
-		hostConfig *containertypes.HostConfig,
-		networkingConfig *networktypes.NetworkingConfig,
+		config *containerTypes.Config,
+		hostConfig *containerTypes.HostConfig,
+		networkingConfig *networkTypes.NetworkingConfig,
 		platform *specs.Platform,
-		containerName string) (containertypes.CreateResponse, error)
+		containerName string) (containerTypes.CreateResponse, error)
 	ContainerExecAttach(ctx context.Context, execID string, config types.ExecStartCheck) (types.HijackedResponse, error)
 	ContainerExecCreate(ctx context.Context, container string, config types.ExecConfig) (types.IDResponse, error)
 	ContainerExecInspect(ctx context.Context, execID string) (types.ContainerExecInspect, error)
@@ -39,11 +39,11 @@ type ContainerAPIClient interface {
 	ContainerLogs(ctx context.Context, container string, options types.ContainerLogsOptions) (io.ReadCloser, error)
 	ContainerRemove(ctx context.Context, container string, options types.ContainerRemoveOptions) error
 	ContainerStart(ctx context.Context, container string, options types.ContainerStartOptions) error
-	ContainerStop(ctx context.Context, name string, options containertypes.StopOptions) error
+	ContainerStop(ctx context.Context, name string, options containerTypes.StopOptions) error
 	ContainerWait(
 		ctx context.Context,
 		container string,
-		condition containertypes.WaitCondition) (<-chan containertypes.WaitResponse, <-chan error)
+		condition containerTypes.WaitCondition) (<-chan containerTypes.WaitResponse, <-chan error)
 }
 
 // ImageAPIClient defines API client methods for the images
