@@ -1,6 +1,7 @@
 package settings
 
 import (
+	"errors"
 	"path"
 
 	"github.com/spf13/viper"
@@ -59,8 +60,9 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
 
 	err := globalSettings.ReadInConfig()
 	if err != nil {
-		_, ok := err.(viper.ConfigFileNotFoundError)
-		if ok {
+		var configFileNotFoundError viper.ConfigFileNotFoundError
+
+		if errors.As(err, &configFileNotFoundError) {
 			err = globalSettings.SafeWriteConfig()
 			if err != nil {
 				return globalSettings, err

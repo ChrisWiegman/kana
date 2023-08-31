@@ -21,7 +21,7 @@ func newConfigCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobr
 			case 0:
 				kanaSite.Settings.ListSettings(consoleOutput)
 			case 1:
-				value, err := kanaSite.Settings.GetGlobalSetting(cmd, args)
+				value, err := kanaSite.Settings.GetGlobalSetting(args)
 				if err != nil {
 					consoleOutput.Error(err)
 				}
@@ -42,7 +42,7 @@ func newConfigCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobr
 					consoleOutput.Println(value)
 				}
 			case 2:
-				err := kanaSite.Settings.SetGlobalSetting(cmd, args)
+				err := kanaSite.Settings.SetGlobalSetting(args)
 				if err != nil {
 					consoleOutput.Error(err)
 				}

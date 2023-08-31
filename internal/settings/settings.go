@@ -39,7 +39,7 @@ var (
 	defaultFilePermissions = 0644
 )
 
-// Individual Settings for use throughout the app lifecycle
+// Settings Individual Settings for use throughout the app lifecycle
 type Settings struct {
 	Local, Xdebug, Mailpit, SSL, WPDebug, Activate bool
 	ImageUpdateDays                                int

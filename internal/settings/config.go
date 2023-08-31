@@ -10,11 +10,10 @@ import (
 
 	"github.com/aquasecurity/table"
 	"github.com/go-playground/validator/v10"
-	"github.com/spf13/cobra"
 )
 
 // GetGlobalSetting Retrieves a global setting for the "config" command
-func (s *Settings) GetGlobalSetting(md *cobra.Command, args []string) (string, error) {
+func (s *Settings) GetGlobalSetting(args []string) (string, error) {
 	if !s.global.IsSet(args[0]) {
 		return "", fmt.Errorf("invalid setting. Please enter a valid key to get")
 	}
@@ -50,7 +49,7 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 		consoleOutput.Bold(s.global.GetString("databaseClient")),
 		consoleOutput.Bold(s.local.GetString("databaseClient")))
 
-	boldPlugins := []string{}
+	var boldPlugins []string
 
 	for _, plugin := range s.Plugins {
 		boldPlugins = append(boldPlugins, consoleOutput.Bold(plugin))
@@ -70,7 +69,7 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 }
 
 // SetGlobalSetting Sets a global setting for the "config" command
-func (s *Settings) SetGlobalSetting(md *cobra.Command, args []string) error {
+func (s *Settings) SetGlobalSetting(args []string) error {
 	if !s.global.IsSet(args[0]) {
 		return fmt.Errorf("invalid setting. Please enter a valid key to set")
 	}

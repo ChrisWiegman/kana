@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -121,8 +122,9 @@ func (d *DockerClient) loadImageUpdateData(appDirectory string) (*viper.Viper, e
 
 	err := imageUpdateData.ReadInConfig()
 	if err != nil {
-		_, ok := err.(viper.ConfigFileNotFoundError)
-		if ok {
+		var configFileNotFoundError viper.ConfigFileNotFoundError
+
+		if errors.As(err, &configFileNotFoundError) {
 			err = imageUpdateData.SafeWriteConfig()
 			if err != nil {
 				return imageUpdateData, err

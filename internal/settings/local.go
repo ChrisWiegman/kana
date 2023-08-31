@@ -68,23 +68,22 @@ func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 
 // ProcessNameFlag Processes the name flag on the site resetting all appropriate local variables
 func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
-	isSite := false // Don't assume we're in a site that has been initialized.
 	isStartCommand := cmd.Use == "start"
 
 	// Don't run this on commands that wouldn't possibly use it.
 	if cmd.Use == "config" || cmd.Use == "version" || cmd.Use == "help" {
-		return isSite, nil
+		return false, nil
 	}
 
 	if isStartCommand && cmd.Flags().Lookup("multisite").Changed {
 		multisiteValue, err := cmd.Flags().GetString("multisite")
 		if !isValidString(multisiteValue, validMultisiteTypes) || err != nil {
-			return isSite,
+			return false,
 				fmt.Errorf("the multisite type, %s, is not a valid type. You must use either `none`, `subdomain` or `subdirectory`", multisiteValue)
 		}
 	}
 
-	// By default the siteLink should be the working directory (assume it's linked)
+	// By default, the siteLink should be the working directory (assume it's linked)
 	siteLink := s.WorkingDirectory
 
 	// Process the name flag if set
@@ -92,7 +91,7 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 		// Check that we're not using invalid start flags for the start command
 		if isStartCommand {
 			if cmd.Flags().Lookup("plugin").Changed || cmd.Flags().Lookup("theme").Changed || cmd.Flags().Lookup("local").Changed {
-				return isSite, fmt.Errorf("invalid flags detected. 'plugin' 'theme' and 'local' flags are not valid with named sites")
+				return false, fmt.Errorf("invalid flags detected. 'plugin' 'theme' and 'local' flags are not valid with named sites")
 			}
 		}
 
@@ -104,6 +103,8 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 
 		siteLink = s.SiteDirectory
 	}
+
+	isSite := false // Don't assume we're in a site that has been initialized.
 
 	_, err := os.Stat(path.Join(s.SiteDirectory, "link.json"))
 	if err == nil || !os.IsNotExist(err) {
