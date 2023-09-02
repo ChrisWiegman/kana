@@ -45,7 +45,7 @@ func (s *Site) getPhpMyAdminContainer() docker.ContainerConfig {
 	return phpMyAdminContainer
 }
 
-// startPHPMyAdmin Starts the PhpMyAdmin container
+// startPHPMyAdmin Starts the PhpMyAdmin container.
 func (s *Site) startPHPMyAdmin(consoleOutput *console.Console) error {
 	phpMyAdminContainer := s.getPhpMyAdminContainer()
 

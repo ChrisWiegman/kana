@@ -7,6 +7,7 @@ import (
 
 	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/docker/mocks"
+
 	"github.com/docker/docker/api/types"
 	"github.com/moby/moby/pkg/jsonmessage"
 	"github.com/stretchr/testify/assert"

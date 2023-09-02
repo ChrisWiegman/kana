@@ -23,7 +23,7 @@ type PluginInfo struct {
 
 var defaultDirPermissions = 0750
 
-// RunWPCli Runs a wp-cli command returning it's output and any errors
+// RunWPCli Runs a wp-cli command returning it's output and any errors.
 func (s *Site) RunWPCli(command []string, consoleOutput *console.Console) (statusCode int64, output string, err error) {
 	appDir, err := s.getAppDirectory(consoleOutput)
 	if err != nil {
@@ -100,7 +100,7 @@ func (s *Site) getAppDirectory(consoleOutput *console.Console) (string, error) {
 	return appDir, err
 }
 
-// getDirectories Returns the correct appDir and databaseDir for the current site
+// getDirectories Returns the correct appDir and databaseDir for the current site.
 func (s *Site) getDirectories(consoleOutput *console.Console) (appDir, databaseDir string, err error) {
 	appDir, err = s.getAppDirectory(consoleOutput)
 	if err != nil {
@@ -118,7 +118,7 @@ func (s *Site) getDirectories(consoleOutput *console.Console) (appDir, databaseD
 	return appDir, databaseDir, err
 }
 
-// getInstalledWordPressPlugins Returns a list of the plugins that have been installed on the site
+// getInstalledWordPressPlugins Returns a list of the plugins that have been installed on the site.
 func (s *Site) getInstalledWordPressPlugins(consoleOutput *console.Console) ([]string, error) {
 	commands := []string{
 		"plugin",
@@ -241,7 +241,7 @@ func (s *Site) getWordPressContainer(appVolumes []mount.Mount, appContainers []d
 	return appContainers
 }
 
-// getWordPressContainers returns an array of strings containing the container names for the site
+// getWordPressContainers returns an array of strings containing the container names for the site.
 func (s *Site) getWordPressContainers() []string {
 	return []string{
 		fmt.Sprintf("kana-%s-database", s.Settings.Name),
@@ -274,7 +274,7 @@ func (s *Site) activateProject(consoleOutput *console.Console) error {
 	return nil
 }
 
-// installDefaultPlugins Installs a list of WordPress plugins
+// installDefaultPlugins Installs a list of WordPress plugins.
 func (s *Site) installDefaultPlugins(consoleOutput *console.Console) error {
 	installedPlugins, err := s.getInstalledWordPressPlugins(consoleOutput)
 	if err != nil {
@@ -314,7 +314,7 @@ func (s *Site) installDefaultPlugins(consoleOutput *console.Console) error {
 	return nil
 }
 
-// installKanaPlugin installs the Kana development plugin
+// installKanaPlugin installs the Kana development plugin.
 func (s *Site) installKanaPlugin(consoleOutput *console.Console) error {
 	appDir, err := s.getAppDirectory(consoleOutput)
 	if err != nil {
@@ -324,7 +324,7 @@ func (s *Site) installKanaPlugin(consoleOutput *console.Console) error {
 	return s.Settings.EnsureKanaPlugin(appDir)
 }
 
-// installWordPress Installs and configures WordPress core
+// installWordPress Installs and configures WordPress core.
 func (s *Site) installWordPress(consoleOutput *console.Console) error {
 	checkCommand := []string{
 		"option",
@@ -397,7 +397,7 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 	return nil
 }
 
-// startContainer Starts a given container configuration
+// startContainer Starts a given container configuration.
 func (s *Site) startContainer(container *docker.ContainerConfig, randomPorts, localUser bool, consoleOutput *console.Console) error {
 	err := s.dockerClient.EnsureImage(container.Image, s.Settings.ImageUpdateDays, consoleOutput)
 	if err != nil {
@@ -408,7 +408,7 @@ func (s *Site) startContainer(container *docker.ContainerConfig, randomPorts, lo
 	return err
 }
 
-// startWordPress Starts the WordPress containers
+// startWordPress Starts the WordPress containers.
 func (s *Site) startWordPress(consoleOutput *console.Console) error {
 	_, _, err := s.dockerClient.EnsureNetwork("kana")
 	if err != nil {
@@ -448,7 +448,7 @@ func (s *Site) startWordPress(consoleOutput *console.Console) error {
 	return nil
 }
 
-// stopWordPress Stops the site in docker, destroying the containers when they close
+// stopWordPress Stops the site in docker, destroying the containers when they close.
 func (s *Site) stopWordPress() error {
 	wordPressContainers := s.getWordPressContainers()
 

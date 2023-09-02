@@ -21,7 +21,7 @@ type portConfig struct {
 	PortSet      nat.PortSet
 }
 
-func (d *DockerClient) EnsureNetwork(name string) (created bool, network types.NetworkResource, err error) {
+func (d *Client) EnsureNetwork(name string) (created bool, network types.NetworkResource, err error) {
 	hasNetwork, network, err := findNetworkByName(name, d.apiClient)
 
 	if err != nil {
@@ -53,7 +53,7 @@ func (d *DockerClient) EnsureNetwork(name string) (created bool, network types.N
 	return false, types.NetworkResource{}, fmt.Errorf("could not create network")
 }
 
-func (d *DockerClient) RemoveNetwork(name string) (removed bool, err error) {
+func (d *Client) RemoveNetwork(name string) (removed bool, err error) {
 	hasNetwork, network, err := findNetworkByName(name, d.apiClient)
 
 	if err != nil {
@@ -135,7 +135,7 @@ func getNetworkConfig(ports []ExposedPorts, randomPorts bool) (portConfig, error
 	}, nil
 }
 
-// getRandomPort Returns an open, ephemeral port for mapping a container
+// getRandomPort Returns an open, ephemeral port for mapping a container.
 func getRandomPort() (string, error) {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNoContent)

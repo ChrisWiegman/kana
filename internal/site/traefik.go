@@ -14,7 +14,7 @@ const (
 	traefikVersion       = "2.10"
 )
 
-// maybeStopTraefik Checks to see if other sites are running and shuts down the traefik instance if none are
+// maybeStopTraefik Checks to see if other sites are running and shuts down the traefik instance if none are.
 func (s *Site) maybeStopTraefik() error {
 	containers, err := s.dockerClient.ContainerList("")
 	if err != nil {
@@ -28,7 +28,7 @@ func (s *Site) maybeStopTraefik() error {
 	return nil
 }
 
-// startTraefik Starts the Traefik container
+// startTraefik Starts the Traefik container.
 func (s *Site) startTraefik(consoleOutput *console.Console) error {
 	err := s.Settings.EnsureSSLCerts()
 	if err != nil {
@@ -89,7 +89,7 @@ func (s *Site) startTraefik(consoleOutput *console.Console) error {
 	return err
 }
 
-// stopTraefik Stops the Traefik container
+// stopTraefik Stops the Traefik container.
 func (s *Site) stopTraefik() error {
 	_, err := s.dockerClient.ContainerStop(traefikContainerName)
 	if err != nil {

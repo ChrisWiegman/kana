@@ -79,7 +79,7 @@ func (s *Settings) EnsureKanaPlugin(appDir string) error {
 	return tmpl.Execute(myFile, pluginVars)
 }
 
-// EnsureSSLCerts Ensures SSL certificates have been generated and are where they need to be
+// EnsureSSLCerts Ensures SSL certificates have been generated and are where they need to be.
 func (s *Settings) EnsureSSLCerts() error {
 	createCert := false
 	certPath := path.Join(s.AppDirectory, "certs")
@@ -110,7 +110,7 @@ func (s *Settings) EnsureSSLCerts() error {
 			return err
 		}
 
-		// If we're on Mac try to add the cert to the system trust
+		// If we're on Mac try to add the cert to the system trust.
 		if runtime.GOOS == "darwin" {
 			installCertCommand := execCommand(
 				"sudo",
@@ -129,7 +129,7 @@ func (s *Settings) EnsureSSLCerts() error {
 	return nil
 }
 
-// EnsureStaticConfigFiles Ensures the application's static config files have been generated and are where they need to be
+// EnsureStaticConfigFiles Ensures the application's static config files have been generated and are where they need to be.
 func (s *Settings) EnsureStaticConfigFiles() error {
 	for _, file := range configFiles {
 		filePath := path.Join(s.AppDirectory, file.LocalPath)

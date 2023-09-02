@@ -24,20 +24,20 @@ var execCommand = exec.Command
 var maxRetries = 12
 var sleepDuration = 5
 
-// DockerClient is an interface the must be implemented to provide Docker services through this package.
-type DockerClient struct {
+// Client is an interface the must be implemented to provide Docker services through this package.
+type Client struct {
 	apiClient       APIClient
 	imageUpdateData ViperClient
 	checkedImages   []string
 }
 
-type DockerContext struct {
+type Context struct {
 	Current        bool   `json:"Current"`
 	DockerEndpoint string `json:"DockerEndpoint"`
 }
 
-func NewDockerClient(consoleOutput *console.Console, appDirectory string) (dockerClient *DockerClient, err error) {
-	dockerClient = new(DockerClient)
+func NewDockerClient(consoleOutput *console.Console, appDirectory string) (dockerClient *Client, err error) {
+	dockerClient = new(Client)
 
 	var dockerEndpoint string
 
@@ -63,7 +63,7 @@ func NewDockerClient(consoleOutput *console.Console, appDirectory string) (docke
 }
 
 func getCurrentDockerEndpoint() (string, error) {
-	dockerContexts := execCommand(
+	rawDockerContexts := execCommand(
 		"docker",
 		"context",
 		"ls",
@@ -71,18 +71,18 @@ func getCurrentDockerEndpoint() (string, error) {
 		"json")
 
 	var out bytes.Buffer
-	dockerContexts.Stdout = &out
+	rawDockerContexts.Stdout = &out
 
-	err := dockerContexts.Run()
+	err := rawDockerContexts.Run()
 	if err != nil {
 		return client.DefaultDockerHost, err
 	}
 
-	var contexts []DockerContext
+	var dockerContexts []Context
 
-	err = json.Unmarshal(out.Bytes(), &contexts)
+	err = json.Unmarshal(out.Bytes(), &dockerContexts)
 	if err != nil {
-		var singleContext DockerContext
+		var singleContext Context
 
 		err = json.Unmarshal(out.Bytes(), &singleContext)
 		if err != nil {
@@ -92,9 +92,9 @@ func getCurrentDockerEndpoint() (string, error) {
 		return singleContext.DockerEndpoint, nil
 	}
 
-	for _, context := range contexts {
-		if context.Current {
-			return context.DockerEndpoint, nil
+	for _, dockerContext := range dockerContexts {
+		if dockerContext.Current {
+			return dockerContext.DockerEndpoint, nil
 		}
 	}
 

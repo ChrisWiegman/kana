@@ -10,18 +10,18 @@ import (
 	"time"
 
 	"github.com/ChrisWiegman/kana-cli/internal/console"
-	"github.com/spf13/viper"
 
 	"github.com/docker/docker/api/types"
 	"github.com/moby/moby/pkg/jsonmessage"
 	"github.com/moby/term"
+	"github.com/spf13/viper"
 )
 
 var displayJSONMessagesStream = jsonmessage.DisplayJSONMessagesStream
 
 // https://gist.github.com/miguelmota/4980b18d750fb3b1eb571c3e207b1b92
 // https://riptutorial.com/docker/example/31980/image-pulling-with-progress-bars--written-in-go
-func (d *DockerClient) EnsureImage(imageName string, updateDays int, consoleOutput *console.Console) (err error) {
+func (d *Client) EnsureImage(imageName string, updateDays int, consoleOutput *console.Console) (err error) {
 	if !strings.Contains(imageName, ":") {
 		imageName = fmt.Sprintf("%s:latest", imageName)
 	}
@@ -36,7 +36,7 @@ func (d *DockerClient) EnsureImage(imageName string, updateDays int, consoleOutp
 	return d.maybeUpdateImage(imageName, updateDays, consoleOutput.JSON)
 }
 
-func (d *DockerClient) maybeUpdateImage(imageName string, updateDays int, suppressOutput bool) error {
+func (d *Client) maybeUpdateImage(imageName string, updateDays int, suppressOutput bool) error {
 	lastUpdated := d.imageUpdateData.GetTime(imageName)
 
 	imageList, err := d.apiClient.ImageList(context.Background(), types.ImageListOptions{})
@@ -97,7 +97,7 @@ func (d *DockerClient) maybeUpdateImage(imageName string, updateDays int, suppre
 	return nil
 }
 
-func (d *DockerClient) removeImage(image string) (removed bool, err error) {
+func (d *Client) removeImage(image string) (removed bool, err error) {
 	removedResponse, err := d.apiClient.ImageRemove(context.Background(), image, types.ImageRemoveOptions{})
 
 	if err != nil {
@@ -113,7 +113,7 @@ func (d *DockerClient) removeImage(image string) (removed bool, err error) {
 	return false, nil
 }
 
-func (d *DockerClient) loadImageUpdateData(appDirectory string) (*viper.Viper, error) {
+func (d *Client) loadImageUpdateData(appDirectory string) (*viper.Viper, error) {
 	imageUpdateData := viper.New()
 
 	imageUpdateData.SetConfigName("images")

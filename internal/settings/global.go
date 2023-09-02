@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// LoadGlobalSettings gets config information that transcends sites such as app and default settings
+// LoadGlobalSettings gets config information that transcends sites such as app and default settings.
 func (s *Settings) LoadGlobalSettings() error {
 	globalViperConfig, err := s.loadGlobalViper()
 	if err != nil {
@@ -34,7 +34,7 @@ func (s *Settings) LoadGlobalSettings() error {
 	return err
 }
 
-// loadGlobalViper loads the global config using viper and sets defaults
+// loadGlobalViper loads the global config using viper and sets defaults.
 func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
 	globalSettings := viper.New()
 

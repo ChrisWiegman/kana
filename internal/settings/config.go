@@ -12,7 +12,7 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-// GetGlobalSetting Retrieves a global setting for the "config" command
+// GetGlobalSetting Retrieves a global setting for the "config" command.
 func (s *Settings) GetGlobalSetting(args []string) (string, error) {
 	if !s.global.IsSet(args[0]) {
 		return "", fmt.Errorf("invalid setting. Please enter a valid key to get")
@@ -21,7 +21,7 @@ func (s *Settings) GetGlobalSetting(args []string) (string, error) {
 	return s.global.GetString(args[0]), nil
 }
 
-// ListSettings Lists all settings for the config command
+// ListSettings Lists all settings for the config command.
 func (s *Settings) ListSettings(consoleOutput *console.Console) {
 	if consoleOutput.JSON {
 		s.printJSONSettings()
@@ -49,7 +49,7 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 		consoleOutput.Bold(s.global.GetString("databaseClient")),
 		consoleOutput.Bold(s.local.GetString("databaseClient")))
 
-	var boldPlugins []string
+	boldPlugins := []string{}
 
 	for _, plugin := range s.Plugins {
 		boldPlugins = append(boldPlugins, consoleOutput.Bold(plugin))
@@ -68,7 +68,7 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 	t.Render()
 }
 
-// SetGlobalSetting Sets a global setting for the "config" command
+// SetGlobalSetting Sets a global setting for the "config" command.
 func (s *Settings) SetGlobalSetting(args []string) error {
 	if !s.global.IsSet(args[0]) {
 		return fmt.Errorf("invalid setting. Please enter a valid key to set")
@@ -84,7 +84,7 @@ func (s *Settings) SetGlobalSetting(args []string) error {
 	return s.global.WriteConfig()
 }
 
-// printJSONSettings Prints out all settings in JSON format
+// printJSONSettings Prints out all settings in JSON format.
 func (s *Settings) printJSONSettings() {
 	type JSONSettings struct {
 		Global, Local map[string]interface{}
@@ -100,7 +100,7 @@ func (s *Settings) printJSONSettings() {
 	fmt.Println(string(str))
 }
 
-// validateSetting validates the values in saved settings
+// validateSetting validates the values in saved settings.
 func (s *Settings) validateSetting(setting, value string) error { //nolint:gocyclo
 	validate := validator.New()
 

@@ -7,8 +7,8 @@ import (
 	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/settings"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
-	"github.com/mitchellh/go-homedir"
 
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 )
 

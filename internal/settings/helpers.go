@@ -4,7 +4,7 @@ import (
 	"strings"
 )
 
-// isValidString Checks a given string against an array of valid values and returns true/false as appropriate
+// isValidString Checks a given string against an array of valid values and returns true/false as appropriate.
 func isValidString(stringToCheck string, validStrings []string) bool {
 	for _, validString := range validStrings {
 		if validString == stringToCheck {

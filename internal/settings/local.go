@@ -28,7 +28,7 @@ type LocalSettings struct {
 	Plugins                                        []string
 }
 
-// LoadLocalSettings Loads the config for the current site being called
+// LoadLocalSettings Loads the config for the current site being called.
 func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 	siteName := sanitizeSiteName(filepath.Base(s.WorkingDirectory))
 	// Setup other options generated from config items
@@ -66,7 +66,7 @@ func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 	return isSite, nil
 }
 
-// ProcessNameFlag Processes the name flag on the site resetting all appropriate local variables
+// ProcessNameFlag Processes the name flag on the site resetting all appropriate local variables.
 func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 	isStartCommand := cmd.Use == "start"
 
@@ -114,7 +114,7 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 	return s.saveLinkConfig(isSite, cmd, siteLink)
 }
 
-// ProcessStartFlags Process the start flags and save them to the settings object
+// ProcessStartFlags Process the start flags and save them to the settings object.
 func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
 	if cmd.Flags().Lookup("local").Changed {
 		s.Local = flags.Local
@@ -153,7 +153,7 @@ func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
 	}
 }
 
-// WriteLocalSettings Writes all appropriate local settings to the local config file
+// WriteLocalSettings Writes all appropriate local settings to the local config file.
 func (s *Settings) WriteLocalSettings(localSettings *LocalSettings) error {
 	s.local.Set("local", localSettings.Local)
 	s.local.Set("type", localSettings.Type)

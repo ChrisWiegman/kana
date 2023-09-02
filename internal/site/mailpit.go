@@ -64,7 +64,7 @@ func (s *Site) isMailpitRunning() bool {
 	return false
 }
 
-// startMailpit Starts the Mailpit container
+// startMailpit Starts the Mailpit container.
 func (s *Site) startMailpit(consoleOutput *console.Console) error {
 	mailpitContainer := s.getMailpitContainer()
 

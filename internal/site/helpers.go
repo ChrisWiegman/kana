@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-// arrayContains Searches an array of strings for a given string and returns true/false as appropriate
+// arrayContains Searches an array of strings for a given string and returns true/false as appropriate.
 func arrayContains(array []string, name string) bool {
 	for _, value := range array {
 		if value == name {
@@ -17,7 +17,7 @@ func arrayContains(array []string, name string) bool {
 	return false
 }
 
-// copyFile Copies a file on the user's host from one place to another
+// copyFile Copies a file on the user's host from one place to another.
 func copyFile(src, dest string) error {
 	srcStat, err := os.Stat(src)
 	if err != nil {

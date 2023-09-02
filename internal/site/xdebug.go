@@ -6,7 +6,7 @@ import (
 	"github.com/ChrisWiegman/kana-cli/internal/console"
 )
 
-// IsXdebugRunning returns true if Xdebug is already running or false if not
+// IsXdebugRunning returns true if Xdebug is already running or false if not.
 func (s *Site) IsXdebugRunning(consoleOutput *console.Console) bool {
 	output, err := s.runCli("pecl list | grep xdebug", false, false)
 	if err != nil {
@@ -16,7 +16,7 @@ func (s *Site) IsXdebugRunning(consoleOutput *console.Console) bool {
 	return strings.Contains(output.StdOut, "xdebug")
 }
 
-// StartXdebug installs and starts xdebug in the site's PHP container
+// StartXdebug installs and starts xdebug in the site's PHP container.
 func (s *Site) StartXdebug(consoleOutput *console.Console) error {
 	commands := []string{
 		"pecl list | grep xdebug",
@@ -52,7 +52,7 @@ func (s *Site) StartXdebug(consoleOutput *console.Console) error {
 	return nil
 }
 
-// StopXdebug stops Xdebug by restarting the WordPress containers
+// StopXdebug stops Xdebug by restarting the WordPress containers.
 func (s *Site) StopXdebug(consoleOutput *console.Console) error {
 	err := s.stopWordPress()
 	if err != nil {

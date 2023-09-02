@@ -25,7 +25,7 @@ import (
 )
 
 type Site struct {
-	dockerClient *docker.DockerClient
+	dockerClient *docker.Client
 	Settings     *settings.Settings
 }
 
@@ -80,9 +80,10 @@ func (s *Site) ExportSiteConfig(consoleOutput *console.Console) error {
 	return s.Settings.WriteLocalSettings(&localSettings)
 }
 
-// GetSiteList Returns a list of all Kana sites, their location and whether they're running
+// GetSiteList Returns a list of all Kana sites, their location and whether they're running.
 func (s *Site) GetSiteList(appDir string, consoleOutput *console.Console) ([]SiteInfo, error) {
-	var sites []SiteInfo
+	sites := []SiteInfo{}
+
 	sitesDir := path.Join(appDir, "sites")
 
 	_, err := os.Stat(sitesDir)
@@ -129,7 +130,7 @@ func (s *Site) GetSiteList(appDir string, consoleOutput *console.Console) ([]Sit
 	return sites, nil
 }
 
-// IsSiteRunning Returns true if the site is up and running in Docker or false. Does not verify other errors
+// IsSiteRunning Returns true if the site is up and running in Docker or false. Does not verify other errors.
 func (s *Site) IsSiteRunning() bool {
 	containers, _ := s.dockerClient.ContainerList(s.Settings.Name)
 
@@ -174,7 +175,7 @@ func (s *Site) LoadSite(cmd *cobra.Command, commandsRequiringSite []string, star
 	return nil
 }
 
-// OpenSite Opens the current site in a browser if it is running
+// OpenSite Opens the current site in a browser if it is running.
 func (s *Site) OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag bool, consoleOutput *console.Console) error {
 	openUrls := []string{}
 
@@ -237,7 +238,7 @@ func (s *Site) OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag bool, co
 	return nil
 }
 
-// StartSite Starts a site, including Traefik if needed
+// StartSite Starts a site, including Traefik if needed.
 func (s *Site) StartSite(consoleOutput *console.Console) error {
 	// Let's start everything up
 	consoleOutput.Printf("Starting development site: %s.\n", consoleOutput.Bold(consoleOutput.Green(s.Settings.URL)))
@@ -306,7 +307,7 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 	return s.OpenSite(false, false, true, consoleOutput)
 }
 
-// StopSite Stops a full site, including Traefik if needed
+// StopSite Stops a full site, including Traefik if needed.
 func (s *Site) StopSite() error {
 	err := s.stopWordPress()
 	if err != nil {
@@ -317,7 +318,7 @@ func (s *Site) StopSite() error {
 	return s.maybeStopTraefik()
 }
 
-// checkStatusCode returns true on 200 or false
+// checkStatusCode returns true on 200 or false.
 func checkStatusCode(checkURL string) (bool, error) {
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, checkURL, http.NoBody)
 	if err != nil {
@@ -345,7 +346,7 @@ func checkStatusCode(checkURL string) (bool, error) {
 	return false, nil
 }
 
-// getLocalAppDir Gets the absolute path to WordPress if the local flag or option has been set
+// getLocalAppDir Gets the absolute path to WordPress if the local flag or option has been set.
 func (s *Site) getLocalAppDir() (string, error) {
 	localAppDir := path.Join(s.Settings.WorkingDirectory, "wordpress")
 
@@ -357,7 +358,7 @@ func (s *Site) getLocalAppDir() (string, error) {
 	return localAppDir, nil
 }
 
-// getRunningConfig gets various options that were used to start the site
+// getRunningConfig gets various options that were used to start the site.
 func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console) (settings.LocalSettings, error) {
 	localSettings := settings.LocalSettings{
 		Type:     "site",
@@ -453,7 +454,7 @@ func (s *Site) isLocalSite(consoleOutput *console.Console) bool {
 	return s.Settings.Local
 }
 
-// runCli Runs an arbitrary CLI command against the site's WordPress container
+// runCli Runs an arbitrary CLI command against the site's WordPress container.
 func (s *Site) runCli(command string, restart, root bool) (docker.ExecResult, error) {
 	container := fmt.Sprintf("kana-%s-wordpress", s.Settings.Name)
 
@@ -470,7 +471,7 @@ func (s *Site) runCli(command string, restart, root bool) (docker.ExecResult, er
 	return output, nil
 }
 
-// verifySite verifies if a site is up and running without error
+// verifySite verifies if a site is up and running without error.
 func (s *Site) verifySite(siteURL string) error {
 	// Setup other options generated from config items
 	rootCert := path.Join(s.Settings.AppDirectory, "certs", s.Settings.RootCert)

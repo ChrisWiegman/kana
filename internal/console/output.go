@@ -18,7 +18,7 @@ type Message struct {
 	Status, Message string
 }
 
-// Blue outputs the requested text as blue
+// Blue outputs the requested text as blue.
 func (c *Console) Blue(output string) string {
 	if c.JSON {
 		return output
@@ -27,7 +27,7 @@ func (c *Console) Blue(output string) string {
 	return aurora.Blue(output).String()
 }
 
-// Bold outputs the requested text as bold
+// Bold outputs the requested text as bold.
 func (c *Console) Bold(output string) string {
 	if c.JSON {
 		return output
@@ -59,7 +59,7 @@ func (c *Console) Error(err error) {
 	os.Exit(1)
 }
 
-// Green outputs the requested text as green
+// Green outputs the requested text as green.
 func (c *Console) Green(output string) string {
 	if c.JSON {
 		return output
@@ -68,7 +68,7 @@ func (c *Console) Green(output string) string {
 	return aurora.Green(output).String()
 }
 
-// Printf is a temporary wrapper on fmt.Printf
+// Printf is a temporary wrapper on fmt.Printf.
 func (c *Console) Printf(format string, a ...any) {
 	if c.JSON {
 		message := Message{
@@ -84,7 +84,7 @@ func (c *Console) Printf(format string, a ...any) {
 	}
 }
 
-// Println is a temporary wrapper on fmt.Println
+// Println is a temporary wrapper on fmt.Println.
 func (c *Console) Println(output string) {
 	if c.JSON {
 		message := Message{
@@ -131,7 +131,7 @@ func (c *Console) PromptConfirm(promptText string, def bool) bool {
 	}
 }
 
-// Success displays a formatted success message on successful completion of the command
+// Success displays a formatted success message on successful completion of the command.
 func (c *Console) Success(output string) {
 	if c.JSON {
 		message := Message{
@@ -147,7 +147,7 @@ func (c *Console) Success(output string) {
 	}
 }
 
-// Warn displays a formatted warning message
+// Warn displays a formatted warning message.
 func (c *Console) Warn(output string) {
 	if c.JSON {
 		message := Message{
@@ -163,7 +163,7 @@ func (c *Console) Warn(output string) {
 	}
 }
 
-// Yellow outputs the requested text as yellow
+// Yellow outputs the requested text as yellow.
 func (c *Console) Yellow(output string) string {
 	if c.JSON {
 		return output

@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// The following are the default settings for Kana
+// The following are the default settings for Kana.
 var (
 	rootKey          = "kana.root.key"
 	rootCert         = "kana.root.pem"
@@ -33,13 +33,13 @@ var (
 	multisite        = "none"
 )
 
-// Default permissions for all new files and folders
+// Default permissions for all new files and folders.
 var (
 	defaultDirPermissions  = 0750
 	defaultFilePermissions = 0644
 )
 
-// Settings Individual Settings for use throughout the app lifecycle
+// Settings Individual Settings for use throughout the app lifecycle.
 type Settings struct {
 	Local, Xdebug, Mailpit, SSL, WPDebug, Activate bool
 	ImageUpdateDays                                int
@@ -116,7 +116,7 @@ func NewSettings() (*Settings, error) {
 	return kanaSettings, err
 }
 
-// GetDefaultPermissions returns the default directory permissions and the default file permissions
+// GetDefaultPermissions returns the default directory permissions and the default file permissions.
 func GetDefaultPermissions() (dirPerms, filePerms int) {
 	return defaultDirPermissions, defaultFilePermissions
 }

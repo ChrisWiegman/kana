@@ -22,7 +22,7 @@ type APIClient interface {
 // Ensure that Client always implements APIClient.
 var _ APIClient = &client.Client{}
 
-// ContainerAPIClient defines API client methods for the containers
+// ContainerAPIClient defines API client methods for the containers.
 type ContainerAPIClient interface {
 	ContainerCreate(
 		ctx context.Context,
@@ -46,21 +46,21 @@ type ContainerAPIClient interface {
 		condition containerTypes.WaitCondition) (<-chan containerTypes.WaitResponse, <-chan error)
 }
 
-// ImageAPIClient defines API client methods for the images
+// ImageAPIClient defines API client methods for the images.
 type ImageAPIClient interface {
 	ImagePull(ctx context.Context, ref string, options types.ImagePullOptions) (io.ReadCloser, error)
 	ImageRemove(ctx context.Context, image string, options types.ImageRemoveOptions) ([]types.ImageDeleteResponseItem, error)
 	ImageList(ctx context.Context, options types.ImageListOptions) ([]types.ImageSummary, error)
 }
 
-// NetworkAPIClient defines API client methods for the networks
+// NetworkAPIClient defines API client methods for the networks.
 type NetworkAPIClient interface {
 	NetworkCreate(ctx context.Context, name string, options types.NetworkCreate) (types.NetworkCreateResponse, error)
 	NetworkList(ctx context.Context, options types.NetworkListOptions) ([]types.NetworkResource, error)
 	NetworkRemove(ctx context.Context, network string) error
 }
 
-// ViperClient defines a mock Viper client for testing
+// ViperClient defines a mock Viper client for testing.
 type ViperClient interface {
 	SetConfigName(in string)
 	SetConfigType(in string)
