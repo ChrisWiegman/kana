@@ -34,7 +34,7 @@ var (
 )
 
 // Default permissions for all new files and folders.
-var (
+const (
 	defaultDirPermissions  = 0750
 	defaultFilePermissions = 0644
 )

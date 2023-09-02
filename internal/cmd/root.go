@@ -7,9 +7,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var flagName string
-var flagVerbose, flagJSONOutput bool
-var commandsRequiringSite []string
+var (
+	flagName                    string
+	flagVerbose, flagJSONOutput bool
+	commandsRequiringSite       []string
+)
 
 func Execute() {
 	kanaSite := new(site.Site)
