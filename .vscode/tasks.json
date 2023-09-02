@@ -40,7 +40,7 @@
                 "isDefault": true
             },
             "presentation": {
-                "reveal": "always",
+                "reveal": "silent",
                 "revealProblems": "onProblem",
                 "panel": "dedicated",
                 "clear": true,

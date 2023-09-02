@@ -51,13 +51,11 @@ install:
 
 .PHONY: lint
 lint:
-	if [ ! -f $GOPATH/bin/gilangci-lint  ]; then \
+	@if [ ! -f $GOPATH/bin/gilangci-lint  ]; then \
 		go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest;\
 	fi
-	golangci-lint \
-			run \
-			-v \
-			./...
+	@golangci-lint \
+			run
 
 .PHONY: mockery
 mockery:
