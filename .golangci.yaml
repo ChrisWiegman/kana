@@ -30,7 +30,7 @@ linters-settings:
   gocyclo:
     min-complexity: 15
   goimports:
-    local-prefixes: github.com/golangci/golangci-lint
+    local-prefixes: github.com/ChrisWiegman/kana-cli
   gomnd:
     # don't include the "operation" and "assign"
     checks:
@@ -97,23 +97,19 @@ linters:
     - unused
     - whitespace
     - noctx
-
-  # don't enable:
-  # - asciicheck
-  # - depguard
-  # - scopelint
-  # - gochecknoglobals
-  # - gocognit
-  # - godot
-  # - godox
-  # - goerr113
-  # - interfacer
-  # - maligned
-  # - nestif
-  # - prealloc
-  # - testpackage
-  # - revive
-  # - wsl
+    - asciicheck
+    - godot
+    - godox
+    - prealloc
+    - bidichk
+    - containedctx
+    - contextcheck
+    - decorder
+    - predeclared
+    - reassign
+    - rowserrcheck
+    - usestdlibvars
+    - wastedassign
 
 run:
   timeout: 5m
