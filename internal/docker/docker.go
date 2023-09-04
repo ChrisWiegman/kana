@@ -10,8 +10,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os/exec"
-	"runtime"
-	"time"
 
 	"github.com/ChrisWiegman/kana-cli/internal/console"
 
@@ -21,7 +19,6 @@ import (
 
 var execCommand = exec.Command
 
-var maxRetries = 12
 var sleepDuration = 5
 
 // Client is an interface the must be implemented to provide Docker services through this package.
@@ -52,7 +49,7 @@ func NewDockerClient(consoleOutput *console.Console, appDirectory string) (docke
 		return nil, err
 	}
 
-	err = ensureDockerIsAvailable(consoleOutput, dockerClient.apiClient)
+	err = ensureDockerIsAvailable(dockerClient.apiClient)
 	if err != nil {
 		return nil, err
 	}
@@ -101,35 +98,11 @@ func getCurrentDockerEndpoint() (string, error) {
 	return client.DefaultDockerHost, fmt.Errorf("docker context was not found. using default")
 }
 
-func ensureDockerIsAvailable(consoleOutput *console.Console, apiClient APIClient) error {
+func ensureDockerIsAvailable(apiClient APIClient) error {
 	_, err := apiClient.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
-		if runtime.GOOS == "darwin" { //nolint:goconst
-			consoleOutput.Println("Docker doesn't appear to be running. Trying to start Docker.")
-			err = execCommand("open", "-a", "Docker").Run()
-			if err != nil {
-				return fmt.Errorf("error: unable to start Docker for Mac")
-			}
-
-			retries := 0
-
-			for retries <= maxRetries {
-				retries++
-
-				if retries == maxRetries {
-					consoleOutput.Println("Restarting Docker is taking too long. We seem to have hit an error")
-					return fmt.Errorf("error: unable to start Docker for Mac")
-				}
-
-				time.Sleep(time.Duration(sleepDuration) * time.Second)
-
-				_, err = apiClient.ContainerList(context.Background(), types.ContainerListOptions{})
-				if err != nil {
-					return err
-				}
-			}
-		}
+		return fmt.Errorf("Could not connect to Docker. Is Docker running?") //nolint:stylecheck
 	}
 
-	return err
+	return nil
 }
