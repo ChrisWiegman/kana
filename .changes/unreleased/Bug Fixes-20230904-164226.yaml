@@ -1,0 +1,3 @@
+kind: Bug Fixes
+body: Upate confirmation text on `stop` command to make it easier to read.
+time: 2023-09-04T16:42:26.901852969Z
