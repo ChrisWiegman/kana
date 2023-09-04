@@ -27,7 +27,7 @@ func newStopCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.
 
 			consoleOutput.Success(
 				fmt.Sprintf(
-					"Your site, %s, has been stopped. Please run `kana start` again if you would like to use it.",
+					"Your site, %s, has been stopped. Please use `kana start` again to restart it.",
 					consoleOutput.Bold(consoleOutput.Blue(kanaSite.Settings.Name))))
 		},
 		Args: cobra.NoArgs,
