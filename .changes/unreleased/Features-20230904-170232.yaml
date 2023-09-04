@@ -1,4 +1,0 @@
-kind: Features
-body: Kana will no longer try to start Docker automatically if it cannot connect to
-  it on Mac.
-time: 2023-09-04T17:02:32.726399592Z

@@ -1,4 +1,0 @@
-kind: Features
-body: Use the current Docker context to find the correct Docker host. This results
-  in more reliable connections to Docker, particularly with Docker Desktop.
-time: 2023-08-27T17:59:35.290654462Z

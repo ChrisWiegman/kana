@@ -1,4 +1,0 @@
-kind: Bug Fixes
-body: Removed the extra information that reiterated the empty site list on the `list`
-  command as the table format has since made it redundant.
-time: 2023-08-16T21:12:18.667409911Z
