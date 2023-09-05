@@ -70,7 +70,11 @@ func (d *Client) maybeUpdateImage(imageName string, updateDays int, suppressOutp
 			return err
 		}
 
-		defer reader.Close()
+		defer func() {
+			if err = reader.Close(); err != nil {
+				panic(err)
+			}
+		}()
 
 		out := os.Stdout
 

@@ -145,7 +145,11 @@ func makeKey(filename string) (*rsa.PrivateKey, error) {
 		return nil, err
 	}
 
-	defer file.Close()
+	defer func() {
+		if err = file.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
 	err = pem.Encode(file, &pem.Block{
 		Type:  "RSA PRIVATE KEY",
@@ -203,7 +207,11 @@ func makeRootCert(key crypto.Signer, filename string) (*x509.Certificate, error)
 		return nil, err
 	}
 
-	defer file.Close()
+	defer func() {
+		if err = file.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
 	err = pem.Encode(file, &pem.Block{
 		Type:  "CERTIFICATE",
@@ -292,7 +300,11 @@ func sign(iss *issuer, domains []string, certPath, siteCert, siteKey string) (*x
 		return nil, err
 	}
 
-	defer file.Close()
+	defer func() {
+		if err = file.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
 	err = pem.Encode(file, &pem.Block{
 		Type:  "CERTIFICATE",

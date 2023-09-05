@@ -337,7 +337,11 @@ func checkStatusCode(checkURL string) (bool, error) {
 		return false, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
 	if resp.StatusCode == http.StatusOK {
 		return true, nil

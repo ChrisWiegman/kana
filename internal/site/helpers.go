@@ -29,17 +29,26 @@ func copyFile(src, dest string) error {
 	}
 
 	source, err := os.Open(src)
-
 	if err != nil {
 		return err
 	}
-	defer source.Close()
+
+	defer func() {
+		if err = source.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
 	destination, err := os.Create(dest)
 	if err != nil {
 		return err
 	}
-	defer destination.Close()
+
+	defer func() {
+		if err = destination.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
 	_, err = io.Copy(destination, source)
 	return err
