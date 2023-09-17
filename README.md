@@ -88,6 +88,8 @@ If you do not specify the `local` flag you can find Kana's site files in `~/.con
 
 `--multisite` Use the multisite flag to setup a WordPress Multisite installation. The optional `subdomain` and `subdirectory` flags will allow for either type of installation.
 
+`--remove-default-plugins` Will remove the default "Hello Dolly" and Akismet plugins when starting the site. Note this will not restore them if they've been manually removed.
+
 ## Importing an existing WordPress database
 
 Kana offers a simple way to import an existing WordPress database. Just use the `kana db import <your database file>` to get started.
@@ -154,6 +156,7 @@ Kana has a handful of options that apply to all new sites created with the app. 
 - `xdebug` **false** - the default usage of the `xdebug` start flag
 - `wpdebug` **false** - the default usage of the `wpdebug` start flag
 - `mailpit` **false** - the default usage of the `mailpit` start flag
+- `removeDefaultPlugins` **false** - removes the default "Hello Dolly" and Akismet plugins when starting a new site. Note this will not restore them if they've already been removed.
 - `ssl` **false** - the default usage of the `ssl` start flag
 - `imageUpdateDays` **1** - the number of days Kana will wait between checking for updated Docker images. Set this to `0` to disable the check for newer images altogether (Kana will only download missing images)
 - `activate` **true** - if the project site is set to `theme` or `plugin` this will activate the project on first load
@@ -179,6 +182,7 @@ In addition to the global config, certain items above can be overridden for any 
 - `wpdebug` **false** - the default usage of the `wpdebug` start flag
 - `mailpit` **false** - the default usage of the `mailpit` start flag
 - `plugins` **[]** - an array of plugins to install and activate when starting the new site. These are slugs from the Plugins section of WordPress.org.
+- `removeDefaultPlugins` **false** - removes the default "Hello Dolly" and Akismet plugins when starting a new site. Note this will not restore them if they've already been removed.
 - `ssl` **false** - the default usage of the `ssl` start flag
 - `activate` **true** - if the project site is set to `theme` or `plugin` this will activate the project on first load
 - `multisite` **none** - set to either `subdirectory` or `subdomain` to create the site as the appropriate type of Multisite installation.
