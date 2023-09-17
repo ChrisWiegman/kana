@@ -374,13 +374,14 @@ func (s *Site) getLocalAppDir() (string, error) {
 // getRunningConfig gets various options that were used to start the site.
 func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console) (settings.LocalSettings, error) {
 	localSettings := settings.LocalSettings{
-		Type:     "site",
-		Local:    false,
-		Xdebug:   false,
-		SSL:      false,
-		Mailpit:  false,
-		WPDebug:  false,
-		Activate: true,
+		Type:                 "site",
+		Local:                false,
+		Xdebug:               false,
+		SSL:                  false,
+		Mailpit:              false,
+		WPDebug:              false,
+		Activate:             true,
+		RemoveDefaultPlugins: false,
 	}
 
 	// We need container details to see if the mailpit container is running
@@ -426,11 +427,12 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 
 	// Don't get plugins if we don't need them
 	if withPlugins {
-		plugins, err := s.getInstalledWordPressPlugins(consoleOutput)
+		plugins, hasDefaultPlugins, err := s.getInstalledWordPressPlugins(consoleOutput)
 		if err != nil {
 			return localSettings, err
 		}
 
+		localSettings.RemoveDefaultPlugins = !hasDefaultPlugins
 		localSettings.Plugins = plugins
 	}
 

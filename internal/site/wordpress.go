@@ -118,17 +118,19 @@ func (s *Site) getDirectories(consoleOutput *console.Console) (appDir, databaseD
 	return appDir, databaseDir, err
 }
 
-// getInstalledWordPressPlugins Returns a list of the plugins that have been installed on the site.
-func (s *Site) getInstalledWordPressPlugins(consoleOutput *console.Console) ([]string, error) {
+// getInstalledWordPressPlugins Returns a list of the plugins that have been installed on the site and whether default plugins are still there
+func (s *Site) getInstalledWordPressPlugins(consoleOutput *console.Console) ([]string, bool, error) {
 	commands := []string{
 		"plugin",
 		"list",
 		"--format=json",
 	}
 
+	hasDefaultPlugins := false
+
 	_, commandOutput, err := s.RunWPCli(commands, consoleOutput)
 	if err != nil {
-		return []string{}, err
+		return []string{}, true, err
 	}
 
 	rawPlugins := []PluginInfo{}
@@ -136,7 +138,7 @@ func (s *Site) getInstalledWordPressPlugins(consoleOutput *console.Console) ([]s
 
 	err = json.Unmarshal([]byte(commandOutput), &rawPlugins)
 	if err != nil {
-		return []string{}, err
+		return []string{}, true, err
 	}
 
 	for _, plugin := range rawPlugins {
@@ -147,9 +149,14 @@ func (s *Site) getInstalledWordPressPlugins(consoleOutput *console.Console) ([]s
 			plugin.Name != "akismet" {
 			plugins = append(plugins, plugin.Name)
 		}
+
+		if plugin.Name == "hello" ||
+			plugin.Name == "akismet" {
+			hasDefaultPlugins = true
+		}
 	}
 
-	return plugins, nil
+	return plugins, hasDefaultPlugins, nil
 }
 
 func (s *Site) getMounts(appDir string) ([]mount.Mount, error) {
@@ -276,7 +283,7 @@ func (s *Site) activateProject(consoleOutput *console.Console) error {
 
 // installDefaultPlugins Installs a list of WordPress plugins.
 func (s *Site) installDefaultPlugins(consoleOutput *console.Console) error {
-	installedPlugins, err := s.getInstalledWordPressPlugins(consoleOutput)
+	installedPlugins, _, err := s.getInstalledWordPressPlugins(consoleOutput)
 	if err != nil {
 		return err
 	}
