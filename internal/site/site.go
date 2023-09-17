@@ -81,7 +81,7 @@ func (s *Site) ExportSiteConfig(consoleOutput *console.Console) error {
 }
 
 // GetSiteList Returns a list of all Kana sites, their location and whether they're running.
-func (s *Site) GetSiteList(appDir string, consoleOutput *console.Console) ([]SiteInfo, error) {
+func (s *Site) GetSiteList(appDir string, checkRunningStatus bool, consoleOutput *console.Console) ([]SiteInfo, error) {
 	sites := []SiteInfo{}
 
 	sitesDir := path.Join(appDir, "sites")
@@ -110,10 +110,7 @@ func (s *Site) GetSiteList(appDir string, consoleOutput *console.Console) ([]Sit
 			return sites, err
 		}
 
-		containers, err := s.dockerClient.ContainerList(f.Name())
-		if err != nil {
-			return sites, err
-		}
+		siteInfo.Name = f.Name()
 
 		sitePath := fmt.Sprint(jsonLink["link"])
 
@@ -121,8 +118,14 @@ func (s *Site) GetSiteList(appDir string, consoleOutput *console.Console) ([]Sit
 			siteInfo.Path = sitePath
 		}
 
-		siteInfo.Name = f.Name()
-		siteInfo.Running = len(containers) != 0
+		if checkRunningStatus {
+			containers, err := s.dockerClient.ContainerList(f.Name())
+			if err != nil {
+				return sites, err
+			}
+
+			siteInfo.Running = len(containers) != 0
+		}
 
 		sites = append(sites, siteInfo)
 	}
