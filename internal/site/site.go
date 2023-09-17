@@ -278,6 +278,12 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 		return err
 	}
 
+	// Maybe Remove the default plugins
+	err = s.maybeRemoveDefaultPlugins(consoleOutput)
+	if err != nil {
+		return err
+	}
+
 	// Install Xdebug if we need to
 	if s.Settings.Xdebug {
 		consoleOutput.Println("Installing and configuring Xdebug.")
@@ -459,6 +465,32 @@ func (s *Site) isLocalSite(consoleOutput *console.Console) bool {
 
 	// Return the flag for all other conditions
 	return s.Settings.Local
+}
+
+// maybeRemoveDefaultPlugins Removes the default plugins if the setting is set.
+func (s *Site) maybeRemoveDefaultPlugins(consoleOutput *console.Console) error {
+	if !s.Settings.RemoveDefaultPlugins {
+		return nil
+	}
+
+	appDir, err := s.getAppDirectory(consoleOutput)
+	if err != nil {
+		return err
+	}
+
+	defaultPlugins := []string{
+		"hello.php",
+		"akismet"}
+
+	for _, plugin := range defaultPlugins {
+		pluginPath := path.Join(appDir, "wp-content", "plugins", plugin)
+		err = os.RemoveAll(pluginPath)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // runCli Runs an arbitrary CLI command against the site's WordPress container.
