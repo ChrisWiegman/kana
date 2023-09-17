@@ -155,7 +155,7 @@ func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
 		s.Activate = flags.Activate
 	}
 
-	if cmd.Flags().Lookup("removeDefaultPlugins").Changed {
+	if cmd.Flags().Lookup("remove-default-plugins").Changed {
 		s.RemoveDefaultPlugins = flags.RemoveDefaultPlugins
 	}
 }
