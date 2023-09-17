@@ -382,6 +382,8 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 		WPDebug:              false,
 		Activate:             true,
 		RemoveDefaultPlugins: false,
+		Multisite:            s.Settings.Multisite,
+		DatabaseClient:       s.Settings.DatabaseClient,
 	}
 
 	// We need container details to see if the mailpit container is running
