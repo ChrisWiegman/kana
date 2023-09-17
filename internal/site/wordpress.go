@@ -118,15 +118,15 @@ func (s *Site) getDirectories(consoleOutput *console.Console) (appDir, databaseD
 	return appDir, databaseDir, err
 }
 
-// getInstalledWordPressPlugins Returns a list of the plugins that have been installed on the site and whether default plugins are still there
-func (s *Site) getInstalledWordPressPlugins(consoleOutput *console.Console) ([]string, bool, error) {
+// getInstalledWordPressPlugins Returns list of installed plugins and whether default plugins are still present.
+func (s *Site) getInstalledWordPressPlugins(consoleOutput *console.Console) (pluginList []string, hasDefaultPlugins bool, err error) {
 	commands := []string{
 		"plugin",
 		"list",
 		"--format=json",
 	}
 
-	hasDefaultPlugins := false
+	hasDefaultPlugins = false
 
 	_, commandOutput, err := s.RunWPCli(commands, consoleOutput)
 	if err != nil {
