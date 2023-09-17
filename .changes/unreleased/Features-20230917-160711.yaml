@@ -1,0 +1,4 @@
+kind: Features
+body: Add config setting that will delete the default WordPress plugins when starting
+  a new site
+time: 2023-09-17T16:07:11.229597347Z

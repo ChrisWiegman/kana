@@ -1,0 +1,4 @@
+kind: Bug Fixes
+body: Ensure the `export` command properly handles the `databaseClient` and `multisite`
+  settings.
+time: 2023-09-17T16:07:42.933549084Z
