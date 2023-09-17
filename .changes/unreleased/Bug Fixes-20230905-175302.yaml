@@ -1,3 +1,0 @@
-kind: Bug Fixes
-body: Ensure we're properly checking for errors when files and other streams are closed.
-time: 2023-09-05T17:53:02.411699551Z
