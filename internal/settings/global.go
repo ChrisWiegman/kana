@@ -19,6 +19,7 @@ func (s *Settings) LoadGlobalSettings() error {
 	s.WPDebug = globalViperConfig.GetBool("wpdebug")
 	s.Mailpit = globalViperConfig.GetBool("mailpit")
 	s.Local = globalViperConfig.GetBool("local")
+	s.RemoveDefaultPlugins = globalViperConfig.GetBool("removeDefaultPlugins")
 	s.AdminEmail = globalViperConfig.GetString("admin.email")
 	s.AdminPassword = globalViperConfig.GetString("admin.password")
 	s.AdminUsername = globalViperConfig.GetString("admin.username")
@@ -53,6 +54,7 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
 	globalSettings.SetDefault("admin.password", adminPassword)
 	globalSettings.SetDefault("admin.email", adminEmail)
 	globalSettings.SetDefault("multisite", multisite)
+	globalSettings.SetDefault("removeDefaultPlugins", removeDefaultPlugins)
 
 	globalSettings.SetConfigName("kana")
 	globalSettings.SetConfigType("json")

@@ -10,27 +10,28 @@ import (
 
 // The following are the default settings for Kana.
 var (
-	rootKey          = "kana.root.key"
-	rootCert         = "kana.root.pem"
-	siteCert         = "kana.site.pem"
-	siteKey          = "kana.site.key"
-	domain           = "sites.kana.li"
-	configFolderName = ".config/kana"
-	php              = "8.1"
-	mariadb          = "11"
-	siteType         = "site"
-	xdebug           = false
-	mailpit          = false
-	local            = false
-	ssl              = false
-	wpdebug          = false
-	adminUsername    = "admin"
-	adminPassword    = "password"
-	adminEmail       = "admin@sites.kana.li"
-	imageUpdateDays  = 1
-	activate         = true
-	databaseClient   = "phpmyadmin"
-	multisite        = "none"
+	rootKey              = "kana.root.key"
+	rootCert             = "kana.root.pem"
+	siteCert             = "kana.site.pem"
+	siteKey              = "kana.site.key"
+	domain               = "sites.kana.li"
+	configFolderName     = ".config/kana"
+	php                  = "8.1"
+	mariadb              = "11"
+	siteType             = "site"
+	xdebug               = false
+	mailpit              = false
+	local                = false
+	ssl                  = false
+	wpdebug              = false
+	removeDefaultPlugins = false
+	adminUsername        = "admin"
+	adminPassword        = "password"
+	adminEmail           = "admin@sites.kana.li"
+	imageUpdateDays      = 1
+	activate             = true
+	databaseClient       = "phpmyadmin"
+	multisite            = "none"
 )
 
 // Default permissions for all new files and folders.
@@ -42,6 +43,7 @@ const (
 // Settings Individual Settings for use throughout the app lifecycle.
 type Settings struct {
 	Local, Xdebug, Mailpit, SSL, WPDebug, Activate bool
+	RemoveDefaultPlugins                           bool
 	ImageUpdateDays                                int
 	AdminEmail, AdminPassword, AdminUsername       string
 	AppDirectory, SiteDirectory, WorkingDirectory  string

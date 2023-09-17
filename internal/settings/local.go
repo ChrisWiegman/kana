@@ -11,19 +11,21 @@ import (
 )
 
 type StartFlags struct {
-	Xdebug    bool
-	WPDebug   bool
-	Mailpit   bool
-	Local     bool
-	IsTheme   bool
-	IsPlugin  bool
-	SSL       bool
-	Activate  bool
-	Multisite string
+	Xdebug               bool
+	WPDebug              bool
+	Mailpit              bool
+	Local                bool
+	IsTheme              bool
+	IsPlugin             bool
+	SSL                  bool
+	Activate             bool
+	RemoveDefaultPlugins bool
+	Multisite            string
 }
 
 type LocalSettings struct {
 	Local, Mailpit, Xdebug, SSL, WPDebug, Activate bool
+	RemoveDefaultPlugins                           bool
 	Type, DatabaseClient, Multisite                string
 	Plugins                                        []string
 }
@@ -54,6 +56,7 @@ func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 	s.WPDebug = localViper.GetBool("wpdebug")
 	s.Mailpit = localViper.GetBool("mailpit")
 	s.Local = localViper.GetBool("local")
+	s.RemoveDefaultPlugins = localViper.GetBool("removeDefaultPlugins")
 	s.PHP = localViper.GetString("php")
 	s.MariaDB = localViper.GetString("mariadb")
 	s.Type = localViper.GetString("type")
@@ -151,6 +154,10 @@ func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
 	if cmd.Flags().Lookup("activate").Changed {
 		s.Activate = flags.Activate
 	}
+
+	if cmd.Flags().Lookup("removeDefaultPlugins").Changed {
+		s.RemoveDefaultPlugins = flags.RemoveDefaultPlugins
+	}
 }
 
 // WriteLocalSettings Writes all appropriate local settings to the local config file.
@@ -165,6 +172,7 @@ func (s *Settings) WriteLocalSettings(localSettings *LocalSettings) error {
 	s.local.Set("activate", localSettings.Activate)
 	s.local.Set("databaseClient", localSettings.DatabaseClient)
 	s.local.Set("multisite", localSettings.Multisite)
+	s.local.Set("removeDefaultPlugins", localSettings.RemoveDefaultPlugins)
 
 	if _, err := os.Stat(path.Join(s.WorkingDirectory, ".kana.json")); os.IsNotExist(err) {
 		return s.local.SafeWriteConfig()
@@ -197,6 +205,7 @@ func (s *Settings) loadLocalViper() (*viper.Viper, error) {
 	localSettings.SetDefault("activate", s.Activate)
 	localSettings.SetDefault("databaseClient", s.DatabaseClient)
 	localSettings.SetDefault("multisite", s.Multisite)
+	localSettings.SetDefault("removeDefaultPlugins", s.RemoveDefaultPlugins)
 
 	localSettings.SetConfigName(".kana")
 	localSettings.SetConfigType("json")

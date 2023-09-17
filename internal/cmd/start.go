@@ -66,6 +66,13 @@ func newStartCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra
 	cmd.Flags().BoolVarP(&startFlags.IsTheme, "theme", "t", false, "Run the site as a theme using the current folder as the theme source.")
 	cmd.Flags().BoolVarP(&startFlags.SSL, "ssl", "s", false, "Whether the site should default to SSL (https) or not.")
 	cmd.Flags().BoolVarP(
+		&startFlags.RemoveDefaultPlugins,
+		"remove-default-plugins",
+		"r",
+		false,
+		"If true will remove the default plugins installed with WordPress (Akismet and Hello Dolly) when starting a site.")
+
+	cmd.Flags().BoolVarP(
 		&startFlags.Activate,
 		"activate",
 		"a",
