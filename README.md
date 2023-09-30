@@ -90,6 +90,10 @@ If you do not specify the `local` flag you can find Kana's site files in `~/.con
 
 `--remove-default-plugins` Will remove the default "Hello Dolly" and Akismet plugins when starting the site. Note this will not restore them if they've been manually removed.
 
+## Trusting the SSL certificate on Mac
+
+On MacOS, Kana will automatically attempt to add its SSL certificate to the MacOS system Keychain the first time you start a site where SSL is the default. You can manually do this without starting a new site using the `kana trust-ssl` command.
+
 ## Importing an existing WordPress database
 
 Kana offers a simple way to import an existing WordPress database. Just use the `kana db import <your database file>` to get started.
