@@ -13,6 +13,8 @@ import (
 
 var execCommand = exec.Command
 
+const certOS = "darwin"
+
 // EnsureSSLCerts Ensures SSL certificates have been generated and are where they need to be.
 func (s *Settings) EnsureSSLCerts(consoleOutput *console.Console) error {
 	createCert := false
@@ -47,7 +49,7 @@ func (s *Settings) EnsureSSLCerts(consoleOutput *console.Console) error {
 	}
 
 	// If we're on Mac try to add the cert to the system trust.
-	if s.SSL && runtime.GOOS == "darwin" {
+	if s.SSL && runtime.GOOS == certOS {
 		return TrustSSL(consoleOutput)
 	}
 
@@ -55,7 +57,7 @@ func (s *Settings) EnsureSSLCerts(consoleOutput *console.Console) error {
 }
 
 func TrustSSL(consoleOutput *console.Console) error {
-	if runtime.GOOS != "darwin" {
+	if runtime.GOOS != certOS {
 		return fmt.Errorf("the trust command is only available for MacOS")
 	}
 	err := VerifySSLTrust()
@@ -80,7 +82,7 @@ func TrustSSL(consoleOutput *console.Console) error {
 }
 
 func VerifySSLTrust() error {
-	if runtime.GOOS == "darwin" {
+	if runtime.GOOS == certOS {
 		verifyCertCommand := execCommand(
 			"security",
 			"find-certificate",
