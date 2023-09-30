@@ -134,6 +134,8 @@ func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
 
 	if cmd.Flags().Lookup("ssl").Changed {
 		s.SSL = flags.SSL
+		s.Protocol = s.getProtocol()
+		s.URL = fmt.Sprintf("%s://%s", s.Protocol, s.SiteDomain)
 	}
 
 	if cmd.Flags().Lookup("mailpit").Changed {
