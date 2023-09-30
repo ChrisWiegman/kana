@@ -56,6 +56,7 @@ func (s *Settings) EnsureSSLCerts(consoleOutput *console.Console) error {
 	return nil
 }
 
+// TrustSSL Adds the Kana certificate to the Apple Keychain.
 func TrustSSL(consoleOutput *console.Console) error {
 	if runtime.GOOS != certOS {
 		return fmt.Errorf("the trust command is only available for MacOS")
@@ -81,6 +82,7 @@ func TrustSSL(consoleOutput *console.Console) error {
 	return nil
 }
 
+// VerifySSLTrust verifies the SSL certificate has been added to that Apple Keychain.
 func VerifySSLTrust() error {
 	if runtime.GOOS == certOS {
 		verifyCertCommand := execCommand(
