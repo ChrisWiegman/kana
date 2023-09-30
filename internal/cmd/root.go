@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"runtime"
+
 	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 
@@ -61,6 +63,10 @@ func Execute() {
 		newXdebugCommand(consoleOutput, kanaSite),
 		newFlushCommand(consoleOutput, kanaSite),
 	)
+
+	if runtime.GOOS == "darwin" {
+		cmd.AddCommand(newTrustCommand(consoleOutput, kanaSite))
+	}
 
 	// Execute anything we need to
 	if err := cmd.Execute(); err != nil {
