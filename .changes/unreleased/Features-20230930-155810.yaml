@@ -1,0 +1,4 @@
+kind: Features
+body: Adds a `trust-ssl` command for Mac to easily add the SSL cert to the Mac system
+  Keychain
+time: 2023-09-30T15:58:10.31742276Z
