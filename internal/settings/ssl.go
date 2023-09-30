@@ -47,7 +47,7 @@ func (s *Settings) EnsureSSLCerts(consoleOutput *console.Console) error {
 	}
 
 	// If we're on Mac try to add the cert to the system trust.
-	if s.SSL {
+	if s.SSL && runtime.GOOS == "darwin" {
 		return TrustSSL(consoleOutput)
 	}
 
