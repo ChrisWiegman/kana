@@ -3,12 +3,8 @@ package settings
 import (
 	_ "embed"
 	"os"
-	"os/exec"
 	"path"
-	"runtime"
 	"text/template"
-
-	"github.com/ChrisWiegman/kana-cli/pkg/minica"
 )
 
 type File struct {
@@ -34,8 +30,6 @@ var TraefikToml string
 
 //go:embed templates/kana-local-development.php
 var KanaWordPressPlugin string
-
-var execCommand = exec.Command
 
 var configFiles = []File{
 	{
@@ -77,56 +71,6 @@ func (s *Settings) EnsureKanaPlugin(appDir string) error {
 	}
 
 	return tmpl.Execute(myFile, pluginVars)
-}
-
-// EnsureSSLCerts Ensures SSL certificates have been generated and are where they need to be.
-func (s *Settings) EnsureSSLCerts() error {
-	createCert := false
-	certPath := path.Join(s.AppDirectory, "certs")
-	rootCert := path.Join(certPath, s.RootCert)
-
-	_, err := os.Stat(rootCert)
-	if err != nil && os.IsNotExist(err) {
-		createCert = true
-	}
-
-	if createCert {
-		err = os.MkdirAll(certPath, os.FileMode(defaultDirPermissions))
-		if err != nil {
-			return err
-		}
-
-		certInfo := minica.CertInfo{
-			CertDir:    certPath,
-			CertDomain: s.AppDomain,
-			RootKey:    s.RootKey,
-			RootCert:   s.RootCert,
-			SiteCert:   s.SiteCert,
-			SiteKey:    s.SiteKey,
-		}
-
-		err = minica.GenCerts(&certInfo)
-		if err != nil {
-			return err
-		}
-
-		// If we're on Mac try to add the cert to the system trust.
-		if runtime.GOOS == "darwin" {
-			installCertCommand := execCommand(
-				"sudo",
-				"security",
-				"add-trusted-cert",
-				"-d",
-				"-r",
-				"trustRoot",
-				"-k",
-				"/Library/Keychains/System.keychain",
-				rootCert)
-			return installCertCommand.Run()
-		}
-	}
-
-	return nil
 }
 
 // EnsureStaticConfigFiles Ensures the application's static config files have been generated and are where they need to be.
