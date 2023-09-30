@@ -1,0 +1,3 @@
+kind: Bug Fixes
+body: Ensure the local SSL setting is respected to load the correct URL
+time: 2023-09-30T15:09:00.884110751Z
