@@ -1,0 +1,3 @@
+kind: Features
+body: Only add Kana's SSL certificate to the MacOS keychain when it needs to be used.
+time: 2023-09-30T14:51:26.873130378Z
