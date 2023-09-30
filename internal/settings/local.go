@@ -35,8 +35,6 @@ func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 	siteName := sanitizeSiteName(filepath.Base(s.WorkingDirectory))
 	// Setup other options generated from config items
 	s.SiteDomain = fmt.Sprintf("%s.%s", siteName, s.AppDomain)
-	s.Protocol = s.getProtocol()
-	s.URL = fmt.Sprintf("%s://%s", s.Protocol, s.SiteDomain)
 
 	s.Name = siteName
 	s.SiteDirectory = path.Join(s.AppDirectory, "sites", siteName)
@@ -65,6 +63,9 @@ func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 	s.SSL = localViper.GetBool("ssl")
 	s.Activate = localViper.GetBool("activate")
 	s.Multisite = localViper.GetString("multisite")
+
+	s.Protocol = s.getProtocol()
+	s.URL = fmt.Sprintf("%s://%s", s.Protocol, s.SiteDomain)
 
 	return isSite, nil
 }
