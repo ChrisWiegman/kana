@@ -29,7 +29,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect
-	gotest.tools/v3 v3.2.0 // indirect
+	gotest.tools/v3 v3.5.1 // indirect
 )
 
 require (
