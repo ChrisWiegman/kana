@@ -28,7 +28,7 @@ var (
 	adminUsername        = "admin"
 	adminPassword        = "password"
 	adminEmail           = "admin@sites.kana.li"
-	imageUpdateDays      = 1
+	imageUpdateDays      = 7
 	activate             = true
 	databaseClient       = "phpmyadmin"
 	multisite            = "none"
