@@ -7,15 +7,6 @@ import (
 	"text/template"
 )
 
-type File struct {
-	Name, Template, LocalPath string
-	Permissions               os.FileMode
-}
-
-type KanaPluginVars struct {
-	SiteName, Version string
-}
-
 //go:embed templates/subdomain.htaccess
 var SubDomainMultisiteHtaccess string
 

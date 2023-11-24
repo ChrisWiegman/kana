@@ -10,26 +10,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-type StartFlags struct {
-	Xdebug               bool
-	WPDebug              bool
-	Mailpit              bool
-	Local                bool
-	IsTheme              bool
-	IsPlugin             bool
-	SSL                  bool
-	Activate             bool
-	RemoveDefaultPlugins bool
-	Multisite            string
-}
-
-type LocalSettings struct {
-	Local, Mailpit, Xdebug, SSL, WPDebug, Activate bool
-	RemoveDefaultPlugins                           bool
-	Type, DatabaseClient, Multisite                string
-	Plugins                                        []string
-}
-
 // LoadLocalSettings Loads the config for the current site being called.
 func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 	siteName := sanitizeSiteName(filepath.Base(s.WorkingDirectory))
