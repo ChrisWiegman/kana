@@ -21,6 +21,7 @@ func (s *Site) getPhpMyAdminContainer() docker.ContainerConfig {
 		},
 		Labels: map[string]string{
 			"traefik.enable": "true",
+			"kana.type":      "phpmyadmin",
 			fmt.Sprintf("traefik.http.routers.wordpress-%s-%s-http.entrypoints", s.Settings.Name, "phpmyadmin"): "web",
 			fmt.Sprintf(
 				"traefik.http.routers.wordpress-%s-%s-http.rule",

@@ -37,6 +37,7 @@ var validPHPVersions = []string{
 	"8.0",
 	"8.1",
 	"8.2",
+	"8.4",
 }
 
 var validMariaDBVersions = []string{

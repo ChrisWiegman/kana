@@ -140,6 +140,7 @@ func (s *Site) getDatabaseContainer(databaseDir string, appContainers []docker.C
 			"MARIADB_PASSWORD=wordpress",
 		},
 		Labels: map[string]string{
+			"kana.type": "database",
 			"kana.site": s.Settings.Name,
 		},
 		Volumes: []mount.Mount{

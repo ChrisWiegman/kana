@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
+
+	"github.com/ChrisWiegman/kana-cli/internal/docker"
 )
 
 // arrayContains Searches an array of strings for a given string and returns true/false as appropriate.
@@ -51,5 +54,22 @@ func copyFile(src, dest string) error {
 	}()
 
 	_, err = io.Copy(destination, source)
+	return err
+}
+
+func (s *Site) handleImageError(container *docker.ContainerConfig, err error) error {
+	if strings.Contains(err.Error(), "manifest unknown") {
+		switch container.Labels["kana.type"] {
+		case "wordpress":
+			return fmt.Errorf(
+				"the PHP version in your configuration, %s, is invalid. See https://hub.docker.com/_/wordpress for a list of supported versions",
+				s.Settings.PHP)
+		case "database":
+			return fmt.Errorf(
+				"the MariaDB version in your configuration, %s, is invalid. See https://hub.docker.com/_/mariadb for a list of supported versions",
+				s.Settings.PHP)
+		}
+	}
+
 	return err
 }

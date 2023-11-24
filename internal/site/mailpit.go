@@ -23,6 +23,7 @@ func (s *Site) getMailpitContainer() docker.ContainerConfig {
 		},
 		Labels: map[string]string{
 			"traefik.enable": "true",
+			"kana.type":      "mailpit",
 			fmt.Sprintf("traefik.http.routers.wordpress-%s-%s-http.entrypoints", s.Settings.Name, "mailpit"): "web",
 			fmt.Sprintf(
 				"traefik.http.routers.wordpress-%s-%s-http.rule",

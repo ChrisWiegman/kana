@@ -229,6 +229,7 @@ func (s *Site) getWordPressContainer(appVolumes []mount.Mount, appContainers []d
 		},
 		Labels: map[string]string{
 			"traefik.enable": "true",
+			"kana.type":      "wordpress",
 			fmt.Sprintf("traefik.http.routers.wordpress-%s-http.entrypoints", s.Settings.Name): "web",
 			fmt.Sprintf("traefik.http.routers.wordpress-%s-http.rule", s.Settings.Name):        hostRule,
 			fmt.Sprintf("traefik.http.routers.wordpress-%s.entrypoints", s.Settings.Name):      "websecure",
@@ -408,7 +409,10 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 func (s *Site) startContainer(container *docker.ContainerConfig, randomPorts, localUser bool, consoleOutput *console.Console) error {
 	err := s.dockerClient.EnsureImage(container.Image, s.Settings.ImageUpdateDays, consoleOutput)
 	if err != nil {
-		return err
+		err = s.handleImageError(container, err)
+		if err != nil {
+			return err
+		}
 	}
 	_, err = s.dockerClient.ContainerRun(container, randomPorts, localUser)
 
