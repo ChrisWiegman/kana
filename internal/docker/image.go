@@ -2,8 +2,11 @@ package docker
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"path"
 	"strings"
@@ -34,6 +37,29 @@ func (d *Client) EnsureImage(imageName string, updateDays int, consoleOutput *co
 	}
 
 	return d.maybeUpdateImage(imageName, updateDays, consoleOutput.JSON)
+}
+
+func ValidateImage(imageName, imageTag string) error {
+	requestURL := fmt.Sprintf("https://registry.hub.docker.com/v2/repositories/library/%s/tags/", imageName)
+	res, err := http.Get(requestURL)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	resBody, err := io.ReadAll(res.Body)
+	if err != nil {
+		fmt.Printf("client: could not read response body: %s\n", err)
+		return err
+	}
+
+	var data map[string]interface{}
+
+	err = json.Unmarshal(resBody, &data)
+	if err != nil {
+		panic(err)
+	}
+	return err
 }
 
 func (d *Client) maybeUpdateImage(imageName string, updateDays int, suppressOutput bool) error {

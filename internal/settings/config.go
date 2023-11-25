@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/ChrisWiegman/kana-cli/internal/console"
+	"github.com/ChrisWiegman/kana-cli/internal/docker"
 
 	"github.com/aquasecurity/table"
 	"github.com/go-playground/validator/v10"
@@ -110,12 +111,16 @@ func (s *Settings) validateSetting(setting, value string) error { //nolint:gocyc
 
 	switch setting {
 	case "php":
-		if !isValidString(value, validPHPVersions) {
-			return fmt.Errorf("please choose a valid php version")
+		if docker.ValidateImage("wordpress", value) != nil {
+			return fmt.Errorf(
+				"the PHP version in your configuration, %s, is invalid. See https://hub.docker.com/_/wordpress for a list of supported versions",
+				value)
 		}
 	case "mariadb":
-		if !isValidString(value, validMariaDBVersions) {
-			return fmt.Errorf("please choose a valid MariaDB version")
+		if docker.ValidateImage("mariadb", value) != nil {
+			return fmt.Errorf(
+				"the MariaDB version in your configuration, %s, is invalid. See https://hub.docker.com/_/mariadb for a list of supported versions",
+				value)
 		}
 	case "type":
 		if !isValidString(value, validTypes) {
