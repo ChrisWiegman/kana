@@ -40,8 +40,8 @@ func (d *Client) EnsureImage(imageName string, updateDays int, consoleOutput *co
 }
 
 func ValidateImage(imageName, imageTag string) error {
-	requestURL := fmt.Sprintf("https://registry.hub.docker.com/v2/repositories/library/%s/tags/", imageName)
-	res, err := http.Get(requestURL)
+	requestURL := fmt.Sprintf("https://hub.docker.com/v2/namespaces/library/repositories/%s/tags/%s", imageName, imageTag)
+	res, err := http.Get(requestURL) //nolint:gosec
 	if err != nil {
 		return err
 	}
@@ -59,6 +59,11 @@ func ValidateImage(imageName, imageTag string) error {
 	if err != nil {
 		panic(err)
 	}
+
+	if data["errinfo"] != nil {
+		return fmt.Errorf("image not found for %s:%s", imageName, imageTag)
+	}
+
 	return err
 }
 

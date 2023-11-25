@@ -111,7 +111,7 @@ func (s *Settings) validateSetting(setting, value string) error { //nolint:gocyc
 
 	switch setting {
 	case "php":
-		if docker.ValidateImage("wordpress", value) != nil {
+		if docker.ValidateImage("wordpress", fmt.Sprintf("php%s", value)) != nil {
 			return fmt.Errorf(
 				"the PHP version in your configuration, %s, is invalid. See https://hub.docker.com/_/wordpress for a list of supported versions",
 				value)

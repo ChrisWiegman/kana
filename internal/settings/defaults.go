@@ -32,19 +32,6 @@ const (
 	defaultFilePermissions = 0644
 )
 
-var validPHPVersions = []string{
-	"7.4",
-	"8.0",
-	"8.1",
-	"8.2",
-	"8.4",
-}
-
-var validMariaDBVersions = []string{
-	"10",
-	"11",
-}
-
 var validTypes = []string{
 	"site",
 	"plugin",

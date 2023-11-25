@@ -2,8 +2,10 @@ package settings
 
 import (
 	"errors"
+	"fmt"
 	"path"
 
+	"github.com/ChrisWiegman/kana-cli/internal/docker"
 	"github.com/spf13/viper"
 )
 
@@ -83,13 +85,13 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
 	}
 
 	// Reset default php version if there's an invalid version in the config file
-	if !isValidString(globalSettings.GetString("php"), validPHPVersions) {
+	if docker.ValidateImage("wordpress", fmt.Sprintf("php%s", globalSettings.GetString("php"))) != nil {
 		changeConfig = true
 		globalSettings.Set("php", php)
 	}
 
 	// Reset default mariadb version if there's an invalid version in the config file
-	if !isValidString(globalSettings.GetString("mariadb"), validMariaDBVersions) {
+	if docker.ValidateImage("mariadb", globalSettings.GetString("mariadb")) != nil {
 		changeConfig = true
 		globalSettings.Set("mariadb", mariadb)
 	}
