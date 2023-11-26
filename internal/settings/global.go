@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"path"
 
-	"github.com/ChrisWiegman/kana-cli/internal/docker"
 	"github.com/spf13/viper"
+
+	"github.com/ChrisWiegman/kana-cli/internal/docker"
 )
 
 // LoadGlobalSettings gets config information that transcends sites such as app and default settings.
