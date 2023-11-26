@@ -153,8 +153,8 @@ Kana has a handful of options that apply to all new sites created with the app. 
 - `admin.password` **password** - the default password used to login to WordPress
 - `admin.username` **admin** - the default username used to login to WordPress
 - `local` **false** - the default usage of the `local` start flag
-- `php` **8.1** - the default PHP version used for new sites (currently 8.0, 8.1 and 8.2 are also supported)
-- `mariadb` **11** - the default MariaDB version used for sites (currently 10 and 11 are supported)
+- `php` **8.1** - the default PHP version used for new sites (see [https://hub.docker.com/_/wordpress] for all supported versions)
+- `mariadb` **11** - the default MariaDB version used for sites (see [https://hub.docker.com/_/mariadb] for all supported versions)
 - `databaseClient` **phpmyadmin** - the default database client for accessing the database directly (currently `phpmyadmin` and `tableplus` are supported)
 - `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
 - `xdebug` **false** - the default usage of the `xdebug` start flag
@@ -178,8 +178,8 @@ The above syntax will allow you to change the defaults for any of the options li
 In addition to the global config, certain items above can be overridden for any given site. For a site without a `name` flag (as seen in the start command), simply create a _.kana.json_ file in the current directory. You can populate it with the following options:
 
 - `local` **false** - the default usage of the `local` start flag
-- `php` **8.1** - the default PHP version used for sites (currently 7.4, 8.0, 8.1 and 8.2 are supported)
-- `mariadb` **11** - the default MariaDB version used for sites (currently 10 and 11 are supported)
+- `php` **8.1** - the default PHP version used for new sites (see [https://hub.docker.com/_/wordpress] for all supported versions)
+- `mariadb` **11** - the default MariaDB version used for sites (see [https://hub.docker.com/_/mariadb] for all supported versions)
 - `databaseClient` **phpmyadmin** - the default database client for accessing the database directly (currently `phpmyadmin` and `tableplus` are supported)
 - `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
 - `xdebug` **false** - the default usage of the `xdebug` start flag
