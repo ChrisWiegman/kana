@@ -41,7 +41,12 @@ func (d *Client) EnsureImage(imageName string, updateDays int, consoleOutput *co
 
 func ValidateImage(imageName, imageTag string) error {
 	requestURL := fmt.Sprintf("https://hub.docker.com/v2/namespaces/library/repositories/%s/tags/%s", imageName, imageTag)
-	res, err := http.Get(requestURL) //nolint:gosec
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, requestURL, http.NoBody)
+	if err != nil {
+		return err
+	}
+
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -49,7 +54,6 @@ func ValidateImage(imageName, imageTag string) error {
 
 	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
-		fmt.Printf("client: could not read response body: %s\n", err)
 		return err
 	}
 
@@ -57,7 +61,7 @@ func ValidateImage(imageName, imageTag string) error {
 
 	err = json.Unmarshal(resBody, &data)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	if data["errinfo"] != nil {
