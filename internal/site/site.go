@@ -140,7 +140,12 @@ func (s *Site) IsSiteRunning() bool {
 	return len(containers) != 0
 }
 
-func (s *Site) LoadSite(cmd *cobra.Command, commandsRequiringSite []string, startFlags settings.StartFlags, flagVerbose bool, consoleOutput *console.Console) error {
+func (s *Site) LoadSite(
+	cmd *cobra.Command,
+	commandsRequiringSite []string,
+	startFlags settings.StartFlags,
+	flagVerbose bool,
+	consoleOutput *console.Console) error {
 	var err error
 
 	s.Settings, err = settings.NewSettings()
