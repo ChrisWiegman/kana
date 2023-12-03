@@ -9,6 +9,8 @@ import (
 	"regexp"
 )
 
+const defaultType = "site"
+
 func (s *Site) DetectType() (string, error) {
 	var err error
 	var isSite bool
@@ -19,7 +21,7 @@ func (s *Site) DetectType() (string, error) {
 	}
 
 	if isSite {
-		return "site", err
+		return defaultType, err
 	}
 
 	items, _ := os.ReadDir(s.Settings.WorkingDirectory)
@@ -56,7 +58,7 @@ func (s *Site) DetectType() (string, error) {
 		}
 	}
 
-	return "site", err
+	return defaultType, err
 }
 
 func pathExists(filePath string) (bool, error) {

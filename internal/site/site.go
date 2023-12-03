@@ -382,7 +382,7 @@ func checkStatusCode(checkURL string) (bool, error) {
 func (s *Site) getLocalAppDir() (string, error) {
 	localAppDir := s.Settings.WorkingDirectory
 
-	if s.Settings.Type != "site" {
+	if s.Settings.Type != defaultType {
 		localAppDir = path.Join(s.Settings.WorkingDirectory, "wordpress")
 	}
 
@@ -397,7 +397,7 @@ func (s *Site) getLocalAppDir() (string, error) {
 // getRunningConfig gets various options that were used to start the site.
 func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console) (settings.LocalSettings, error) {
 	localSettings := settings.LocalSettings{
-		Type:                 "site",
+		Type:                 defaultType,
 		Local:                false,
 		Xdebug:               false,
 		SSL:                  false,
@@ -433,7 +433,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana-%s-wordpress", s.Settings.Name))
 
 	if len(mounts) == 1 {
-		localSettings.Type = "site"
+		localSettings.Type = defaultType
 	}
 
 	for _, mount := range mounts {
