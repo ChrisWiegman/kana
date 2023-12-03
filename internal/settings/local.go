@@ -50,6 +50,15 @@ func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 	return isSite, nil
 }
 
+// HasLocalOptions Returns true if local options have been saved to a file or false.
+func (s *Settings) HasLocalOptions() bool {
+	if _, err := os.Stat(path.Join(s.WorkingDirectory, ".kana.json")); os.IsNotExist(err) {
+		return false
+	}
+
+	return true
+}
+
 // ProcessNameFlag Processes the name flag on the site resetting all appropriate local variables.
 func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 	isStartCommand := cmd.Use == "start"
