@@ -57,7 +57,7 @@ Kana relies on [Traefik](https://traefik.io) to map real domains to local sites.
 
 ## Start
 
-`kana start` will start a kana site based on your current directory and open it in your browser.
+`kana start` will start a kana site based on your current directory and open it in your browser. It will detect if the current directory is a plugin or a theme and start the site as the appropriate type.
 
 To login to the new site use the following:
 
