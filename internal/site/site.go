@@ -140,7 +140,7 @@ func (s *Site) IsSiteRunning() bool {
 	return len(containers) != 0
 }
 
-func (s *Site) LoadSite(cmd *cobra.Command, commandsRequiringSite []string, startFlags settings.StartFlags, flagVerbose bool) error {
+func (s *Site) LoadSite(cmd *cobra.Command, commandsRequiringSite []string, startFlags settings.StartFlags, flagVerbose bool, consoleOutput *console.Console) error {
 	var err error
 
 	s.Settings, err = settings.NewSettings()
@@ -173,6 +173,20 @@ func (s *Site) LoadSite(cmd *cobra.Command, commandsRequiringSite []string, star
 		}
 
 		s.Settings.ProcessStartFlags(cmd, startFlags)
+
+		if !cmd.Flags().Lookup("plugin").Changed && !cmd.Flags().Lookup("theme").Changed && !s.Settings.HasLocalOptions() {
+			var siteType string
+
+			siteType, err = s.DetectType()
+			if err != nil {
+				return err
+			}
+
+			if siteType != s.Settings.Type {
+				s.Settings.Type = siteType
+				consoleOutput.Printf("A %s was detected as the current site folder. Starting site as a %s.\n", siteType, siteType)
+			}
+		}
 	}
 
 	return nil
