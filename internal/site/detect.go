@@ -11,15 +11,15 @@ import (
 
 func (s *Site) DetectType() (string, error) {
 	var err error
-	var isCore bool
+	var isSite bool
 
-	isCore, err = pathExists(path.Join(s.Settings.WorkingDirectory, "wp-includes", "version.php"))
+	isSite, err = pathExists(path.Join(s.Settings.WorkingDirectory, "wp-includes", "version.php"))
 	if err != nil {
 		return "", err
 	}
 
-	if isCore {
-		return "core", err
+	if isSite {
+		return "site", err
 	}
 
 	items, _ := os.ReadDir(s.Settings.WorkingDirectory)
@@ -56,7 +56,7 @@ func (s *Site) DetectType() (string, error) {
 		}
 	}
 
-	return "core", err
+	return "site", err
 }
 
 func pathExists(filePath string) (bool, error) {

@@ -380,7 +380,11 @@ func checkStatusCode(checkURL string) (bool, error) {
 
 // getLocalAppDir Gets the absolute path to WordPress if the local flag or option has been set.
 func (s *Site) getLocalAppDir() (string, error) {
-	localAppDir := path.Join(s.Settings.WorkingDirectory, "wordpress")
+	localAppDir := s.Settings.WorkingDirectory
+
+	if s.Settings.Type != "site" {
+		localAppDir = path.Join(s.Settings.WorkingDirectory, "wordpress")
+	}
 
 	err := os.MkdirAll(localAppDir, os.FileMode(defaultDirPermissions))
 	if err != nil {
