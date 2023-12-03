@@ -1,0 +1,4 @@
+kind: Features
+body: Kana will now detect if a folder where a site is started is a theme or a plugin
+  and start the appropriate site type.
+time: 2023-12-03T16:20:42.294371372Z
