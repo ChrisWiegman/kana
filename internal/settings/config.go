@@ -8,6 +8,7 @@ import (
 
 	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/docker"
+	"github.com/ChrisWiegman/kana-cli/internal/helpers"
 
 	"github.com/aquasecurity/table"
 	"github.com/go-playground/validator/v10"
@@ -123,7 +124,7 @@ func (s *Settings) validateSetting(setting, value string) error { //nolint:gocyc
 				value)
 		}
 	case "type":
-		if !isValidString(value, validTypes) {
+		if !helpers.IsValidString(value, validTypes) {
 			return fmt.Errorf("please choose a valid project type")
 		}
 	case "admin.email":
@@ -137,11 +138,11 @@ func (s *Settings) validateSetting(setting, value string) error { //nolint:gocyc
 		return validate.Var(value, "gte=0")
 	case "databaseClient":
 	case "databaseclient":
-		if !isValidString(value, validDatabaseClients) {
+		if !helpers.IsValidString(value, validDatabaseClients) {
 			return fmt.Errorf("the database client, %s, is not a valid client. You must use either `phpmyadmin` or `tableplus`", setting)
 		}
 	case "multisite":
-		if !isValidString(value, validMultisiteTypes) {
+		if !helpers.IsValidString(value, validMultisiteTypes) {
 			return fmt.Errorf("the multisite type, %s, is not a valid type. You must use either `none`, `subdomain` or `subdirectory`", setting)
 		}
 	default:

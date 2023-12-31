@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/ChrisWiegman/kana-cli/internal/docker"
+	"github.com/ChrisWiegman/kana-cli/internal/helpers"
 )
 
 // LoadGlobalSettings gets config information that transcends sites such as app and default settings.
@@ -80,7 +81,7 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
 	changeConfig := false
 
 	// Reset default "site" type if there's an invalid type in the config file
-	if !isValidString(globalSettings.GetString("type"), validTypes) {
+	if !helpers.IsValidString(globalSettings.GetString("type"), validTypes) {
 		changeConfig = true
 		globalSettings.Set("type", "site")
 	}
@@ -98,13 +99,13 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
 	}
 
 	// Reset default database client if there's an invalid client in the config file
-	if !isValidString(globalSettings.GetString("databaseClient"), validDatabaseClients) {
+	if !helpers.IsValidString(globalSettings.GetString("databaseClient"), validDatabaseClients) {
 		changeConfig = true
 		globalSettings.Set("databaseClient", databaseClient)
 	}
 
 	// Reset default multisite type if there's an invalid type in the config file
-	if !isValidString(globalSettings.GetString("multisite"), validMultisiteTypes) {
+	if !helpers.IsValidString(globalSettings.GetString("multisite"), validMultisiteTypes) {
 		changeConfig = true
 		globalSettings.Set("multisite", multisite)
 	}

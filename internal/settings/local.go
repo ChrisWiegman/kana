@@ -6,13 +6,15 @@ import (
 	"path"
 	"path/filepath"
 
+	"github.com/ChrisWiegman/kana-cli/internal/helpers"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 // LoadLocalSettings Loads the config for the current site being called.
 func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
-	siteName := sanitizeSiteName(filepath.Base(s.WorkingDirectory))
+	siteName := helpers.SanitizeSiteName(filepath.Base(s.WorkingDirectory))
 	// Setup other options generated from config items
 	s.SiteDomain = fmt.Sprintf("%s.%s", siteName, s.AppDomain)
 
@@ -23,6 +25,9 @@ func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 	if err != nil {
 		return isSite, err
 	}
+
+	fmt.Println(s.SiteDirectory)
+	os.Exit(0)
 
 	localViper, err := s.loadLocalViper()
 	if err != nil {
@@ -70,7 +75,7 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 
 	if isStartCommand && cmd.Flags().Lookup("multisite").Changed {
 		multisiteValue, err := cmd.Flags().GetString("multisite")
-		if !isValidString(multisiteValue, validMultisiteTypes) || err != nil {
+		if !helpers.IsValidString(multisiteValue, validMultisiteTypes) || err != nil {
 			return false,
 				fmt.Errorf("the multisite type, %s, is not a valid type. You must use either `none`, `subdomain` or `subdirectory`", multisiteValue)
 		}
@@ -88,7 +93,7 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 			}
 		}
 
-		s.Name = sanitizeSiteName(cmd.Flags().Lookup("name").Value.String())
+		s.Name = helpers.SanitizeSiteName(cmd.Flags().Lookup("name").Value.String())
 		s.SiteDirectory = (path.Join(s.AppDirectory, "sites", s.Name))
 
 		s.SiteDomain = fmt.Sprintf("%s.%s", s.Name, s.AppDomain)
