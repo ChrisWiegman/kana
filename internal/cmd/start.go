@@ -21,6 +21,12 @@ func newStartCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra
 		Run: func(cmd *cobra.Command, args []string) {
 			err := kanaSite.EnsureDocker(consoleOutput)
 			if err != nil {
+				if kanaSite.Settings.IsNewSite {
+					remError := os.RemoveAll(kanaSite.Settings.SiteDirectory)
+					if remError != nil {
+						consoleOutput.Error(remError)
+					}
+				}
 				consoleOutput.Error(err)
 			}
 
@@ -31,6 +37,12 @@ func newStartCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra
 
 				siteType, err = kanaSite.DetectType()
 				if err != nil {
+					if kanaSite.Settings.IsNewSite {
+						remError := os.RemoveAll(kanaSite.Settings.SiteDirectory)
+						if remError != nil {
+							consoleOutput.Error(remError)
+						}
+					}
 					consoleOutput.Error(err)
 				}
 

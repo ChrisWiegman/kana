@@ -26,9 +26,6 @@ func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 		return isSite, err
 	}
 
-	fmt.Println(s.SiteDirectory)
-	os.Exit(0)
-
 	localViper, err := s.loadLocalViper()
 	if err != nil {
 		return isSite, err
@@ -108,6 +105,8 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 	if err == nil || !os.IsNotExist(err) {
 		isSite = true
 	}
+
+	s.IsNewSite = !isSite // Negate the site exists here to set if this is a new site.
 
 	return s.saveLinkConfig(isSite, cmd, siteLink)
 }
