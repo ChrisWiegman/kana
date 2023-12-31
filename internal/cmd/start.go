@@ -24,6 +24,22 @@ func newStartCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra
 				consoleOutput.Error(err)
 			}
 
+			kanaSite.Settings.ProcessStartFlags(cmd, startFlags)
+
+			if !cmd.Flags().Lookup("plugin").Changed && !cmd.Flags().Lookup("theme").Changed && !kanaSite.Settings.HasLocalOptions() {
+				var siteType string
+
+				siteType, err = kanaSite.DetectType()
+				if err != nil {
+					consoleOutput.Error(err)
+				}
+
+				if siteType != kanaSite.Settings.Type {
+					kanaSite.Settings.Type = siteType
+					consoleOutput.Printf("A %s was detected as the current site folder. Starting site as a %s.\n", siteType, siteType)
+				}
+			}
+
 			// Check that the site is already running and show an error if it is.
 			if kanaSite.IsSiteRunning() {
 				consoleOutput.Error(fmt.Errorf("the site is already running. Please stop your site before running the start command"))

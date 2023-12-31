@@ -176,22 +176,6 @@ func (s *Site) LoadSite(
 		if startFlags.IsPlugin && startFlags.IsTheme {
 			return fmt.Errorf("you have set both the plugin and theme flags. Please choose only one option")
 		}
-
-		s.Settings.ProcessStartFlags(cmd, startFlags)
-
-		if !cmd.Flags().Lookup("plugin").Changed && !cmd.Flags().Lookup("theme").Changed && !s.Settings.HasLocalOptions() {
-			var siteType string
-
-			siteType, err = s.DetectType()
-			if err != nil {
-				return err
-			}
-
-			if siteType != s.Settings.Type {
-				s.Settings.Type = siteType
-				consoleOutput.Printf("A %s was detected as the current site folder. Starting site as a %s.\n", siteType, siteType)
-			}
-		}
 	}
 
 	return nil
