@@ -27,7 +27,7 @@ func SanitizeSiteName(rawSiteName string) string {
 	return strings.ToValidUTF8(siteName, "")
 }
 
-// PathExists returns true if the given path exists or false if it doesn't
+// PathExists returns true if the given path exists or false if it doesn't.
 func PathExists(filePath string) (bool, error) {
 	_, err := os.Stat(filePath)
 
