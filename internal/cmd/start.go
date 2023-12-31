@@ -37,12 +37,6 @@ func newStartCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra
 
 				siteType, err = kanaSite.DetectType()
 				if err != nil {
-					if kanaSite.Settings.IsNewSite {
-						remError := os.RemoveAll(kanaSite.Settings.SiteDirectory)
-						if remError != nil {
-							consoleOutput.Error(remError)
-						}
-					}
 					consoleOutput.Error(err)
 				}
 
