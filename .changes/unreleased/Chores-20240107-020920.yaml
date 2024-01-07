@@ -1,0 +1,4 @@
+kind: Chores
+body: Update GitHub actions to use Ubuntu 22.04 on all actions for consistency and
+  ensure all actions are up to date.
+time: 2024-01-07T02:09:20.134101385Z
