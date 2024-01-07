@@ -244,6 +244,14 @@ func (s *Site) getWordPressContainer(appVolumes []mount.Mount, appContainers []d
 		wordPressContainer.Env = append(wordPressContainer.Env, "WORDPRESS_DEBUG=1")
 	}
 
+	extraConfig := fmt.Sprintf("WORDPRESS_CONFIG_EXTRA=define( 'WP_ENVIRONMENT_TYPE', '%s' );", s.Settings.Environment)
+
+	if s.Settings.ScriptDebug {
+		extraConfig += "define( 'SCRIPT_DEBUG', true );"
+	}
+
+	wordPressContainer.Env = append(wordPressContainer.Env, extraConfig)
+
 	appContainers = append(appContainers, wordPressContainer)
 
 	return appContainers
