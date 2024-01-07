@@ -64,7 +64,7 @@ func (s *Settings) HasLocalOptions() bool {
 }
 
 // ProcessNameFlag Processes the name flag on the site resetting all appropriate local variables.
-func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
+func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) { //nolint:gocyclo
 	isStartCommand := cmd.Use == "start"
 
 	// Don't run this on commands that wouldn't possibly use it.
@@ -72,11 +72,20 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) {
 		return false, nil
 	}
 
+	// Validate the flags that could make this an invalid site
 	if isStartCommand && cmd.Flags().Lookup("multisite").Changed {
 		multisiteValue, err := cmd.Flags().GetString("multisite")
 		if !helpers.IsValidString(multisiteValue, validMultisiteTypes) || err != nil {
 			return false,
 				fmt.Errorf("the multisite type, %s, is not a valid type. You must use either `none`, `subdomain` or `subdirectory`", multisiteValue)
+		}
+	}
+
+	if isStartCommand && cmd.Flags().Lookup("environment").Changed {
+		environmentValue, err := cmd.Flags().GetString("environment")
+		if !helpers.IsValidString(environmentValue, validEnvironmentTypes) || err != nil {
+			return false,
+				fmt.Errorf("the environment, %s, is not valid. You must use either `local`, `development`, `staging` or `production`", environmentValue)
 		}
 	}
 
