@@ -80,6 +80,10 @@ If you do not specify the `local` flag you can find Kana's site files in `~/.con
 
 `--wpdebug` will enable `WP_DEBUG` on the site.
 
+`--scriptdebug` will enable `SCRIPT_DEBUG` on the site.
+
+`--environment` allows the user to change the `WP_ENVIRONMENT_TYPE` constant. Defaults to `local`. Valid options are `local`, `devlopment`, `staging` and `production`.
+
 `--mailpit` will start an instance of [Mailpit](https://github.com/axllent/mailpit) to allow for email capture and troubleshooting.
 
 `--ssl` will set the site's default URLs to use SSL.
@@ -159,6 +163,8 @@ Kana has a handful of options that apply to all new sites created with the app. 
 - `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
 - `xdebug` **false** - the default usage of the `xdebug` start flag
 - `wpdebug` **false** - the default usage of the `wpdebug` start flag
+- `scriptdebug` **false** - the default usage of the `scriptdebug` start flag
+- `environment` **local** - the default usage of the `environment` start flag
 - `mailpit` **false** - the default usage of the `mailpit` start flag
 - `removeDefaultPlugins` **false** - removes the default "Hello Dolly" and Akismet plugins when starting a new site. Note this will not restore them if they've already been removed.
 - `ssl` **false** - the default usage of the `ssl` start flag
@@ -184,6 +190,8 @@ In addition to the global config, certain items above can be overridden for any 
 - `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
 - `xdebug` **false** - the default usage of the `xdebug` start flag
 - `wpdebug` **false** - the default usage of the `wpdebug` start flag
+- `scriptdebug` **false** - the default usage of the `scriptdebug` start flag
+- `environment` **local** - the default usage of the `environment` start flag
 - `mailpit` **false** - the default usage of the `mailpit` start flag
 - `plugins` **[]** - an array of plugins to install and activate when starting the new site. These are slugs from the Plugins section of WordPress.org.
 - `removeDefaultPlugins` **false** - removes the default "Hello Dolly" and Akismet plugins when starting a new site. Note this will not restore them if they've already been removed.
