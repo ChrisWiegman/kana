@@ -82,6 +82,7 @@ func newStartCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra
 
 	// Add associated flags to customize the site at runtime.
 	cmd.Flags().BoolVarP(&startFlags.Xdebug, "xdebug", "x", false, "Enable Xdebug when starting the container.")
+	cmd.Flags().BoolVarP(&startFlags.ScriptDebug, "scriptdebug", "c", false, "Enable SCRIPT_DEBUG when starting the container.")
 	cmd.Flags().BoolVarP(&startFlags.WPDebug, "wpdebug", "d", false, "Enable WP_Debug when starting the container.")
 	cmd.Flags().BoolVarP(&startFlags.Mailpit, "mailpit", "m", false, "Enable Mailpit when starting the container.")
 	cmd.Flags().BoolVarP(&startFlags.IsPlugin, "plugin", "p", false, "Run the site as a plugin using the current folder as the plugin source.")
@@ -107,6 +108,7 @@ func newStartCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra
 		false,
 		"Installs the WordPress files in your current path at ./wordpress instead of the global app path.")
 	cmd.Flags().StringVarP(&startFlags.Multisite, "multisite", "u", "none", "Creates your new site as a multisite installation.")
+	cmd.Flags().StringVarP(&startFlags.Environment, "environment", "e", "local", "Sets the WP_ENVIRONMENT_TYPE for the site.")
 	cmd.Flags().Lookup("multisite").NoOptDefVal = "subdomain"
 
 	return cmd
