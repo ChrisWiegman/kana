@@ -70,6 +70,8 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 	t.AddRow("activate", consoleOutput.Bold(s.global.GetString("activate")), consoleOutput.Bold(s.local.GetString("activate")))
 	t.AddRow("wpdebug", consoleOutput.Bold(s.global.GetString("wpdebug")), consoleOutput.Bold(s.local.GetString("wpdebug")))
 	t.AddRow("xdebug", consoleOutput.Bold(s.global.GetString("xdebug")), consoleOutput.Bold(s.local.GetString("xdebug")))
+	t.AddRow("scriptdebug", consoleOutput.Bold(s.global.GetString("scriptdebug")), consoleOutput.Bold(s.local.GetString("scriptdebug")))
+	t.AddRow("environment", consoleOutput.Bold(s.global.GetString("environment")), consoleOutput.Bold(s.local.GetString("environment")))
 
 	t.Render()
 }
@@ -144,6 +146,10 @@ func (s *Settings) validateSetting(setting, value string) error { //nolint:gocyc
 	case "multisite":
 		if !helpers.IsValidString(value, validMultisiteTypes) {
 			return fmt.Errorf("the multisite type, %s, is not a valid type. You must use either `none`, `subdomain` or `subdirectory`", setting)
+		}
+	case "environment":
+		if !helpers.IsValidString(value, validEnvironmentTypes) {
+			return fmt.Errorf("the environment, %s, is not valid. You must use either `local`, `development`, `staging` or `production`", setting)
 		}
 	default:
 		err := validate.Var(value, "boolean")

@@ -8,24 +8,25 @@ import (
 
 // Settings Individual Settings for use throughout the app lifecycle.
 type Settings struct {
-	Local, Xdebug, Mailpit, SSL, WPDebug, Activate bool
-	RemoveDefaultPlugins                           bool
-	IsNewSite                                      bool
-	ImageUpdateDays                                int
-	AdminEmail, AdminPassword, AdminUsername       string
-	AppDirectory, SiteDirectory, WorkingDirectory  string
-	AppDomain, SiteDomain                          string
-	Name                                           string
-	PHP                                            string
-	MariaDB                                        string
-	RootCert, RootKey, SiteCert, SiteKey           string
-	URL, Protocol                                  string
-	Type                                           string
-	DatabaseClient                                 string
-	Multisite                                      string
-	Plugins                                        []string
-	global                                         *viper.Viper
-	local                                          *viper.Viper
+	Local, Xdebug, Mailpit, SSL, WPDebug, Activate, ScriptDebug bool
+	RemoveDefaultPlugins                                        bool
+	IsNewSite                                                   bool
+	ImageUpdateDays                                             int
+	AdminEmail, AdminPassword, AdminUsername                    string
+	AppDirectory, SiteDirectory, WorkingDirectory               string
+	AppDomain, SiteDomain                                       string
+	Name                                                        string
+	PHP                                                         string
+	MariaDB                                                     string
+	RootCert, RootKey, SiteCert, SiteKey                        string
+	URL, Protocol                                               string
+	Type                                                        string
+	DatabaseClient                                              string
+	Multisite                                                   string
+	Environment                                                 string
+	Plugins                                                     []string
+	global                                                      *viper.Viper
+	local                                                       *viper.Viper
 }
 
 type StartFlags struct {
@@ -38,14 +39,16 @@ type StartFlags struct {
 	SSL                  bool
 	Activate             bool
 	RemoveDefaultPlugins bool
+	ScriptDebug          bool
+	Environment          string
 	Multisite            string
 }
 
 type LocalSettings struct {
-	Local, Mailpit, Xdebug, SSL, WPDebug, Activate bool
-	RemoveDefaultPlugins                           bool
-	Type, DatabaseClient, Multisite                string
-	Plugins                                        []string
+	Local, Mailpit, Xdebug, SSL, WPDebug, Activate, ScriptDebug bool
+	RemoveDefaultPlugins                                        bool
+	Type, DatabaseClient, Multisite, Environment                string
+	Plugins                                                     []string
 }
 
 type File struct {

@@ -16,6 +16,7 @@ var (
 	local                = false
 	ssl                  = false
 	wpdebug              = false
+	scriptDebug          = false
 	removeDefaultPlugins = false
 	adminUsername        = "admin"
 	adminPassword        = "password"
@@ -24,6 +25,7 @@ var (
 	activate             = true
 	databaseClient       = "phpmyadmin"
 	multisite            = "none"
+	environment          = "local"
 )
 
 // Default permissions for all new files and folders.
@@ -47,4 +49,11 @@ var validMultisiteTypes = []string{
 	"none",
 	"subdomain",
 	"subdirectory",
+}
+
+var validEnvironmentTypes = []string{
+	"local",
+	"development",
+	"staging",
+	"production",
 }

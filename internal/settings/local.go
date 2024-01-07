@@ -34,12 +34,14 @@ func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 	s.local = localViper
 	s.Xdebug = localViper.GetBool("xdebug")
 	s.WPDebug = localViper.GetBool("wpdebug")
+	s.ScriptDebug = localViper.GetBool("scriptdebug")
 	s.Mailpit = localViper.GetBool("mailpit")
 	s.Local = localViper.GetBool("local")
 	s.RemoveDefaultPlugins = localViper.GetBool("removeDefaultPlugins")
 	s.PHP = localViper.GetString("php")
 	s.MariaDB = localViper.GetString("mariadb")
 	s.Type = localViper.GetString("type")
+	s.Environment = localViper.GetString("environment")
 	s.DatabaseClient = localViper.GetString("databaseClient")
 	s.Plugins = localViper.GetStringSlice("plugins")
 	s.SSL = localViper.GetBool("ssl")
@@ -125,6 +127,10 @@ func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
 		s.WPDebug = flags.WPDebug
 	}
 
+	if cmd.Flags().Lookup("scriptdebug").Changed {
+		s.ScriptDebug = flags.ScriptDebug
+	}
+
 	if cmd.Flags().Lookup("ssl").Changed {
 		s.SSL = flags.SSL
 		s.Protocol = s.getProtocol()
@@ -151,6 +157,10 @@ func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
 		s.Activate = flags.Activate
 	}
 
+	if cmd.Flags().Lookup("environment").Changed {
+		s.Environment = flags.Environment
+	}
+
 	if cmd.Flags().Lookup("remove-default-plugins").Changed {
 		s.RemoveDefaultPlugins = flags.RemoveDefaultPlugins
 	}
@@ -161,6 +171,7 @@ func (s *Settings) WriteLocalSettings(localSettings *LocalSettings) error {
 	s.local.Set("local", localSettings.Local)
 	s.local.Set("type", localSettings.Type)
 	s.local.Set("xdebug", localSettings.Xdebug)
+	s.local.Set("scriptdebug", localSettings.ScriptDebug)
 	s.local.Set("mailpit", localSettings.Mailpit)
 	s.local.Set("plugins", localSettings.Plugins)
 	s.local.Set("ssl", localSettings.SSL)
@@ -169,6 +180,7 @@ func (s *Settings) WriteLocalSettings(localSettings *LocalSettings) error {
 	s.local.Set("databaseClient", localSettings.DatabaseClient)
 	s.local.Set("multisite", localSettings.Multisite)
 	s.local.Set("removeDefaultPlugins", localSettings.RemoveDefaultPlugins)
+	s.local.Set("environment", localSettings.Environment)
 
 	if _, err := os.Stat(path.Join(s.WorkingDirectory, ".kana.json")); os.IsNotExist(err) {
 		return s.local.SafeWriteConfig()
@@ -195,6 +207,7 @@ func (s *Settings) loadLocalViper() (*viper.Viper, error) {
 	localSettings.SetDefault("local", s.Local)
 	localSettings.SetDefault("xdebug", s.Xdebug)
 	localSettings.SetDefault("wpdebug", s.WPDebug)
+	localSettings.SetDefault("scriptdebug", s.ScriptDebug)
 	localSettings.SetDefault("mailpit", s.Mailpit)
 	localSettings.SetDefault("plugins", []string{})
 	localSettings.SetDefault("ssl", s.SSL)
@@ -202,6 +215,7 @@ func (s *Settings) loadLocalViper() (*viper.Viper, error) {
 	localSettings.SetDefault("databaseClient", s.DatabaseClient)
 	localSettings.SetDefault("multisite", s.Multisite)
 	localSettings.SetDefault("removeDefaultPlugins", s.RemoveDefaultPlugins)
+	localSettings.SetDefault("environment", s.Environment)
 
 	localSettings.SetConfigName(".kana")
 	localSettings.SetConfigType("json")

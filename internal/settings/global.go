@@ -21,6 +21,8 @@ func (s *Settings) LoadGlobalSettings() error {
 	s.global = globalViperConfig
 	s.Xdebug = globalViperConfig.GetBool("xdebug")
 	s.WPDebug = globalViperConfig.GetBool("wpdebug")
+	s.ScriptDebug = globalViperConfig.GetBool("scriptdebug")
+	s.Environment = globalViperConfig.GetString("environment")
 	s.Mailpit = globalViperConfig.GetBool("mailpit")
 	s.Local = globalViperConfig.GetBool("local")
 	s.RemoveDefaultPlugins = globalViperConfig.GetBool("removeDefaultPlugins")
@@ -40,13 +42,14 @@ func (s *Settings) LoadGlobalSettings() error {
 }
 
 // loadGlobalViper loads the global config using viper and sets defaults.
-func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
+func (s *Settings) loadGlobalViper() (*viper.Viper, error) { //nolint:funlen
 	globalSettings := viper.New()
 
 	globalSettings.SetDefault("xdebug", xdebug)
 	globalSettings.SetDefault("imageUpdateDays", imageUpdateDays)
 	globalSettings.SetDefault("databaseClient", databaseClient)
 	globalSettings.SetDefault("wpdebug", wpdebug)
+	globalSettings.SetDefault("scriptdebug", scriptDebug)
 	globalSettings.SetDefault("mailpit", mailpit)
 	globalSettings.SetDefault("type", siteType)
 	globalSettings.SetDefault("local", local)
@@ -59,6 +62,7 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
 	globalSettings.SetDefault("admin.email", adminEmail)
 	globalSettings.SetDefault("multisite", multisite)
 	globalSettings.SetDefault("removeDefaultPlugins", removeDefaultPlugins)
+	globalSettings.SetDefault("environment", environment)
 
 	globalSettings.SetConfigName("kana")
 	globalSettings.SetConfigType("json")
@@ -108,6 +112,12 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) {
 	if !helpers.IsValidString(globalSettings.GetString("multisite"), validMultisiteTypes) {
 		changeConfig = true
 		globalSettings.Set("multisite", multisite)
+	}
+
+	// Reset default environment type if there's an invalid type in the config file
+	if !helpers.IsValidString(globalSettings.GetString("environment"), validEnvironmentTypes) {
+		changeConfig = true
+		globalSettings.Set("environment", environment)
 	}
 
 	if changeConfig {
