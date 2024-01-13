@@ -1,0 +1,4 @@
+kind: Breaking Changes
+body: Removes the `local` flag and related configuration items. All sites that don't
+  use the `name` flag now store their WordPress and database in the folder from which the site was initiated.
+time: 2024-01-13T17:54:32.930442339Z
