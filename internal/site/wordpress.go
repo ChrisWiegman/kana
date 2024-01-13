@@ -104,7 +104,7 @@ func (s *Site) getWordPressDirectory() (wordPressDirectory string, err error) {
 		wordPressDirectory = s.Settings.WorkingDirectory
 
 		if s.Settings.Type != defaultType {
-			wordPressDirectory = path.Join(s.Settings.WorkingDirectory, ".kana", "wordpress")
+			wordPressDirectory = path.Join(s.Settings.WorkingDirectory, "wordpress")
 		}
 	}
 
@@ -128,12 +128,6 @@ func (s *Site) getDirectories() (wordPressDirectory, databaseDir string, err err
 		return "", "", err
 	}
 
-	err = os.MkdirAll(wordPressDirectory, os.FileMode(defaultDirPermissions))
-	if err != nil {
-		return "", "", err
-	}
-
-	err = os.MkdirAll(databaseDir, os.FileMode(defaultDirPermissions))
 	return wordPressDirectory, databaseDir, err
 }
 
