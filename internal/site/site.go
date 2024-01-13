@@ -363,22 +363,6 @@ func checkStatusCode(checkURL string) (bool, error) {
 	return false, nil
 }
 
-// getLocalAppDir Gets the absolute path to WordPress if the local flag or option has been set.
-func (s *Site) getLocalAppDir() (string, error) {
-	localAppDir := s.Settings.WorkingDirectory
-
-	if s.Settings.Type != defaultType {
-		localAppDir = path.Join(s.Settings.WorkingDirectory, "wordpress")
-	}
-
-	err := os.MkdirAll(localAppDir, os.FileMode(defaultDirPermissions))
-	if err != nil {
-		return "", err
-	}
-
-	return localAppDir, nil
-}
-
 // getRunningConfig gets various options that were used to start the site.
 func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console) (settings.LocalSettings, error) {
 	localSettings := settings.LocalSettings{
@@ -450,7 +434,7 @@ func (s *Site) maybeRemoveDefaultPlugins() error {
 		return nil
 	}
 
-	appDir, err := s.getAppDirectory()
+	wordPressDirectory, err := s.getWordPressDirectory()
 	if err != nil {
 		return err
 	}
@@ -460,7 +444,7 @@ func (s *Site) maybeRemoveDefaultPlugins() error {
 		"akismet"}
 
 	for _, plugin := range defaultPlugins {
-		pluginPath := path.Join(appDir, "wp-content", "plugins", plugin)
+		pluginPath := path.Join(wordPressDirectory, "wp-content", "plugins", plugin)
 		err = os.RemoveAll(pluginPath)
 		if err != nil {
 			return err

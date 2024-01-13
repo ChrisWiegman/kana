@@ -25,7 +25,7 @@ var defaultDirPermissions = 0750
 
 // RunWPCli Runs a wp-cli command returning it's output and any errors.
 func (s *Site) RunWPCli(command []string, consoleOutput *console.Console) (statusCode int64, output string, err error) {
-	appDir, err := s.getAppDirectory()
+	wordPressDirectory, err := s.getWordPressDirectory()
 	if err != nil {
 		return 1, "", err
 	}
@@ -42,7 +42,7 @@ func (s *Site) RunWPCli(command []string, consoleOutput *console.Console) (statu
 		}
 	}
 
-	appVolumes, err := s.getMounts(appDir)
+	appVolumes, err := s.getMounts(wordPressDirectory)
 	if err != nil {
 		return 1, "", err
 	}
@@ -86,36 +86,59 @@ func (s *Site) RunWPCli(command []string, consoleOutput *console.Console) (statu
 	return code, output, nil
 }
 
-func (s *Site) getAppDirectory() (string, error) {
-	var err error
-	appDir := path.Join(s.Settings.SiteDirectory, "app")
+func (s *Site) getDatabaseDirectory() (databaseDirectory string, err error) {
+	databaseDirectory = path.Join(s.Settings.SiteDirectory, "database")
 
 	if !s.Settings.IsNamedSite {
-		appDir, err = s.getLocalAppDir()
-		if err != nil {
-			return "", err
+		databaseDirectory = path.Join(s.Settings.WorkingDirectory, ".kana", "database")
+	}
+
+	err = os.MkdirAll(databaseDirectory, os.FileMode(defaultDirPermissions))
+	if err != nil {
+		return "", err
+	}
+
+	return databaseDirectory, err
+}
+
+func (s *Site) getWordPressDirectory() (wordPressDirectory string, err error) {
+	wordPressDirectory = path.Join(s.Settings.SiteDirectory, "wordpress")
+
+	if !s.Settings.IsNamedSite {
+		wordPressDirectory = s.Settings.WorkingDirectory
+
+		if s.Settings.Type != defaultType {
+			wordPressDirectory = path.Join(s.Settings.WorkingDirectory, ".kana", "wordpress")
 		}
 	}
 
-	return appDir, err
+	err = os.MkdirAll(wordPressDirectory, os.FileMode(defaultDirPermissions))
+	if err != nil {
+		return "", err
+	}
+
+	return wordPressDirectory, err
 }
 
 // getDirectories Returns the correct appDir and databaseDir for the current site.
-func (s *Site) getDirectories() (appDir, databaseDir string, err error) {
-	appDir, err = s.getAppDirectory()
+func (s *Site) getDirectories() (wordPressDirectory, databaseDir string, err error) {
+	wordPressDirectory, err = s.getWordPressDirectory()
 	if err != nil {
 		return "", "", err
 	}
 
-	databaseDir = path.Join(s.Settings.SiteDirectory, "database")
+	databaseDir, err = s.getDatabaseDirectory()
+	if err != nil {
+		return "", "", err
+	}
 
-	err = os.MkdirAll(appDir, os.FileMode(defaultDirPermissions))
+	err = os.MkdirAll(wordPressDirectory, os.FileMode(defaultDirPermissions))
 	if err != nil {
 		return "", "", err
 	}
 
 	err = os.MkdirAll(databaseDir, os.FileMode(defaultDirPermissions))
-	return appDir, databaseDir, err
+	return wordPressDirectory, databaseDir, err
 }
 
 // getInstalledWordPressPlugins Returns list of installed plugins and whether default plugins are still present.
@@ -332,12 +355,12 @@ func (s *Site) installDefaultPlugins(consoleOutput *console.Console) error {
 
 // installKanaPlugin installs the Kana development plugin.
 func (s *Site) installKanaPlugin() error {
-	appDir, err := s.getAppDirectory()
+	wordPressDirectory, err := s.getWordPressDirectory()
 	if err != nil {
 		return err
 	}
 
-	return s.Settings.EnsureKanaPlugin(appDir)
+	return s.Settings.EnsureKanaPlugin(wordPressDirectory)
 }
 
 // installWordPress Installs and configures WordPress core.
@@ -480,7 +503,7 @@ func (s *Site) stopWordPress() error {
 }
 
 func (s *Site) writeHtaccess() error {
-	appDir, err := s.getAppDirectory()
+	wordPressDirectory, err := s.getWordPressDirectory()
 	if err != nil {
 		return err
 	}
@@ -488,5 +511,5 @@ func (s *Site) writeHtaccess() error {
 	_, filePerms := settings.GetDefaultPermissions()
 	htaccessContents := s.Settings.GetHtaccess()
 
-	return os.WriteFile(path.Join(appDir, ".htaccess"), []byte(htaccessContents), os.FileMode(filePerms))
+	return os.WriteFile(path.Join(wordPressDirectory, ".htaccess"), []byte(htaccessContents), os.FileMode(filePerms))
 }
