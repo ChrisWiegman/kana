@@ -89,10 +89,6 @@ func (s *Site) RunWPCli(command []string, consoleOutput *console.Console) (statu
 func (s *Site) getDatabaseDirectory() (databaseDirectory string, err error) {
 	databaseDirectory = path.Join(s.Settings.SiteDirectory, "database")
 
-	if !s.Settings.IsNamedSite {
-		databaseDirectory = path.Join(s.Settings.WorkingDirectory, ".kana", "database")
-	}
-
 	err = os.MkdirAll(databaseDirectory, os.FileMode(defaultDirPermissions))
 	if err != nil {
 		return "", err
