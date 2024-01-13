@@ -72,10 +72,6 @@ Note: these can be changed in the config. Please see below.
 
 `--theme` will map the current directory as a theme within the created site. Use this if you are developing a theme.
 
-`--local` will create a directory called "wordpress" in the current directory and map it to the main WordPress site. This will allow you easy access, if you need it, to all the WordPress files (including any other installed plugins and themes) in your IDE.
-
-If you do not specify the `local` flag you can find Kana's site files in `~/.config/kana/sites/<SITE NAME>/app`
-
 `--xdebug` will start Xdebug on the site (see below for usage).
 
 `--wpdebug` will enable `WP_DEBUG` on the site.
@@ -156,7 +152,6 @@ Kana has a handful of options that apply to all new sites created with the app. 
 - `admin.email` __admin@kanasite.localhost__ - the admin email address for the default admin account
 - `admin.password` **password** - the default password used to login to WordPress
 - `admin.username` **admin** - the default username used to login to WordPress
-- `local` **false** - the default usage of the `local` start flag
 - `php` **8.1** - the default PHP version used for new sites (see [https://hub.docker.com/_/wordpress] for all supported versions)
 - `mariadb` **11** - the default MariaDB version used for sites (see [https://hub.docker.com/_/mariadb] for all supported versions)
 - `databaseClient` **phpmyadmin** - the default database client for accessing the database directly (currently `phpmyadmin` and `tableplus` are supported)
@@ -183,7 +178,6 @@ The above syntax will allow you to change the defaults for any of the options li
 
 In addition to the global config, certain items above can be overridden for any given site. For a site without a `name` flag (as seen in the start command), simply create a _.kana.json_ file in the current directory. You can populate it with the following options:
 
-- `local` **false** - the default usage of the `local` start flag
 - `php` **8.1** - the default PHP version used for new sites (see [https://hub.docker.com/_/wordpress] for all supported versions)
 - `mariadb` **11** - the default MariaDB version used for sites (see [https://hub.docker.com/_/mariadb] for all supported versions)
 - `databaseClient` **phpmyadmin** - the default database client for accessing the database directly (currently `phpmyadmin` and `tableplus` are supported)
@@ -243,8 +237,6 @@ Currently Kana only supports step debugging in xdebug. To use this with VSCode c
     ]
 }
 ```
-
-Note the above example will map the current folder as a plugin and maps the _wordpress_ folder as if the `local` flag was used. You may need to adjust these paths depending on your setup.
 
 To trigger step debugging you'll also need the appropriate extension for your browser:
 
