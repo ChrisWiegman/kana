@@ -90,11 +90,9 @@ func (s *Site) getAppDirectory(consoleOutput *console.Console) (string, error) {
 	var err error
 	appDir := path.Join(s.Settings.SiteDirectory, "app")
 
-	if s.isLocalSite(consoleOutput) {
-		appDir, err = s.getLocalAppDir()
-		if err != nil {
-			return "", err
-		}
+	appDir, err = s.getLocalAppDir()
+	if err != nil {
+		return "", err
 	}
 
 	return appDir, err
@@ -439,12 +437,10 @@ func (s *Site) startWordPress(consoleOutput *console.Console) error {
 		return err
 	}
 
-	if s.isLocalSite(consoleOutput) {
-		// Replace wp-config.php with the container's file
-		_, err = os.Stat(path.Join(appDir, "wp-config.php"))
-		if err == nil {
-			os.Remove(path.Join(appDir, "wp-config.php"))
-		}
+	// Replace wp-config.php with the container's file
+	_, err = os.Stat(path.Join(appDir, "wp-config.php"))
+	if err == nil {
+		os.Remove(path.Join(appDir, "wp-config.php"))
 	}
 
 	appVolumes, err := s.getMounts(appDir)

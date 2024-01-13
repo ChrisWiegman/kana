@@ -101,12 +101,6 @@ func newStartCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra
 		"a",
 		false,
 		"Activate the current plugin or theme (only works when used with the 'plugin' or 'theme' flags).")
-	cmd.Flags().BoolVarP(
-		&startFlags.Local,
-		"local",
-		"l",
-		false,
-		"Installs the WordPress files in your current path at ./wordpress instead of the global app path.")
 	cmd.Flags().StringVarP(&startFlags.Multisite, "multisite", "u", "none", "Creates your new site as a multisite installation.")
 	cmd.Flags().StringVarP(&startFlags.Environment, "environment", "e", "local", "Sets the WP_ENVIRONMENT_TYPE for the site.")
 	cmd.Flags().Lookup("multisite").NoOptDefVal = "subdomain"

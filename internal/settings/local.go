@@ -36,7 +36,6 @@ func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 	s.WPDebug = localViper.GetBool("wpdebug")
 	s.ScriptDebug = localViper.GetBool("scriptdebug")
 	s.Mailpit = localViper.GetBool("mailpit")
-	s.Local = localViper.GetBool("local")
 	s.RemoveDefaultPlugins = localViper.GetBool("removeDefaultPlugins")
 	s.PHP = localViper.GetString("php")
 	s.MariaDB = localViper.GetString("mariadb")
@@ -124,10 +123,6 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) { //nolint:
 
 // ProcessStartFlags Process the start flags and save them to the settings object.
 func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
-	if cmd.Flags().Lookup("local").Changed {
-		s.Local = flags.Local
-	}
-
 	if cmd.Flags().Lookup("xdebug").Changed {
 		s.Xdebug = flags.Xdebug
 	}
@@ -177,7 +172,6 @@ func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
 
 // WriteLocalSettings Writes all appropriate local settings to the local config file.
 func (s *Settings) WriteLocalSettings(localSettings *LocalSettings) error {
-	s.local.Set("local", localSettings.Local)
 	s.local.Set("type", localSettings.Type)
 	s.local.Set("xdebug", localSettings.Xdebug)
 	s.local.Set("scriptdebug", localSettings.ScriptDebug)
@@ -213,7 +207,6 @@ func (s *Settings) loadLocalViper() (*viper.Viper, error) {
 	localSettings.SetDefault("php", s.PHP)
 	localSettings.SetDefault("mariadb", s.MariaDB)
 	localSettings.SetDefault("type", s.Type)
-	localSettings.SetDefault("local", s.Local)
 	localSettings.SetDefault("xdebug", s.Xdebug)
 	localSettings.SetDefault("wpdebug", s.WPDebug)
 	localSettings.SetDefault("scriptdebug", s.ScriptDebug)

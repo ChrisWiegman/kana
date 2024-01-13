@@ -382,7 +382,6 @@ func (s *Site) getLocalAppDir() (string, error) {
 func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console) (settings.LocalSettings, error) {
 	localSettings := settings.LocalSettings{
 		Type:                 defaultType,
-		Local:                false,
 		Xdebug:               false,
 		SSL:                  false,
 		Mailpit:              false,
@@ -421,10 +420,6 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 	}
 
 	for _, mount := range mounts {
-		if mount.Source == path.Join(s.Settings.WorkingDirectory, "wordpress") {
-			localSettings.Local = true
-		}
-
 		if strings.Contains(mount.Destination, "/var/www/html/wp-content/plugins/") {
 			localSettings.Type = "plugin"
 		}
@@ -446,36 +441,6 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 	}
 
 	return localSettings, nil
-}
-
-// isLocalSite Determines if a site is a "local" site (started with the "local" flag) so that other commands can work as needed.
-func (s *Site) isLocalSite(consoleOutput *console.Console) bool {
-	// If the site is already running, try to make this easier
-	if s.IsSiteRunning() {
-		runningConfig, _ := s.getRunningConfig(false, consoleOutput)
-		if runningConfig.Local {
-			return true
-		}
-	}
-
-	// First check the app site folders. If we've created the site (has a DB) without an "app" folder we can assume it was local last time.
-	hasNonLocalAppFolder := true
-	hasDatabaseFolder := true
-
-	if _, err := os.Stat(path.Join(s.Settings.SiteDirectory, "app")); os.IsNotExist(err) {
-		hasNonLocalAppFolder = false
-	}
-
-	if _, err := os.Stat(path.Join(s.Settings.SiteDirectory, "database")); os.IsNotExist(err) {
-		hasDatabaseFolder = false
-	}
-
-	if hasDatabaseFolder && !hasNonLocalAppFolder {
-		return true
-	}
-
-	// Return the flag for all other conditions
-	return s.Settings.Local
 }
 
 // maybeRemoveDefaultPlugins Removes the default plugins if the setting is set.
