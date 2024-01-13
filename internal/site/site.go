@@ -27,6 +27,7 @@ import (
 type Site struct {
 	dockerClient *docker.Client
 	Settings     *settings.Settings
+	Named        bool
 }
 
 type SiteInfo struct {
@@ -282,7 +283,7 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 	}
 
 	// Maybe Remove the default plugins
-	err = s.maybeRemoveDefaultPlugins(consoleOutput)
+	err = s.maybeRemoveDefaultPlugins()
 	if err != nil {
 		return err
 	}
@@ -298,7 +299,7 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 	}
 
 	// Install the Kana development plugin
-	err = s.installKanaPlugin(consoleOutput)
+	err = s.installKanaPlugin()
 	if err != nil {
 		return err
 	}
@@ -444,12 +445,12 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 }
 
 // maybeRemoveDefaultPlugins Removes the default plugins if the setting is set.
-func (s *Site) maybeRemoveDefaultPlugins(consoleOutput *console.Console) error {
+func (s *Site) maybeRemoveDefaultPlugins() error {
 	if !s.Settings.RemoveDefaultPlugins {
 		return nil
 	}
 
-	appDir, err := s.getAppDirectory(consoleOutput)
+	appDir, err := s.getAppDirectory()
 	if err != nil {
 		return err
 	}

@@ -10,7 +10,7 @@ import (
 type Settings struct {
 	Local, Xdebug, Mailpit, SSL, WPDebug, Activate, ScriptDebug bool
 	RemoveDefaultPlugins                                        bool
-	IsNewSite                                                   bool
+	IsNewSite, IsNamedSite                                      bool
 	ImageUpdateDays                                             int
 	AdminEmail, AdminPassword, AdminUsername                    string
 	AppDirectory, SiteDirectory, WorkingDirectory               string

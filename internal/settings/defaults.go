@@ -13,7 +13,6 @@ var (
 	siteType             = "site"
 	xdebug               = false
 	mailpit              = false
-	local                = false
 	ssl                  = false
 	wpdebug              = false
 	scriptDebug          = false

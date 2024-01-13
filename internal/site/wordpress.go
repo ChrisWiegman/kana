@@ -25,7 +25,7 @@ var defaultDirPermissions = 0750
 
 // RunWPCli Runs a wp-cli command returning it's output and any errors.
 func (s *Site) RunWPCli(command []string, consoleOutput *console.Console) (statusCode int64, output string, err error) {
-	appDir, err := s.getAppDirectory(consoleOutput)
+	appDir, err := s.getAppDirectory()
 	if err != nil {
 		return 1, "", err
 	}
@@ -86,21 +86,23 @@ func (s *Site) RunWPCli(command []string, consoleOutput *console.Console) (statu
 	return code, output, nil
 }
 
-func (s *Site) getAppDirectory(consoleOutput *console.Console) (string, error) {
+func (s *Site) getAppDirectory() (string, error) {
 	var err error
 	appDir := path.Join(s.Settings.SiteDirectory, "app")
 
-	appDir, err = s.getLocalAppDir()
-	if err != nil {
-		return "", err
+	if !s.Settings.IsNamedSite {
+		appDir, err = s.getLocalAppDir()
+		if err != nil {
+			return "", err
+		}
 	}
 
 	return appDir, err
 }
 
 // getDirectories Returns the correct appDir and databaseDir for the current site.
-func (s *Site) getDirectories(consoleOutput *console.Console) (appDir, databaseDir string, err error) {
-	appDir, err = s.getAppDirectory(consoleOutput)
+func (s *Site) getDirectories() (appDir, databaseDir string, err error) {
+	appDir, err = s.getAppDirectory()
 	if err != nil {
 		return "", "", err
 	}
@@ -329,8 +331,8 @@ func (s *Site) installDefaultPlugins(consoleOutput *console.Console) error {
 }
 
 // installKanaPlugin installs the Kana development plugin.
-func (s *Site) installKanaPlugin(consoleOutput *console.Console) error {
-	appDir, err := s.getAppDirectory(consoleOutput)
+func (s *Site) installKanaPlugin() error {
+	appDir, err := s.getAppDirectory()
 	if err != nil {
 		return err
 	}
@@ -372,7 +374,7 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 				setupCommand = append(setupCommand, "--subdomains")
 			}
 
-			err = s.writeHtaccess(consoleOutput)
+			err = s.writeHtaccess()
 			if err != nil {
 				return err
 			}
@@ -432,7 +434,7 @@ func (s *Site) startWordPress(consoleOutput *console.Console) error {
 		return err
 	}
 
-	appDir, databaseDir, err := s.getDirectories(consoleOutput)
+	appDir, databaseDir, err := s.getDirectories()
 	if err != nil {
 		return err
 	}
@@ -477,8 +479,8 @@ func (s *Site) stopWordPress() error {
 	return nil
 }
 
-func (s *Site) writeHtaccess(consoleOutput *console.Console) error {
-	appDir, err := s.getAppDirectory(consoleOutput)
+func (s *Site) writeHtaccess() error {
+	appDir, err := s.getAppDirectory()
 	if err != nil {
 		return err
 	}

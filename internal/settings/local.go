@@ -93,10 +93,12 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) { //nolint:
 
 	// Process the name flag if set
 	if cmd.Flags().Lookup("name").Changed {
+		s.IsNamedSite = true
+
 		// Check that we're not using invalid start flags for the start command
 		if isStartCommand {
-			if cmd.Flags().Lookup("plugin").Changed || cmd.Flags().Lookup("theme").Changed || cmd.Flags().Lookup("local").Changed {
-				return false, fmt.Errorf("invalid flags detected. 'plugin' 'theme' and 'local' flags are not valid with named sites")
+			if cmd.Flags().Lookup("plugin").Changed || cmd.Flags().Lookup("theme").Changed {
+				return false, fmt.Errorf("invalid flags detected. 'plugin' and 'theme' flags are not valid with named sites")
 			}
 		}
 
