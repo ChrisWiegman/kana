@@ -125,7 +125,7 @@ func (d *Client) ContainerGetMounts(containerName string) []types.MountPoint {
 
 // containerIsRunning Checks if a given container is running by name.
 func (d *Client) containerIsRunning(containerName string) (id string, isRunning bool) {
-	containers, err := d.apiClient.ContainerList(context.Background(), types.ContainerListOptions{})
+	containers, err := d.apiClient.ContainerList(context.Background(), container.ListOptions{})
 	if err != nil {
 		return "", false
 	}
@@ -151,7 +151,7 @@ func (d *Client) ContainerList(site string) ([]types.Container, error) {
 		f.Add("label", fmt.Sprintf("kana.site=%s", site))
 	}
 
-	options := types.ContainerListOptions{
+	options := container.ListOptions{
 		All:     true,
 		Filters: f,
 	}
@@ -165,7 +165,7 @@ func (d *Client) containerLog(id string) (result string, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(sleepDuration)*time.Second)
 	defer cancel()
 
-	reader, err := d.apiClient.ContainerLogs(ctx, id, types.ContainerLogsOptions{
+	reader, err := d.apiClient.ContainerLogs(ctx, id, container.LogsOptions{
 		ShowStdout: true,
 		ShowStderr: true})
 
@@ -193,7 +193,7 @@ func (d *Client) ContainerRestart(containerName string) (bool, error) {
 		return false, err
 	}
 
-	err = d.apiClient.ContainerStart(context.Background(), containerID, types.ContainerStartOptions{})
+	err = d.apiClient.ContainerStart(context.Background(), containerID, container.StartOptions{})
 	if err != nil {
 		return false, err
 	}
@@ -254,7 +254,7 @@ func (d *Client) ContainerRun(config *ContainerConfig, randomPorts, localUser bo
 		return "", err
 	}
 
-	err = d.apiClient.ContainerStart(context.Background(), resp.ID, types.ContainerStartOptions{})
+	err = d.apiClient.ContainerStart(context.Background(), resp.ID, container.StartOptions{})
 	if err != nil {
 		return "", err
 	}
@@ -278,7 +278,7 @@ func (d *Client) ContainerRunAndClean(config *ContainerConfig) (statusCode int64
 	// Get the log
 	body, _ = d.containerLog(id)
 
-	err = d.apiClient.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{})
+	err = d.apiClient.ContainerRemove(context.Background(), id, container.RemoveOptions{})
 	return statusCode, body, err
 }
 
@@ -293,7 +293,7 @@ func (d *Client) ContainerStop(containerName string) (bool, error) {
 		return false, err
 	}
 
-	err = d.apiClient.ContainerRemove(context.Background(), containerID, types.ContainerRemoveOptions{})
+	err = d.apiClient.ContainerRemove(context.Background(), containerID, container.RemoveOptions{})
 	if err != nil {
 		return false, err
 	}

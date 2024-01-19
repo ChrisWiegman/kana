@@ -6,7 +6,8 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
-	containerTypes "github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
 	networkTypes "github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
@@ -26,31 +27,31 @@ var _ APIClient = &client.Client{}
 type ContainerAPIClient interface {
 	ContainerCreate(
 		ctx context.Context,
-		config *containerTypes.Config,
-		hostConfig *containerTypes.HostConfig,
+		config *container.Config,
+		hostConfig *container.HostConfig,
 		networkingConfig *networkTypes.NetworkingConfig,
 		platform *specs.Platform,
-		containerName string) (containerTypes.CreateResponse, error)
+		containerName string) (container.CreateResponse, error)
 	ContainerExecAttach(ctx context.Context, execID string, config types.ExecStartCheck) (types.HijackedResponse, error)
 	ContainerExecCreate(ctx context.Context, container string, config types.ExecConfig) (types.IDResponse, error)
 	ContainerExecInspect(ctx context.Context, execID string) (types.ContainerExecInspect, error)
 	ContainerInspect(ctx context.Context, container string) (types.ContainerJSON, error)
-	ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error)
-	ContainerLogs(ctx context.Context, container string, options types.ContainerLogsOptions) (io.ReadCloser, error)
-	ContainerRemove(ctx context.Context, container string, options types.ContainerRemoveOptions) error
-	ContainerStart(ctx context.Context, container string, options types.ContainerStartOptions) error
-	ContainerStop(ctx context.Context, name string, options containerTypes.StopOptions) error
+	ContainerList(ctx context.Context, options container.ListOptions) ([]types.Container, error)
+	ContainerLogs(ctx context.Context, container string, options container.LogsOptions) (io.ReadCloser, error)
+	ContainerRemove(ctx context.Context, container string, options container.RemoveOptions) error
+	ContainerStart(ctx context.Context, container string, options container.StartOptions) error
+	ContainerStop(ctx context.Context, name string, options container.StopOptions) error
 	ContainerWait(
 		ctx context.Context,
 		container string,
-		condition containerTypes.WaitCondition) (<-chan containerTypes.WaitResponse, <-chan error)
+		condition container.WaitCondition) (<-chan container.WaitResponse, <-chan error)
 }
 
 // ImageAPIClient defines API client methods for the images.
 type ImageAPIClient interface {
 	ImagePull(ctx context.Context, ref string, options types.ImagePullOptions) (io.ReadCloser, error)
-	ImageRemove(ctx context.Context, image string, options types.ImageRemoveOptions) ([]types.ImageDeleteResponseItem, error)
-	ImageList(ctx context.Context, options types.ImageListOptions) ([]types.ImageSummary, error)
+	ImageRemove(ctx context.Context, image string, options types.ImageRemoveOptions) ([]image.DeleteResponse, error)
+	ImageList(ctx context.Context, options types.ImageListOptions) ([]image.Summary, error)
 }
 
 // NetworkAPIClient defines API client methods for the networks.

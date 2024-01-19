@@ -8,7 +8,7 @@ import (
 	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/docker/mocks"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/image"
 	"github.com/moby/moby/pkg/jsonmessage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -28,7 +28,7 @@ func TestEnsureImage(t *testing.T) {
 		ExpectedErr:  nil,
 	}
 
-	imageList := []types.ImageSummary{
+	imageList := []image.Summary{
 		{RepoTags: []string{
 			"alpine:latest",
 		}},
@@ -64,20 +64,20 @@ func TestRemoveImage(t *testing.T) {
 
 	var tests = []struct {
 		name                string
-		imageDeleteResponse []types.ImageDeleteResponseItem
+		imageDeleteResponse []image.DeleteResponse
 		imageRemoveError    error
 		expectedError       error
 		expectedRemove      bool
 	}{
 		{
 			"image doesn't exist to remove",
-			[]types.ImageDeleteResponseItem{},
+			[]image.DeleteResponse{},
 			nil,
 			nil,
 			false},
 		{
 			"image successfully removed",
-			[]types.ImageDeleteResponseItem{
+			[]image.DeleteResponse{
 				{},
 			},
 			nil,
@@ -85,7 +85,7 @@ func TestRemoveImage(t *testing.T) {
 			true},
 		{
 			"image successfully removed",
-			[]types.ImageDeleteResponseItem{
+			[]image.DeleteResponse{
 				{},
 			},
 			fmt.Errorf("image remove function hit error"),

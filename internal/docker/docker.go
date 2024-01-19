@@ -13,7 +13,7 @@ import (
 
 	"github.com/ChrisWiegman/kana-cli/internal/console"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 )
 
@@ -99,7 +99,7 @@ func getCurrentDockerEndpoint() (string, error) {
 }
 
 func ensureDockerIsAvailable(apiClient APIClient) error {
-	_, err := apiClient.ContainerList(context.Background(), types.ContainerListOptions{})
+	_, err := apiClient.ContainerList(context.Background(), container.ListOptions{})
 	if err != nil {
 		return fmt.Errorf("Could not connect to Docker. Is Docker running?") //nolint:stylecheck
 	}
