@@ -28,6 +28,8 @@ func Execute() {
 			consoleOutput.Debug = flagVerbose
 			consoleOutput.JSON = flagJSONOutput
 
+			checkForUpdate(false, consoleOutput)
+
 			err := kanaSite.LoadSite(cmd, commandsRequiringSite, startFlags, flagVerbose, consoleOutput)
 			if err != nil {
 				consoleOutput.Error(err)
