@@ -58,6 +58,8 @@ func (s *Site) ExportSiteConfig(consoleOutput *console.Console) error {
 		return err
 	}
 
+	fmt.Println(localSettings.Environment)
+
 	checkCommand := []string{
 		"option",
 		"get",
@@ -375,6 +377,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 		RemoveDefaultPlugins: false,
 		Multisite:            s.Settings.Multisite,
 		DatabaseClient:       s.Settings.DatabaseClient,
+		Environment:          s.Settings.Environment,
 	}
 
 	// We need container details to see if the mailpit container is running
