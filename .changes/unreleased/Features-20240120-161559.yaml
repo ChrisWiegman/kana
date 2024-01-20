@@ -1,0 +1,4 @@
+kind: Features
+body: Kana will ask for confirmation when starting a new site in a non-empty folder
+  to avoid file conflicts with WordPress.
+time: 2024-01-20T16:15:59.918260378Z
