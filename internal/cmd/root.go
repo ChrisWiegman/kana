@@ -62,6 +62,7 @@ func Execute() {
 		newListCommand(consoleOutput, kanaSite),
 		newXdebugCommand(consoleOutput, kanaSite),
 		newFlushCommand(consoleOutput, kanaSite),
+		newChangelogCommand(consoleOutput),
 	)
 
 	if runtime.GOOS == "darwin" {
