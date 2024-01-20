@@ -125,7 +125,7 @@ func verifyEmpty(siteType string, kanaSite *site.Site, consoleOutput *console.Co
 				"The current directory is not empty. Are you sure you want to try to install WordPress in this folder? This may cause the WordPress installation to fail.", //nolint: lll
 				false)
 			if !confirm {
-				os.Exit(0)
+				consoleOutput.Error(fmt.Errorf("start aborted by user confirmation"))
 			}
 		}
 	}
