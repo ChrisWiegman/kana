@@ -248,6 +248,10 @@ To trigger step debugging you'll also need the appropriate extension for your br
 
 Two wp-cli commands I find myself using regularly when working on WordPress are `wp transient delete --all` and `wp cache flush`. I use them so often that it seemed like a good idea to make them easier to access with Kana. As a result I've added the `kana flush` command which will call both on the specified site.
 
+# Viewing the Kana changelog
+
+It's always good to know what's changed before updating. You can use `kana changelog` to take to Kana's releases on GitHub where you can view the current changes and look for anything you might want to wait on.
+
 # This project is under active development
 
 Note that I am using this project for my own work and it is under active development. Some of the things I'm currently working on include:
