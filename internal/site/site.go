@@ -366,7 +366,7 @@ func checkStatusCode(checkURL string) (bool, error) {
 // getRunningConfig gets various options that were used to start the site.
 func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console) (settings.LocalSettings, error) {
 	localSettings := settings.LocalSettings{
-		Type:                 defaultType,
+		Type:                 DefaultType,
 		Xdebug:               false,
 		SSL:                  false,
 		Mailpit:              false,
@@ -401,7 +401,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana-%s-wordpress", s.Settings.Name))
 
 	if len(mounts) == 1 {
-		localSettings.Type = defaultType
+		localSettings.Type = DefaultType
 	}
 
 	for _, mount := range mounts {

@@ -11,7 +11,7 @@ import (
 	"github.com/ChrisWiegman/kana-cli/internal/helpers"
 )
 
-const defaultType = "site"
+const DefaultType = "site"
 
 func (s *Site) DetectType() (string, error) {
 	var err error
@@ -23,7 +23,7 @@ func (s *Site) DetectType() (string, error) {
 	}
 
 	if isSite {
-		return defaultType, err
+		return DefaultType, err
 	}
 
 	items, _ := os.ReadDir(s.Settings.WorkingDirectory)
@@ -65,5 +65,5 @@ func (s *Site) DetectType() (string, error) {
 		err = nil
 	}
 
-	return defaultType, err
+	return DefaultType, err
 }

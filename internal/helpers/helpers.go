@@ -3,6 +3,7 @@ package helpers
 import (
 	"bufio"
 	"errors"
+	"io"
 	"os"
 	"strings"
 )
@@ -55,4 +56,21 @@ func ReadLine(r *bufio.Reader) (string, error) {
 		ln = append(ln, line...)
 	}
 	return string(ln), err
+}
+
+// IsEmpty returns a bool to indicate if the provided path is empty.
+func IsEmpty(path string) (bool, error) {
+	osFile, err := os.Open(path)
+	if err != nil {
+		return false, err
+	}
+
+	defer osFile.Close()
+
+	_, err = osFile.Readdirnames(1)
+	if err == io.EOF {
+		return true, nil
+	}
+
+	return false, err
 }

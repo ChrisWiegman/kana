@@ -103,7 +103,7 @@ func (s *Site) getWordPressDirectory() (wordPressDirectory string, err error) {
 	if !s.Settings.IsNamedSite {
 		wordPressDirectory = s.Settings.WorkingDirectory
 
-		if s.Settings.Type != defaultType {
+		if s.Settings.Type != DefaultType {
 			wordPressDirectory = path.Join(s.Settings.WorkingDirectory, "wordpress")
 		}
 	}

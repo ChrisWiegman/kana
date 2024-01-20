@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/ChrisWiegman/kana-cli/internal/console"
+	"github.com/ChrisWiegman/kana-cli/internal/helpers"
 	"github.com/ChrisWiegman/kana-cli/internal/settings"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
 
@@ -39,6 +40,8 @@ func newStartCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra
 				if err != nil {
 					consoleOutput.Error(err)
 				}
+
+				verifyEmpty(siteType, kanaSite, consoleOutput)
 
 				if siteType != kanaSite.Settings.Type {
 					kanaSite.Settings.Type = siteType
@@ -106,4 +109,24 @@ func newStartCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra
 	cmd.Flags().Lookup("multisite").NoOptDefVal = "subdomain"
 
 	return cmd
+}
+
+// verifyEmpty Verifies the folder is empty when starting a new site in it.
+// This helps prevent conflicts with WordPress files and anything in the folder.
+func verifyEmpty(siteType string, kanaSite *site.Site, consoleOutput *console.Console) {
+	if siteType == site.DefaultType {
+		isEmpty, err := helpers.IsEmpty(kanaSite.Settings.WorkingDirectory)
+		if err != nil {
+			consoleOutput.Error(err)
+		}
+
+		if !isEmpty && kanaSite.Settings.IsNewSite {
+			confirm := consoleOutput.PromptConfirm(
+				"The current directory is not empty. Are you sure you want to try to install WordPress in this folder? This may cause the WordPress installation to fail.", //nolint: lll
+				false)
+			if !confirm {
+				os.Exit(0)
+			}
+		}
+	}
 }
