@@ -1,10 +1,10 @@
 # Kana
 
-Kana is a simple CLI tool for developing WordPress plugins and themes efficiently.
+Kana is a CLI (command line) tool for developing WordPress sites, plugins and themes efficiently.
 
 # Why Kana?
 
-I've gone through many different tools to run WordPress sites over the years. All of them are either extremely complex or don't support basic features such as ensuring plugin and theme development can be a first-class experience. I rarely build sites with WordPress and I wanted a tool that will allow me to build the plugins and themes I do work on as efficiently as possible.
+I've gone through many different tools to run WordPress locally over the years. All of them are either extremely complex or don't support basic features such as ensuring plugin and theme development can be a first-class experience. I rarely build sites with WordPress and I wanted a tool that will allow me to build the plugins and themes I do work on as efficiently as possible.
 
 # System requirements
 
@@ -12,21 +12,19 @@ I've gone through many different tools to run WordPress sites over the years. Al
 
 - [Docker Desktop](https://www.docker.com)
 
-Note: Docker Desktop 4.20 or greater is required due to updates in the core Docker library this is built around
-
 ## Linux
 
 - [Docker Engine](https://docs.docker.com/engine/install/)
 
-Note: Docker Engine 24 or greater is required due to updates in the core Docker library this is built around
+Docker Desktop for Linux may work but I have not tested it.
 
 # Installing Kana
 
-There are a few options for installing Kana. You can use [Homebrew](https://brew.sh) (recommended), you can install it from the "releases" page here or you can build it manually.
+There are a few options for installing Kana. You can use [Homebrew](https://brew.sh) (recommended), you can install it from [the "releases" page](https://github.com/ChrisWiegman/kana-cli/releases) here or you can build it manually.
 
 ## Install from Homebrew
 
-Installing from [Homebrew](https://brew.sh) is the recommended approach on both Max and Linux as it allows for automatic updates when needed. To install from Homebrew run the following command:
+Installing from [Homebrew](https://brew.sh) is the recommended approach on both Mac and Linux as it allows for automatic updates when needed. To install from Homebrew run the following command:
 
 ```
 brew install ChrisWiegman/kana/kana
@@ -42,16 +40,16 @@ Simply download the latest release from our [release page](https://github.com/Ch
 
 ## Build manually
 
-You will need [Go](https://go.dev) installed locally to build the application for now. I hope to fix this in the new future.
+You will need [Go](https://go.dev) installed locally to build the application.
 
-1. Clone this repo `git clone git@github.com:ChrisWiegman/kana-cli.git`
+1. Clone this repo `git clone https://github.com/ChrisWiegman/kana-cli.git`
 2. CD into the repo and run `make install`
 
 Assuming you have Go properly setup with `GOBIN` in your system path, you should now be able to use Kana. Run `kana version` to test.
 
 # Using Kana
 
-At it's most basic you can start a zero-config Kana site by running `kana start` in your terminal. This will create a new Kana site based on your current directory and open it in your default browser. If you're on Mac and it is the first time you've run Kana it will also install it's root CA in your Mac's system store.
+At it's most basic you can start a zero-config Kana site by running `kana start` in your terminal. This will create a new Kana site based on your current directory and open it in your default browser.
 
 Kana relies on [Traefik](https://traefik.io) to map real domains to local sites. You can run as many sites as you need and each will be mapped to a subdomain of _sites.kana.li_.
 
@@ -115,7 +113,7 @@ You can also export the database file your Kana site is using with `kana db expo
 
 ## Stop
 
-`kana stop` will stop the current site and, if no other sites are running, will shut down shared containers as well.
+`kana stop` will stop the current site and, if no other sites are running, will shut down shared containers like Traefik as well.
 
 ## List
 
@@ -134,6 +132,8 @@ By default Kana will prompt you to confirm any site you wish to destroy. You can
 By default Kana will open the appropriate WordPress site. To open the database or Mailpit simply append the appropriate flag to the open command ie `kana open --database`.
 
 Note that by default Kana will open the database in [phpMyAdmin](https://www.phpmyadmin.net). You can also tell Kana to open the database in [TablePlus](https://tableplus.com) instead by setting the `databaseClient` configuration setting to `tableplus`.
+
+Currently pphpMyAdmin and TablePlus are the only two clients I've configured. If you would like to use a different client, please [open an issue](https://github.com/ChrisWiegman/kana-cli/issues) and I'd be happy to take a look.
 
 ## wp-cli
 
