@@ -2,6 +2,7 @@ package site
 
 import (
 	"bufio"
+	"io"
 	"os"
 	"path"
 	"path/filepath"
@@ -57,6 +58,11 @@ func (s *Site) DetectType() (string, error) {
 				line, err = helpers.ReadLine(reader)
 			}
 		}
+	}
+
+	// We don't care if it is an empty folder.
+	if err == io.EOF {
+		err = nil
 	}
 
 	return defaultType, err
