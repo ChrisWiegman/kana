@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"github.com/ChrisWiegman/kana-cli/internal/console"
-	"github.com/pkg/browser"
 
+	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
 )
 
