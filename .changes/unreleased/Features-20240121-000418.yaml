@@ -1,0 +1,3 @@
+kind: Features
+body: Add `update` command to self-update Kana for installations that didn't use Homebrew.
+time: 2024-01-21T00:04:18.317574156Z
