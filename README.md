@@ -47,6 +47,12 @@ You will need [Go](https://go.dev) installed locally to build the application.
 
 Assuming you have Go properly setup with `GOBIN` in your system path, you should now be able to use Kana. Run `kana version` to test.
 
+# Updating Kana
+
+If you build Kana from source you'll need to manually update Kana with a `git pull` and then a fresh build.
+
+If you use Homebrew or install Kana from the releases page Kana will automatically check for updates and warn you of a new version. You can then update via homebrew, if that's how you installed it, or by running `kana update` which will replace the existing binary with the updated version.
+
 # Using Kana
 
 At it's most basic you can start a zero-config Kana site by running `kana start` in your terminal. This will create a new Kana site based on your current directory and open it in your default browser.
