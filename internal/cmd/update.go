@@ -38,6 +38,7 @@ func runUpdate(runUpdate bool, cmd string, consoleOutput *console.Console) {
 	latest, found, err := selfupdate.DetectLatest(context.Background(), selfupdate.ParseSlug("ChrisWiegman/kana-cli"))
 	if err != nil || !found {
 		consoleOutput.Warn("Kana could not check GitHub for the latest version.")
+		return
 	}
 
 	if runUpdate {
