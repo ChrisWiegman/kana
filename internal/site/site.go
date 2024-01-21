@@ -58,8 +58,6 @@ func (s *Site) ExportSiteConfig(consoleOutput *console.Console) error {
 		return err
 	}
 
-	fmt.Println(localSettings.Environment)
-
 	checkCommand := []string{
 		"option",
 		"get",
@@ -166,6 +164,14 @@ func (s *Site) LoadSite(
 	isSite, err := s.Settings.LoadLocalSettings(cmd)
 	if err != nil {
 		return err
+	}
+
+	// Always make sure we set the correct type, even if a config file isn't available.
+	if cmd.Use != "start" {
+		s.Settings.Type, err = s.DetectType()
+		if err != nil {
+			return err
+		}
 	}
 
 	// Fail now if we have a command that requires a completed site and we haven't started it before
