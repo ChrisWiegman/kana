@@ -179,14 +179,6 @@ func (s *Site) LoadSite(
 		return fmt.Errorf("the current site you are trying to work with does not exist. Use `kana start` to initialize")
 	}
 
-	// Process the "start" command flags
-	if cmd.Use == "start" {
-		// A site shouldn't be both a plugin and a theme so this reports an error if that is the case.
-		if startFlags.IsPlugin && startFlags.IsTheme {
-			return fmt.Errorf("you have set both the plugin and theme flags. Please choose only one option")
-		}
-	}
-
 	return nil
 }
 

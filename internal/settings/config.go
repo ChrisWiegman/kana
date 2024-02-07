@@ -126,7 +126,7 @@ func (s *Settings) validateSetting(setting, value string) error { //nolint:gocyc
 		}
 	case "type":
 		if !helpers.IsValidString(value, validTypes) {
-			return fmt.Errorf("please choose a valid project type")
+			return fmt.Errorf("the type you selected, %s, is not a valid type. You must use either `site`, `plugin` or `theme`", setting)
 		}
 	case "admin.email":
 		return validate.Var(value, "email")

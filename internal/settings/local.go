@@ -81,6 +81,14 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) { //nolint:
 		}
 	}
 
+	if isStartCommand && cmd.Flags().Lookup("type").Changed {
+		typeValue, err := cmd.Flags().GetString("type")
+		if !helpers.IsValidString(typeValue, validTypes) || err != nil {
+			return false,
+				fmt.Errorf("the type, %s, is not valid. Only a `site` is valid with named sites", typeValue)
+		}
+	}
+
 	if isStartCommand && cmd.Flags().Lookup("environment").Changed {
 		environmentValue, err := cmd.Flags().GetString("environment")
 		if !helpers.IsValidString(environmentValue, validEnvironmentTypes) || err != nil {
@@ -97,9 +105,11 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) { //nolint:
 		s.IsNamedSite = true
 
 		// Check that we're not using invalid start flags for the start command
-		if isStartCommand {
-			if cmd.Flags().Lookup("plugin").Changed || cmd.Flags().Lookup("theme").Changed {
-				return false, fmt.Errorf("invalid flags detected. 'plugin' and 'theme' flags are not valid with named sites")
+		if isStartCommand && cmd.Flags().Lookup("type").Changed {
+			typeValue, _ := cmd.Flags().GetString("type")
+			if typeValue != "site" {
+				return false,
+					fmt.Errorf("the type, %s, is not valid. Only a `site` is valid with named sites", typeValue)
 			}
 		}
 
@@ -148,12 +158,8 @@ func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
 		s.Mailpit = flags.Mailpit
 	}
 
-	if cmd.Flags().Lookup("plugin").Changed && flags.IsPlugin {
-		s.Type = "plugin"
-	}
-
-	if cmd.Flags().Lookup("theme").Changed && flags.IsTheme {
-		s.Type = "theme"
+	if cmd.Flags().Lookup("type").Changed {
+		s.Type = flags.Type
 	}
 
 	if cmd.Flags().Lookup("multisite").Changed {

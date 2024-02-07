@@ -219,7 +219,7 @@ func (d *Client) ContainerRun(config *ContainerConfig, randomPorts, localUser bo
 
 	networkConfig := network.NetworkingConfig{}
 
-	if len(config.NetworkName) > 0 {
+	if config.NetworkName != "" {
 		networkConfig.EndpointsConfig = map[string]*network.EndpointSettings{
 			config.NetworkName: {},
 		}

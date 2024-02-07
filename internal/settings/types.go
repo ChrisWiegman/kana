@@ -33,14 +33,13 @@ type StartFlags struct {
 	Xdebug               bool
 	WPDebug              bool
 	Mailpit              bool
-	IsTheme              bool
-	IsPlugin             bool
 	SSL                  bool
 	Activate             bool
 	RemoveDefaultPlugins bool
 	ScriptDebug          bool
 	Environment          string
 	Multisite            string
+	Type                 string
 }
 
 type LocalSettings struct {

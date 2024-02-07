@@ -33,7 +33,7 @@ func newStartCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra
 
 			kanaSite.Settings.ProcessStartFlags(cmd, startFlags)
 
-			if !cmd.Flags().Lookup("plugin").Changed && !cmd.Flags().Lookup("theme").Changed && !kanaSite.Settings.HasLocalOptions() {
+			if !cmd.Flags().Lookup("type").Changed && !kanaSite.Settings.HasLocalOptions() {
 				var siteType string
 
 				siteType, err = kanaSite.DetectType()
@@ -88,8 +88,7 @@ func newStartCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra
 	cmd.Flags().BoolVarP(&startFlags.ScriptDebug, "scriptdebug", "c", false, "Enable SCRIPT_DEBUG when starting the container.")
 	cmd.Flags().BoolVarP(&startFlags.WPDebug, "wpdebug", "d", false, "Enable WP_Debug when starting the container.")
 	cmd.Flags().BoolVarP(&startFlags.Mailpit, "mailpit", "m", false, "Enable Mailpit when starting the container.")
-	cmd.Flags().BoolVarP(&startFlags.IsPlugin, "plugin", "p", false, "Run the site as a plugin using the current folder as the plugin source.")
-	cmd.Flags().BoolVarP(&startFlags.IsTheme, "theme", "t", false, "Run the site as a theme using the current folder as the theme source.")
+	cmd.Flags().StringVarP(&startFlags.Type, "type", "t", "site", "Set the type of the installation, `site`, `plugin` or `theme`.")
 	cmd.Flags().BoolVarP(&startFlags.SSL, "ssl", "s", false, "Whether the site should default to SSL (https) or not.")
 	cmd.Flags().BoolVarP(
 		&startFlags.RemoveDefaultPlugins,
