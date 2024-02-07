@@ -1,0 +1,4 @@
+kind: Bug Fixes
+body: Fixed a bug whereby SCRIPT_DEBUG wasn't accurately accounted for when using
+  the `export` command.
+time: 2024-02-07T01:05:55.631591443Z
