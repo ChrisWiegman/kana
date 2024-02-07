@@ -72,9 +72,7 @@ Note: these can be changed in the config. Please see below.
 
 ### Start options
 
-`--plugin` will map the current directory as a plugin within the created site. Use this if you are developing a plugin.
-
-`--theme` will map the current directory as a theme within the created site. Use this if you are developing a theme.
+`--type` Defaults to `site` for developing a WordPress site. Can set to `plugin` map the current directory as a plugin within the created site or `theme` to map the current directory as a theme within the created site.
 
 `--xdebug` will start Xdebug on the site (see below for usage).
 
