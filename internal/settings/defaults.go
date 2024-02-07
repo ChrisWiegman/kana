@@ -2,29 +2,29 @@ package settings
 
 // The following are the default settings for Kana.
 var (
-	rootKey              = "kana.root.key"
+	activate             = true
+	adminEmail           = "admin@sites.kana.li"
+	adminPassword        = "password"
+	adminUsername        = "admin"
+	configFolderName     = ".config/kana"
+	databaseClient       = "phpmyadmin"
+	domain               = "sites.kana.li"
+	environment          = "local"
+	imageUpdateDays      = 7
+	mailpit              = false
+	mariadb              = "11"
+	multisite            = "none"
+	php                  = "8.1"
+	removeDefaultPlugins = false
 	rootCert             = "kana.root.pem"
+	rootKey              = "kana.root.key"
+	scriptDebug          = false
 	siteCert             = "kana.site.pem"
 	siteKey              = "kana.site.key"
-	domain               = "sites.kana.li"
-	configFolderName     = ".config/kana"
-	php                  = "8.1"
-	mariadb              = "11"
 	siteType             = "site"
-	xdebug               = false
-	mailpit              = false
 	ssl                  = false
 	wpdebug              = false
-	scriptDebug          = false
-	removeDefaultPlugins = false
-	adminUsername        = "admin"
-	adminPassword        = "password"
-	adminEmail           = "admin@sites.kana.li"
-	imageUpdateDays      = 7
-	activate             = true
-	databaseClient       = "phpmyadmin"
-	multisite            = "none"
-	environment          = "local"
+	xdebug               = false
 )
 
 // Default permissions for all new files and folders.
