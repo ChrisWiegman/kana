@@ -379,6 +379,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 		SSL:                  false,
 		Mailpit:              false,
 		WPDebug:              false,
+		ScriptDebug:          true,
 		Activate:             true,
 		RemoveDefaultPlugins: false,
 		Multisite:            s.Settings.Multisite,
@@ -405,6 +406,15 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 
 	if strings.Contains(output.StdOut, "1") {
 		localSettings.WPDebug = true
+	}
+
+	output, err = s.runCli("echo $SCRIPT_DEBUG", false, false)
+	if err != nil {
+		return localSettings, err
+	}
+
+	if strings.Contains(output.StdOut, "1") {
+		localSettings.ScriptDebug = true
 	}
 
 	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana-%s-wordpress", s.Settings.Name))
