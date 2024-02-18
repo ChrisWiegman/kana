@@ -32,10 +32,10 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.21"
+          go-version: "1.22"
 
       - name: Lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v4
         with:
           version: latest
 
@@ -44,4 +44,4 @@ jobs:
           docker context ls --format=json
 
       - name: Test
-        uses: robherley/go-test-action@v0.1.0
+        uses: robherley/go-test-action@v0.2.0
