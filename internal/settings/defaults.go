@@ -14,7 +14,7 @@ var (
 	mailpit              = false
 	mariadb              = "11"
 	multisite            = "none"
-	php                  = "8.1"
+	php                  = "8.2"
 	removeDefaultPlugins = false
 	rootCert             = "kana.root.pem"
 	rootKey              = "kana.root.key"
