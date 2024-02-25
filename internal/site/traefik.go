@@ -11,7 +11,7 @@ import (
 
 const (
 	traefikContainerName = "kana_traefik"
-	traefikVersion       = "2.10"
+	traefikVersion       = "2.11"
 )
 
 // maybeStopTraefik Checks to see if other sites are running and shuts down the traefik instance if none are.
