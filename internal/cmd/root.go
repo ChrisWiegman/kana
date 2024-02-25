@@ -28,8 +28,6 @@ func Execute() {
 			consoleOutput.Debug = flagVerbose
 			consoleOutput.JSON = flagJSONOutput
 
-			runUpdate(false, cmd.Use, consoleOutput)
-
 			err := kanaSite.LoadSite(cmd, commandsRequiringSite, startFlags, flagVerbose, consoleOutput)
 			if err != nil {
 				consoleOutput.Error(err)
@@ -65,7 +63,6 @@ func Execute() {
 		newXdebugCommand(consoleOutput, kanaSite),
 		newFlushCommand(consoleOutput, kanaSite),
 		newChangelogCommand(consoleOutput),
-		newUpdateCommand(consoleOutput),
 	)
 
 	if runtime.GOOS == "darwin" {
