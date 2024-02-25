@@ -1,4 +1,0 @@
-kind: Breaking Changes
-body: Removed `theme` and `plugin` start flags in favor of the single `type` start
-  flag.
-time: 2024-02-07T22:33:02.540227761Z

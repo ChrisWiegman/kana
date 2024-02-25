@@ -1,3 +1,0 @@
-kind: Breaking Changes
-body: Removed the self-updater. For now the app will stick with Homebrew for updates.
-time: 2024-02-25T15:53:16.086371584Z
