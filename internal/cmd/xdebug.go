@@ -10,7 +10,7 @@ import (
 func xdebug(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "xdebug [on/off]",
-		Short: "Turns xdebug on or off without having to stop and start the site.",
+		Short: "Turns Xdebug on or off without having to stop and start the site.",
 		Args:  cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			err := kanaSite.EnsureDocker(consoleOutput)
