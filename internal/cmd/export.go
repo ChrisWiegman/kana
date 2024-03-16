@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newExportCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
+func export(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "export",
 		Short: "Export the current config to a .kana.json file to save with your repo.",

@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newListCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
+func list(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "Lists all Kana sites and their associated status.",

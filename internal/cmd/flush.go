@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newFlushCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
+func flush(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "flush",
 		Short: "Flushes the cache and deletes all transients.",

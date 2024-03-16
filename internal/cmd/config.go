@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newConfigCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
+func config(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "config",
 		Short: "View and edit the saved configuration for the app or the local site.",

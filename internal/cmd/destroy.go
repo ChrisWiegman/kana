@@ -13,7 +13,7 @@ import (
 
 var flagForce bool
 
-func newDestroyCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
+func destroy(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "destroy",
 		Short: "Destroys the current WordPress site. This is a permanent change.",

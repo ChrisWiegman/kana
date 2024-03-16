@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newTrustCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
+func trust(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "trust-ssl",
 		Short: "Add the Kana SSL certificate to the MacOS Keychain (if needed).",

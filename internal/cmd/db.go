@@ -12,7 +12,7 @@ import (
 var flagPreserve bool
 var flagReplaceDomain string
 
-func newDBCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
+func db(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "db",
 		Short: "Commands to easily import and export a WordPress database from an existing site",

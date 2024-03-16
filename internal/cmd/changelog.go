@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newChangelogCommand(consoleOutput *console.Console) *cobra.Command {
+func changelog(consoleOutput *console.Console) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "changelog",
 		Short: "Open Kana's changelog in your browser",

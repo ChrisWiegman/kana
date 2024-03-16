@@ -15,7 +15,7 @@ type VersionInfo struct {
 	Version, Timestamp string
 }
 
-func newVersionCommand(consoleOutput *console.Console) *cobra.Command {
+func version(consoleOutput *console.Console) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "version",
 		Short: "Displays version information for the Kana CLI.",

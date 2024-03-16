@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newWPCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
+func wp(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "wp",
 		Short: "Run a wp-cli command against the current site.",

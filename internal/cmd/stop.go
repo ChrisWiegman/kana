@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newStopCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
+func stop(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "stop",
 		Short: "Stops the WordPress development environment.",

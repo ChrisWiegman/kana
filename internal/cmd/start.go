@@ -15,7 +15,7 @@ import (
 
 var startFlags settings.StartFlags
 
-func newStartCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
+func start(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "start",
 		Short: "Starts a new environment in the local folder.",

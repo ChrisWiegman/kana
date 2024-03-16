@@ -12,7 +12,7 @@ import (
 
 var openDatabaseFlag, openMailpitFlag, openSiteFlag bool
 
-func newOpenCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
+func open(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "open",
 		Short: "Open the current site in your browser.",

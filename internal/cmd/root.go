@@ -50,23 +50,23 @@ func Execute() {
 
 	// Register the subcommands
 	cmd.AddCommand(
-		newStartCommand(consoleOutput, kanaSite),
-		newStopCommand(consoleOutput, kanaSite),
-		newOpenCommand(consoleOutput, kanaSite),
-		newWPCommand(consoleOutput, kanaSite),
-		newDestroyCommand(consoleOutput, kanaSite),
-		newConfigCommand(consoleOutput, kanaSite),
-		newExportCommand(consoleOutput, kanaSite),
-		newVersionCommand(consoleOutput),
-		newDBCommand(consoleOutput, kanaSite),
-		newListCommand(consoleOutput, kanaSite),
-		newXdebugCommand(consoleOutput, kanaSite),
-		newFlushCommand(consoleOutput, kanaSite),
-		newChangelogCommand(consoleOutput),
+		changelog(consoleOutput),
+		config(consoleOutput, kanaSite),
+		db(consoleOutput, kanaSite),
+		destroy(consoleOutput, kanaSite),
+		export(consoleOutput, kanaSite),
+		flush(consoleOutput, kanaSite),
+		list(consoleOutput, kanaSite),
+		open(consoleOutput, kanaSite),
+		start(consoleOutput, kanaSite),
+		stop(consoleOutput, kanaSite),
+		version(consoleOutput),
+		wp(consoleOutput, kanaSite),
+		xdebug(consoleOutput, kanaSite),
 	)
 
 	if runtime.GOOS == "darwin" {
-		cmd.AddCommand(newTrustCommand(consoleOutput, kanaSite))
+		cmd.AddCommand(trust(consoleOutput, kanaSite))
 	}
 
 	// Execute anything we need to

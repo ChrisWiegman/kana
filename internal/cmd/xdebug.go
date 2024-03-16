@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newXdebugCommand(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
+func xdebug(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "xdebug",
 		Short: "Commands to easily import and export a WordPress database from an existing site",
