@@ -1,3 +1,0 @@
-kind: Bug Fixes
-body: Fix an issue that caused a fatal error when running `kana db export`
-time: 2024-03-16T22:51:49.483729094Z
