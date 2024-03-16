@@ -24,6 +24,7 @@ type Settings struct {
 	DatabaseClient                                              string
 	Multisite                                                   string
 	Environment                                                 string
+	Version                                                     string
 	Plugins                                                     []string
 	global                                                      *viper.Viper
 	local                                                       *viper.Viper

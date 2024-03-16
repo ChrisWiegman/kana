@@ -38,10 +38,10 @@ var configFiles = []File{
 }
 
 // EnsureKanaPlugin ensures the Kana plugin file is in place and ready to go.
-func (s *Settings) EnsureKanaPlugin(appDir string) error {
+func (s *Settings) EnsureKanaPlugin(appDir, siteName string) error {
 	pluginVars := KanaPluginVars{
-		Version:  "1.0.0",
-		SiteName: "my-site",
+		Version:  s.Version,
+		SiteName: siteName,
 	}
 
 	tmpl := template.Must(template.New("kanaPlugin").Parse(KanaWordPressPlugin))

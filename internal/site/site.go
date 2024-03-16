@@ -146,10 +146,11 @@ func (s *Site) New(
 	commandsRequiringSite []string,
 	startFlags settings.StartFlags,
 	flagVerbose bool,
-	consoleOutput *console.Console) error {
+	consoleOutput *console.Console,
+	version string) error {
 	var err error
 
-	s.Settings, err = settings.NewSettings()
+	s.Settings, err = settings.NewSettings(version)
 	if err != nil {
 		return err
 	}

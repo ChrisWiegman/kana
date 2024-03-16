@@ -28,7 +28,7 @@ func Execute() {
 			consoleOutput.Debug = flagVerbose
 			consoleOutput.JSON = flagJSONOutput
 
-			err := kanaSite.New(cmd, commandsRequiringSite, startFlags, flagVerbose, consoleOutput)
+			err := kanaSite.New(cmd, commandsRequiringSite, startFlags, flagVerbose, consoleOutput, Version)
 			if err != nil {
 				consoleOutput.Error(err)
 			}

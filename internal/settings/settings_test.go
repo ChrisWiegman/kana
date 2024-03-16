@@ -7,7 +7,7 @@ import (
 )
 
 func TestNewSettings(t *testing.T) {
-	settings, err := NewSettings()
+	settings, err := NewSettings("1.0.0")
 
 	assert.False(t, settings.Activate)
 	assert.Equal(t, nil, err)

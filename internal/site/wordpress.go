@@ -350,7 +350,7 @@ func (s *Site) installKanaPlugin() error {
 		return err
 	}
 
-	return s.Settings.EnsureKanaPlugin(wordPressDirectory)
+	return s.Settings.EnsureKanaPlugin(wordPressDirectory, s.Settings.Name)
 }
 
 // installWordPress Installs and configures WordPress core.

@@ -7,7 +7,7 @@ import (
 	"github.com/mitchellh/go-homedir"
 )
 
-func NewSettings() (*Settings, error) {
+func NewSettings(version string) (*Settings, error) {
 	kanaSettings := new(Settings)
 
 	kanaSettings.AppDomain = domain
@@ -15,6 +15,7 @@ func NewSettings() (*Settings, error) {
 	kanaSettings.RootCert = rootCert
 	kanaSettings.SiteCert = siteCert
 	kanaSettings.SiteKey = siteKey
+	kanaSettings.Version = version
 
 	cwd, err := os.Getwd()
 	if err != nil {
