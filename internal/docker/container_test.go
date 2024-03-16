@@ -13,7 +13,7 @@ import (
 func TestContainerRun(t *testing.T) {
 	consoleOutput := new(console.Console)
 
-	d, err := NewDockerClient(consoleOutput, "")
+	d, err := New(consoleOutput, "")
 	if err != nil {
 		t.Error(err)
 	}

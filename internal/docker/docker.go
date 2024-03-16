@@ -33,7 +33,7 @@ type Context struct {
 	DockerEndpoint string `json:"DockerEndpoint"`
 }
 
-func NewDockerClient(consoleOutput *console.Console, appDirectory string) (dockerClient *Client, err error) {
+func New(consoleOutput *console.Console, appDirectory string) (dockerClient *Client, err error) {
 	dockerClient = new(Client)
 
 	var dockerEndpoint string

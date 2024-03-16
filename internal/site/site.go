@@ -42,7 +42,7 @@ var execCommand = exec.Command
 // EnsureDocker Ensures Docker is available for commands that need it.
 func (s *Site) EnsureDocker(consoleOutput *console.Console) error {
 	// Add a docker client to the site
-	dockerClient, err := docker.NewDockerClient(consoleOutput, s.Settings.AppDirectory)
+	dockerClient, err := docker.New(consoleOutput, s.Settings.AppDirectory)
 	if err != nil {
 		return err
 	}
@@ -141,7 +141,7 @@ func (s *Site) IsSiteRunning() bool {
 	return len(containers) != 0
 }
 
-func (s *Site) LoadSite(
+func (s *Site) New(
 	cmd *cobra.Command,
 	commandsRequiringSite []string,
 	startFlags settings.StartFlags,
