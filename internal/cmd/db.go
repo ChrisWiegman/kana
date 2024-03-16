@@ -46,6 +46,11 @@ func db(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 		Use:   "export [sql file]",
 		Short: "Export the site's WordPress database",
 		Run: func(cmd *cobra.Command, args []string) {
+			err := kanaSite.EnsureDocker(consoleOutput)
+			if err != nil {
+				consoleOutput.Error(err)
+			}
+
 			file, err := kanaSite.ExportDatabase(args, consoleOutput)
 			if err != nil {
 				consoleOutput.Error(err)
