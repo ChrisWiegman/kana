@@ -41,7 +41,9 @@ func start(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 					consoleOutput.Error(err)
 				}
 
-				verifyEmpty(siteType, kanaSite, consoleOutput)
+				if !cmd.Flags().Lookup("name").Changed {
+					verifyEmpty(siteType, kanaSite, consoleOutput)
+				}
 
 				if siteType != kanaSite.Settings.Type {
 					kanaSite.Settings.Type = siteType
