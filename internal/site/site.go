@@ -184,11 +184,15 @@ func (s *Site) New(
 }
 
 // OpenSite Opens the current site in a browser if it is running.
-func (s *Site) OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag bool, consoleOutput *console.Console) error {
+func (s *Site) OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag, openAdminFlag bool, consoleOutput *console.Console) error {
 	openUrls := []string{}
 
 	if openSiteFlag {
 		openUrls = append(openUrls, s.Settings.URL)
+	}
+
+	if openAdminFlag {
+		openUrls = append(openUrls, s.Settings.URL+"/wp-admin/")
 	}
 
 	if openDatabaseFlag {
@@ -318,7 +322,7 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 	}
 
 	// Open the site in the user's browser
-	return s.OpenSite(false, false, true, consoleOutput)
+	return s.OpenSite(false, false, true, false, consoleOutput)
 }
 
 // StopSite Stops a full site, including Traefik if needed.

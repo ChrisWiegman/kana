@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/pflag"
 )
 
-var openDatabaseFlag, openMailpitFlag, openSiteFlag bool
+var openDatabaseFlag, openMailpitFlag, openSiteFlag, openAdminFlag bool
 
 func open(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd := &cobra.Command{
@@ -25,12 +25,13 @@ func open(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 			// Default to opening the site if no flags are specified
 			if !cmd.Flags().Lookup("database").Changed &&
 				!cmd.Flags().Lookup("mailpit").Changed &&
-				!cmd.Flags().Lookup("site").Changed {
+				!cmd.Flags().Lookup("site").Changed &&
+				!cmd.Flags().Lookup("admin").Changed {
 				openSiteFlag = true
 			}
 
 			// Open the site in the user's default browser,
-			err = kanaSite.OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag, consoleOutput)
+			err = kanaSite.OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag, openAdminFlag, consoleOutput)
 			if err != nil {
 				consoleOutput.Error(fmt.Errorf("an error occurred and we can't open the requested resource: %s", err))
 			}
@@ -59,6 +60,12 @@ func open(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 		false,
 		"Opens the Mailpit UI for the current or specified Kana site in your default browser")
 	cmd.Flags().BoolVarP(&openSiteFlag, "site", "s", false, "Opens the current or specified Kana site in your default browser")
+	cmd.Flags().BoolVarP(
+		&openAdminFlag,
+		"admin",
+		"a",
+		false,
+		"Opens the current or specified Kana site's WordPress dashboard in your default browser")
 
 	cmd.Flags().SetNormalizeFunc(aliasPhpMyAdminFlag)
 
