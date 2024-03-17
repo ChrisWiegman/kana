@@ -50,6 +50,7 @@ jobs:
             -o ./build/kana \
             -ldflags "-s -w -X ./internal/cmd.Version=1.0.0 -X $(PKG)/internal/cmd.Timestamp=2024-03-16_10:50:11PM" \
             ./cmd/...
+          ./build/kana
 
       - name: Test
         uses: robherley/go-test-action@v0.2.0
