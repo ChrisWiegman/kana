@@ -17,7 +17,6 @@ Available Commands:
   open        Open the current site in your browser.
   start       Starts a new environment in the local folder.
   stop        Stops the WordPress development environment.
-  trust-ssl   Add the Kana SSL certificate to the MacOS Keychain (if needed).
   version     Displays version information for the Kana CLI.
   wp          Run a wp-cli command against the current site.
   xdebug      Turns Xdebug on or off without having to stop and start the site.

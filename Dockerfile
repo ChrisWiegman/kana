@@ -13,4 +13,12 @@ RUN curl -OL https://golang.org/dl/go1.22.1.linux-amd64.tar.gz && \
 
 ENV PATH="$PATH:/usr/local/go/bin"
 
-RUN which go
+CMD go build \
+        -o ./build/kana \
+        -ldflags "-s -w -X $(PKG)/internal/cmd.Version=$(VERSION) -X $(PKG)/internal/cmd.Timestamp=$(TIMESTAMP)" \
+        ./cmd/... && \
+    go test \
+        -v \
+        -timeout 30s\
+        -cover \
+        ./...

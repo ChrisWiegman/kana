@@ -104,13 +104,4 @@ test: clean build-test-image
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		-v $(PWD):/usr/src/kana \
 		-w /usr/src/kana \
-		kana-test \
-		go build \
-			-o ./build/kana \
-			-ldflags "-s -w -X $(PKG)/internal/cmd.Version=$(VERSION) -X $(PKG)/internal/cmd.Timestamp=$(TIMESTAMP)" \
-			./cmd/... && \
-		go test \
-			-v \
-			-timeout 30s\
-			-cover \
-			./...
+		kana-test
