@@ -9,15 +9,15 @@ import (
 )
 
 func TestVersion(t *testing.T) {
-	cmd := exec.Command("../../build/kana", "version")
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	err := cmd.Run()
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
-	}
-
 	t.Run("Test the version command for appropriate output", func(t *testing.T) {
+		cmd := exec.Command("../../build/kana", "version")
+		var out bytes.Buffer
+		cmd.Stdout = &out
+		err := cmd.Run()
+		if err != nil {
+			t.Fatalf("Unexpected error: %v", err)
+		}
+
 		snaps.MatchSnapshot(t, out.String())
 	})
 }
