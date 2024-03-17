@@ -25,11 +25,6 @@ var defaultDirPermissions = 0750
 
 // RunWPCli Runs a wp-cli command returning it's output and any errors.
 func (s *Site) RunWPCli(command []string, consoleOutput *console.Console) (statusCode int64, output string, err error) {
-	wordPressDirectory, err := s.getWordPressDirectory()
-	if err != nil {
-		return 1, "", err
-	}
-
 	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana-%s-wordpress", s.Settings.Name))
 
 	for _, mount := range mounts {
@@ -40,6 +35,11 @@ func (s *Site) RunWPCli(command []string, consoleOutput *console.Console) (statu
 		if strings.Contains(mount.Destination, "/var/www/html/wp-content/themes/") {
 			s.Settings.Type = "theme"
 		}
+	}
+
+	wordPressDirectory, err := s.getWordPressDirectory()
+	if err != nil {
+		return 1, "", err
 	}
 
 	appVolumes, err := s.getMounts(wordPressDirectory)
