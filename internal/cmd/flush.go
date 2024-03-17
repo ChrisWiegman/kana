@@ -27,7 +27,7 @@ func flush(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 			for _, command := range commands {
 				var code int64
 
-				code, _, err = kanaSite.RunWPCli(command, consoleOutput)
+				code, _, err = kanaSite.RunWPCli(command, false, consoleOutput)
 				if code != 0 || err != nil {
 					consoleOutput.Error(fmt.Errorf("unable to complete flush"))
 				}

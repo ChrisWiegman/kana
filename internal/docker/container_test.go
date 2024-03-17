@@ -39,7 +39,7 @@ func TestContainerRun(t *testing.T) {
 		Command: []string{"echo", "hello world"},
 	}
 
-	statusCode, body, err := d.ContainerRunAndClean(&config)
+	statusCode, body, err := d.ContainerRunAndClean(&config, false)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()

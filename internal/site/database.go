@@ -33,7 +33,7 @@ func (s *Site) ExportDatabase(args []string, consoleOutput *console.Console) (st
 		"/Site/export.sql",
 	}
 
-	code, output, err := s.RunWPCli(exportCommand, consoleOutput)
+	code, output, err := s.RunWPCli(exportCommand, false, consoleOutput)
 	if err != nil || code != 0 {
 		return "", fmt.Errorf("database export failed: %s\n%s", err.Error(), output)
 	}
@@ -81,12 +81,12 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string, 
 		var code int64
 		var output string
 
-		code, output, err = s.RunWPCli(dropCommand, consoleOutput)
+		code, output, err = s.RunWPCli(dropCommand, false, consoleOutput)
 		if err != nil || code != 0 {
 			return fmt.Errorf("drop database failed: %s\n%s", err.Error(), output)
 		}
 
-		code, output, err = s.RunWPCli(createCommand, consoleOutput)
+		code, output, err = s.RunWPCli(createCommand, false, consoleOutput)
 		if err != nil || code != 0 {
 			return fmt.Errorf("create database failed: %s\n%s", err.Error(), output)
 		}
@@ -100,7 +100,7 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string, 
 		"/Site/import.sql",
 	}
 
-	code, output, err := s.RunWPCli(importCommand, consoleOutput)
+	code, output, err := s.RunWPCli(importCommand, false, consoleOutput)
 	if err != nil || code != 0 {
 		return fmt.Errorf("database import failed: %s\n%s", err.Error(), output)
 	}
@@ -115,7 +115,7 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string, 
 			"--all-tables",
 		}
 
-		code, output, err := s.RunWPCli(replaceCommand, consoleOutput)
+		code, output, err := s.RunWPCli(replaceCommand, false, consoleOutput)
 		if err != nil || code != 0 {
 			return fmt.Errorf("replace domain failed failed: %s\n%s", err.Error(), output)
 		}

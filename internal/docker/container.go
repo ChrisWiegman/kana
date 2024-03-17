@@ -19,6 +19,7 @@ import (
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/strslice"
 	"github.com/docker/docker/pkg/stdcopy"
+	"golang.org/x/sync/errgroup"
 )
 
 type ContainerConfig struct {
@@ -265,19 +266,31 @@ func (d *Client) ContainerRun(config *ContainerConfig, randomPorts, localUser bo
 		return "", err
 	}
 
-	waiter, err := d.apiClient.ContainerAttach(context.Background(), resp.ID, container.AttachOptions{
+	return resp.ID, nil
+}
+
+func (d *Client) showInteractiveTerminal(containerID string) error {
+	waiter, err := d.apiClient.ContainerAttach(context.Background(), containerID, container.AttachOptions{
 		Stderr: true,
 		Stdout: true,
 		Stdin:  true,
 		Stream: true,
 	})
-
-	go io.Copy(os.Stdout, waiter.Reader)
-	go io.Copy(os.Stderr, waiter.Reader)
-
 	if err != nil {
-		panic(err)
+		return err
 	}
+
+	errs, _ := errgroup.WithContext(context.Background())
+
+	errs.Go(func() error {
+		_, err := io.Copy(os.Stdout, waiter.Reader)
+		return err
+	})
+
+	errs.Go(func() error {
+		_, err := io.Copy(os.Stderr, waiter.Reader)
+		return err
+	})
 
 	inOut := make(chan []byte)
 
@@ -298,18 +311,28 @@ func (d *Client) ContainerRun(config *ContainerConfig, randomPorts, localUser bo
 				return
 			}
 
-			w.Write(append(data, '\n'))
+			_, err := w.Write(append(data, '\n'))
+			if err != nil {
+				panic(err)
+			}
 		}
 	}(waiter.Conn)
 
-	return resp.ID, nil
+	return nil
 }
 
-func (d *Client) ContainerRunAndClean(config *ContainerConfig) (statusCode int64, body string, err error) {
+func (d *Client) ContainerRunAndClean(config *ContainerConfig, interactive bool) (statusCode int64, body string, err error) {
 	// Start the container
 	id, err := d.ContainerRun(config, false, true)
 	if err != nil {
 		return statusCode, body, err
+	}
+
+	if interactive {
+		err = d.showInteractiveTerminal(id)
+		if err != nil {
+			return statusCode, body, err
+		}
 	}
 
 	// Wait for it to finish
@@ -318,8 +341,10 @@ func (d *Client) ContainerRunAndClean(config *ContainerConfig) (statusCode int64
 		return statusCode, body, err
 	}
 
-	// Get the log
-	body, _ = d.containerLog(id)
+	// Get the output if we're not running interactively
+	if !interactive {
+		body, _ = d.containerLog(id)
+	}
 
 	err = d.apiClient.ContainerRemove(context.Background(), id, container.RemoveOptions{})
 	return statusCode, body, err

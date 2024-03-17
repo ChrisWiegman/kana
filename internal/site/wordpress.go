@@ -24,7 +24,7 @@ type PluginInfo struct {
 var defaultDirPermissions = 0750
 
 // RunWPCli Runs a wp-cli command returning it's output and any errors.
-func (s *Site) RunWPCli(command []string, consoleOutput *console.Console) (statusCode int64, output string, err error) {
+func (s *Site) RunWPCli(command []string, interactive bool, consoleOutput *console.Console) (statusCode int64, output string, err error) {
 	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana-%s-wordpress", s.Settings.Name))
 
 	for _, mount := range mounts {
@@ -78,7 +78,7 @@ func (s *Site) RunWPCli(command []string, consoleOutput *console.Console) (statu
 		return 1, "", err
 	}
 
-	code, output, err := s.dockerClient.ContainerRunAndClean(&container)
+	code, output, err := s.dockerClient.ContainerRunAndClean(&container, interactive)
 	if err != nil {
 		return code, "", err
 	}
@@ -141,7 +141,7 @@ func (s *Site) getInstalledWordPressPlugins(consoleOutput *console.Console) (plu
 
 	hasDefaultPlugins = false
 
-	_, commandOutput, err := s.RunWPCli(commands, consoleOutput)
+	_, commandOutput, err := s.RunWPCli(commands, false, consoleOutput)
 	if err != nil {
 		return []string{}, true, err
 	}
@@ -290,7 +290,7 @@ func (s *Site) activateProject(consoleOutput *console.Console) error {
 			s.Settings.Name,
 		}
 
-		code, _, err := s.RunWPCli(setupCommand, consoleOutput)
+		code, _, err := s.RunWPCli(setupCommand, false, consoleOutput)
 		if err != nil {
 			return err
 		}
@@ -329,7 +329,7 @@ func (s *Site) installDefaultPlugins(consoleOutput *console.Console) error {
 				plugin,
 			}
 
-			code, _, err := s.RunWPCli(setupCommand, consoleOutput)
+			code, _, err := s.RunWPCli(setupCommand, false, consoleOutput)
 			if err != nil {
 				return err
 			}
@@ -361,7 +361,7 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 		"siteurl",
 	}
 
-	code, checkURL, err := s.RunWPCli(checkCommand, consoleOutput)
+	code, checkURL, err := s.RunWPCli(checkCommand, false, consoleOutput)
 
 	if err != nil || code != 0 {
 		consoleOutput.Println("Finishing WordPress setup.")
@@ -395,7 +395,7 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 
 		var output string
 
-		code, output, err = s.RunWPCli(setupCommand, consoleOutput)
+		code, output, err = s.RunWPCli(setupCommand, false, consoleOutput)
 		if err != nil || code != 0 {
 			return fmt.Errorf("installation of WordPress failed: %s", output)
 		}
@@ -416,7 +416,7 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 				s.Settings.URL,
 			}
 
-			code, _, err = s.RunWPCli(setSiteURLCommand, consoleOutput)
+			code, _, err = s.RunWPCli(setSiteURLCommand, false, consoleOutput)
 			if err != nil || code != 0 {
 				return fmt.Errorf("installation of WordPress failed: %s", err.Error())
 			}

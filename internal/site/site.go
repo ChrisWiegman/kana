@@ -64,7 +64,7 @@ func (s *Site) ExportSiteConfig(consoleOutput *console.Console) error {
 		"siteurl",
 	}
 
-	code, checkURL, err := s.RunWPCli(checkCommand, consoleOutput)
+	code, checkURL, err := s.RunWPCli(checkCommand, false, consoleOutput)
 	if err != nil || code != 0 {
 		return fmt.Errorf("unable to determine SSL status")
 	}
