@@ -1,3 +1,0 @@
-kind: Bug Fixes
-body: Ensure we can run interactive wp-cli commands such as help
-time: 2024-03-17T15:16:43.715899759Z
