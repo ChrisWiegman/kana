@@ -1,0 +1,32 @@
+
+[TestRoot/run_the_kana_root_command_without_further_input - 1]
+Kana is a simple WordPress development tool designed for plugin and theme developers.
+
+Usage:
+  kana [command]
+
+Available Commands:
+  changelog   Open Kana's changelog in your browser
+  config      View and edit the saved configuration for the app or the local site.
+  db          Commands to easily import and export a WordPress database from an existing site
+  destroy     Destroys the current WordPress site. This is a permanent change.
+  export      Export the current config to a .kana.json file to save with your repo.
+  flush       Flushes the cache and deletes all transients.
+  help        Help about any command
+  list        Lists all Kana sites and their associated status.
+  open        Open the current site in your browser.
+  start       Starts a new environment in the local folder.
+  stop        Stops the WordPress development environment.
+  trust-ssl   Add the Kana SSL certificate to the MacOS Keychain (if needed).
+  version     Displays version information for the Kana CLI.
+  wp          Run a wp-cli command against the current site.
+  xdebug      Turns Xdebug on or off without having to stop and start the site.
+
+Flags:
+  -h, --help          help for kana
+  -n, --name string   Specify a name for the site, used to override using the current folder.
+  -v, --verbose       Display debugging information along with detailed command output
+
+Use "kana [command] --help" for more information about a command.
+
+---

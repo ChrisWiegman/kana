@@ -6,6 +6,18 @@ ARGS          = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
 %:
 	@:
 
+.PHONY: build
+build:
+	go mod vendor
+	go$(GO_VERSION) build \
+		-o ./build/kana \
+		-ldflags "-s -w -X $(PKG)/internal/cmd.Version=$(VERSION) -X $(PKG)/internal/cmd.Timestamp=$(TIMESTAMP)" \
+		./cmd/...
+
+.PHONY: build-test-image
+build-test-image:
+	docker build -t kana-test .
+
 .PHONY: change
 change:
 	docker run \
@@ -40,7 +52,8 @@ changelog:
 clean:
 	rm -rf \
 		dist \
-		vendor
+		vendor \
+		build
 
 .PHONY: install
 install:
@@ -86,10 +99,18 @@ snapshot:
 		--snapshot
 
 .PHONY: test
-test:
-	go \
-		test \
-		-v \
-		-timeout 30s\
-		-cover \
-		./...
+test: clean build-test-image
+	docker run --rm \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-v $(PWD):/usr/src/kana \
+		-w /usr/src/kana \
+		kana-test \
+		go build \
+			-o ./build/kana \
+			-ldflags "-s -w -X $(PKG)/internal/cmd.Version=$(VERSION) -X $(PKG)/internal/cmd.Timestamp=$(TIMESTAMP)" \
+			./cmd/... && \
+		go test \
+			-v \
+			-timeout 30s\
+			-cover \
+			./...
