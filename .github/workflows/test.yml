@@ -44,7 +44,7 @@ jobs:
           docker context ls --format=json
 
       - name: Build test cli
-        run:
+        run: |
           go mod vendor
           go build \
             -o ./build/kana \
