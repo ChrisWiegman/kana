@@ -1,10 +1,12 @@
 package docker
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"fmt"
 	"io"
+	"os"
 	"os/user"
 	"runtime"
 	"strings"
@@ -235,6 +237,10 @@ func (d *Client) ContainerRun(config *ContainerConfig, randomPorts, localUser bo
 		Hostname:     config.HostName,
 		Env:          config.Env,
 		Labels:       config.Labels,
+		OpenStdin:    true,
+		AttachStdin:  true,
+		AttachStdout: true,
+		AttachStderr: true,
 	}
 
 	// Linux doesn't abstract the user so we have to do it ourselves
@@ -258,6 +264,43 @@ func (d *Client) ContainerRun(config *ContainerConfig, randomPorts, localUser bo
 	if err != nil {
 		return "", err
 	}
+
+	waiter, err := d.apiClient.ContainerAttach(context.Background(), resp.ID, container.AttachOptions{
+		Stderr: true,
+		Stdout: true,
+		Stdin:  true,
+		Stream: true,
+	})
+
+	go io.Copy(os.Stdout, waiter.Reader)
+	go io.Copy(os.Stderr, waiter.Reader)
+
+	if err != nil {
+		panic(err)
+	}
+
+	inOut := make(chan []byte)
+
+	go func() {
+		scanner := bufio.NewScanner(os.Stdin)
+		for scanner.Scan() {
+			inOut <- []byte(scanner.Text())
+		}
+	}()
+
+	// Write to docker container
+	go func(w io.WriteCloser) {
+		for {
+			data, ok := <-inOut
+			if !ok {
+				fmt.Println("!ok")
+				w.Close()
+				return
+			}
+
+			w.Write(append(data, '\n'))
+		}
+	}(waiter.Conn)
 
 	return resp.ID, nil
 }

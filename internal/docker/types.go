@@ -32,6 +32,7 @@ type ContainerAPIClient interface {
 		networkingConfig *networkTypes.NetworkingConfig,
 		platform *specs.Platform,
 		containerName string) (container.CreateResponse, error)
+	ContainerAttach(ctx context.Context, container string, options container.AttachOptions) (types.HijackedResponse, error)
 	ContainerExecAttach(ctx context.Context, execID string, config types.ExecStartCheck) (types.HijackedResponse, error)
 	ContainerExecCreate(ctx context.Context, container string, config types.ExecConfig) (types.IDResponse, error)
 	ContainerExecInspect(ctx context.Context, execID string) (types.ContainerExecInspect, error)
