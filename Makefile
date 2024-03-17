@@ -105,3 +105,5 @@ test: clean build-test-image
 		-v $(PWD):/usr/src/kana \
 		-w /usr/src/kana \
 		kana-test
+	$(MAKE) clean
+	$(MAKE) install
