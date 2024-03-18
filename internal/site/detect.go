@@ -37,7 +37,7 @@ func (s *Site) DetectType() (string, error) {
 			var f *os.File
 			var line string
 
-			f, err = os.Open(item.Name())
+			f, err = os.Open(path.Join(s.Settings.WorkingDirectory, item.Name()))
 			if err != nil {
 				return "", err
 			}
