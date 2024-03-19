@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/ChrisWiegman/kana-cli/internal/console"
 	"github.com/ChrisWiegman/kana-cli/internal/site"
@@ -22,6 +23,21 @@ func wp(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 
 			if !kanaSite.IsSiteRunning() {
 				consoleOutput.Error(fmt.Errorf("the `wp` command only works on a running site. Please run 'kana start' to start the site"))
+			}
+
+			if cmd.Flags().Lookup("name").Changed {
+				for i := range args {
+					if !strings.Contains(args[i], "--name=") && !strings.Contains(args[i], "-n=") {
+						continue
+					}
+
+					nameFlag := strings.Split(args[i], "=")
+
+					if nameFlag[1] == cmd.Flags().Lookup("name").Value.String() {
+						args = append(args[:i], args[i+1:]...)
+						break
+					}
+				}
 			}
 
 			// Run the output from wp-cli
@@ -44,4 +60,24 @@ func wp(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd.DisableFlagParsing = true
 
 	return cmd
+}
+
+func parseWPNameFlag(args []string, cmd *cobra.Command) error {
+	for i := range args {
+		if !strings.Contains(args[i], "--name=") && !strings.Contains(args[i], "-n=") {
+			continue
+		}
+
+		nameFlag := strings.Split(args[i], "=")
+
+		err := cmd.Flag("name").Value.Set(nameFlag[1])
+		if err != nil {
+			return err
+		}
+
+		cmd.Flag("name").Changed = true
+		break
+	}
+
+	return nil
 }

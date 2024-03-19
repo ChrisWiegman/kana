@@ -28,6 +28,13 @@ func Execute() {
 			consoleOutput.Debug = flagVerbose
 			consoleOutput.JSON = flagJSONOutput
 
+			if cmd.Use == "wp" {
+				err := parseWPNameFlag(args, cmd)
+				if err != nil {
+					consoleOutput.Error(err)
+				}
+			}
+
 			err := kanaSite.New(cmd, commandsRequiringSite, startFlags, flagVerbose, consoleOutput, Version)
 			if err != nil {
 				consoleOutput.Error(err)
