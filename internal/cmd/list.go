@@ -25,7 +25,7 @@ func list(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 				dockerIsRunning = false
 			}
 
-			sites, err := kanaSite.GetSiteList(kanaSite.Settings.AppDirectory, dockerIsRunning, consoleOutput)
+			sites, err := kanaSite.GetSiteList(kanaSite.Settings.AppDirectory, dockerIsRunning)
 			if err != nil {
 				consoleOutput.Error(err)
 			}

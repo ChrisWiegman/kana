@@ -82,7 +82,7 @@ func (s *Site) ExportSiteConfig(consoleOutput *console.Console) error {
 }
 
 // GetSiteList Returns a list of all Kana sites, their location and whether they're running.
-func (s *Site) GetSiteList(appDir string, checkRunningStatus bool, consoleOutput *console.Console) ([]SiteInfo, error) {
+func (s *Site) GetSiteList(appDir string, checkRunningStatus bool) ([]SiteInfo, error) {
 	sites := []SiteInfo{}
 
 	sitesDir := path.Join(appDir, "sites")
