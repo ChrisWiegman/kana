@@ -1,3 +1,3 @@
 kind: Bug Fixes
-body: Fix a bug preventing commands running on named sites.
+body: Fix a bug preventing wp-cli commands running on named sites.
 time: 2024-03-18T23:10:51.906922009Z
