@@ -81,11 +81,27 @@ func (s *Site) ExportSiteConfig(consoleOutput *console.Console) error {
 	return s.Settings.WriteLocalSettings(&localSettings)
 }
 
+// GetSiteLink returns the link to the site.
+func (s *Site) GetSiteLink() (string, error) {
+	siteList, err := s.GetSiteList(false)
+	if err != nil {
+		return "", err
+	}
+
+	for i := range siteList {
+		if siteList[i].Name == s.Settings.Name {
+			return siteList[i].Path, nil
+		}
+	}
+
+	return "", fmt.Errorf("site path not found")
+}
+
 // GetSiteList Returns a list of all Kana sites, their location and whether they're running.
-func (s *Site) GetSiteList(appDir string, checkRunningStatus bool) ([]SiteInfo, error) {
+func (s *Site) GetSiteList(checkRunningStatus bool) ([]SiteInfo, error) {
 	sites := []SiteInfo{}
 
-	sitesDir := path.Join(appDir, "sites")
+	sitesDir := path.Join(s.Settings.AppDirectory, "sites")
 
 	_, err := os.Stat(sitesDir)
 	if os.IsNotExist(err) {
