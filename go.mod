@@ -1,4 +1,4 @@
-module github.com/ChrisWiegman/kana-cli
+module github.com/ChrisWiegman/kana
 
 go 1.22.0
 

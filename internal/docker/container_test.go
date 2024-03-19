@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ChrisWiegman/kana-cli/internal/console"
-	"github.com/ChrisWiegman/kana-cli/internal/docker/mocks"
+	"github.com/ChrisWiegman/kana/internal/console"
+	"github.com/ChrisWiegman/kana/internal/docker/mocks"
 
 	"github.com/stretchr/testify/mock"
 )

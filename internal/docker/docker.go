@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"os/exec"
 
-	"github.com/ChrisWiegman/kana-cli/internal/console"
+	"github.com/ChrisWiegman/kana/internal/console"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"

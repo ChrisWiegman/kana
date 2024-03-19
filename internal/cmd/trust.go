@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"github.com/ChrisWiegman/kana-cli/internal/console"
-	"github.com/ChrisWiegman/kana-cli/internal/settings"
-	"github.com/ChrisWiegman/kana-cli/internal/site"
+	"github.com/ChrisWiegman/kana/internal/console"
+	"github.com/ChrisWiegman/kana/internal/settings"
+	"github.com/ChrisWiegman/kana/internal/site"
 
 	"github.com/spf13/cobra"
 )

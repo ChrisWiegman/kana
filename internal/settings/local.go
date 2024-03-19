@@ -6,7 +6,7 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/ChrisWiegman/kana-cli/internal/helpers"
+	"github.com/ChrisWiegman/kana/internal/helpers"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

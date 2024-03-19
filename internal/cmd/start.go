@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ChrisWiegman/kana-cli/internal/console"
-	"github.com/ChrisWiegman/kana-cli/internal/helpers"
-	"github.com/ChrisWiegman/kana-cli/internal/settings"
-	"github.com/ChrisWiegman/kana-cli/internal/site"
+	"github.com/ChrisWiegman/kana/internal/console"
+	"github.com/ChrisWiegman/kana/internal/helpers"
+	"github.com/ChrisWiegman/kana/internal/settings"
+	"github.com/ChrisWiegman/kana/internal/site"
 
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"

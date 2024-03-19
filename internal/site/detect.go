@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"regexp"
 
-	"github.com/ChrisWiegman/kana-cli/internal/helpers"
+	"github.com/ChrisWiegman/kana/internal/helpers"
 )
 
 const DefaultType = "site"

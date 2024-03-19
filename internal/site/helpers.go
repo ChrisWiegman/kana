@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ChrisWiegman/kana-cli/internal/docker"
+	"github.com/ChrisWiegman/kana/internal/docker"
 )
 
 // arrayContains Searches an array of strings for a given string and returns true/false as appropriate.
