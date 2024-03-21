@@ -14,7 +14,7 @@ import (
 
 	"github.com/ChrisWiegman/kana/internal/console"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/image"
 	"github.com/moby/moby/pkg/jsonmessage"
 	"github.com/moby/term"
 	"github.com/spf13/viper"
@@ -74,7 +74,7 @@ func ValidateImage(imageName, imageTag string) error {
 func (d *Client) maybeUpdateImage(imageName string, updateDays int, suppressOutput bool) error {
 	lastUpdated := d.imageUpdateData.GetTime(imageName)
 
-	imageList, err := d.apiClient.ImageList(context.Background(), types.ImageListOptions{})
+	imageList, err := d.apiClient.ImageList(context.Background(), image.ListOptions{})
 	if err != nil {
 		return err
 	}
@@ -100,7 +100,7 @@ func (d *Client) maybeUpdateImage(imageName string, updateDays int, suppressOutp
 
 	// Pull the image or a newer image if needed
 	if !hasImage || checkForUpdate {
-		reader, err := d.apiClient.ImagePull(context.Background(), imageName, types.ImagePullOptions{})
+		reader, err := d.apiClient.ImagePull(context.Background(), imageName, image.PullOptions{})
 		if err != nil {
 			return err
 		}
@@ -136,8 +136,8 @@ func (d *Client) maybeUpdateImage(imageName string, updateDays int, suppressOutp
 	return nil
 }
 
-func (d *Client) removeImage(image string) (removed bool, err error) {
-	removedResponse, err := d.apiClient.ImageRemove(context.Background(), image, types.ImageRemoveOptions{})
+func (d *Client) removeImage(imageName string) (removed bool, err error) {
+	removedResponse, err := d.apiClient.ImageRemove(context.Background(), imageName, image.RemoveOptions{})
 
 	if err != nil {
 		if !strings.Contains(err.Error(), "No such image:") {

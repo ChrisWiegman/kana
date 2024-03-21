@@ -50,9 +50,9 @@ type ContainerAPIClient interface {
 
 // ImageAPIClient defines API client methods for the images.
 type ImageAPIClient interface {
-	ImagePull(ctx context.Context, ref string, options types.ImagePullOptions) (io.ReadCloser, error)
-	ImageRemove(ctx context.Context, image string, options types.ImageRemoveOptions) ([]image.DeleteResponse, error)
-	ImageList(ctx context.Context, options types.ImageListOptions) ([]image.Summary, error)
+	ImagePull(ctx context.Context, ref string, options image.PullOptions) (io.ReadCloser, error)
+	ImageRemove(ctx context.Context, image string, options image.RemoveOptions) ([]image.DeleteResponse, error)
+	ImageList(ctx context.Context, options image.ListOptions) ([]image.Summary, error)
 }
 
 // NetworkAPIClient defines API client methods for the networks.
