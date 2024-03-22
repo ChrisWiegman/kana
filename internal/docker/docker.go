@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os/exec"
+	"strings"
 
 	"github.com/ChrisWiegman/kana/internal/console"
 
@@ -75,23 +76,18 @@ func getCurrentDockerEndpoint() (string, error) {
 		return client.DefaultDockerHost, err
 	}
 
-	var dockerContexts []Context
+	contexts := strings.Split(out.String(), "\n")
 
-	err = json.Unmarshal(out.Bytes(), &dockerContexts)
-	if err != nil {
+	for i := range contexts {
 		var singleContext Context
 
-		err = json.Unmarshal(out.Bytes(), &singleContext)
+		err = json.Unmarshal([]byte(contexts[i]), &singleContext)
 		if err != nil {
 			return client.DefaultDockerHost, err
 		}
 
-		return singleContext.DockerEndpoint, nil
-	}
-
-	for _, dockerContext := range dockerContexts {
-		if dockerContext.Current {
-			return dockerContext.DockerEndpoint, nil
+		if singleContext.Current {
+			return singleContext.DockerEndpoint, nil
 		}
 	}
 
