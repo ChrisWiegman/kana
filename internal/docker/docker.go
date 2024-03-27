@@ -76,33 +76,28 @@ func getCurrentDockerEndpoint() (string, error) {
 		return client.DefaultDockerHost, err
 	}
 
-	if out.String()[0:1] == "[" {
-		var contexts []Context
+	var contexts []Context
 
-		err = json.Unmarshal(out.Bytes(), &contexts)
-		if err != nil {
-			return client.DefaultDockerHost, err
-		}
+	err = json.Unmarshal(out.Bytes(), &contexts)
+	if err != nil {
+		// Docker Desktop and Docker Engine treat the json output differently so we need to account for each.
+		rawContexts := strings.Split(out.String(), "\n")
 
-		for i := range contexts {
-			if contexts[i].Current {
-				return contexts[i].DockerEndpoint, nil
-			}
-		}
-	} else {
-		contexts := strings.Split(out.String(), "\n")
-
-		for i := range contexts {
+		for i := range rawContexts {
 			var singleContext Context
 
-			err = json.Unmarshal([]byte(contexts[i]), &singleContext)
+			err = json.Unmarshal([]byte(rawContexts[i]), &singleContext)
 			if err != nil {
 				return client.DefaultDockerHost, err
 			}
 
-			if singleContext.Current {
-				return singleContext.DockerEndpoint, nil
-			}
+			contexts = append(contexts, singleContext)
+		}
+	}
+
+	for i := range contexts {
+		if contexts[i].Current {
+			return contexts[i].DockerEndpoint, nil
 		}
 	}
 
