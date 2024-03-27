@@ -1,4 +1,0 @@
-kind: Bug Fixes
-body: Fix a bug on Mac resulting from the differences in the `docker context ls` command
-  between Docker Engine and Docker Desktop.
-time: 2024-03-27T19:25:30.408662262Z
