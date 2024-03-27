@@ -84,14 +84,16 @@ func getCurrentDockerEndpoint() (string, error) {
 		rawContexts := strings.Split(out.String(), "\n")
 
 		for i := range rawContexts {
-			var singleContext Context
+			if rawContexts[i] != "" { //Don't test an empty context
+				var singleContext Context
 
-			err = json.Unmarshal([]byte(rawContexts[i]), &singleContext)
-			if err != nil {
-				return client.DefaultDockerHost, err
+				err = json.Unmarshal([]byte(rawContexts[i]), &singleContext)
+				if err != nil {
+					return client.DefaultDockerHost, err
+				}
+
+				contexts = append(contexts, singleContext)
 			}
-
-			contexts = append(contexts, singleContext)
 		}
 	}
 
