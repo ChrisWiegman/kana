@@ -1,0 +1,12 @@
+
+[TestList/Test_the_default_list_command - 1]
+┌──────┬──────┬─────────┐
+│ Name │ Path │ Running │
+└──────┴──────┴─────────┘
+
+---
+
+[TestList/Test_the_list_command_with_json_output - 1]
+[]
+
+---

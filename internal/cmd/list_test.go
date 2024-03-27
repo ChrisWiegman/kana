@@ -8,9 +8,9 @@ import (
 	"github.com/gkampitakis/go-snaps/snaps"
 )
 
-func TestConfig(t *testing.T) {
-	t.Run("Test the default config command", func(t *testing.T) {
-		cmd := exec.Command("../../build/kana", "config")
+func TestList(t *testing.T) {
+	t.Run("Test the default list command", func(t *testing.T) {
+		cmd := exec.Command("../../build/kana", "list")
 		var out bytes.Buffer
 		cmd.Stdout = &out
 		err := cmd.Run()
@@ -21,8 +21,8 @@ func TestConfig(t *testing.T) {
 		snaps.MatchSnapshot(t, out.String())
 	})
 
-	t.Run("Retrieve the PHP value from the config command", func(t *testing.T) {
-		cmd := exec.Command("../../build/kana", "config", "php")
+	t.Run("Test the list command with json output", func(t *testing.T) {
+		cmd := exec.Command("../../build/kana", "list", "--output-json")
 		var out bytes.Buffer
 		cmd.Stdout = &out
 		err := cmd.Run()
