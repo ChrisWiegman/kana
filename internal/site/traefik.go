@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	traefikContainerName = "kana_traefik"
+	traefikContainerName = "kana-traefik"
 	traefikVersion       = "2.11"
 )
 
