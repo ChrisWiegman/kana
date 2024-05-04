@@ -217,6 +217,16 @@ You can also access the database directly by viewing the database port with `doc
 - **Database user**: _wordpress_
 - **Database password**: _wordpress_
 
+# Verify you're using Kana
+
+You can verify you're in a Kana environment by verifying the `IS_KANA_ENVIRONMENT` env variable. Here's an example:
+
+```php
+if ( getenv( 'IS_KANA_ENVIRONMENT' ) === true ) {
+    // We're on a Kana environment
+}
+```
+
 # Using Xdebug
 
 You can setup [Xdebug](https://xdebug.org) when starting a site in Kana using the `--xdebug` flag with the start command or by setting the `xdebug` setting globally or at the site level.
