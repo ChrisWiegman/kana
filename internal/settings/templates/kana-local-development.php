@@ -36,7 +36,7 @@ add_filter( 'jetpack_offline_mode', '__return_true' );
 function action_phpmailer_init( $phpmailer ) {
 
 	$phpmailer->isSMTP();
-	$phpmailer->Host = '{{ .SiteName }}';
+	$phpmailer->Host = 'kana-{{ .SiteName }}-mailpit';
 	$phpmailer->Port = 1025;
 
 }
