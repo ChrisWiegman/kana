@@ -241,6 +241,7 @@ func (s *Site) getWordPressContainer(appVolumes []mount.Mount, appContainers []d
 		HostName:    fmt.Sprintf("kana-%s-wordpress", s.Settings.Name),
 		Env: []string{
 			fmt.Sprintf("WORDPRESS_DB_HOST=kana-%s-database", s.Settings.Name),
+			"IS_KANA_ENVIRONMENT=true",
 			"WORDPRESS_DB_USER=wordpress",
 			"WORDPRESS_DB_PASSWORD=wordpress",
 			"WORDPRESS_DB_NAME=wordpress",
