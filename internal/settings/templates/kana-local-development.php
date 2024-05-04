@@ -47,8 +47,6 @@ add_action( 'phpmailer_init', '\KanaCLI\action_phpmailer_init' );
 function login_to_admin() {
 	if ( ! getenv('IS_KANA_ENVIRONMENT') === true
 		||  ! getenv('KANA_ADMIN_LOGIN') === true
-		|| ! function_exists( 'wp_get_environment_type' )
-		|| 'local' !== wp_get_environment_type()
 		|| ! is_admin()
 		|| is_user_logged_in() ) {
 		return;
