@@ -71,6 +71,7 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 	t.AddRow("xdebug", consoleOutput.Bold(s.global.GetString("xdebug")), consoleOutput.Bold(s.local.GetString("xdebug")))
 	t.AddRow("scriptdebug", consoleOutput.Bold(s.global.GetString("scriptdebug")), consoleOutput.Bold(s.local.GetString("scriptdebug")))
 	t.AddRow("environment", consoleOutput.Bold(s.global.GetString("environment")), consoleOutput.Bold(s.local.GetString("environment")))
+	t.AddRow("adminLogin", consoleOutput.Bold(s.global.GetString("adminLogin")), consoleOutput.Bold(s.local.GetString("adminLogin")))
 
 	t.Render()
 }

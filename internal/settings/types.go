@@ -11,6 +11,7 @@ type Settings struct {
 	Local, Xdebug, Mailpit, SSL, WPDebug, Activate, ScriptDebug bool
 	RemoveDefaultPlugins                                        bool
 	IsNewSite, IsNamedSite                                      bool
+	AdminLogin                                                  bool
 	ImageUpdateDays                                             int
 	AdminEmail, AdminPassword, AdminUsername                    string
 	AppDirectory, SiteDirectory, WorkingDirectory               string
@@ -46,6 +47,7 @@ type StartFlags struct {
 type LocalSettings struct {
 	Mailpit, Xdebug, SSL, WPDebug, Activate, ScriptDebug bool
 	RemoveDefaultPlugins                                 bool
+	AdminLogin                                           bool
 	Type, DatabaseClient, Multisite, Environment         string
 	Plugins                                              []string
 }
