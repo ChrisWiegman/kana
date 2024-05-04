@@ -283,6 +283,12 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 		return err
 	}
 
+	// Install the Kana development plugin
+	err = s.installKanaPlugin()
+	if err != nil {
+		return err
+	}
+
 	// Start Mailpit
 	if s.Settings.Mailpit {
 		err = s.startMailpit(consoleOutput)
@@ -317,12 +323,6 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 		if err != nil {
 			return err
 		}
-	}
-
-	// Install the Kana development plugin
-	err = s.installKanaPlugin()
-	if err != nil {
-		return err
 	}
 
 	// Install any configuration plugins if needed
@@ -364,7 +364,12 @@ func checkStatusCode(checkURL string) (bool, error) {
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:gosec
 	}
 
-	client := &http.Client{Transport: clientTransport}
+	client := &http.Client{
+		Transport: clientTransport,
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -377,7 +382,7 @@ func checkStatusCode(checkURL string) (bool, error) {
 		}
 	}()
 
-	if resp.StatusCode == http.StatusOK {
+	if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusFound {
 		return true, nil
 	}
 
