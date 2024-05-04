@@ -1,0 +1,3 @@
+kind: Bug Fixes
+body: WordPress will no longer display an email send error if Mailpit is running
+time: 2024-05-04T21:44:47.351688262Z
