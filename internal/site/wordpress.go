@@ -74,6 +74,10 @@ func (s *Site) RunWPCli(command []string, interactive bool, consoleOutput *conso
 		Volumes: appVolumes,
 	}
 
+	if s.Settings.AdminLogin {
+		container.Env = append(container.Env, "KANA_ADMIN_LOGIN=true")
+	}
+
 	err = s.dockerClient.EnsureImage(container.Image, s.Settings.ImageUpdateDays, consoleOutput)
 	if err != nil {
 		return 1, "", err
@@ -258,6 +262,10 @@ func (s *Site) getWordPressContainer(appVolumes []mount.Mount, appContainers []d
 			"kana.site": s.Settings.Name,
 		},
 		Volumes: appVolumes,
+	}
+
+	if s.Settings.AdminLogin {
+		wordPressContainer.Env = append(wordPressContainer.Env, "KANA_ADMIN_LOGIN=true")
 	}
 
 	if s.Settings.WPDebug {
