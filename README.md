@@ -133,6 +133,8 @@ By default Kana will prompt you to confirm any site you wish to destroy. You can
 
 `kana open` will open the site in your default browser
 
+`kana open -a` will open the WordPress Dashboard. This will also login the "admin" user unless the `adminLogin` setting is set to false.
+
 By default Kana will open the appropriate WordPress site. To open the database or Mailpit simply append the appropriate flag to the open command ie `kana open --database`.
 
 Note that by default Kana will open the database in [phpMyAdmin](https://www.phpmyadmin.net). You can also tell Kana to open the database in [TablePlus](https://tableplus.com) instead by setting the `databaseClient` configuration setting to `tableplus`.
@@ -170,6 +172,7 @@ Kana has a handful of options that apply to all new sites created with the app. 
 - `imageUpdateDays` **1** - the number of days Kana will wait between checking for updated Docker images. Set this to `0` to disable the check for newer images altogether (Kana will only download missing images)
 - `activate` **true** - if the project site is set to `theme` or `plugin` this will activate the project on first load
 - `multisite` **none** - set to either `subdirectory` or `subdomain` to create the site as the appropriate type of Multisite installation.
+- `adminLogin` **true** - will automatically login the "admin" user when accessing the WordPress dashboard
 
 You can get or set any of the above options using a similar syntax to GIT's config. For example:
 
