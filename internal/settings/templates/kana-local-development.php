@@ -34,11 +34,41 @@ add_filter( 'jetpack_offline_mode', '__return_true' );
  * @param PHPMailer $phpmailer The PHPMailer instance (passed by reference).
  */
 function action_phpmailer_init( $phpmailer ) {
-
 	$phpmailer->isSMTP();
 	$phpmailer->Host = 'kana-{{ .SiteName }}-mailpit';
 	$phpmailer->Port = 1025;
-
 }
 
 add_action( 'phpmailer_init', '\KanaCLI\action_phpmailer_init' );
+
+/**
+ * Login to the WordPress admin automatically when visiting a WordPress admin URL.
+ */
+function login_to_admin() {
+	if ( ! getenv('IS_KANA_ENVIRONMENT') === true ) {
+		return;
+	}
+
+	if ( ! is_admin() || is_user_logged_in() ) {
+		return;
+	}
+
+	if ( ! function_exists( 'wp_get_environment_type' ) || 'local' !== wp_get_environment_type() ) {
+		return;
+	}
+
+	$user = wp_signon(
+		array(
+			'user_login'    => 'admin',
+			'user_password' => 'password',
+			'remember'      => true,
+		)
+	);
+
+	if ( ! is_wp_error( $user ) && isset( $_SERVER['REQUEST_URI'] ) ) {
+		wp_safe_redirect( $_SERVER['REQUEST_URI'] );
+		exit();
+	}
+}
+
+add_action( 'init', '\KanaCLI\login_to_admin' );

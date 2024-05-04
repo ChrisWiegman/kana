@@ -61,6 +61,7 @@ func (s *Site) RunWPCli(command []string, interactive bool, consoleOutput *conso
 		HostName:    fmt.Sprintf("kana-%s-wordpress_cli", s.Settings.Name),
 		Command:     fullCommand,
 		Env: []string{
+			"IS_KANA_ENVIRONMENT=true",
 			fmt.Sprintf("WORDPRESS_DB_HOST=kana-%s-database", s.Settings.Name),
 			"WORDPRESS_DB_USER=wordpress",
 			"WORDPRESS_DB_PASSWORD=wordpress",
