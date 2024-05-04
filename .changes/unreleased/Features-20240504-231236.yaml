@@ -1,0 +1,4 @@
+kind: Features
+body: Introduce the `IS_KANA_ENVIRONMENT` env variable to allow developers to verify
+  they're working in a Kana development environment
+time: 2024-05-04T23:12:36.114354384Z

@@ -1,0 +1,4 @@
+kind: Features
+body: Introduce the `adminLogin` config variable to allow users to disable automatic
+  login into the WordPress Dashboard
+time: 2024-05-04T23:11:55.088084087Z
