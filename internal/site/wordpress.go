@@ -232,7 +232,7 @@ func (s *Site) getMounts(appDir string) ([]mount.Mount, error) {
 }
 
 func (s *Site) getWordPressContainer(appVolumes []mount.Mount, appContainers []docker.ContainerConfig) []docker.ContainerConfig {
-	hostRule := fmt.Sprintf("HostRegexp(`%[1]s`, `{subdomain:.*}.%[1]s`)", s.Settings.SiteDomain)
+	hostRule := fmt.Sprintf("HostRegexp(`^(.+\\.)?%[1]s$`)", strings.ReplaceAll(s.Settings.SiteDomain, ".", "\\."))
 
 	wordPressContainer := docker.ContainerConfig{
 		Name:        fmt.Sprintf("kana-%s-wordpress", s.Settings.Name),
