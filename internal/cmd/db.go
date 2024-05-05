@@ -64,10 +64,8 @@ func db(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	commandsRequiringSite = append(commandsRequiringSite, exportCmd.Use)
 
 	importCmd.Flags().BoolVarP(&flagPreserve, "preserve", "p", false, "Preserve the existing database (don't drop it before import)")
-	importCmd.Flags().StringVarP(
-		&flagReplaceDomain,
+	importCmd.Flags().StringVar(&flagReplaceDomain,
 		"replace-domain",
-		"d",
 		"",
 		"The old site domain to replace automatically with the development site domain")
 

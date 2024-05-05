@@ -90,25 +90,23 @@ func start(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	cmd.Flags().BoolVarP(&startFlags.ScriptDebug, "scriptdebug", "c", false, "Enable SCRIPT_DEBUG when starting the container.")
 	cmd.Flags().BoolVarP(&startFlags.WPDebug, "wpdebug", "d", false, "Enable WP_Debug when starting the container.")
 	cmd.Flags().BoolVarP(&startFlags.Mailpit, "mailpit", "m", false, "Enable Mailpit when starting the container.")
-	cmd.Flags().StringVarP(&startFlags.Type, "type", "t", "site", "Set the type of the installation, `site`, `plugin` or `theme`.")
 	cmd.Flags().BoolVarP(&startFlags.SSL, "ssl", "s", false, "Whether the site should default to SSL (https) or not.")
-	cmd.Flags().BoolVarP(
-		&startFlags.RemoveDefaultPlugins,
+	cmd.Flags().BoolVarP(&startFlags.RemoveDefaultPlugins,
 		"remove-default-plugins",
 		"r",
 		false,
 		"If true will remove the default plugins installed with WordPress (Akismet and Hello Dolly) when starting a site.")
-
-	cmd.Flags().BoolVarP(
-		&startFlags.Activate,
+	cmd.Flags().BoolVarP(&startFlags.Activate,
 		"activate",
 		"a",
 		false,
 		"Activate the current plugin or theme (only works when used with the 'plugin' or 'theme' flags).")
-	cmd.Flags().StringVarP(&startFlags.Multisite, "multisite", "u", "none", "Creates your new site as a multisite installation.")
-	cmd.Flags().StringVarP(&startFlags.Environment, "environment", "e", "local", "Sets the WP_ENVIRONMENT_TYPE for the site.")
 
+	cmd.Flags().StringVar(&startFlags.Multisite, "multisite", "none", "Creates your new site as a multisite installation.")
+	cmd.Flags().StringVar(&startFlags.Environment, "environment", "local", "Sets the WP_ENVIRONMENT_TYPE for the site.")
+	cmd.Flags().StringVar(&startFlags.Type, "type", "site", "Set the type of the installation, `site`, `plugin` or `theme`.")
 	cmd.Flags().StringVar(&startFlags.Theme, "theme", "", "Installs and activates a theme when starting a site.")
+
 	cmd.Flags().Lookup("multisite").NoOptDefVal = "subdomain"
 
 	return cmd
