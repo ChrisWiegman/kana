@@ -1,3 +1,0 @@
-kind: Bug Fixes
-body: Always ensure that all default plugins are installed and activated on site start
-time: 2024-05-05T15:17:17.040823053Z
