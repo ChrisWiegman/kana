@@ -23,7 +23,7 @@ Available Commands:
 
 Flags:
   -h, --help          help for kana
-  -n, --name string   Specify a name for the site, used to override using the current folder.
+      --name string   Specify a name for the site, used to override using the current folder.
   -v, --verbose       Display debugging information along with detailed command output
 
 Use "kana [command] --help" for more information about a command.
