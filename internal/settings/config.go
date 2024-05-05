@@ -117,44 +117,46 @@ func (s *Settings) validateSetting(setting, value string) error { //nolint:gocyc
 	validate := validator.New()
 
 	switch setting {
-	case "php":
-		if docker.ValidateImage("wordpress", fmt.Sprintf("php%s", value)) != nil {
-			return fmt.Errorf(
-				"the PHP version in your configuration, %s, is invalid. See https://hub.docker.com/_/wordpress for a list of supported versions",
-				value)
-		}
-	case "mariadb":
-		if docker.ValidateImage("mariadb", value) != nil {
-			return fmt.Errorf(
-				"the MariaDB version in your configuration, %s, is invalid. See https://hub.docker.com/_/mariadb for a list of supported versions",
-				value)
-		}
-	case "type":
-		if !helpers.IsValidString(value, validTypes) {
-			return fmt.Errorf("the type you selected, %s, is not a valid type. You must use either `site`, `plugin` or `theme`", setting)
-		}
 	case "admin.email":
 		return validate.Var(value, "email")
 	case "admin.password":
 		return validate.Var(value, "alphanumunicode")
 	case "admin.username":
 		return validate.Var(value, "alpha")
-	case "imageUpdateDays":
-	case "imageupdatedays":
-		return validate.Var(value, "gte=0")
 	case "databaseClient":
 	case "databaseclient":
 		if !helpers.IsValidString(value, validDatabaseClients) {
 			return fmt.Errorf("the database client, %s, is not a valid client. You must use either `phpmyadmin` or `tableplus`", setting)
 		}
-	case "multisite":
-		if !helpers.IsValidString(value, validMultisiteTypes) {
-			return fmt.Errorf("the multisite type, %s, is not a valid type. You must use either `none`, `subdomain` or `subdirectory`", setting)
-		}
 	case "environment":
 		if !helpers.IsValidString(value, validEnvironmentTypes) {
 			return fmt.Errorf("the environment, %s, is not valid. You must use either `local`, `development`, `staging` or `production`", setting)
 		}
+	case "imageUpdateDays":
+	case "imageupdatedays":
+		return validate.Var(value, "gte=0")
+	case "mariadb":
+		if docker.ValidateImage("mariadb", value) != nil {
+			return fmt.Errorf(
+				"the MariaDB version in your configuration, %s, is invalid. See https://hub.docker.com/_/mariadb for a list of supported versions",
+				value)
+		}
+	case "multisite":
+		if !helpers.IsValidString(value, validMultisiteTypes) {
+			return fmt.Errorf("the multisite type, %s, is not a valid type. You must use either `none`, `subdomain` or `subdirectory`", setting)
+		}
+	case "php":
+		if docker.ValidateImage("wordpress", fmt.Sprintf("php%s", value)) != nil {
+			return fmt.Errorf(
+				"the PHP version in your configuration, %s, is invalid. See https://hub.docker.com/_/wordpress for a list of supported versions",
+				value)
+		}
+
+	case "type":
+		if !helpers.IsValidString(value, validTypes) {
+			return fmt.Errorf("the type you selected, %s, is not a valid type. You must use either `site`, `plugin` or `theme`", setting)
+		}
+
 	default:
 		err := validate.Var(value, "boolean")
 		if err != nil {

@@ -6,6 +6,7 @@ var (
 	adminEmail           = "admin@sites.kana.li"
 	adminPassword        = "password"
 	adminUsername        = "admin"
+	automaticLogin       = true
 	configFolderName     = ".config/kana"
 	databaseClient       = "phpmyadmin"
 	domain               = "sites.kana.li"
@@ -15,6 +16,7 @@ var (
 	mariadb              = "11"
 	multisite            = "none"
 	php                  = "8.2"
+	plugins              = []string{}
 	removeDefaultPlugins = false
 	rootCert             = "kana.root.pem"
 	rootKey              = "kana.root.key"
@@ -23,11 +25,9 @@ var (
 	siteKey              = "kana.site.key"
 	siteType             = "site"
 	ssl                  = false
+	theme                = ""
 	wpdebug              = false
 	xdebug               = false
-	automaticLogin       = true
-	theme                = ""
-	plugins              = []string{}
 )
 
 // Default permissions for all new files and folders.

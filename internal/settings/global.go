@@ -24,6 +24,7 @@ func (s *Settings) LoadGlobalSettings() error {
 	s.AdminEmail = globalViperConfig.GetString("admin.email")
 	s.AdminPassword = globalViperConfig.GetString("admin.password")
 	s.AdminUsername = globalViperConfig.GetString("admin.username")
+	s.AutomaticLogin = globalViperConfig.GetBool("automaticLogin")
 	s.DatabaseClient = globalViperConfig.GetString("databaseClient")
 	s.Environment = globalViperConfig.GetString("environment")
 	s.ImageUpdateDays = globalViperConfig.GetInt("imageUpdateDays")
@@ -31,15 +32,14 @@ func (s *Settings) LoadGlobalSettings() error {
 	s.MariaDB = globalViperConfig.GetString("mariadb")
 	s.Multisite = globalViperConfig.GetString("multisite")
 	s.PHP = globalViperConfig.GetString("php")
+	s.Plugins = globalViperConfig.GetStringSlice("plugins")
 	s.RemoveDefaultPlugins = globalViperConfig.GetBool("removeDefaultPlugins")
 	s.ScriptDebug = globalViperConfig.GetBool("scriptdebug")
 	s.SSL = globalViperConfig.GetBool("ssl")
+	s.Theme = globalViperConfig.GetString(("theme"))
 	s.Type = globalViperConfig.GetString("type")
 	s.WPDebug = globalViperConfig.GetBool("wpdebug")
 	s.Xdebug = globalViperConfig.GetBool("xdebug")
-	s.AutomaticLogin = globalViperConfig.GetBool("automaticLogin")
-	s.Theme = globalViperConfig.GetString(("theme"))
-	s.Plugins = globalViperConfig.GetStringSlice("plugins")
 
 	return err
 }
@@ -52,6 +52,7 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) { //nolint:funlen
 	globalSettings.SetDefault("admin.email", adminEmail)
 	globalSettings.SetDefault("admin.password", adminPassword)
 	globalSettings.SetDefault("admin.username", adminUsername)
+	globalSettings.SetDefault("automaticLogin", automaticLogin)
 	globalSettings.SetDefault("databaseClient", databaseClient)
 	globalSettings.SetDefault("environment", environment)
 	globalSettings.SetDefault("imageUpdateDays", imageUpdateDays)
@@ -63,11 +64,10 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) { //nolint:funlen
 	globalSettings.SetDefault("removeDefaultPlugins", removeDefaultPlugins)
 	globalSettings.SetDefault("scriptdebug", scriptDebug)
 	globalSettings.SetDefault("ssl", ssl)
+	globalSettings.SetDefault("theme", theme)
 	globalSettings.SetDefault("type", siteType)
 	globalSettings.SetDefault("wpdebug", wpdebug)
 	globalSettings.SetDefault("xdebug", xdebug)
-	globalSettings.SetDefault("automaticLogin", automaticLogin)
-	globalSettings.SetDefault("theme", theme)
 
 	globalSettings.SetConfigName("kana")
 	globalSettings.SetConfigType("json")
@@ -89,16 +89,16 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) { //nolint:funlen
 
 	changeConfig := false
 
-	// Reset default "site" type if there's an invalid type in the config file
-	if !helpers.IsValidString(globalSettings.GetString("type"), validTypes) {
-		changeConfig = true
-		globalSettings.Set("type", "site")
-	}
-
 	// Reset default php version if there's an invalid version in the config file
 	if docker.ValidateImage("wordpress", fmt.Sprintf("php%s", globalSettings.GetString("php"))) != nil {
 		changeConfig = true
 		globalSettings.Set("php", php)
+	}
+
+	// Reset default "site" type if there's an invalid type in the config file
+	if !helpers.IsValidString(globalSettings.GetString("type"), validTypes) {
+		changeConfig = true
+		globalSettings.Set("type", "site")
 	}
 
 	// Reset default mariadb version if there's an invalid version in the config file

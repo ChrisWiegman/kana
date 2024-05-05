@@ -8,28 +8,45 @@ import (
 
 // Settings Individual Settings for use throughout the app lifecycle.
 type Settings struct {
-	Local, Xdebug, Mailpit, SSL, WPDebug, Activate, ScriptDebug bool
-	RemoveDefaultPlugins                                        bool
-	IsNewSite, IsNamedSite                                      bool
-	AutomaticLogin                                              bool
-	ImageUpdateDays                                             int
-	AdminEmail, AdminPassword, AdminUsername                    string
-	AppDirectory, SiteDirectory, WorkingDirectory               string
-	AppDomain, SiteDomain                                       string
-	Name                                                        string
-	PHP                                                         string
-	MariaDB                                                     string
-	RootCert, RootKey, SiteCert, SiteKey                        string
-	URL, Protocol                                               string
-	Type                                                        string
-	DatabaseClient                                              string
-	Multisite                                                   string
-	Environment                                                 string
-	Version                                                     string
-	Theme                                                       string
-	Plugins                                                     []string
-	global                                                      *viper.Viper
-	local                                                       *viper.Viper
+	global *viper.Viper // The "global" viper holding app-wide settings.
+	local  *viper.Viper // The "local" viper holding site-specific settings.
+
+	Activate             bool   // Activate the plugin or theme for the appropriate site type.
+	AdminEmail           string // The email address for the admin user.
+	AdminPassword        string // The password for the admin user.
+	AdminUsername        string // The username for the admin user.
+	AppDomain            string // The top-level domain for the app.
+	AppDirectory         string
+	AutomaticLogin       bool
+	DatabaseClient       string
+	Environment          string
+	ImageUpdateDays      int
+	IsNamedSite          bool
+	IsNewSite            bool
+	Local                bool
+	Mailpit              bool
+	MariaDB              string
+	Multisite            string
+	Name                 string
+	PHP                  string
+	Plugins              []string
+	Protocol             string
+	RemoveDefaultPlugins bool
+	RootCert             string
+	RootKey              string
+	ScriptDebug          bool
+	SiteCert             string
+	SiteDirectory        string
+	SiteDomain           string
+	SiteKey              string
+	SSL                  bool
+	Theme                string
+	Type                 string
+	URL                  string
+	Version              string
+	WorkingDirectory     string
+	WPDebug              bool
+	Xdebug               bool
 }
 
 type StartFlags struct {
@@ -47,20 +64,30 @@ type StartFlags struct {
 }
 
 type LocalSettings struct {
-	Mailpit, Xdebug, SSL, WPDebug, Activate, ScriptDebug bool
-	AdminEmail, AdminPassword, AdminUsername             string
-	RemoveDefaultPlugins                                 bool
-	AutomaticLogin                                       bool
-	Type, DatabaseClient, Multisite, Environment         string
-	Plugins                                              []string
-	Theme                                                string
+	Activate             bool
+	AutomaticLogin       bool
+	DatabaseClient       string
+	Environment          string
+	Mailpit              bool
+	Multisite            string
+	Plugins              []string
+	RemoveDefaultPlugins bool
+	ScriptDebug          bool
+	SSL                  bool
+	Theme                string
+	Type                 string
+	WPDebug              bool
+	Xdebug               bool
 }
 
 type File struct {
-	Name, Template, LocalPath string
-	Permissions               os.FileMode
+	LocalPath   string
+	Name        string
+	Permissions os.FileMode
+	Template    string
 }
 
 type KanaPluginVars struct {
-	SiteName, Version string
+	SiteName string
+	Version  string
 }
