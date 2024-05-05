@@ -160,7 +160,7 @@ func (s *Site) IsSiteRunning() bool {
 func (s *Site) New(
 	cmd *cobra.Command,
 	commandsRequiringSite []string,
-	startFlags settings.StartFlags,
+	startFlags *settings.StartFlags,
 	flagVerbose bool,
 	consoleOutput *console.Console,
 	version string) error {

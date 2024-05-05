@@ -35,7 +35,7 @@ func Execute() {
 				}
 			}
 
-			err := kanaSite.New(cmd, commandsRequiringSite, startFlags, flagVerbose, consoleOutput, Version)
+			err := kanaSite.New(cmd, commandsRequiringSite, &startFlags, flagVerbose, consoleOutput, Version)
 			if err != nil {
 				consoleOutput.Error(err)
 			}
