@@ -25,7 +25,7 @@ var (
 	ssl                  = false
 	wpdebug              = false
 	xdebug               = false
-	adminLogin           = true
+	automaticLogin       = true
 	theme                = ""
 )
 

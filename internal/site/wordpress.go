@@ -76,7 +76,7 @@ func (s *Site) RunWPCli(command []string, interactive bool, consoleOutput *conso
 		Volumes: appVolumes,
 	}
 
-	if s.Settings.AdminLogin {
+	if s.Settings.AutomaticLogin {
 		container.Env = append(container.Env, "KANA_ADMIN_LOGIN=true")
 	}
 
@@ -269,7 +269,7 @@ func (s *Site) getWordPressContainer(appVolumes []mount.Mount, appContainers []d
 		Volumes: appVolumes,
 	}
 
-	if s.Settings.AdminLogin {
+	if s.Settings.AutomaticLogin {
 		wordPressContainer.Env = append(wordPressContainer.Env, "KANA_ADMIN_LOGIN=true")
 	}
 

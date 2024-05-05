@@ -11,7 +11,7 @@ type Settings struct {
 	Local, Xdebug, Mailpit, SSL, WPDebug, Activate, ScriptDebug bool
 	RemoveDefaultPlugins                                        bool
 	IsNewSite, IsNamedSite                                      bool
-	AdminLogin                                                  bool
+	AutomaticLogin                                              bool
 	ImageUpdateDays                                             int
 	AdminEmail, AdminPassword, AdminUsername                    string
 	AppDirectory, SiteDirectory, WorkingDirectory               string
@@ -50,7 +50,7 @@ type LocalSettings struct {
 	Mailpit, Xdebug, SSL, WPDebug, Activate, ScriptDebug bool
 	AdminEmail, AdminPassword, AdminUsername             string
 	RemoveDefaultPlugins                                 bool
-	AdminLogin                                           bool
+	AutomaticLogin                                       bool
 	Type, DatabaseClient, Multisite, Environment         string
 	Plugins                                              []string
 	Theme                                                string
