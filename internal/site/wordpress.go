@@ -357,32 +357,33 @@ func (s *Site) installDefaultPlugins(consoleOutput *console.Console) error {
 	}
 
 	for _, plugin := range s.Settings.Plugins {
-		installPlugin := true
+		setupCommand := []string{
+			"plugin",
+			"install",
+			"--activate",
+			plugin,
+		}
 
 		for _, installedPlugin := range installedPlugins {
 			if installedPlugin == plugin {
-				installPlugin = false
+				setupCommand = []string{
+					"plugin",
+					"install",
+					"--activate",
+					plugin,
+				}
 			}
 		}
 
-		if installPlugin {
-			consoleOutput.Println(fmt.Sprintf("Installing plugin:  %s", consoleOutput.Bold(consoleOutput.Blue(plugin))))
+		consoleOutput.Println(fmt.Sprintf("Installing plugin:  %s", consoleOutput.Bold(consoleOutput.Blue(plugin))))
 
-			setupCommand := []string{
-				"plugin",
-				"install",
-				"--activate",
-				plugin,
-			}
+		code, _, err := s.RunWPCli(setupCommand, false, consoleOutput)
+		if err != nil {
+			return err
+		}
 
-			code, _, err := s.RunWPCli(setupCommand, false, consoleOutput)
-			if err != nil {
-				return err
-			}
-
-			if code != 0 {
-				consoleOutput.Warn(fmt.Sprintf("Unable to install plugin: %s.", consoleOutput.Bold(consoleOutput.Blue(plugin))))
-			}
+		if code != 0 {
+			consoleOutput.Warn(fmt.Sprintf("Unable to install plugin: %s.", consoleOutput.Bold(consoleOutput.Blue(plugin))))
 		}
 	}
 
