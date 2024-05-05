@@ -133,7 +133,7 @@ By default Kana will prompt you to confirm any site you wish to destroy. You can
 
 `kana open` will open the site in your default browser
 
-`kana open -a` will open the WordPress Dashboard. This will also login the "admin" user unless the `adminLogin` setting is set to false.
+`kana open -a` will open the WordPress Dashboard. This will also login the "admin" user unless the `automaticLogin` setting is set to false.
 
 By default Kana will open the appropriate WordPress site. To open the database or Mailpit simply append the appropriate flag to the open command ie `kana open --database`.
 
@@ -155,25 +155,25 @@ Kana has a handful of options that apply to all new sites created with the app. 
 
 `kana config` will list all changeable defaults for a new site. Currently these include the following:
 
+- `activate` **true** - if the project site is set to `theme` or `plugin` this will activate the project on first load
 - `admin.email` __admin@kanasite.localhost__ - the admin email address for the default admin account
 - `admin.password` **password** - the default password used to login to WordPress
 - `admin.username` **admin** - the default username used to login to WordPress
-- `php` **8.2** - the default PHP version used for new sites (see [https://hub.docker.com/_/wordpress] for all supported versions)
-- `mariadb` **11** - the default MariaDB version used for sites (see [https://hub.docker.com/_/mariadb] for all supported versions)
+- `automaticLogin` **true** - will automatically login the "admin" user when accessing the WordPress dashboard
 - `databaseClient` **phpmyadmin** - the default database client for accessing the database directly (currently `phpmyadmin` and `tableplus` are supported)
-- `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
-- `xdebug` **false** - the default usage of the `xdebug` start flag
-- `wpdebug` **false** - the default usage of the `wpdebug` start flag
-- `scriptdebug` **false** - the default usage of the `scriptdebug` start flag
 - `environment` **local** - the default usage of the `environment` start flag
-- `mailpit` **false** - the default usage of the `mailpit` start flag
-- `removeDefaultPlugins` **false** - removes the default "Hello Dolly" and Akismet plugins when starting a new site. Note this will not restore them if they've already been removed.
-- `ssl` **false** - the default usage of the `ssl` start flag
 - `imageUpdateDays` **1** - the number of days Kana will wait between checking for updated Docker images. Set this to `0` to disable the check for newer images altogether (Kana will only download missing images)
-- `activate` **true** - if the project site is set to `theme` or `plugin` this will activate the project on first load
+- `mailpit` **false** - the default usage of the `mailpit` start flag
+- `mariadb` **11** - the default MariaDB version used for sites (see [https://hub.docker.com/_/mariadb] for all supported versions)
 - `multisite` **none** - set to either `subdirectory` or `subdomain` to create the site as the appropriate type of Multisite installation.
-- `adminLogin` **true** - will automatically login the "admin" user when accessing the WordPress dashboard
+- `php` **8.2** - the default PHP version used for new sites (see [https://hub.docker.com/_/wordpress] for all supported versions)
+- `removeDefaultPlugins` **false** - removes the default "Hello Dolly" and Akismet plugins when starting a new site. Note this will not restore them if they've already been removed.
+- `scriptdebug` **false** - the default usage of the `scriptdebug` start flag
+- `ssl` **false** - the default usage of the `ssl` start flag
 - `theme` ***<empty string>*** - the default theme to be installed from wordpress.org and activated with new sites
+- `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
+- `wpdebug` **false** - the default usage of the `wpdebug` start flag
+- `xdebug` **false** - the default usage of the `xdebug` start flag
 
 You can get or set any of the above options using a similar syntax to GIT's config. For example:
 
@@ -186,21 +186,25 @@ The above syntax will allow you to change the defaults for any of the options li
 
 In addition to the global config, certain items above can be overridden for any given site. For a site without a `name` flag (as seen in the start command), simply create a _.kana.json_ file in the current directory. You can populate it with the following options:
 
-- `php` **8.2** - the default PHP version used for new sites (see [https://hub.docker.com/_/wordpress] for all supported versions)
-- `mariadb` **11** - the default MariaDB version used for sites (see [https://hub.docker.com/_/mariadb] for all supported versions)
+- `activate` **true** - if the project site is set to `theme` or `plugin` this will activate the project on first load
+- `admin.email` __admin@kanasite.localhost__ - the admin email address for the default admin account
+- `admin.password` **password** - the default password used to login to WordPress
+- `admin.username` **admin** - the default username used to login to WordPress
+- `automaticLogin` **true** - will automatically login the "admin" user when accessing the WordPress dashboard
 - `databaseClient` **phpmyadmin** - the default database client for accessing the database directly (currently `phpmyadmin` and `tableplus` are supported)
-- `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
-- `xdebug` **false** - the default usage of the `xdebug` start flag
-- `wpdebug` **false** - the default usage of the `wpdebug` start flag
-- `scriptdebug` **false** - the default usage of the `scriptdebug` start flag
 - `environment` **local** - the default usage of the `environment` start flag
 - `mailpit` **false** - the default usage of the `mailpit` start flag
+- `mariadb` **11** - the default MariaDB version used for sites (see [https://hub.docker.com/_/mariadb] for all supported versions)
+- `multisite` **none** - set to either `subdirectory` or `subdomain` to create the site as the appropriate type of Multisite installation.
+- `php` **8.2** - the default PHP version used for new sites (see [https://hub.docker.com/_/wordpress] for all supported versions)
 - `plugins` **[]** - an array of plugins to install and activate when starting the new site. These are slugs from the Plugins section of WordPress.org.
 - `removeDefaultPlugins` **false** - removes the default "Hello Dolly" and Akismet plugins when starting a new site. Note this will not restore them if they've already been removed.
+- `scriptdebug` **false** - the default usage of the `scriptdebug` start flag
 - `ssl` **false** - the default usage of the `ssl` start flag
-- `activate` **true** - if the project site is set to `theme` or `plugin` this will activate the project on first load
-- `multisite` **none** - set to either `subdirectory` or `subdomain` to create the site as the appropriate type of Multisite installation.
 - `theme` ***<empty string>*** - the default theme to be installed from wordpress.org and activated with the site
+- `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
+- `wpdebug` **false** - the default usage of the `wpdebug` start flag
+- `xdebug` **false** - the default usage of the `xdebug` start flag
 
 ### Export a sites Kana config automatically
 
