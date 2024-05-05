@@ -1,4 +1,0 @@
-kind: Bug Fixes
-body: Fix an error that prevented a site from starting when the current folder was
-  detected as a plugin or a theme.
-time: 2024-05-05T20:57:13.510680838Z
