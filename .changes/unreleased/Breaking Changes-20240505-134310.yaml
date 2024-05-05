@@ -1,0 +1,3 @@
+kind: Breaking Changes
+body: Rename `adminLogin` setting to `automaticLogin`
+time: 2024-05-05T13:43:10.278083801Z
