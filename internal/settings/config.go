@@ -34,6 +34,8 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 
 	t.SetHeaders("Setting", "Global Value", "Local Value")
 
+	t.AddRow("activate", consoleOutput.Bold(s.global.GetString("activate")), consoleOutput.Bold(s.local.GetString("activate")))
+
 	t.AddRow("admin.email", consoleOutput.Bold(s.global.GetString("admin.email")), consoleOutput.Bold(s.local.GetString("admin.email")))
 	t.AddRow("admin.password",
 		consoleOutput.Bold(s.global.GetString("admin.password")),
@@ -41,16 +43,21 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 	t.AddRow("admnin.username",
 		consoleOutput.Bold(s.global.GetString("admin.username")),
 		consoleOutput.Bold(s.local.GetString("admin.username")))
-	t.AddRow("imageUpdateDays",
-		consoleOutput.Bold(s.global.GetString("imageUpdateDays")),
-		consoleOutput.Bold(s.local.GetString("imageUpdateDays")))
-	t.AddRow("multisite", consoleOutput.Bold(s.global.GetString("multisite")), consoleOutput.Bold(s.local.GetString("multisite")))
-	t.AddRow("mailpit", consoleOutput.Bold(s.global.GetString("mailpit")), consoleOutput.Bold(s.local.GetString("mailpit")))
-	t.AddRow("php", consoleOutput.Bold(s.global.GetString("php")), consoleOutput.Bold(s.local.GetString("php")))
-	t.AddRow("mariadb", consoleOutput.Bold(s.global.GetString("mariadb")), consoleOutput.Bold(s.local.GetString("mariadb")))
+	t.AddRow("adminLogin", consoleOutput.Bold(s.global.GetString("adminLogin")), consoleOutput.Bold(s.local.GetString("adminLogin")))
+
 	t.AddRow("databaseClient",
 		consoleOutput.Bold(s.global.GetString("databaseClient")),
 		consoleOutput.Bold(s.local.GetString("databaseClient")))
+	t.AddRow("environment", consoleOutput.Bold(s.global.GetString("environment")), consoleOutput.Bold(s.local.GetString("environment")))
+
+	t.AddRow("imageUpdateDays",
+		consoleOutput.Bold(s.global.GetString("imageUpdateDays")),
+		consoleOutput.Bold(s.local.GetString("imageUpdateDays")))
+	t.AddRow("mailpit", consoleOutput.Bold(s.global.GetString("mailpit")), consoleOutput.Bold(s.local.GetString("mailpit")))
+	t.AddRow("mariadb", consoleOutput.Bold(s.global.GetString("mariadb")), consoleOutput.Bold(s.local.GetString("mariadb")))
+
+	t.AddRow("multisite", consoleOutput.Bold(s.global.GetString("multisite")), consoleOutput.Bold(s.local.GetString("multisite")))
+	t.AddRow("php", consoleOutput.Bold(s.global.GetString("php")), consoleOutput.Bold(s.local.GetString("php")))
 
 	boldPlugins := []string{}
 
@@ -65,17 +72,15 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 	t.AddRow("removeDefaultPlugins",
 		consoleOutput.Bold(s.global.GetString("removeDefaultPlugins")),
 		consoleOutput.Bold(s.local.GetString("removeDefaultPlugins")))
+	t.AddRow("ssl", consoleOutput.Bold(s.global.GetString("ssl")), consoleOutput.Bold(s.local.GetString("ssl")))
+	t.AddRow("scriptdebug", consoleOutput.Bold(s.global.GetString("scriptdebug")), consoleOutput.Bold(s.local.GetString("scriptdebug")))
+
 	t.AddRow("theme",
 		consoleOutput.Bold(s.global.GetString("theme")),
 		consoleOutput.Bold(s.local.GetString("theme")))
-	t.AddRow("ssl", consoleOutput.Bold(s.global.GetString("ssl")), consoleOutput.Bold(s.local.GetString("ssl")))
 	t.AddRow("type", consoleOutput.Bold(s.global.GetString("type")), consoleOutput.Bold(s.local.GetString("type")))
-	t.AddRow("activate", consoleOutput.Bold(s.global.GetString("activate")), consoleOutput.Bold(s.local.GetString("activate")))
 	t.AddRow("wpdebug", consoleOutput.Bold(s.global.GetString("wpdebug")), consoleOutput.Bold(s.local.GetString("wpdebug")))
 	t.AddRow("xdebug", consoleOutput.Bold(s.global.GetString("xdebug")), consoleOutput.Bold(s.local.GetString("xdebug")))
-	t.AddRow("scriptdebug", consoleOutput.Bold(s.global.GetString("scriptdebug")), consoleOutput.Bold(s.local.GetString("scriptdebug")))
-	t.AddRow("environment", consoleOutput.Bold(s.global.GetString("environment")), consoleOutput.Bold(s.local.GetString("environment")))
-	t.AddRow("adminLogin", consoleOutput.Bold(s.global.GetString("adminLogin")), consoleOutput.Bold(s.local.GetString("adminLogin")))
 
 	t.Render()
 }
