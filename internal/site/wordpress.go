@@ -323,6 +323,32 @@ func (s *Site) activateProject(consoleOutput *console.Console) error {
 	return nil
 }
 
+func (s *Site) activateTheme(consoleOutput *console.Console) error {
+	if s.Settings.Type == "theme" {
+		return nil
+	}
+
+	consoleOutput.Println(fmt.Sprintf("Installing default theme:  %s", consoleOutput.Bold(consoleOutput.Blue(s.Settings.Theme))))
+
+	setupCommand := []string{
+		"theme",
+		"install",
+		"--activate",
+		s.Settings.Theme,
+	}
+
+	code, _, err := s.RunWPCli(setupCommand, false, consoleOutput)
+	if err != nil {
+		return err
+	}
+
+	if code != 0 {
+		consoleOutput.Warn(fmt.Sprintf("Unable to install theme: %s.", consoleOutput.Bold(consoleOutput.Blue(s.Settings.Theme))))
+	}
+
+	return nil
+}
+
 // installDefaultPlugins Installs a list of WordPress plugins.
 func (s *Site) installDefaultPlugins(consoleOutput *console.Console) error {
 	installedPlugins, _, err := s.getInstalledWordPressPlugins(consoleOutput)

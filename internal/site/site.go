@@ -331,6 +331,12 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 		return err
 	}
 
+	// Activate the default theme if set
+	err = s.activateTheme(consoleOutput)
+	if err != nil {
+		return err
+	}
+
 	// Activate the current project if asked
 	err = s.activateProject(consoleOutput)
 	if err != nil {
