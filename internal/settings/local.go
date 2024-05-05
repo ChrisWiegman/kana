@@ -48,6 +48,9 @@ func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 	s.WPDebug = localViper.GetBool("wpdebug")
 	s.Xdebug = localViper.GetBool("xdebug")
 	s.AdminLogin = localViper.GetBool("adminLogin")
+	s.AdminEmail = localViper.GetString("admin.email")
+	s.AdminPassword = localViper.GetString("admin.password")
+	s.AdminUsername = localViper.GetString("admin.username")
 
 	s.Protocol = s.getProtocol()
 	s.URL = fmt.Sprintf("%s://%s", s.Protocol, s.SiteDomain)
@@ -195,6 +198,9 @@ func (s *Settings) WriteLocalSettings(localSettings *LocalSettings) error {
 	s.local.Set("wpdebug", localSettings.WPDebug)
 	s.local.Set("xdebug", localSettings.Xdebug)
 	s.local.Set("adminLogin", s.AdminLogin)
+	s.local.Set("admin.email", s.AdminEmail)
+	s.local.Set("admin.username", s.AdminUsername)
+	s.local.Set("admin.password", s.AdminPassword)
 
 	if _, err := os.Stat(path.Join(s.WorkingDirectory, ".kana.json")); os.IsNotExist(err) {
 		return s.local.SafeWriteConfig()
@@ -230,6 +236,9 @@ func (s *Settings) loadLocalViper() (*viper.Viper, error) {
 	localSettings.SetDefault("wpdebug", s.WPDebug)
 	localSettings.SetDefault("xdebug", s.Xdebug)
 	localSettings.SetDefault("adminLogin", s.AdminLogin)
+	localSettings.SetDefault("admin.email", s.AdminEmail)
+	localSettings.SetDefault("admin.username", s.AdminUsername)
+	localSettings.SetDefault("admin.password", s.AdminPassword)
 
 	localSettings.SetConfigName(".kana")
 	localSettings.SetConfigType("json")

@@ -46,6 +46,7 @@ type StartFlags struct {
 
 type LocalSettings struct {
 	Mailpit, Xdebug, SSL, WPDebug, Activate, ScriptDebug bool
+	AdminEmail, AdminPassword, AdminUsername             string
 	RemoveDefaultPlugins                                 bool
 	AdminLogin                                           bool
 	Type, DatabaseClient, Multisite, Environment         string
