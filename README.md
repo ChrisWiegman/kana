@@ -94,6 +94,8 @@ Note: these can be changed in the config. Please see below.
 
 `--theme` Sets the default theme if you do not wish to use the theme bundled with WordPress. Will attempt to download the theme from wordpress.org. Does not work if the site type is set to "theme"
 
+`--plugins` A comma-separated list of plugins to install when starting the site.
+
 ## Trusting the SSL certificate on Mac
 
 On MacOS, Kana will automatically attempt to add its SSL certificate to the MacOS system Keychain the first time you start a site where SSL is the default. You can manually do this without starting a new site using the `kana trust-ssl` command.
