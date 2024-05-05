@@ -55,6 +55,7 @@ type StartFlags struct {
 	Mailpit              bool
 	SSL                  bool
 	Activate             bool
+	Plugins              string
 	RemoveDefaultPlugins bool
 	ScriptDebug          bool
 	Environment          string

@@ -32,13 +32,16 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 
 	t := table.New(os.Stdout)
 
-	boldPlugins := []string{}
+	localPlugins := []string{}
+	globalPlugins := []string{}
 
-	for _, plugin := range s.Plugins {
-		boldPlugins = append(boldPlugins, consoleOutput.Bold(plugin))
+	for _, plugin := range s.local.GetStringSlice("plugins") {
+		localPlugins = append(localPlugins, consoleOutput.Bold(plugin))
 	}
 
-	plugins := consoleOutput.Bold(strings.Join(boldPlugins, "\n"))
+	for _, plugin := range s.global.GetStringSlice("plugins") {
+		globalPlugins = append(globalPlugins, consoleOutput.Bold(plugin))
+	}
 
 	t.SetHeaders("Setting", "Global Value", "Local Value")
 
@@ -64,7 +67,9 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 	t.AddRow("mariadb", consoleOutput.Bold(s.global.GetString("mariadb")), consoleOutput.Bold(s.local.GetString("mariadb")))
 	t.AddRow("multisite", consoleOutput.Bold(s.global.GetString("multisite")), consoleOutput.Bold(s.local.GetString("multisite")))
 	t.AddRow("php", consoleOutput.Bold(s.global.GetString("php")), consoleOutput.Bold(s.local.GetString("php")))
-	t.AddRow("plugins", "", plugins)
+	t.AddRow("plugins",
+		consoleOutput.Bold(strings.Join(globalPlugins, "\n")),
+		consoleOutput.Bold(strings.Join(localPlugins, "\n")))
 	t.AddRow("removeDefaultPlugins",
 		consoleOutput.Bold(s.global.GetString("removeDefaultPlugins")),
 		consoleOutput.Bold(s.local.GetString("removeDefaultPlugins")))
@@ -91,7 +96,13 @@ func (s *Settings) SetGlobalSetting(args []string) error {
 		return err
 	}
 
-	s.global.Set(args[0], args[1])
+	if args[0] == "plugins" {
+		plugins := strings.Split(args[1], ",")
+
+		s.global.Set(args[0], plugins)
+	} else {
+		s.global.Set(args[0], args[1])
+	}
 
 	return s.global.WriteConfig()
 }
@@ -151,12 +162,13 @@ func (s *Settings) validateSetting(setting, value string) error { //nolint:gocyc
 				"the PHP version in your configuration, %s, is invalid. See https://hub.docker.com/_/wordpress for a list of supported versions",
 				value)
 		}
-
+	case "plugins":
+	case "theme":
+		return validate.Var(value, "ascii")
 	case "type":
 		if !helpers.IsValidString(value, validTypes) {
 			return fmt.Errorf("the type you selected, %s, is not a valid type. You must use either `site`, `plugin` or `theme`", setting)
 		}
-
 	default:
 		err := validate.Var(value, "boolean")
 		if err != nil {

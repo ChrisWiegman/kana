@@ -31,7 +31,7 @@ func start(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 				consoleOutput.Error(err)
 			}
 
-			kanaSite.Settings.ProcessStartFlags(cmd, startFlags)
+			kanaSite.Settings.ProcessStartFlags(cmd, &startFlags)
 
 			err = handleTypeDetection(cmd, consoleOutput, kanaSite)
 			if err != nil {
@@ -95,8 +95,12 @@ func start(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 
 	cmd.Flags().StringVar(&startFlags.Multisite, "multisite", "none", "Creates your new site as a multisite installation.")
 	cmd.Flags().StringVar(&startFlags.Environment, "environment", "local", "Sets the WP_ENVIRONMENT_TYPE for the site.")
-	cmd.Flags().StringVar(&startFlags.Type, "type", "site", "Set the type of the installation, `site`, `plugin` or `theme`.")
+	cmd.Flags().StringVar(&startFlags.Plugins,
+		"plugins",
+		"",
+		"Installs and activates the specified plugins. Multiple plugins should be separated by commas")
 	cmd.Flags().StringVar(&startFlags.Theme, "theme", "", "Installs and activates a theme when starting a site.")
+	cmd.Flags().StringVar(&startFlags.Type, "type", "site", "Set the type of the installation, `site`, `plugin` or `theme`.")
 
 	cmd.Flags().Lookup("multisite").NoOptDefVal = "subdomain"
 

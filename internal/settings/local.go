@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/ChrisWiegman/kana/internal/helpers"
 
@@ -140,7 +141,7 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) { //nolint:
 }
 
 // ProcessStartFlags Process the start flags and save them to the settings object.
-func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
+func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags *StartFlags) {
 	if cmd.Flags().Lookup("xdebug").Changed {
 		s.Xdebug = flags.Xdebug
 	}
@@ -181,6 +182,10 @@ func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
 
 	if cmd.Flags().Lookup("environment").Changed {
 		s.Environment = flags.Environment
+	}
+
+	if cmd.Flags().Lookup("plugins").Changed {
+		s.Plugins = strings.Split(flags.Plugins, ",")
 	}
 
 	if cmd.Flags().Lookup("remove-default-plugins").Changed {
