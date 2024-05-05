@@ -123,7 +123,7 @@ func handleTypeDetection(cmd *cobra.Command, consoleOutput *console.Console, kan
 
 		if siteType != kanaSite.Settings.Type {
 			kanaSite.Settings.Type = siteType
-			return fmt.Errorf("a %s was detected as the current site folder. Starting site as a %s", siteType, siteType)
+			consoleOutput.Printf("A %s was detected in the current site folder. Starting site as a %s", siteType, siteType)
 		}
 	}
 
