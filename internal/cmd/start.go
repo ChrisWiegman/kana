@@ -33,22 +33,13 @@ func start(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 
 			kanaSite.Settings.ProcessStartFlags(cmd, startFlags)
 
-			if !cmd.Flags().Lookup("type").Changed && !kanaSite.Settings.HasLocalOptions() {
-				var siteType string
+			err = handleTypeDetection(cmd, consoleOutput, kanaSite)
+			if err != nil {
+				consoleOutput.Error(err)
+			}
 
-				siteType, err = kanaSite.DetectType()
-				if err != nil {
-					consoleOutput.Error(err)
-				}
-
-				if !cmd.Flags().Lookup("name").Changed {
-					verifyEmpty(siteType, kanaSite, consoleOutput)
-				}
-
-				if siteType != kanaSite.Settings.Type {
-					kanaSite.Settings.Type = siteType
-					consoleOutput.Printf("A %s was detected as the current site folder. Starting site as a %s.\n", siteType, siteType)
-				}
+			if !cmd.Flags().Lookup("theme").Changed && kanaSite.Settings.Type == "theme" {
+				consoleOutput.Error(fmt.Errorf("a default theme cannot be set on a site of type 'theme"))
 			}
 
 			// Check that the site is already running and show an error if it is.
@@ -112,13 +103,36 @@ func start(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	return cmd
 }
 
+func handleTypeDetection(cmd *cobra.Command, consoleOutput *console.Console, kanaSite *site.Site) error {
+	if !cmd.Flags().Lookup("type").Changed && !kanaSite.Settings.HasLocalOptions() {
+		siteType, err := kanaSite.DetectType()
+		if err != nil {
+			return err
+		}
+
+		if !cmd.Flags().Lookup("name").Changed {
+			err = verifyEmpty(siteType, kanaSite, consoleOutput)
+			if err != nil {
+				return err
+			}
+		}
+
+		if siteType != kanaSite.Settings.Type {
+			kanaSite.Settings.Type = siteType
+			return fmt.Errorf("a %s was detected as the current site folder. Starting site as a %s", siteType, siteType)
+		}
+	}
+
+	return nil
+}
+
 // verifyEmpty Verifies the folder is empty when starting a new site in it.
 // This helps prevent conflicts with WordPress files and anything in the folder.
-func verifyEmpty(siteType string, kanaSite *site.Site, consoleOutput *console.Console) {
+func verifyEmpty(siteType string, kanaSite *site.Site, consoleOutput *console.Console) error {
 	if siteType == site.DefaultType {
 		isEmpty, err := helpers.IsEmpty(kanaSite.Settings.WorkingDirectory)
 		if err != nil {
-			consoleOutput.Error(err)
+			return err
 		}
 
 		if !isEmpty && kanaSite.Settings.IsNewSite {
@@ -126,8 +140,10 @@ func verifyEmpty(siteType string, kanaSite *site.Site, consoleOutput *console.Co
 				"The current directory is not empty. Are you sure you want to try to install WordPress in this folder? This may cause the WordPress installation to fail.", //nolint: lll
 				false)
 			if !confirm {
-				consoleOutput.Error(fmt.Errorf("start aborted by user confirmation"))
+				return fmt.Errorf("start aborted by user confirmation")
 			}
 		}
 	}
+
+	return nil
 }

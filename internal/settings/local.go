@@ -167,6 +167,10 @@ func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags StartFlags) {
 		s.Type = flags.Type
 	}
 
+	if cmd.Flags().Lookup("theme").Changed {
+		s.Theme = flags.Theme
+	}
+
 	if cmd.Flags().Lookup("multisite").Changed {
 		s.Multisite = flags.Multisite
 	}
