@@ -54,8 +54,8 @@ function login_to_admin() {
 
 	$user = wp_signon(
 		array(
-			'user_login'    => 'admin',
-			'user_password' => 'password',
+			'user_login'    => getenv( 'KANA_ADMIN_USER' ),
+			'user_password' => getenv( 'KANA_ADMIN_PASSWORD' ),
 			'remember'      => true,
 		)
 	);
@@ -64,6 +64,11 @@ function login_to_admin() {
 		wp_safe_redirect( $_SERVER['REQUEST_URI'] );
 		exit();
 	}
+
+	if ( is_wp_error( $user ) ) {
+		$kana_error = '<p>If you have changed the login credentials in your Kana config you will need to update the WordPress user manually to match the new settings or change your Kana config to match your login user.</p>';
+		wp_die( $user->get_error_message() . $kana_error, 200 );
+	}
 }
 
-add_action( 'init', '\KanaCLI\login_to_admin' );
+add_action( 'set_current_user', '\KanaCLI\login_to_admin' );
