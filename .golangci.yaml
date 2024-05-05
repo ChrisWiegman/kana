@@ -23,7 +23,7 @@ linters-settings:
     min-complexity: 15
   goimports:
     local-prefixes: github.com/ChrisWiegman/kana
-  gomnd:
+  mnd:
     # don't include the "operation" and "assign"
     checks:
       - argument
@@ -71,7 +71,7 @@ linters:
     - gocyclo
     - gofmt
     - goimports
-    - gomnd
+    - mnd
     - goprintffuncname
     - gosec
     - gosimple
