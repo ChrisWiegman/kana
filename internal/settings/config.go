@@ -65,6 +65,9 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 	t.AddRow("removeDefaultPlugins",
 		consoleOutput.Bold(s.global.GetString("removeDefaultPlugins")),
 		consoleOutput.Bold(s.local.GetString("removeDefaultPlugins")))
+	t.AddRow("theme",
+		consoleOutput.Bold(s.global.GetString("theme")),
+		consoleOutput.Bold(s.local.GetString("theme")))
 	t.AddRow("ssl", consoleOutput.Bold(s.global.GetString("ssl")), consoleOutput.Bold(s.local.GetString("ssl")))
 	t.AddRow("type", consoleOutput.Bold(s.global.GetString("type")), consoleOutput.Bold(s.local.GetString("type")))
 	t.AddRow("activate", consoleOutput.Bold(s.global.GetString("activate")), consoleOutput.Bold(s.local.GetString("activate")))

@@ -26,6 +26,7 @@ var (
 	wpdebug              = false
 	xdebug               = false
 	adminLogin           = true
+	theme                = ""
 )
 
 // Default permissions for all new files and folders.

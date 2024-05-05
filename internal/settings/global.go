@@ -38,6 +38,7 @@ func (s *Settings) LoadGlobalSettings() error {
 	s.WPDebug = globalViperConfig.GetBool("wpdebug")
 	s.Xdebug = globalViperConfig.GetBool("xdebug")
 	s.AdminLogin = globalViperConfig.GetBool("adminLogin")
+	s.Theme = globalViperConfig.GetString(("theme"))
 
 	return err
 }
@@ -64,6 +65,7 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) { //nolint:funlen
 	globalSettings.SetDefault("wpdebug", wpdebug)
 	globalSettings.SetDefault("xdebug", xdebug)
 	globalSettings.SetDefault("adminLogin", adminLogin)
+	globalSettings.SetDefault("theme", theme)
 
 	globalSettings.SetConfigName("kana")
 	globalSettings.SetConfigType("json")

@@ -201,6 +201,7 @@ func (s *Settings) WriteLocalSettings(localSettings *LocalSettings) error {
 	s.local.Set("admin.email", s.AdminEmail)
 	s.local.Set("admin.username", s.AdminUsername)
 	s.local.Set("admin.password", s.AdminPassword)
+	s.local.Set("theme", localSettings.Theme)
 
 	if _, err := os.Stat(path.Join(s.WorkingDirectory, ".kana.json")); os.IsNotExist(err) {
 		return s.local.SafeWriteConfig()
@@ -239,6 +240,7 @@ func (s *Settings) loadLocalViper() (*viper.Viper, error) {
 	localSettings.SetDefault("admin.email", s.AdminEmail)
 	localSettings.SetDefault("admin.username", s.AdminUsername)
 	localSettings.SetDefault("admin.password", s.AdminPassword)
+	localSettings.SetDefault("theme", s.Theme)
 
 	localSettings.SetConfigName(".kana")
 	localSettings.SetConfigType("json")

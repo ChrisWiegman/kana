@@ -107,6 +107,8 @@ func start(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 		"Activate the current plugin or theme (only works when used with the 'plugin' or 'theme' flags).")
 	cmd.Flags().StringVarP(&startFlags.Multisite, "multisite", "u", "none", "Creates your new site as a multisite installation.")
 	cmd.Flags().StringVarP(&startFlags.Environment, "environment", "e", "local", "Sets the WP_ENVIRONMENT_TYPE for the site.")
+
+	cmd.Flags().StringVar(&startFlags.Theme, "theme", "", "Installs and activates a theme when starting a site.")
 	cmd.Flags().Lookup("multisite").NoOptDefVal = "subdomain"
 
 	return cmd

@@ -26,6 +26,7 @@ type Settings struct {
 	Multisite                                                   string
 	Environment                                                 string
 	Version                                                     string
+	Theme                                                       string
 	Plugins                                                     []string
 	global                                                      *viper.Viper
 	local                                                       *viper.Viper
@@ -42,6 +43,7 @@ type StartFlags struct {
 	Environment          string
 	Multisite            string
 	Type                 string
+	Theme                string
 }
 
 type LocalSettings struct {
@@ -51,6 +53,7 @@ type LocalSettings struct {
 	AdminLogin                                           bool
 	Type, DatabaseClient, Multisite, Environment         string
 	Plugins                                              []string
+	Theme                                                string
 }
 
 type File struct {
