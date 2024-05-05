@@ -27,6 +27,7 @@ var (
 	xdebug               = false
 	automaticLogin       = true
 	theme                = ""
+	plugins              = []string{}
 )
 
 // Default permissions for all new files and folders.

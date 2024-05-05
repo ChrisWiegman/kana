@@ -39,6 +39,7 @@ func (s *Settings) LoadGlobalSettings() error {
 	s.Xdebug = globalViperConfig.GetBool("xdebug")
 	s.AutomaticLogin = globalViperConfig.GetBool("automaticLogin")
 	s.Theme = globalViperConfig.GetString(("theme"))
+	s.Plugins = globalViperConfig.GetStringSlice("plugins")
 
 	return err
 }
@@ -58,6 +59,7 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) { //nolint:funlen
 	globalSettings.SetDefault("mariadb", mariadb)
 	globalSettings.SetDefault("multisite", multisite)
 	globalSettings.SetDefault("php", php)
+	globalSettings.SetDefault("plugins", plugins)
 	globalSettings.SetDefault("removeDefaultPlugins", removeDefaultPlugins)
 	globalSettings.SetDefault("scriptdebug", scriptDebug)
 	globalSettings.SetDefault("ssl", ssl)

@@ -229,7 +229,7 @@ func (s *Settings) loadLocalViper() (*viper.Viper, error) {
 	localSettings.SetDefault("mariadb", s.MariaDB)
 	localSettings.SetDefault("multisite", s.Multisite)
 	localSettings.SetDefault("php", s.PHP)
-	localSettings.SetDefault("plugins", []string{})
+	localSettings.SetDefault("plugins", s.Plugins)
 	localSettings.SetDefault("removeDefaultPlugins", s.RemoveDefaultPlugins)
 	localSettings.SetDefault("scriptdebug", s.ScriptDebug)
 	localSettings.SetDefault("ssl", s.SSL)
