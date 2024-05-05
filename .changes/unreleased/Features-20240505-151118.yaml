@@ -1,0 +1,3 @@
+kind: Features
+body: Add `plugins` flag to install specified plugins on start.
+time: 2024-05-05T15:11:18.806789429Z
