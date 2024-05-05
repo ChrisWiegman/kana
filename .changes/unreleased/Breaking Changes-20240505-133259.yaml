@@ -1,0 +1,4 @@
+kind: Breaking Changes
+body: Shorthand flags for string parameters have been removed. For example, the `name`
+  flag must use the full "--name=" syntax and the "-n=" has been removed.
+time: 2024-05-05T13:32:59.645767504Z
