@@ -173,6 +173,7 @@ Kana has a handful of options that apply to all new sites created with the app. 
 - `activate` **true** - if the project site is set to `theme` or `plugin` this will activate the project on first load
 - `multisite` **none** - set to either `subdirectory` or `subdomain` to create the site as the appropriate type of Multisite installation.
 - `adminLogin` **true** - will automatically login the "admin" user when accessing the WordPress dashboard
+- `theme` ***<empty string>*** - the default theme to be installed from wordpress.org and activated with new sites
 
 You can get or set any of the above options using a similar syntax to GIT's config. For example:
 
@@ -199,6 +200,7 @@ In addition to the global config, certain items above can be overridden for any 
 - `ssl` **false** - the default usage of the `ssl` start flag
 - `activate` **true** - if the project site is set to `theme` or `plugin` this will activate the project on first load
 - `multisite` **none** - set to either `subdirectory` or `subdomain` to create the site as the appropriate type of Multisite installation.
+- `theme` ***<empty string>*** - the default theme to be installed from wordpress.org and activated with the site
 
 ### Export a sites Kana config automatically
 
