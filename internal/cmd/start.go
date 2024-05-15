@@ -38,7 +38,7 @@ func start(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 				consoleOutput.Error(err)
 			}
 
-			if !cmd.Flags().Lookup("theme").Changed && kanaSite.Settings.Type == "theme" {
+			if cmd.Flags().Lookup("theme").Changed && kanaSite.Settings.Type == "theme" {
 				consoleOutput.Error(fmt.Errorf("a default theme cannot be set on a site of type 'theme"))
 			}
 
