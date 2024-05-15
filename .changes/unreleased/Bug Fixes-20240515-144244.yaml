@@ -1,3 +1,0 @@
-kind: Bug Fixes
-body: Fix an error when starting a theme due to a false positive in default theme detection.
-time: 2024-05-15T14:42:44.430006884Z
