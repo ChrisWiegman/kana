@@ -47,7 +47,13 @@ func list(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 			t.SetHeaders("Name", "Path", "Running")
 
 			for _, site := range sites {
-				t.AddRow(site.Name, site.Path, strconv.FormatBool(site.Running))
+				path := site.Path
+				_, err := os.Stat(site.Path)
+				if err != nil && os.IsNotExist(err) {
+					path = consoleOutput.Yellow(path)
+				}
+
+				t.AddRow(site.Name, path, strconv.FormatBool(site.Running))
 			}
 
 			t.Render()
