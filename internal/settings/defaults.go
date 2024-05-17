@@ -3,13 +3,13 @@ package settings
 // The following are the default settings for Kana.
 var (
 	activate             = true
-	adminEmail           = "admin@sites.kana.li"
+	adminEmail           = "admin@sites.kana.sh"
 	adminPassword        = "password"
 	adminUsername        = "admin"
 	automaticLogin       = true
 	configFolderName     = ".config/kana"
 	databaseClient       = "phpmyadmin"
-	domain               = "sites.kana.li"
+	domain               = "sites.kana.sh"
 	environment          = "local"
 	imageUpdateDays      = 7
 	mailpit              = false

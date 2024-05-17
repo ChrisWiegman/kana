@@ -57,7 +57,7 @@ If you use Homebrew or install Kana from the releases page Kana will automatical
 
 At it's most basic you can start a zero-config Kana site by running `kana start` in your terminal. This will create a new Kana site based on your current directory and open it in your default browser.
 
-Kana relies on [Traefik](https://traefik.io) to map real domains to local sites. You can run as many sites as you need and each will be mapped to a subdomain of _sites.kana.li_.
+Kana relies on [Traefik](https://traefik.io) to map real domains to local sites. You can run as many sites as you need and each will be mapped to a subdomain of _sites.kana.sh_.
 
 ## Start
 
