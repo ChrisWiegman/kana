@@ -1,0 +1,3 @@
+kind: Breaking Changes
+body: The primary domain for Kana, kana.li, has been replaced with `kana.sh`. Nothing should change for the moment but eventually kana.li sites will fail to work.
+time: 2024-05-17T16:37:20.593925924Z
