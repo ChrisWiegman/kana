@@ -1,0 +1,3 @@
+kind: Bug Fixes
+body: Fixes an issue with the automatic WordPress login that prevented login if the admin user differs from the configured user.
+time: 2024-05-24T14:44:30.65707834Z
