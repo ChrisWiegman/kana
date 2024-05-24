@@ -67,8 +67,6 @@ func (s *Site) RunWPCli(command []string, interactive bool, consoleOutput *conso
 			"WORDPRESS_DB_PASSWORD=wordpress",
 			"WORDPRESS_DB_NAME=wordpress",
 			"WORDPRESS_DEBUG=0",
-			fmt.Sprintf("KANA_ADMIN_USER=%s", s.Settings.AdminUsername),
-			fmt.Sprintf("KANA_ADMIN_PASSWORD=%s", s.Settings.AdminPassword),
 		},
 		Labels: map[string]string{
 			"kana.site": s.Settings.Name,
@@ -253,8 +251,6 @@ func (s *Site) getWordPressContainer(appVolumes []mount.Mount, appContainers []d
 			"WORDPRESS_DB_PASSWORD=wordpress",
 			"WORDPRESS_DB_NAME=wordpress",
 			"WORDPRESS_ADMIN_USER=admin",
-			fmt.Sprintf("KANA_ADMIN_USER=%s", s.Settings.AdminUsername),
-			fmt.Sprintf("KANA_ADMIN_PASSWORD=%s", s.Settings.AdminPassword),
 		},
 		Labels: map[string]string{
 			"traefik.enable": "true",
