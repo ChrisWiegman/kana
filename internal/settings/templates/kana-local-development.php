@@ -46,27 +46,40 @@ add_action( 'phpmailer_init', '\KanaCLI\action_phpmailer_init' );
  */
 function login_to_admin() {
 	if ( ! getenv('IS_KANA_ENVIRONMENT') === true
-		||  ! getenv('KANA_ADMIN_LOGIN') === true
 		|| ! is_admin()
 		|| is_user_logged_in() ) {
 		return;
 	}
 
-	$user = wp_signon(
-		array(
-			'user_login'    => getenv( 'KANA_ADMIN_USER' ),
-			'user_password' => getenv( 'KANA_ADMIN_PASSWORD' ),
-			'remember'      => true,
-		)
+	$kana_error = '<p>Kana could not find a valid admin user to login to your site.</p>';
+
+
+	$args = array(
+		'role'    => 'administrator',
+		'orderby' => 'id',
+		'order'   => 'ASC',
+		'number'  => '2',
 	);
 
-	if ( ! is_wp_error( $user ) && isset( $_SERVER['REQUEST_URI'] ) ) {
-		wp_safe_redirect( $_SERVER['REQUEST_URI'] );
-		exit();
+	$users = get_users( $args );
+
+	if ( empty( $users ) ) {
+		wp_die( $kana_error, 200 );
+	}
+
+	$user = $users[0];
+
+	if (! is_wp_error( $user)) {
+		wp_set_current_user( $user->ID, $user->user_login );
+		wp_set_auth_cookie( $user->ID );
+
+		if ( isset( $_SERVER['REQUEST_URI'] ) ) {
+			wp_safe_redirect( $_SERVER['REQUEST_URI'] );
+			exit();
+		}
 	}
 
 	if ( is_wp_error( $user ) ) {
-		$kana_error = '<p>If you have changed the login credentials in your Kana config you will need to update the WordPress user manually to match the new settings or change your Kana config to match your login user.</p>';
 		wp_die( $user->get_error_message() . $kana_error, 200 );
 	}
 }
