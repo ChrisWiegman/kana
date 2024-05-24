@@ -1,0 +1,3 @@
+kind: Bug Fixes
+body: Ensure we're properly using the automaticLogin setting to allow or prevent logins.
+time: 2024-05-24T14:55:18.84741046Z
