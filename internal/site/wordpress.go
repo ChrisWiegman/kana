@@ -320,7 +320,7 @@ func (s *Site) activateProject(consoleOutput *console.Console) error {
 }
 
 func (s *Site) activateTheme(consoleOutput *console.Console) error {
-	if s.Settings.Type == "theme" {
+	if s.Settings.Type == "theme" || s.Settings.Theme == "" {
 		return nil
 	}
 
