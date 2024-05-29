@@ -1,3 +1,0 @@
-kind: Bug Fixes
-body: Ensure WordPress always has access to the files and can install plugins/themes or do other file operations from the Dashboard
-time: 2024-05-29T17:25:35.997614922Z
