@@ -518,7 +518,13 @@ func (s *Site) startWordPress(consoleOutput *console.Console) error {
 		}
 	}
 
-	return nil
+	// Ensure the www-data user owns the WordPress directory
+	_, err = s.dockerClient.ContainerExec(
+		fmt.Sprintf("kana-%s-wordpress", s.Settings.Name),
+		true,
+		[]string{"chown", "-R", "www-data:www-data", "/var/www/html"})
+
+	return err
 }
 
 // stopWordPress Stops the site in docker, destroying the containers when they close.
