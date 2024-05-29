@@ -309,6 +309,12 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 		return err
 	}
 
+	// Verify the WordPress file permissions are correct
+	err = s.resetWPFilePermissions()
+	if err != nil {
+		return err
+	}
+
 	// Maybe Remove the default plugins
 	err = s.maybeRemoveDefaultPlugins()
 	if err != nil {

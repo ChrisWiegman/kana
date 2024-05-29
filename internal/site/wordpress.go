@@ -518,13 +518,15 @@ func (s *Site) startWordPress(consoleOutput *console.Console) error {
 		}
 	}
 
-	// Ensure the www-data user owns the WordPress directory
-	test, err := s.dockerClient.ContainerExec(
+	return nil
+}
+
+// resetWPFilePermissions Ensures the www-data user owns the WordPress directory
+func (s *Site) resetWPFilePermissions() error {
+	_, err := s.dockerClient.ContainerExec(
 		fmt.Sprintf("kana-%s-wordpress", s.Settings.Name),
 		true,
 		[]string{"chown -R www-data:www-data /var/www/html"})
-
-	fmt.Println(test)
 
 	return err
 }
