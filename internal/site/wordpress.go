@@ -522,7 +522,7 @@ func (s *Site) startWordPress(consoleOutput *console.Console) error {
 	return nil
 }
 
-// resetWPFilePermissions Ensures the www-data user owns the WordPress directory
+// resetWPFilePermissions Ensures the www-data user owns the WordPress directory.
 func (s *Site) resetWPFilePermissions() error {
 	if runtime.GOOS == "linux" {
 		return nil
