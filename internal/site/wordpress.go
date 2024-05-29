@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"runtime"
 	"strings"
 
 	"github.com/ChrisWiegman/kana/internal/console"
@@ -523,6 +524,10 @@ func (s *Site) startWordPress(consoleOutput *console.Console) error {
 
 // resetWPFilePermissions Ensures the www-data user owns the WordPress directory
 func (s *Site) resetWPFilePermissions() error {
+	if runtime.GOOS == "linux" {
+		return nil
+	}
+
 	_, err := s.dockerClient.ContainerExec(
 		fmt.Sprintf("kana-%s-wordpress", s.Settings.Name),
 		true,
