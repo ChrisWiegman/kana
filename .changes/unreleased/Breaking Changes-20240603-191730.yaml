@@ -1,0 +1,3 @@
+kind: Breaking Changes
+body: Renamed the `mariadb` config option to `databaseVersion` to better accomodate different database options.
+time: 2024-06-03T19:17:30.206170211Z
