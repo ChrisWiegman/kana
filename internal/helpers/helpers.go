@@ -81,6 +81,7 @@ func IsEmpty(path string) (bool, error) {
 	return false, err
 }
 
+// CopyFile copies a file from source to destination.
 func CopyFile(sourceFile, destinationFile string) error {
 	sourceFileStat, err := os.Stat(sourceFile)
 	if err != nil {
@@ -106,6 +107,7 @@ func CopyFile(sourceFile, destinationFile string) error {
 	return err
 }
 
+// DownloadFile downloads a file from a given URL and saves it to the destination path.
 func DownloadFile(downloadURL, destinationPath string) (string, error) {
 	// Build fileName from fullPath
 	fileURL, err := url.Parse(downloadURL)
@@ -149,6 +151,7 @@ func DownloadFile(downloadURL, destinationPath string) (string, error) {
 	return fileName, err
 }
 
+// UnZipFile extracts a zip file to a given destination path.
 func UnZipFile(sourceFile, destinationPath string) error {
 	archive, err := zip.OpenReader(sourceFile)
 	if err != nil {
