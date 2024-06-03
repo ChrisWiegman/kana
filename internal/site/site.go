@@ -267,7 +267,7 @@ func (s *Site) OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag, openAdm
 }
 
 // StartSite Starts a site, including Traefik if needed.
-func (s *Site) StartSite(consoleOutput *console.Console) error {
+func (s *Site) StartSite(consoleOutput *console.Console) error { //nolint:gocyclo
 	// Let's start everything up
 	consoleOutput.Printf("Starting development site: %s.\n", consoleOutput.Bold(consoleOutput.Green(s.Settings.URL)))
 
@@ -283,7 +283,7 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 		return err
 	}
 
-	// Make sure we're using the correct database client
+	// Make sure we're using the correct database server
 	err = s.maybeSetupSQLite()
 	if err != nil {
 		return err

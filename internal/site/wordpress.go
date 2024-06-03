@@ -212,7 +212,7 @@ func (s *Site) getMounts(appDir string) ([]mount.Mount, error) {
 		appVolumes = append(appVolumes, mount.Mount{ // Map's the user's working directory as a plugin
 			Type:   mount.TypeBind,
 			Source: s.Settings.WorkingDirectory,
-			Target: filepath.Join("/var/www/html", "wp-content", "plugins", s.Settings.Name),
+			Target: filepath.Join("var", "www", "html", "wp-content", "plugins", s.Settings.Name),
 		})
 	}
 
@@ -230,7 +230,7 @@ func (s *Site) getMounts(appDir string) ([]mount.Mount, error) {
 		appVolumes = append(appVolumes, mount.Mount{ // Map's the user's working directory as a theme
 			Type:   mount.TypeBind,
 			Source: s.Settings.WorkingDirectory,
-			Target: filepath.Join("/var/www/html", "wp-content", "themes", s.Settings.Name),
+			Target: filepath.Join("var", "www", "html", "wp-content", "themes", s.Settings.Name),
 		})
 	}
 

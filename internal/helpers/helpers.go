@@ -112,9 +112,7 @@ func DownloadFile(downloadURL, destinationPath string) (string, error) {
 		return "", err
 	}
 
-	path := fileURL.Path
-	segments := strings.Split(path, "/")
-	fileName := segments[len(segments)-1]
+	fileName := filepath.Base(fileURL.Path)
 
 	// Create blank file
 	file, err := os.Create(filepath.Join(destinationPath, fileName))
