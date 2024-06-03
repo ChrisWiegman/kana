@@ -40,6 +40,7 @@ jobs:
 
       - name: Test the browser
         run: |
+          export BROWSER=/usr/bin/epiphany
           xdg-settings --list
 
       - name: Build test cli
