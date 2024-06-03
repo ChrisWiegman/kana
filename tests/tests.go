@@ -14,9 +14,10 @@ import (
 type Test struct {
 	Description string
 	Command     []string
+	Docker      bool
 }
 
-func teardown() {
+func Teardown(docker bool) {
 	home, err := homedir.Dir()
 	if err != nil {
 		panic(err)
@@ -43,7 +44,7 @@ func RunSnapshotTest(testCases []Test, t *testing.T) {
 
 			snaps.MatchSnapshot(t, out.String())
 
-			teardown()
+			Teardown(test.Docker)
 		})
 	}
 }

@@ -147,3 +147,13 @@ Build Time: 2024-03-16_10:50:11PM
 {"Version":"1.0.0","Timestamp":"2024-03-16_10:50:11PM"}
 
 ---
+
+[TestChangelog/Test_the_default_changelog_command - 1]
+[1;32m[Success][0m The Kana changelog has been opened in your default browser.
+
+---
+
+[TestChangelog/Test_the_changelog_command_with_json_output - 1]
+{"Status":"Success","Message":"The Kana changelog has been opened in your default browser."}
+
+---
