@@ -80,11 +80,12 @@ func RunSnapshotTest(testCases []Test, t *testing.T) {
 	for _, test := range testCases {
 		t.Run(test.Description, func(t *testing.T) {
 			cmd := exec.Command("../../build/kana", test.Command...) //nolint: gosec
-			var out bytes.Buffer
+			var out, stdErr bytes.Buffer
 			cmd.Stdout = &out
+			cmd.Stderr = &stdErr
 			err := cmd.Run()
 			if err != nil {
-				t.Fatalf("Unexpected error: %v", out.String())
+				t.Fatalf("Unexpected error: %v", stdErr.String())
 			}
 
 			snaps.MatchSnapshot(t, out.String())
