@@ -38,6 +38,10 @@ jobs:
         run: |
           sudo apt-get install -y epiphany-browser
           sudo update-alternatives --config x-www-browser
+          sudo update-alternatives --install /usr/bin/x-www-browser x-www-browser /usr/bin/epiphany-browser 500
+          sudo update-alternatives --set x-www-browser /usr/bin/epiphany-browser
+          sudo update-alternatives --install /usr/bin/x-www-browser www-browser /usr/bin/epiphany-browser 500
+          sudo update-alternatives --set www-browser /usr/bin/epiphany-browser
 
       - name: Build test cli
         run: |
