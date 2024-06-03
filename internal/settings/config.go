@@ -109,6 +109,15 @@ func (s *Settings) SetGlobalSetting(args []string) error {
 		s.global.Set(args[0], args[1])
 	}
 
+	if args[0] == "database" && args[1] != s.global.GetString("database") {
+		switch args[1] {
+		case "mariadb":
+			s.global.Set("databaseVersion", mariadbVersion)
+		case "mysql": //nolint:goconst
+			s.global.Set("databaseVersion", mysqlVersion)
+		}
+	}
+
 	return s.global.WriteConfig()
 }
 

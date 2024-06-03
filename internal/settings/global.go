@@ -49,6 +49,12 @@ func (s *Settings) LoadGlobalSettings() error {
 func (s *Settings) loadGlobalViper() (*viper.Viper, error) { //nolint:funlen
 	globalSettings := viper.New()
 
+	databaseVersion := mariadbVersion
+
+	if database == "mysql" {
+		databaseVersion = mysqlVersion
+	}
+
 	globalSettings.SetDefault("activate", activate)
 	globalSettings.SetDefault("admin.email", adminEmail)
 	globalSettings.SetDefault("admin.password", adminPassword)
@@ -106,10 +112,10 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) { //nolint:funlen
 	// Reset default database version if there's an invalid version in the config file
 	if docker.ValidateImage(globalSettings.GetString("database"), globalSettings.GetString("databaseVersion")) != nil {
 		changeConfig = true
-		defaultDatabaseVersion := "11"
+		defaultDatabaseVersion := mariadbVersion
 
 		if globalSettings.GetString("database") == "mysql" {
-			defaultDatabaseVersion = "8"
+			defaultDatabaseVersion = mysqlVersion
 		}
 
 		globalSettings.Set("databaseVersion", defaultDatabaseVersion)
