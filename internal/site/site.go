@@ -212,7 +212,12 @@ func (s *Site) OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag, openAdm
 	}
 
 	if openDatabaseFlag {
-		if s.Settings.Database == "sqlite" {
+		isUsingSQLite, err := s.isUsingSQLite()
+		if err != nil {
+			return err
+		}
+
+		if isUsingSQLite {
 			consoleOutput.Warn(fmt.Sprintf(
 				"SQLite databases do not have a web interface and cannot be opened in TablePlus by URL. Open the database file, %s, directly using your database client of choice.", //nolint:lll
 				filepath.Join(s.Settings.WorkingDirectory, "wp-content", "database", ".ht.sqlite")))
@@ -274,7 +279,7 @@ func (s *Site) OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag, openAdm
 }
 
 // StartSite Starts a site, including Traefik if needed.
-func (s *Site) StartSite(consoleOutput *console.Console) error { //nolint:gocyclo
+func (s *Site) StartSite(consoleOutput *console.Console) error {
 	// Let's start everything up
 	consoleOutput.Printf("Starting development site: %s.\n", consoleOutput.Bold(consoleOutput.Green(s.Settings.URL)))
 
@@ -465,8 +470,6 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 	if err != nil {
 		return localSettings, err
 	}
-
-	fmt.Println(output.StdOut)
 
 	if strings.Contains(output.StdOut, "true") {
 		localSettings.Database = "sqlite"

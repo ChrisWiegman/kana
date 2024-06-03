@@ -59,7 +59,12 @@ func (s *Site) RunWPCli(command []string, interactive bool, consoleOutput *conso
 		"IS_KANA_ENVIRONMENT=true",
 	}
 
-	if s.Settings.Database == "sqlite" {
+	isUsingSQLite, err := s.isUsingSQLite()
+	if err != nil {
+		return 1, "", err
+	}
+
+	if isUsingSQLite {
 		envVars = append(envVars, "KANA_SQLITE=true")
 	} else {
 		envVars = append(envVars,
@@ -252,7 +257,12 @@ func (s *Site) getWordPressContainer(appVolumes []mount.Mount, appContainers []d
 		"IS_KANA_ENVIRONMENT=true",
 	}
 
-	if s.Settings.Database == "sqlite" {
+	isUsingSQLite, err := s.isUsingSQLite()
+	if err != nil {
+		return appContainers
+	}
+
+	if isUsingSQLite {
 		envVars = append(envVars, "KANA_SQLITE=true")
 	} else {
 		envVars = append(envVars,

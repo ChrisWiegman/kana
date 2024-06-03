@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/ChrisWiegman/kana/internal/console"
 	"github.com/ChrisWiegman/kana/internal/docker"
@@ -15,6 +16,15 @@ import (
 )
 
 func (s *Site) ExportDatabase(args []string, consoleOutput *console.Console) (string, error) {
+	isUsingSQLite, err := s.isUsingSQLite()
+	if err != nil {
+		return "", err
+	}
+
+	if isUsingSQLite {
+		return "", fmt.Errorf("SQLite databases cannot be exported")
+	}
+
 	cwd, err := os.Getwd()
 	if err != nil {
 		return "", err
@@ -48,6 +58,15 @@ func (s *Site) ExportDatabase(args []string, consoleOutput *console.Console) (st
 }
 
 func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string, consoleOutput *console.Console) error {
+	isUsingSQLite, err := s.isUsingSQLite()
+	if err != nil {
+		return err
+	}
+
+	if isUsingSQLite {
+		return fmt.Errorf("SQLite databases cannot be imported")
+	}
+
 	cwd, err := os.Getwd()
 	if err != nil {
 		return err
@@ -126,7 +145,12 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string, 
 }
 
 func (s *Site) getDatabaseContainer(databaseDir string, appContainers []docker.ContainerConfig) []docker.ContainerConfig {
-	if s.Settings.Database == "sqlite" { //nolint:goconst
+	isUsingSQLite, err := s.isUsingSQLite()
+	if err != nil {
+		return appContainers
+	}
+
+	if isUsingSQLite {
 		return appContainers
 	}
 
@@ -177,7 +201,12 @@ func (s *Site) getDatabasePort() string {
 }
 
 func (s *Site) maybeSetupSQLite() error {
-	if s.Settings.Database != "sqlite" {
+	isUsingSQLite, err := s.isUsingSQLite()
+	if err != nil {
+		return err
+	}
+
+	if isUsingSQLite {
 		return nil
 	}
 
@@ -204,4 +233,17 @@ func (s *Site) maybeSetupSQLite() error {
 		filepath.Join(
 			s.Settings.WorkingDirectory, "wp-content", "plugins", "sqlite-database-integration", "db.copy"),
 		filepath.Join(s.Settings.WorkingDirectory, "wp-content", "db.php"))
+}
+
+func (s *Site) isUsingSQLite() (bool, error) {
+	output, err := s.runCli("echo $KANA_SQLITE", false, false)
+	if err != nil {
+		return false, err
+	}
+
+	if strings.Contains(output.StdOut, "true") {
+		return true, nil
+	}
+
+	return false, nil
 }
