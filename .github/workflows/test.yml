@@ -34,6 +34,12 @@ jobs:
         with:
           go-version: "1.22"
 
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
       - name: Build test cli
         run: |
           go mod vendor

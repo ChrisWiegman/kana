@@ -1,0 +1,25 @@
+{
+  "name": "kana",
+  "description": "A simple, portable CLI for efficient WordPress development ",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChrisWiegman/kana.git"
+  },
+  "keywords": [
+    "docker",
+    "wordpress",
+    "plugins",
+    "themes",
+    "developer-tools",
+    "development-environment"
+  ],
+  "author": "Chris Wiegman <contact@chriswiegman.com>",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/ChrisWiegman/kana/issues"
+  },
+  "homepage": "https://github.com/ChrisWiegman/kana#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.44.1"
+  }
+}
