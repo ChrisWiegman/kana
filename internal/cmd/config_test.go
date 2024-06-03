@@ -1,17 +1,10 @@
 package cmd
 
 import (
-	"os"
 	"testing"
 
 	"github.com/ChrisWiegman/kana/tests"
 )
-
-func TestMain(m *testing.M) {
-	code := m.Run()
-	tests.Teardown()
-	os.Exit(code)
-}
 
 func TestConfig(t *testing.T) {
 	testCases := []tests.Test{

@@ -16,7 +16,7 @@ type Test struct {
 	Command     []string
 }
 
-func Teardown() {
+func teardown() {
 	home, err := homedir.Dir()
 	if err != nil {
 		panic(err)
@@ -42,6 +42,8 @@ func RunSnapshotTest(testCases []Test, t *testing.T) {
 			}
 
 			snaps.MatchSnapshot(t, out.String())
+
+			teardown()
 		})
 	}
 }
