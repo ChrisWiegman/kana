@@ -137,6 +137,10 @@ func (s *Settings) validateSetting(setting, value string) error { //nolint:gocyc
 		return validate.Var(value, "alphanumunicode")
 	case "admin.username":
 		return validate.Var(value, "alpha")
+	case "database":
+		if !helpers.IsValidString(value, validDatabases) {
+			return fmt.Errorf("the database, %s, is not a valid database type. You must use either `mariadb` or `sqlite`", setting)
+		}
 	case "databaseClient":
 	case "databaseclient":
 		if !helpers.IsValidString(value, validDatabaseClients) {
