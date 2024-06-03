@@ -55,20 +55,28 @@ func (s *Site) RunWPCli(command []string, interactive bool, consoleOutput *conso
 
 	fullCommand = append(fullCommand, command...)
 
+	envVars := []string{
+		"IS_KANA_ENVIRONMENT=true",
+	}
+
+	if s.Settings.Database == "sqlite" {
+		envVars = append(envVars, "KANA_SQLITE=true")
+	} else {
+		envVars = append(envVars,
+			fmt.Sprintf("WORDPRESS_DB_HOST=kana-%s-database", s.Settings.Name),
+			"WORDPRESS_DB_USER=wordpress",
+			"WORDPRESS_DB_PASSWORD=wordpress",
+			"WORDPRESS_DB_NAME=wordpress",
+			"WORDPRESS_ADMIN_USER=admin")
+	}
+
 	container := docker.ContainerConfig{
 		Name:        fmt.Sprintf("kana-%s-wordpress_cli", s.Settings.Name),
 		Image:       fmt.Sprintf("wordpress:cli-php%s", s.Settings.PHP),
 		NetworkName: "kana",
 		HostName:    fmt.Sprintf("kana-%s-wordpress_cli", s.Settings.Name),
 		Command:     fullCommand,
-		Env: []string{
-			"IS_KANA_ENVIRONMENT=true",
-			fmt.Sprintf("WORDPRESS_DB_HOST=kana-%s-database", s.Settings.Name),
-			"WORDPRESS_DB_USER=wordpress",
-			"WORDPRESS_DB_PASSWORD=wordpress",
-			"WORDPRESS_DB_NAME=wordpress",
-			"WORDPRESS_DEBUG=0",
-		},
+		Env:         envVars,
 		Labels: map[string]string{
 			"kana.site": s.Settings.Name,
 		},
@@ -240,19 +248,27 @@ func (s *Site) getMounts(appDir string) ([]mount.Mount, error) {
 func (s *Site) getWordPressContainer(appVolumes []mount.Mount, appContainers []docker.ContainerConfig) []docker.ContainerConfig {
 	hostRule := fmt.Sprintf("Host(`%[1]s`)", s.Settings.SiteDomain)
 
+	envVars := []string{
+		"IS_KANA_ENVIRONMENT=true",
+	}
+
+	if s.Settings.Database == "sqlite" {
+		envVars = append(envVars, "KANA_SQLITE=true")
+	} else {
+		envVars = append(envVars,
+			fmt.Sprintf("WORDPRESS_DB_HOST=kana-%s-database", s.Settings.Name),
+			"WORDPRESS_DB_USER=wordpress",
+			"WORDPRESS_DB_PASSWORD=wordpress",
+			"WORDPRESS_DB_NAME=wordpress",
+			"WORDPRESS_ADMIN_USER=admin")
+	}
+
 	wordPressContainer := docker.ContainerConfig{
 		Name:        fmt.Sprintf("kana-%s-wordpress", s.Settings.Name),
 		Image:       fmt.Sprintf("wordpress:php%s", s.Settings.PHP),
 		NetworkName: "kana",
 		HostName:    fmt.Sprintf("kana-%s-wordpress", s.Settings.Name),
-		Env: []string{
-			fmt.Sprintf("WORDPRESS_DB_HOST=kana-%s-database", s.Settings.Name),
-			"IS_KANA_ENVIRONMENT=true",
-			"WORDPRESS_DB_USER=wordpress",
-			"WORDPRESS_DB_PASSWORD=wordpress",
-			"WORDPRESS_DB_NAME=wordpress",
-			"WORDPRESS_ADMIN_USER=admin",
-		},
+		Env:         envVars,
 		Labels: map[string]string{
 			"traefik.enable": "true",
 			"kana.type":      "wordpress",
