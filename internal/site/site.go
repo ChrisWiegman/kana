@@ -227,7 +227,7 @@ func (s *Site) OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag, openAdm
 		databasePort := s.getDatabasePort()
 
 		databaseURL := fmt.Sprintf(
-			"mysql://wordpress:wordpress@127.0.0.1:%s/wordpress?enviroment=local&name=$database&safeModeLevel=0&advancedSafeModeLevel=0",
+			"mysql://wordpress:wordpress@127.0.0.1:%s/wordpress",
 			databasePort)
 
 		if s.Settings.DatabaseClient == "phpmyadmin" {
