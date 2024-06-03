@@ -3,11 +3,12 @@ package site
 import (
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 	"strconv"
 
 	"github.com/ChrisWiegman/kana/internal/console"
 	"github.com/ChrisWiegman/kana/internal/docker"
+	"github.com/ChrisWiegman/kana/internal/helpers"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/mount"
@@ -20,10 +21,10 @@ func (s *Site) ExportDatabase(args []string, consoleOutput *console.Console) (st
 	}
 
 	exportFileName := fmt.Sprintf("kana-%s.sql", s.Settings.Name)
-	exportFile := path.Join(cwd, exportFileName)
+	exportFile := filepath.Join(cwd, exportFileName)
 
 	if len(args) == 1 {
-		exportFile = path.Join(cwd, args[0])
+		exportFile = filepath.Join(cwd, args[0])
 	}
 
 	exportCommand := []string{
@@ -38,7 +39,7 @@ func (s *Site) ExportDatabase(args []string, consoleOutput *console.Console) (st
 		return "", fmt.Errorf("database export failed: %s\n%s", err.Error(), output)
 	}
 
-	err = copyFile(path.Join(s.Settings.SiteDirectory, "export.sql"), exportFile)
+	err = copyFile(filepath.Join(s.Settings.SiteDirectory, "export.sql"), exportFile)
 	if err != nil {
 		return "", err
 	}
@@ -52,12 +53,12 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string, 
 		return err
 	}
 
-	rawImportFile := path.Join(cwd, file)
+	rawImportFile := filepath.Join(cwd, file)
 	if _, err = os.Stat(rawImportFile); os.IsNotExist(err) {
 		return fmt.Errorf("the specified sql file does not exist. Please enter a valid file to import")
 	}
 
-	kanaImportFile := path.Join(s.Settings.SiteDirectory, "import.sql")
+	kanaImportFile := filepath.Join(s.Settings.SiteDirectory, "import.sql")
 
 	err = copyFile(rawImportFile, kanaImportFile)
 	if err != nil {
@@ -125,6 +126,10 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string, 
 }
 
 func (s *Site) getDatabaseContainer(databaseDir string, appContainers []docker.ContainerConfig) []docker.ContainerConfig {
+	if s.Settings.Database == "sqlite" {
+		return appContainers
+	}
+
 	databaseContainer := docker.ContainerConfig{
 		Name:        fmt.Sprintf("kana-%s-database", s.Settings.Name),
 		Image:       fmt.Sprintf("mariadb:%s", s.Settings.MariaDB),
@@ -169,4 +174,34 @@ func (s *Site) getDatabasePort() string {
 	}
 
 	return strconv.Itoa(int(databasePort.PublicPort))
+}
+
+func (s *Site) maybeSetupSQLite() error {
+	if s.Settings.Database != "sqlite" {
+		return nil
+	}
+
+	file, err := helpers.DownloadFile(
+		"https://downloads.wordpress.org/plugin/sqlite-database-integration.zip",
+		s.Settings.WorkingDirectory)
+	if err != nil {
+		return err
+	}
+
+	err = helpers.UnZipFile(
+		filepath.Join(s.Settings.WorkingDirectory, file),
+		filepath.Join(s.Settings.WorkingDirectory, "wp-content", "plugins"))
+	if err != nil {
+		return err
+	}
+
+	err = os.Remove(filepath.Join(s.Settings.WorkingDirectory, file))
+	if err != nil {
+		return err
+	}
+
+	return helpers.CopyFile(
+		filepath.Join(
+			s.Settings.WorkingDirectory, "wp-content", "plugins", "sqlite-database-integration", "db.copy"),
+		filepath.Join(s.Settings.WorkingDirectory, "wp-content", "db.php"))
 }

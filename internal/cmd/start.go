@@ -93,6 +93,7 @@ func start(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 		false,
 		"Activate the current plugin or theme (only works when used with the 'plugin' or 'theme' flags).")
 
+	cmd.Flags().StringVar(&startFlags.Database, "database", "mariadb", "Select the database server you wish to use with your installation.")
 	cmd.Flags().StringVar(&startFlags.Multisite, "multisite", "none", "Creates your new site as a multisite installation.")
 	cmd.Flags().StringVar(&startFlags.Environment, "environment", "local", "Sets the WP_ENVIRONMENT_TYPE for the site.")
 	cmd.Flags().StringVar(&startFlags.Plugins,

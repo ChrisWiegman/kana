@@ -283,6 +283,12 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 		return err
 	}
 
+	// Make sure we're using the correct database client
+	err = s.maybeSetupSQLite()
+	if err != nil {
+		return err
+	}
+
 	// Install the Kana development plugin
 	err = s.installKanaPlugin()
 	if err != nil {
@@ -299,12 +305,6 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 
 	// Make sure the WordPress site is running
 	err = s.verifySite(s.Settings.URL)
-	if err != nil {
-		return err
-	}
-
-	// Make sure we're using the correct database client
-	err = s.maybeSetupDatase()
 	if err != nil {
 		return err
 	}
