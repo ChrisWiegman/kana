@@ -11,7 +11,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
-	"path"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
@@ -101,7 +101,7 @@ func (s *Site) GetSiteLink() (string, error) {
 func (s *Site) GetSiteList(checkRunningStatus bool) ([]SiteInfo, error) {
 	sites := []SiteInfo{}
 
-	sitesDir := path.Join(s.Settings.AppDirectory, "sites")
+	sitesDir := filepath.Join(s.Settings.AppDirectory, "sites")
 
 	_, err := os.Stat(sitesDir)
 	if os.IsNotExist(err) {
@@ -116,7 +116,7 @@ func (s *Site) GetSiteList(checkRunningStatus bool) ([]SiteInfo, error) {
 	for _, f := range appSites {
 		var siteInfo SiteInfo
 
-		content, err := os.ReadFile(path.Join(sitesDir, f.Name(), "link.json"))
+		content, err := os.ReadFile(filepath.Join(sitesDir, f.Name(), "link.json"))
 		if err != nil {
 			return sites, err
 		}
@@ -299,6 +299,12 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 
 	// Make sure the WordPress site is running
 	err = s.verifySite(s.Settings.URL)
+	if err != nil {
+		return err
+	}
+
+	// Make sure we're using the correct database client
+	err = s.maybeSetupDatase()
 	if err != nil {
 		return err
 	}
@@ -493,7 +499,7 @@ func (s *Site) maybeRemoveDefaultPlugins() error {
 		"akismet"}
 
 	for _, plugin := range defaultPlugins {
-		pluginPath := path.Join(wordPressDirectory, "wp-content", "plugins", plugin)
+		pluginPath := filepath.Join(wordPressDirectory, "wp-content", "plugins", plugin)
 		err = os.RemoveAll(pluginPath)
 		if err != nil {
 			return err
@@ -523,7 +529,7 @@ func (s *Site) runCli(command string, restart, root bool) (docker.ExecResult, er
 // verifySite verifies if a site is up and running without error.
 func (s *Site) verifySite(siteURL string) error {
 	// Setup other options generated from config items
-	rootCert := path.Join(s.Settings.AppDirectory, "certs", s.Settings.RootCert)
+	rootCert := filepath.Join(s.Settings.AppDirectory, "certs", s.Settings.RootCert)
 
 	caCert, err := os.ReadFile(rootCert)
 	if err != nil {

@@ -8,7 +8,7 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -157,7 +157,7 @@ func (d *Client) loadImageUpdateData(appDirectory string) (*viper.Viper, error) 
 
 	imageUpdateData.SetConfigName("images")
 	imageUpdateData.SetConfigType("json")
-	imageUpdateData.AddConfigPath(path.Join(appDirectory, "config"))
+	imageUpdateData.AddConfigPath(filepath.Join(appDirectory, "config"))
 
 	err := imageUpdateData.ReadInConfig()
 	if err != nil {

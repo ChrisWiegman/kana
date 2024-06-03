@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"path"
+	"path/filepath"
 
 	"github.com/ChrisWiegman/kana/internal/console"
 	"github.com/ChrisWiegman/kana/internal/site"
@@ -29,7 +29,7 @@ func export(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command 
 				consoleOutput.Error(err)
 			}
 
-			consoleOutput.Success(fmt.Sprintf("Your config has been exported to %s", path.Join(kanaSite.Settings.WorkingDirectory, ".kana.json")))
+			consoleOutput.Success(fmt.Sprintf("Your config has been exported to %s", filepath.Join(kanaSite.Settings.WorkingDirectory, ".kana.json")))
 		},
 		Args: cobra.ArbitraryArgs,
 	}

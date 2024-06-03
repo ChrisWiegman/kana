@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path"
+	"path/filepath"
 	"runtime"
 
 	"github.com/ChrisWiegman/kana/internal/console"
@@ -19,8 +19,8 @@ const certOS = "darwin"
 func (s *Settings) EnsureSSLCerts(consoleOutput *console.Console) error {
 	createCert := false
 
-	certPath := path.Join(s.AppDirectory, "certs")
-	rootCert = path.Join(certPath, s.RootCert)
+	certPath := filepath.Join(s.AppDirectory, "certs")
+	rootCert = filepath.Join(certPath, s.RootCert)
 
 	_, err := os.Stat(rootCert)
 	if err != nil && os.IsNotExist(err) {

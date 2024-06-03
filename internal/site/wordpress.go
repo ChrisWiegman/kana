@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 	"runtime"
 	"strings"
 
@@ -93,7 +93,7 @@ func (s *Site) RunWPCli(command []string, interactive bool, consoleOutput *conso
 }
 
 func (s *Site) getDatabaseDirectory() (databaseDirectory string, err error) {
-	databaseDirectory = path.Join(s.Settings.SiteDirectory, "database")
+	databaseDirectory = filepath.Join(s.Settings.SiteDirectory, "database")
 
 	err = os.MkdirAll(databaseDirectory, os.FileMode(defaultDirPermissions))
 	if err != nil {
@@ -104,7 +104,7 @@ func (s *Site) getDatabaseDirectory() (databaseDirectory string, err error) {
 }
 
 func (s *Site) getWordPressDirectory() (wordPressDirectory string, err error) {
-	wordPressDirectory = path.Join(s.Settings.SiteDirectory, "wordpress")
+	wordPressDirectory = filepath.Join(s.Settings.SiteDirectory, "wordpress")
 
 	siteLink, err := s.GetSiteLink()
 	if err != nil {
@@ -115,7 +115,7 @@ func (s *Site) getWordPressDirectory() (wordPressDirectory string, err error) {
 		wordPressDirectory = s.Settings.WorkingDirectory
 
 		if s.Settings.Type != DefaultType {
-			wordPressDirectory = path.Join(s.Settings.WorkingDirectory, "wordpress")
+			wordPressDirectory = filepath.Join(s.Settings.WorkingDirectory, "wordpress")
 		}
 	}
 
@@ -199,7 +199,7 @@ func (s *Site) getMounts(appDir string) ([]mount.Mount, error) {
 
 	if s.Settings.Type == "plugin" {
 		err := os.MkdirAll(
-			path.Join(
+			filepath.Join(
 				appDir,
 				"wp-content",
 				"plugins",
@@ -212,13 +212,13 @@ func (s *Site) getMounts(appDir string) ([]mount.Mount, error) {
 		appVolumes = append(appVolumes, mount.Mount{ // Map's the user's working directory as a plugin
 			Type:   mount.TypeBind,
 			Source: s.Settings.WorkingDirectory,
-			Target: path.Join("/var/www/html", "wp-content", "plugins", s.Settings.Name),
+			Target: filepath.Join("/var/www/html", "wp-content", "plugins", s.Settings.Name),
 		})
 	}
 
 	if s.Settings.Type == "theme" {
 		err := os.MkdirAll(
-			path.Join(appDir,
+			filepath.Join(appDir,
 				"wp-content",
 				"themes",
 				s.Settings.Name),
@@ -230,7 +230,7 @@ func (s *Site) getMounts(appDir string) ([]mount.Mount, error) {
 		appVolumes = append(appVolumes, mount.Mount{ // Map's the user's working directory as a theme
 			Type:   mount.TypeBind,
 			Source: s.Settings.WorkingDirectory,
-			Target: path.Join("/var/www/html", "wp-content", "themes", s.Settings.Name),
+			Target: filepath.Join("/var/www/html", "wp-content", "themes", s.Settings.Name),
 		})
 	}
 
@@ -497,9 +497,9 @@ func (s *Site) startWordPress(consoleOutput *console.Console) error {
 	}
 
 	// Replace wp-config.php with the container's file
-	_, err = os.Stat(path.Join(appDir, "wp-config.php"))
+	_, err = os.Stat(filepath.Join(appDir, "wp-config.php"))
 	if err == nil {
-		os.Remove(path.Join(appDir, "wp-config.php"))
+		os.Remove(filepath.Join(appDir, "wp-config.php"))
 	}
 
 	appVolumes, err := s.getMounts(appDir)
@@ -559,5 +559,5 @@ func (s *Site) writeHtaccess() error {
 	_, filePerms := settings.GetDefaultPermissions()
 	htaccessContents := s.Settings.GetHtaccess()
 
-	return os.WriteFile(path.Join(wordPressDirectory, ".htaccess"), []byte(htaccessContents), os.FileMode(filePerms))
+	return os.WriteFile(filepath.Join(wordPressDirectory, ".htaccess"), []byte(htaccessContents), os.FileMode(filePerms))
 }

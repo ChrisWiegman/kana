@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"io"
 	"os"
-	"path"
 	"path/filepath"
 	"regexp"
 
@@ -17,7 +16,7 @@ func (s *Site) DetectType() (string, error) {
 	var err error
 	var isSite bool
 
-	isSite, err = helpers.PathExists(path.Join(s.Settings.WorkingDirectory, "wp-includes", "version.php"))
+	isSite, err = helpers.PathExists(filepath.Join(s.Settings.WorkingDirectory, "wp-includes", "version.php"))
 	if err != nil {
 		return "", err
 	}
@@ -37,7 +36,7 @@ func (s *Site) DetectType() (string, error) {
 			var f *os.File
 			var line string
 
-			f, err = os.Open(path.Join(s.Settings.WorkingDirectory, item.Name()))
+			f, err = os.Open(filepath.Join(s.Settings.WorkingDirectory, item.Name()))
 			if err != nil {
 				return "", err
 			}

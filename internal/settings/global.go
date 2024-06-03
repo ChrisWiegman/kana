@@ -3,7 +3,7 @@ package settings
 import (
 	"errors"
 	"fmt"
-	"path"
+	"path/filepath"
 
 	"github.com/spf13/viper"
 
@@ -73,7 +73,7 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) { //nolint:funlen
 
 	globalSettings.SetConfigName("kana")
 	globalSettings.SetConfigType("json")
-	globalSettings.AddConfigPath(path.Join(s.AppDirectory, "config"))
+	globalSettings.AddConfigPath(filepath.Join(s.AppDirectory, "config"))
 
 	err := globalSettings.ReadInConfig()
 	if err != nil {

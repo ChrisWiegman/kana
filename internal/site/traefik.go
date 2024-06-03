@@ -1,7 +1,7 @@
 package site
 
 import (
-	"path"
+	"path/filepath"
 
 	"github.com/ChrisWiegman/kana/internal/console"
 	"github.com/ChrisWiegman/kana/internal/docker"
@@ -63,17 +63,17 @@ func (s *Site) startTraefik(consoleOutput *console.Console) error {
 		Volumes: []mount.Mount{
 			{
 				Type:   mount.TypeBind,
-				Source: path.Join(s.Settings.AppDirectory, "config", "traefik", "traefik.toml"),
+				Source: filepath.Join(s.Settings.AppDirectory, "config", "traefik", "traefik.toml"),
 				Target: "/etc/traefik/traefik.toml",
 			},
 			{
 				Type:   mount.TypeBind,
-				Source: path.Join(s.Settings.AppDirectory, "config", "traefik", "dynamic.toml"),
+				Source: filepath.Join(s.Settings.AppDirectory, "config", "traefik", "dynamic.toml"),
 				Target: "/etc/traefik/dynamic.toml",
 			},
 			{
 				Type:   mount.TypeBind,
-				Source: path.Join(s.Settings.AppDirectory, "certs"),
+				Source: filepath.Join(s.Settings.AppDirectory, "certs"),
 				Target: "/var/certs",
 			},
 			{

@@ -3,7 +3,7 @@ package settings
 import (
 	_ "embed"
 	"os"
-	"path"
+	"path/filepath"
 	"text/template"
 )
 
@@ -46,7 +46,7 @@ func (s *Settings) EnsureKanaPlugin(appDir, siteName string) error {
 
 	tmpl := template.Must(template.New("kanaPlugin").Parse(KanaWordPressPlugin))
 
-	pluginPath := path.Join(appDir, "wp-content", "mu-plugins")
+	pluginPath := filepath.Join(appDir, "wp-content", "mu-plugins")
 
 	_, err := os.Stat(pluginPath)
 	if err != nil && os.IsNotExist(err) {
@@ -56,7 +56,7 @@ func (s *Settings) EnsureKanaPlugin(appDir, siteName string) error {
 		}
 	}
 
-	myFile, err := os.Create(path.Join(pluginPath, "kana-local-development.php"))
+	myFile, err := os.Create(filepath.Join(pluginPath, "kana-local-development.php"))
 	if err != nil {
 		return err
 	}
@@ -67,8 +67,8 @@ func (s *Settings) EnsureKanaPlugin(appDir, siteName string) error {
 // EnsureStaticConfigFiles Ensures the application's static config files have been generated and are where they need to be.
 func (s *Settings) EnsureStaticConfigFiles() error {
 	for _, file := range configFiles {
-		filePath := path.Join(s.AppDirectory, file.LocalPath)
-		destFile := path.Join(s.AppDirectory, file.LocalPath, file.Name)
+		filePath := filepath.Join(s.AppDirectory, file.LocalPath)
+		destFile := filepath.Join(s.AppDirectory, file.LocalPath, file.Name)
 
 		if err := os.MkdirAll(filePath, os.FileMode(defaultDirPermissions)); err != nil {
 			return err

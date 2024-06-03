@@ -3,7 +3,6 @@ package settings
 import (
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -20,7 +19,7 @@ func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 	s.SiteDomain = fmt.Sprintf("%s.%s", siteName, s.AppDomain)
 
 	s.Name = siteName
-	s.SiteDirectory = path.Join(s.AppDirectory, "sites", siteName)
+	s.SiteDirectory = filepath.Join(s.AppDirectory, "sites", siteName)
 
 	isSite, err := s.ProcessNameFlag(cmd)
 	if err != nil {
@@ -63,7 +62,7 @@ func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 
 // HasLocalOptions Returns true if local options have been saved to a file or false.
 func (s *Settings) HasLocalOptions() bool {
-	if _, err := os.Stat(path.Join(s.WorkingDirectory, ".kana.json")); os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(s.WorkingDirectory, ".kana.json")); os.IsNotExist(err) {
 		return false
 	}
 
@@ -121,7 +120,7 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) { //nolint:
 		}
 
 		s.Name = helpers.SanitizeSiteName(cmd.Flags().Lookup("name").Value.String())
-		s.SiteDirectory = (path.Join(s.AppDirectory, "sites", s.Name))
+		s.SiteDirectory = (filepath.Join(s.AppDirectory, "sites", s.Name))
 
 		s.SiteDomain = fmt.Sprintf("%s.%s", s.Name, s.AppDomain)
 		s.URL = fmt.Sprintf("%s://%s", s.Protocol, s.SiteDomain)
@@ -131,7 +130,7 @@ func (s *Settings) ProcessNameFlag(cmd *cobra.Command) (bool, error) { //nolint:
 
 	isSite := false // Don't assume we're in a site that has been initialized.
 
-	_, err := os.Stat(path.Join(s.SiteDirectory, "link.json"))
+	_, err := os.Stat(filepath.Join(s.SiteDirectory, "link.json"))
 	if err == nil || !os.IsNotExist(err) {
 		isSite = true
 	}
@@ -219,7 +218,7 @@ func (s *Settings) WriteLocalSettings(localSettings *LocalSettings) error {
 	s.local.Set("wpdebug", localSettings.WPDebug)
 	s.local.Set("xdebug", localSettings.Xdebug)
 
-	if _, err := os.Stat(path.Join(s.WorkingDirectory, ".kana.json")); os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(s.WorkingDirectory, ".kana.json")); os.IsNotExist(err) {
 		return s.local.SafeWriteConfig()
 	}
 

@@ -14,7 +14,7 @@ import (
 	"math"
 	"math/big"
 	"os"
-	"path"
+	"path/filepath"
 	"time"
 )
 
@@ -39,8 +39,8 @@ var thirtyDays = 30
 var certBytes = 2048
 
 func GenCerts(certInfo *CertInfo) error {
-	caKey := path.Join(certInfo.CertDir, certInfo.RootKey)
-	caCert := path.Join(certInfo.CertDir, certInfo.RootCert)
+	caKey := filepath.Join(certInfo.CertDir, certInfo.RootKey)
+	caCert := filepath.Join(certInfo.CertDir, certInfo.RootCert)
 	domains := []string{
 		fmt.Sprintf("*.%s", certInfo.CertDomain),
 	}
@@ -261,7 +261,7 @@ func calculateSKID(pubKey crypto.PublicKey) ([]byte, error) {
 func sign(iss *issuer, domains []string, certPath, siteCert, siteKey string) (*x509.Certificate, error) {
 	cn := domains[0]
 
-	key, err := makeKey(path.Join(certPath, siteKey))
+	key, err := makeKey(filepath.Join(certPath, siteKey))
 	if err != nil {
 		return nil, err
 	}
@@ -295,7 +295,7 @@ func sign(iss *issuer, domains []string, certPath, siteCert, siteKey string) (*x
 		return nil, err
 	}
 
-	file, err := os.OpenFile(path.Join(certPath, siteCert), os.O_CREATE|os.O_EXCL|os.O_WRONLY, os.FileMode(fileOpenMode))
+	file, err := os.OpenFile(filepath.Join(certPath, siteCert), os.O_CREATE|os.O_EXCL|os.O_WRONLY, os.FileMode(fileOpenMode))
 	if err != nil {
 		return nil, err
 	}
