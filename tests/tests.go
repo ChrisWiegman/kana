@@ -84,7 +84,7 @@ func RunSnapshotTest(testCases []Test, t *testing.T) {
 			cmd.Stdout = &out
 			err := cmd.Run()
 			if err != nil {
-				t.Fatalf("Unexpected error: %v", err)
+				t.Fatalf("Unexpected error: %v", out)
 			}
 
 			snaps.MatchSnapshot(t, out.String())
