@@ -141,7 +141,7 @@ func (s *Settings) validateSetting(setting, value string) error { //nolint:gocyc
 		return validate.Var(value, "alpha")
 	case "database":
 		if !helpers.IsValidString(value, validDatabases) {
-			return fmt.Errorf("the database, %s, is not a valid database type. You must use either `mariadb` or `sqlite`", setting)
+			return fmt.Errorf("the database, %s, is not a valid database type. You must use either `mariadb`, `mysql` or `sqlite`", setting)
 		}
 	case "databaseClient":
 	case "databaseclient":
@@ -157,10 +157,16 @@ func (s *Settings) validateSetting(setting, value string) error { //nolint:gocyc
 		return validate.Var(value, "gte=0")
 	case "databaseVersion":
 	case "mariadb":
-		if docker.ValidateImage("mariadb", value) != nil {
+		if docker.ValidateImage(s.Database, value) != nil {
+			databaseURL := "https://hub.docker.com/_/mariadb"
+
+			if s.Database == "mysql" {
+				databaseURL = "https://hub.docker.com/_/mysql"
+			}
+
 			return fmt.Errorf(
-				"the MariaDB version in your configuration, %s, is invalid. See https://hub.docker.com/_/mariadb for a list of supported versions",
-				value)
+				"the database version in your configuration, %s, is invalid. See %s for a list of supported versions",
+				value, databaseURL)
 		}
 	case "multisite":
 		if !helpers.IsValidString(value, validMultisiteTypes) {

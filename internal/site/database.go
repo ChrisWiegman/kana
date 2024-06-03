@@ -46,7 +46,13 @@ func (s *Site) ExportDatabase(args []string, consoleOutput *console.Console) (st
 
 	code, output, err := s.RunWPCli(exportCommand, false, consoleOutput)
 	if err != nil || code != 0 {
-		return "", fmt.Errorf("database export failed: %s\n%s", err.Error(), output)
+		errorMessage := ""
+
+		if err != nil {
+			errorMessage = err.Error()
+		}
+
+		return "", fmt.Errorf("database export failed: %s\n%s", errorMessage, output)
 	}
 
 	err = copyFile(filepath.Join(s.Settings.SiteDirectory, "export.sql"), exportFile)
@@ -154,20 +160,31 @@ func (s *Site) getDatabaseContainer(databaseDir string, appContainers []docker.C
 		return appContainers
 	}
 
+	envVars := []string{
+		"MARIADB_ROOT_PASSWORD=password",
+		"MARIADB_DATABASE=wordpress",
+		"MARIADB_USER=wordpress",
+		"MARIADB_PASSWORD=wordpress",
+	}
+
+	if s.Settings.Database == "mysql" {
+		envVars = []string{
+			"MYSQL_ROOT_PASSWORD=password",
+			"MYSQL_DATABASE=wordpress",
+			"MYSQL_USER=wordpress",
+			"MYSQL_PASSWORD=wordpress",
+		}
+	}
+
 	databaseContainer := docker.ContainerConfig{
 		Name:        fmt.Sprintf("kana-%s-database", s.Settings.Name),
-		Image:       fmt.Sprintf("mariadb:%s", s.Settings.DatabaseVersion),
+		Image:       fmt.Sprintf("%s:%s", s.Settings.Database, s.Settings.DatabaseVersion),
 		NetworkName: "kana",
 		HostName:    fmt.Sprintf("kana-%s-database", s.Settings.Name),
 		Ports: []docker.ExposedPorts{
 			{Port: "3306", Protocol: "tcp"},
 		},
-		Env: []string{
-			"MARIADB_ROOT_PASSWORD=password",
-			"MARIADB_DATABASE=wordpress",
-			"MARIADB_USER=wordpress",
-			"MARIADB_PASSWORD=wordpress",
-		},
+		Env: envVars,
 		Labels: map[string]string{
 			"kana.type": "database",
 			"kana.site": s.Settings.Name,
@@ -192,7 +209,7 @@ func (s *Site) getDatabasePort() string {
 	var databasePort types.Port
 
 	for i := range containers {
-		if containers[i].Image == fmt.Sprintf("mariadb:%s", s.Settings.DatabaseVersion) {
+		if containers[i].Image == fmt.Sprintf("%s:%s", s.Settings.Database, s.Settings.DatabaseVersion) {
 			databasePort = containers[i].Ports[0]
 		}
 	}
@@ -206,7 +223,7 @@ func (s *Site) maybeSetupSQLite() error {
 		return err
 	}
 
-	if isUsingSQLite {
+	if !isUsingSQLite {
 		return nil
 	}
 

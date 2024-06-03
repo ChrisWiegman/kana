@@ -50,6 +50,7 @@ var validDatabaseClients = []string{
 
 var validDatabases = []string{
 	"mariadb",
+	"mysql",
 	"sqlite",
 }
 

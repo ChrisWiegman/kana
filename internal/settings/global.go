@@ -104,9 +104,15 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) { //nolint:funlen
 	}
 
 	// Reset default mariadb version if there's an invalid version in the config file
-	if docker.ValidateImage("mariadb", globalSettings.GetString("databaseVersion")) != nil {
+	if docker.ValidateImage(globalSettings.GetString("database"), globalSettings.GetString("databaseVersion")) != nil {
 		changeConfig = true
-		globalSettings.Set("databaseVersion", databaseVersion)
+		defaultDatabaseVersion := "11"
+
+		if globalSettings.GetString("database") == "mysql" {
+			defaultDatabaseVersion = "8"
+		}
+
+		globalSettings.Set("databaseVersion", defaultDatabaseVersion)
 	}
 
 	// Reset default database type if there's an invalid type in the config file
