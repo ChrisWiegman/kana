@@ -67,7 +67,7 @@ func (s *Site) handleImageError(container *docker.ContainerConfig, err error) er
 		case "database":
 			return fmt.Errorf(
 				"the MariaDB version in your configuration, %s, is invalid. See https://hub.docker.com/_/mariadb for a list of supported versions",
-				s.Settings.MariaDB)
+				s.Settings.DatabaseVersion)
 		}
 	}
 

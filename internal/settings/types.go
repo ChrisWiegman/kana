@@ -20,13 +20,13 @@ type Settings struct {
 	AutomaticLogin       bool
 	Database             string
 	DatabaseClient       string
+	DatabaseVersion      string
 	Environment          string
 	ImageUpdateDays      int
 	IsNamedSite          bool
 	IsNewSite            bool
 	Local                bool
 	Mailpit              bool
-	MariaDB              string
 	Multisite            string
 	Name                 string
 	PHP                  string
@@ -71,6 +71,7 @@ type LocalSettings struct {
 	AutomaticLogin       bool
 	Database             string
 	DatabaseClient       string
+	DatabaseVersion      string
 	Environment          string
 	Mailpit              bool
 	Multisite            string

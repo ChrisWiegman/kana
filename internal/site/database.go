@@ -156,7 +156,7 @@ func (s *Site) getDatabaseContainer(databaseDir string, appContainers []docker.C
 
 	databaseContainer := docker.ContainerConfig{
 		Name:        fmt.Sprintf("kana-%s-database", s.Settings.Name),
-		Image:       fmt.Sprintf("mariadb:%s", s.Settings.MariaDB),
+		Image:       fmt.Sprintf("mariadb:%s", s.Settings.DatabaseVersion),
 		NetworkName: "kana",
 		HostName:    fmt.Sprintf("kana-%s-database", s.Settings.Name),
 		Ports: []docker.ExposedPorts{
@@ -192,7 +192,7 @@ func (s *Site) getDatabasePort() string {
 	var databasePort types.Port
 
 	for i := range containers {
-		if containers[i].Image == fmt.Sprintf("mariadb:%s", s.Settings.MariaDB) {
+		if containers[i].Image == fmt.Sprintf("mariadb:%s", s.Settings.DatabaseVersion) {
 			databasePort = containers[i].Ports[0]
 		}
 	}

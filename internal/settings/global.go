@@ -27,10 +27,10 @@ func (s *Settings) LoadGlobalSettings() error {
 	s.AutomaticLogin = globalViperConfig.GetBool("automaticLogin")
 	s.Database = globalViperConfig.GetString("database")
 	s.DatabaseClient = globalViperConfig.GetString("databaseClient")
+	s.DatabaseVersion = globalViperConfig.GetString("databaseVersion")
 	s.Environment = globalViperConfig.GetString("environment")
 	s.ImageUpdateDays = globalViperConfig.GetInt("imageUpdateDays")
 	s.Mailpit = globalViperConfig.GetBool("mailpit")
-	s.MariaDB = globalViperConfig.GetString("mariadb")
 	s.Multisite = globalViperConfig.GetString("multisite")
 	s.PHP = globalViperConfig.GetString("php")
 	s.Plugins = globalViperConfig.GetStringSlice("plugins")
@@ -56,10 +56,10 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) { //nolint:funlen
 	globalSettings.SetDefault("automaticLogin", automaticLogin)
 	globalSettings.SetDefault("database", database)
 	globalSettings.SetDefault("databaseClient", databaseClient)
+	globalSettings.SetDefault("databaseVersion", databaseVersion)
 	globalSettings.SetDefault("environment", environment)
 	globalSettings.SetDefault("imageUpdateDays", imageUpdateDays)
 	globalSettings.SetDefault("mailpit", mailpit)
-	globalSettings.SetDefault("mariadb", mariadb)
 	globalSettings.SetDefault("multisite", multisite)
 	globalSettings.SetDefault("php", php)
 	globalSettings.SetDefault("plugins", plugins)
@@ -104,9 +104,9 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) { //nolint:funlen
 	}
 
 	// Reset default mariadb version if there's an invalid version in the config file
-	if docker.ValidateImage("mariadb", globalSettings.GetString("mariadb")) != nil {
+	if docker.ValidateImage("mariadb", globalSettings.GetString("databaseVersion")) != nil {
 		changeConfig = true
-		globalSettings.Set("mariadb", mariadb)
+		globalSettings.Set("databaseVersion", databaseVersion)
 	}
 
 	// Reset default database type if there's an invalid type in the config file

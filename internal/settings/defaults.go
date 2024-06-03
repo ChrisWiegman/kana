@@ -14,7 +14,7 @@ var (
 	environment          = "local"
 	imageUpdateDays      = 7
 	mailpit              = false
-	mariadb              = "11"
+	databaseVersion      = "11"
 	multisite            = "none"
 	php                  = "8.2"
 	plugins              = []string{}

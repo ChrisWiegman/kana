@@ -62,12 +62,14 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 	t.AddRow("databaseClient",
 		consoleOutput.Bold(s.global.GetString("databaseClient")),
 		consoleOutput.Bold(s.local.GetString("databaseClient")))
+	t.AddRow("databaseVersion",
+		consoleOutput.Bold(s.global.GetString("databaseVersion")),
+		consoleOutput.Bold(s.local.GetString("databaseVersion")))
 	t.AddRow("environment", consoleOutput.Bold(s.global.GetString("environment")), consoleOutput.Bold(s.local.GetString("environment")))
 	t.AddRow("imageUpdateDays",
 		consoleOutput.Bold(s.global.GetString("imageUpdateDays")),
 		consoleOutput.Bold(s.local.GetString("imageUpdateDays")))
 	t.AddRow("mailpit", consoleOutput.Bold(s.global.GetString("mailpit")), consoleOutput.Bold(s.local.GetString("mailpit")))
-	t.AddRow("mariadb", consoleOutput.Bold(s.global.GetString("mariadb")), consoleOutput.Bold(s.local.GetString("mariadb")))
 	t.AddRow("multisite", consoleOutput.Bold(s.global.GetString("multisite")), consoleOutput.Bold(s.local.GetString("multisite")))
 	t.AddRow("php", consoleOutput.Bold(s.global.GetString("php")), consoleOutput.Bold(s.local.GetString("php")))
 	t.AddRow("plugins",
@@ -153,6 +155,7 @@ func (s *Settings) validateSetting(setting, value string) error { //nolint:gocyc
 	case "imageUpdateDays":
 	case "imageupdatedays":
 		return validate.Var(value, "gte=0")
+	case "databaseVersion":
 	case "mariadb":
 		if docker.ValidateImage("mariadb", value) != nil {
 			return fmt.Errorf(
