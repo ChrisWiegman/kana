@@ -37,8 +37,7 @@ jobs:
       - name: Setup a Browser
         run: |
           sudo apt-get install -y epiphany-browser
-          xdg-settings set default-web-browser epiphany.desktop
-          xdg-settings --list
+          sudo update-alternatives --config x-www-browser
 
       - name: Build test cli
         run: |
