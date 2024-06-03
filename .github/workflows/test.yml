@@ -35,7 +35,8 @@ jobs:
           go-version: "1.22"
 
       - name: Setup a Browser
-        uses: browser-actions/setup-chrome@v1
+        run: |
+          sudo apt-get install -y epiphany-browser
 
       - name: Test the browser
         run: |
