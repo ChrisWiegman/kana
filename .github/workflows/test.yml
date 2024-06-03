@@ -34,6 +34,9 @@ jobs:
         with:
           go-version: "1.22"
 
+      - name: Setup a Browser
+        uses: browser-actions/setup-chrome@v1
+
       - name: Build test cli
         run: |
           go mod vendor
