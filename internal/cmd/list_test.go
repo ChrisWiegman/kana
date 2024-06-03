@@ -1,35 +1,20 @@
 package cmd
 
 import (
-	"bytes"
-	"os/exec"
 	"testing"
 
-	"github.com/gkampitakis/go-snaps/snaps"
+	"github.com/ChrisWiegman/kana/tests"
 )
 
 func TestList(t *testing.T) {
-	t.Run("Test the default list command", func(t *testing.T) {
-		cmd := exec.Command("../../build/kana", "list")
-		var out bytes.Buffer
-		cmd.Stdout = &out
-		err := cmd.Run()
-		if err != nil {
-			t.Fatalf("Unexpected error: %v", err)
-		}
+	testCases := []tests.Test{
+		{
+			Description: "Test the default list command",
+			Command:     []string{"list"}},
+		{
+			Description: "Test the list command with json output",
+			Command:     []string{"list", "--output-json"}},
+	}
 
-		snaps.MatchSnapshot(t, out.String())
-	})
-
-	t.Run("Test the list command with json output", func(t *testing.T) {
-		cmd := exec.Command("../../build/kana", "list", "--output-json")
-		var out bytes.Buffer
-		cmd.Stdout = &out
-		err := cmd.Run()
-		if err != nil {
-			t.Fatalf("Unexpected error: %v", err)
-		}
-
-		snaps.MatchSnapshot(t, out.String())
-	})
+	tests.RunSnapshotTest(testCases, t)
 }

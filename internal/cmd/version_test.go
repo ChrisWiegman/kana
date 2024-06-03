@@ -1,23 +1,20 @@
 package cmd
 
 import (
-	"bytes"
-	"os/exec"
 	"testing"
 
-	"github.com/gkampitakis/go-snaps/snaps"
+	"github.com/ChrisWiegman/kana/tests"
 )
 
 func TestVersion(t *testing.T) {
-	t.Run("Test the version command for appropriate output", func(t *testing.T) {
-		cmd := exec.Command("../../build/kana", "version")
-		var out bytes.Buffer
-		cmd.Stdout = &out
-		err := cmd.Run()
-		if err != nil {
-			t.Fatalf("Unexpected error: %v", err)
-		}
+	testCases := []tests.Test{
+		{
+			Description: "Test the version command for appropriate output",
+			Command:     []string{"version"}},
+		{
+			Description: "Test the config command with json output",
+			Command:     []string{"version", "--output-json"}},
+	}
 
-		snaps.MatchSnapshot(t, out.String())
-	})
+	tests.RunSnapshotTest(testCases, t)
 }

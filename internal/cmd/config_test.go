@@ -1,14 +1,10 @@
 package cmd
 
 import (
-	"bytes"
 	"os"
-	"os/exec"
 	"testing"
 
 	"github.com/ChrisWiegman/kana/tests"
-
-	"github.com/gkampitakis/go-snaps/snaps"
 )
 
 func TestMain(m *testing.M) {
@@ -18,26 +14,20 @@ func TestMain(m *testing.M) {
 }
 
 func TestConfig(t *testing.T) {
-	kanaTests := []tests.Test{
+	testCases := []tests.Test{
 		{
 			Description: "Test the default config command",
 			Command:     []string{"config"}},
 		{
+			Description: "Test the config command with json output",
+			Command:     []string{"config", "--output-json"}},
+		{
 			Description: "Retrieve the PHP value from the config command",
 			Command:     []string{"config", "php"}},
+		{
+			Description: "Retrieve the PHP value from the config command with json output",
+			Command:     []string{"config", "php", "--output-json"}},
 	}
 
-	for _, test := range kanaTests {
-		t.Run(test.Description, func(t *testing.T) {
-			cmd := exec.Command("../../build/kana", test.Command...) //nolint: gosec
-			var out bytes.Buffer
-			cmd.Stdout = &out
-			err := cmd.Run()
-			if err != nil {
-				t.Fatalf("Unexpected error: %v", err)
-			}
-
-			snaps.MatchSnapshot(t, out.String())
-		})
-	}
+	tests.RunSnapshotTest(testCases, t)
 }
