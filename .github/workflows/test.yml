@@ -36,7 +36,7 @@ jobs:
 
       - name: Setup a Browser
         run: |
-          sudo apt-get install -y epiphany-browser
+          sudo apt-get install -y epiphany-browser xdg-utils
 
       - name: Test the browser
         run: |
