@@ -96,6 +96,8 @@ Note: these can be changed in the config. Please see below.
 
 `--plugins` A comma-separated list of plugins to install when starting the site.
 
+`--database` By default Kana uses [MariaDB](https://mariadb.org) for its WordPress database. You can use [SQLite](https://www.sqlite.org/index.html) instead by specifying `sqlite` as the database type here.
+
 ## Trusting the SSL certificate on Mac
 
 On MacOS, Kana will automatically attempt to add its SSL certificate to the MacOS system Keychain the first time you start a site where SSL is the default. You can manually do this without starting a new site using the `kana trust-ssl` command.
@@ -164,6 +166,7 @@ Kana has a handful of options that apply to all new sites created with the app. 
 - `admin.password` **password** - the default password used to login to WordPress
 - `admin.username` **admin** - the default username used to login to WordPress
 - `automaticLogin` **true** - will automatically login the "admin" user when accessing the WordPress dashboard
+- `database` **mariadb** - Specify the database server for WordPress, currently either `mariadb` or `sqlite`
 - `databaseClient` **phpmyadmin** - the default database client for accessing the database directly (currently `phpmyadmin` and `tableplus` are supported)
 - `environment` **local** - the default usage of the `environment` start flag
 - `imageUpdateDays` **1** - the number of days Kana will wait between checking for updated Docker images. Set this to `0` to disable the check for newer images altogether (Kana will only download missing images)
@@ -195,6 +198,7 @@ In addition to the global config, certain items above can be overridden for any 
 - `admin.password` **password** - the default password used to login to WordPress
 - `admin.username` **admin** - the default username used to login to WordPress
 - `automaticLogin` **true** - will automatically login the "admin" user when accessing the WordPress dashboard
+- `database` **mariadb** - Specify the database server for WordPress, currently either `mariadb` or `sqlite`
 - `databaseClient` **phpmyadmin** - the default database client for accessing the database directly (currently `phpmyadmin` and `tableplus` are supported)
 - `environment` **local** - the default usage of the `environment` start flag
 - `mailpit` **false** - the default usage of the `mailpit` start flag
