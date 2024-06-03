@@ -8,6 +8,7 @@ var (
 	adminUsername        = "admin"
 	automaticLogin       = true
 	configFolderName     = ".config/kana"
+	database             = "mariadb"
 	databaseClient       = "phpmyadmin"
 	domain               = "sites.kana.sh"
 	environment          = "local"
@@ -45,6 +46,11 @@ var validTypes = []string{
 var validDatabaseClients = []string{
 	"phpmyadmin",
 	"tableplus",
+}
+
+var validDatabases = []string{
+	"mariadb",
+	"sqlite",
 }
 
 var validMultisiteTypes = []string{

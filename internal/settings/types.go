@@ -18,6 +18,7 @@ type Settings struct {
 	AppDomain            string // The top-level domain for the app.
 	AppDirectory         string
 	AutomaticLogin       bool
+	Database             string
 	DatabaseClient       string
 	Environment          string
 	ImageUpdateDays      int
@@ -55,6 +56,7 @@ type StartFlags struct {
 	Mailpit              bool
 	SSL                  bool
 	Activate             bool
+	Database             string
 	Plugins              string
 	RemoveDefaultPlugins bool
 	ScriptDebug          bool
@@ -67,6 +69,7 @@ type StartFlags struct {
 type LocalSettings struct {
 	Activate             bool
 	AutomaticLogin       bool
+	Database             string
 	DatabaseClient       string
 	Environment          string
 	Mailpit              bool

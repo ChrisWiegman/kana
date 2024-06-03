@@ -25,6 +25,7 @@ func (s *Settings) LoadGlobalSettings() error {
 	s.AdminPassword = globalViperConfig.GetString("admin.password")
 	s.AdminUsername = globalViperConfig.GetString("admin.username")
 	s.AutomaticLogin = globalViperConfig.GetBool("automaticLogin")
+	s.Database = globalViperConfig.GetString("database")
 	s.DatabaseClient = globalViperConfig.GetString("databaseClient")
 	s.Environment = globalViperConfig.GetString("environment")
 	s.ImageUpdateDays = globalViperConfig.GetInt("imageUpdateDays")
@@ -53,6 +54,7 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) { //nolint:funlen
 	globalSettings.SetDefault("admin.password", adminPassword)
 	globalSettings.SetDefault("admin.username", adminUsername)
 	globalSettings.SetDefault("automaticLogin", automaticLogin)
+	globalSettings.SetDefault("database", database)
 	globalSettings.SetDefault("databaseClient", databaseClient)
 	globalSettings.SetDefault("environment", environment)
 	globalSettings.SetDefault("imageUpdateDays", imageUpdateDays)
@@ -105,6 +107,12 @@ func (s *Settings) loadGlobalViper() (*viper.Viper, error) { //nolint:funlen
 	if docker.ValidateImage("mariadb", globalSettings.GetString("mariadb")) != nil {
 		changeConfig = true
 		globalSettings.Set("mariadb", mariadb)
+	}
+
+	// Reset default database type if there's an invalid type in the config file
+	if !helpers.IsValidString(globalSettings.GetString("database"), validDatabases) {
+		changeConfig = true
+		globalSettings.Set("database", database)
 	}
 
 	// Reset default database client if there's an invalid client in the config file

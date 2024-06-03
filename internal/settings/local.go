@@ -39,6 +39,7 @@ func (s *Settings) LoadLocalSettings(cmd *cobra.Command) (bool, error) {
 	s.AdminPassword = localViper.GetString("admin.password")
 	s.AdminUsername = localViper.GetString("admin.username")
 	s.AutomaticLogin = localViper.GetBool("automaticLogin")
+	s.Database = localViper.GetString("database")
 	s.DatabaseClient = localViper.GetString("databaseClient")
 	s.Environment = localViper.GetString("environment")
 	s.Mailpit = localViper.GetBool("mailpit")
@@ -191,6 +192,10 @@ func (s *Settings) ProcessStartFlags(cmd *cobra.Command, flags *StartFlags) {
 	if cmd.Flags().Lookup("remove-default-plugins").Changed {
 		s.RemoveDefaultPlugins = flags.RemoveDefaultPlugins
 	}
+
+	if cmd.Flags().Lookup("database").Changed {
+		s.Database = flags.Database
+	}
 }
 
 // WriteLocalSettings Writes all appropriate local settings to the local config file.
@@ -200,6 +205,7 @@ func (s *Settings) WriteLocalSettings(localSettings *LocalSettings) error {
 	s.local.Set("admin.username", s.AdminUsername)
 	s.local.Set("admin.password", s.AdminPassword)
 	s.local.Set("automaticLogin", s.AutomaticLogin)
+	s.local.Set("database", localSettings.Database)
 	s.local.Set("databaseClient", localSettings.DatabaseClient)
 	s.local.Set("environment", localSettings.Environment)
 	s.local.Set("mailpit", localSettings.Mailpit)
@@ -237,6 +243,7 @@ func (s *Settings) loadLocalViper() (*viper.Viper, error) {
 	localSettings.SetDefault("admin.username", s.AdminUsername)
 	localSettings.SetDefault("admin.password", s.AdminPassword)
 	localSettings.SetDefault("automaticLogin", s.AutomaticLogin)
+	localSettings.SetDefault("database", s.Database)
 	localSettings.SetDefault("databaseClient", s.DatabaseClient)
 	localSettings.SetDefault("environment", s.Environment)
 	localSettings.SetDefault("mailpit", s.Mailpit)

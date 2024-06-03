@@ -56,6 +56,9 @@ func (s *Settings) ListSettings(consoleOutput *console.Console) {
 	t.AddRow("automaticLogin",
 		consoleOutput.Bold(s.global.GetString("automaticLogin")),
 		consoleOutput.Bold(s.local.GetString("automaticLogin")))
+	t.AddRow("database",
+		consoleOutput.Bold(s.global.GetString("database")),
+		consoleOutput.Bold(s.local.GetString("database")))
 	t.AddRow("databaseClient",
 		consoleOutput.Bold(s.global.GetString("databaseClient")),
 		consoleOutput.Bold(s.local.GetString("databaseClient")))
