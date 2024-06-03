@@ -3,6 +3,7 @@ package helpers
 import (
 	"archive/zip"
 	"bufio"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -120,19 +121,27 @@ func DownloadFile(downloadURL, destinationPath string) (string, error) {
 		return "", err
 	}
 
-	client := http.Client{
-		CheckRedirect: func(r *http.Request, via []*http.Request) error {
-			r.URL.Opaque = r.URL.Path
-			return nil
-		},
-	}
-
-	// Put content on file
-	resp, err := client.Get(downloadURL)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, downloadURL, http.NoBody)
 	if err != nil {
 		return "", err
 	}
-	defer resp.Body.Close()
+
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
 	_, err = io.Copy(file, resp.Body)
 	defer file.Close()
@@ -140,36 +149,53 @@ func DownloadFile(downloadURL, destinationPath string) (string, error) {
 	return fileName, err
 }
 
-func UnZipFile(src, dest string) error {
-	r, err := zip.OpenReader(src)
+func UnZipFile(sourceFile, destinationPath string) error {
+	archive, err := zip.OpenReader(sourceFile)
 	if err != nil {
 		return err
 	}
-	defer r.Close()
+	defer archive.Close()
 
-	for _, f := range r.File {
-		rc, err := f.Open()
+	for _, f := range archive.File {
+		filePath := filepath.Join(destinationPath, filepath.Clean(f.Name))
+
+		if f.FileInfo().IsDir() {
+			err = os.MkdirAll(filePath, f.Mode())
+			if err != nil {
+				return err
+			}
+
+			continue
+		}
+
+		if err := os.MkdirAll(filepath.Dir(filePath), os.ModePerm); err != nil {
+			return err
+		}
+
+		dstFile, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
 		if err != nil {
 			return err
 		}
-		defer rc.Close()
 
-		path := filepath.Join(dest, f.Name)
-		if f.FileInfo().IsDir() {
-			os.MkdirAll(path, f.Mode())
-		} else {
-			f, err := os.OpenFile(
-				path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
-			if err != nil {
-				return err
-			}
-			defer f.Close()
+		fileInArchive, err := f.Open()
+		if err != nil {
+			return err
+		}
 
-			_, err = io.Copy(f, rc)
+		const maxBufferSize = 1 << 20
+
+		for {
+			_, err := io.CopyN(dstFile, fileInArchive, maxBufferSize)
 			if err != nil {
+				if err == io.EOF {
+					break
+				}
 				return err
 			}
 		}
+
+		dstFile.Close()
+		fileInArchive.Close()
 	}
 
 	return nil
