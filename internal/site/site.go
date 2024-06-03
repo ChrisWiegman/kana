@@ -428,6 +428,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 		Multisite:            s.Settings.Multisite,
 		DatabaseClient:       s.Settings.DatabaseClient,
 		Environment:          s.Settings.Environment,
+		Database:             s.Settings.Database,
 	}
 
 	// We need container details to see if the mailpit container is running
@@ -458,6 +459,17 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 
 	if strings.Contains(output.StdOut, "1") {
 		localSettings.ScriptDebug = true
+	}
+
+	output, err = s.runCli("echo $KANA_SQLITE", false, false)
+	if err != nil {
+		return localSettings, err
+	}
+
+	fmt.Println(output.StdOut)
+
+	if strings.Contains(output.StdOut, "true") {
+		localSettings.Database = "sqlite"
 	}
 
 	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana-%s-wordpress", s.Settings.Name))
