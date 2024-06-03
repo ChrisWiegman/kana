@@ -126,7 +126,7 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string, 
 }
 
 func (s *Site) getDatabaseContainer(databaseDir string, appContainers []docker.ContainerConfig) []docker.ContainerConfig {
-	if s.Settings.Database == "sqlite" {
+	if s.Settings.Database == "sqlite" { //nolint:goconst
 		return appContainers
 	}
 
