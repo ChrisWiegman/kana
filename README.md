@@ -172,10 +172,10 @@ Kana has a handful of options that apply to all new sites created with the app. 
 - `automaticLogin` **true** - will automatically login the "admin" user when accessing the WordPress dashboard
 - `database` **mariadb** - Specify the database server for WordPress, currently either `mariadb`, `mysql` or `sqlite`
 - `databaseClient` **phpmyadmin** - the default database client for accessing the database directly (currently `phpmyadmin` and `tableplus` are supported)
+- `databaseVersion` **11** - the default database version used for sites. 11 is chosen for the default MariaDB database. You will need to update this if you switch to MySQL.
 - `environment` **local** - the default usage of the `environment` start flag
 - `imageUpdateDays` **1** - the number of days Kana will wait between checking for updated Docker images. Set this to `0` to disable the check for newer images altogether (Kana will only download missing images)
 - `mailpit` **false** - the default usage of the `mailpit` start flag
-- `mariadb` **11** - the default MariaDB version used for sites (see [https://hub.docker.com/_/mariadb] for all supported versions)
 - `multisite` **none** - set to either `subdirectory` or `subdomain` to create the site as the appropriate type of Multisite installation.
 - `php` **8.2** - the default PHP version used for new sites (see [https://hub.docker.com/_/wordpress] for all supported versions)
 - `removeDefaultPlugins` **false** - removes the default "Hello Dolly" and Akismet plugins when starting a new site. Note this will not restore them if they've already been removed.
@@ -204,9 +204,9 @@ In addition to the global config, certain items above can be overridden for any 
 - `automaticLogin` **true** - will automatically login the "admin" user when accessing the WordPress dashboard
 - `database` **mariadb** - Specify the database server for WordPress, currently either `mariadb`, `mysql` or `sqlite`
 - `databaseClient` **phpmyadmin** - the default database client for accessing the database directly (currently `phpmyadmin` and `tableplus` are supported)
+- `databaseVersion` **11** - the default database version used for sites. 11 is chosen for the default MariaDB database. You will need to update this if you switch to MySQL.
 - `environment` **local** - the default usage of the `environment` start flag
 - `mailpit` **false** - the default usage of the `mailpit` start flag
-- `mariadb` **11** - the default MariaDB version used for sites (see [https://hub.docker.com/_/mariadb] for all supported versions)
 - `multisite` **none** - set to either `subdirectory` or `subdomain` to create the site as the appropriate type of Multisite installation.
 - `php` **8.2** - the default PHP version used for new sites (see [https://hub.docker.com/_/wordpress] for all supported versions)
 - `plugins` **[]** - an array of plugins to install and activate when starting the new site. These are slugs from the Plugins section of WordPress.org.

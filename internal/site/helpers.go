@@ -65,9 +65,15 @@ func (s *Site) handleImageError(container *docker.ContainerConfig, err error) er
 				"the PHP version in your configuration, %s, is invalid. See https://hub.docker.com/_/wordpress for a list of supported versions",
 				s.Settings.PHP)
 		case "database":
+			databaseURL := "https://hub.docker.com/_/mariadb"
+
+			if s.Settings.Database == "mysql" {
+				databaseURL = "https://hub.docker.com/_/mysql"
+			}
+
 			return fmt.Errorf(
-				"the MariaDB version in your configuration, %s, is invalid. See https://hub.docker.com/_/mariadb for a list of supported versions",
-				s.Settings.DatabaseVersion)
+				"the database version in your configuration, %s, is invalid. See %s for a list of supported versions",
+				s.Settings.DatabaseVersion, databaseURL)
 		}
 	}
 
