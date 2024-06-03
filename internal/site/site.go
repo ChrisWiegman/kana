@@ -212,6 +212,13 @@ func (s *Site) OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag, openAdm
 	}
 
 	if openDatabaseFlag {
+		if s.Settings.Database == "sqlite" {
+			consoleOutput.Warn(fmt.Sprintf(
+				"SQLite databases do not have a web interface and cannot be opened in TablePlus by URL. Open the database file, %s, directly using your database client of choice.", //nolint:lll
+				filepath.Join(s.Settings.WorkingDirectory, "wp-content", "database", ".ht.sqlite")))
+			os.Exit(0)
+		}
+
 		databasePort := s.getDatabasePort()
 
 		databaseURL := fmt.Sprintf(
