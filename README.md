@@ -96,7 +96,7 @@ Note: these can be changed in the config. Please see below.
 
 `--plugins` A comma-separated list of plugins to install when starting the site.
 
-`--database` By default Kana uses [MariaDB](https://mariadb.org) for its WordPress database. You can use [SQLite](https://www.sqlite.org/index.html) instead by specifying `sqlite` as the database type here.
+`--database` By default Kana uses [MariaDB](https://mariadb.org) for its WordPress database. You can use MySQL or [SQLite](https://www.sqlite.org/index.html) instead by specifying `mysql` or `sqlite` as the database type here.
 
 ## Trusting the SSL certificate on Mac
 
@@ -120,6 +120,8 @@ If you're coming from a site with a different home address you can specify `--re
 ### Exporting your Kana database
 
 You can also export the database file your Kana site is using with `kana db export`. By default it will save the file in your default site directory but you can specify a relative path to the file where you would like to export your database if you wish.
+
+> *Note* Currently importang and exporting databases only works with MariaDB databases. [I am working on bringing this functionality to MySQL](https://github.com/docker-library/wordpress/pull/902) and hope to have it available with MySQL soon. I do not anticipate bringing this to SQLite for a while.
 
 ## Stop
 
@@ -147,6 +149,8 @@ Note that by default Kana will open the database in [phpMyAdmin](https://www.php
 
 Currently pphpMyAdmin and TablePlus are the only two clients I've configured. If you would like to use a different client, please [open an issue](https://github.com/ChrisWiegman/kana/issues) and I'd be happy to take a look.
 
+> *Note* Opening the Database directly with Kana doesn't work for SQLite databases. To open a SQLite database directly navigate to `<your-site-folder>/wp-content/database/.ht.sqlite` and open the file directly.
+
 ## wp-cli
 
 `kana wp <WP-CLI COMMAND>` will execute a [wp-cli](https://wp-cli.org) command on your site. For example `kana wp plugin list` will list all the plugins on the site and their associated statuses
@@ -166,7 +170,7 @@ Kana has a handful of options that apply to all new sites created with the app. 
 - `admin.password` **password** - the default password used to login to WordPress
 - `admin.username` **admin** - the default username used to login to WordPress
 - `automaticLogin` **true** - will automatically login the "admin" user when accessing the WordPress dashboard
-- `database` **mariadb** - Specify the database server for WordPress, currently either `mariadb` or `sqlite`
+- `database` **mariadb** - Specify the database server for WordPress, currently either `mariadb`, `mysql` or `sqlite`
 - `databaseClient` **phpmyadmin** - the default database client for accessing the database directly (currently `phpmyadmin` and `tableplus` are supported)
 - `environment` **local** - the default usage of the `environment` start flag
 - `imageUpdateDays` **1** - the number of days Kana will wait between checking for updated Docker images. Set this to `0` to disable the check for newer images altogether (Kana will only download missing images)
@@ -198,7 +202,7 @@ In addition to the global config, certain items above can be overridden for any 
 - `admin.password` **password** - the default password used to login to WordPress
 - `admin.username` **admin** - the default username used to login to WordPress
 - `automaticLogin` **true** - will automatically login the "admin" user when accessing the WordPress dashboard
-- `database` **mariadb** - Specify the database server for WordPress, currently either `mariadb` or `sqlite`
+- `database` **mariadb** - Specify the database server for WordPress, currently either `mariadb`, `mysql` or `sqlite`
 - `databaseClient` **phpmyadmin** - the default database client for accessing the database directly (currently `phpmyadmin` and `tableplus` are supported)
 - `environment` **local** - the default usage of the `environment` start flag
 - `mailpit` **false** - the default usage of the `mailpit` start flag
