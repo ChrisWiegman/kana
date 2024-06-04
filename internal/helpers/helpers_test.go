@@ -65,8 +65,13 @@ func TestSanitizeSiteName(t *testing.T) {
 }
 
 func TestPathExists(t *testing.T) {
-	existingPath := "/path/to/existing/file.txt"
-	nonExistingPath := "/path/to/nonexisting/file.txt"
+	testPath, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	existingPath := testPath
+	nonExistingPath := filepath.Join(testPath, "nonexisting")
 
 	exists, err := PathExists(existingPath)
 	assert.NoError(t, err)
