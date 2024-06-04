@@ -34,16 +34,11 @@ jobs:
         with:
           go-version: "1.22"
 
-      - name: Setup Chrome
-        uses: browser-actions/setup-chrome@v1
-        id: setup-chrome
-
-
       - name: Setup a Browser
         run: |
-          ${{ steps.setup-chrome.outputs.chrome-path }} --version
-          sudo update-alternatives --install /usr/bin/www-browser www-browser ${{ steps.setup-chrome.outputs.chrome-path }} 500
-          sudo update-alternatives --set www-browser ${{ steps.setup-chrome.outputs.chrome-path }}
+          sudo apt-get install -y w3m
+          sudo update-alternatives --install /usr/bin/www-browser www-browser /usr/bin/w3m 500
+          sudo update-alternatives --set www-browser /usr/bin/w3m
           sudo update-alternatives --config www-browser
 
       - name: Build test cli
