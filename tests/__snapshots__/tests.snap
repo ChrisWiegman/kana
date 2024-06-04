@@ -48,13 +48,18 @@
 
 ---
 
+[TestConfig/Test_the_config_command_with_json_output - 1]
+{"Global":{"activate":true,"admin":{"email":"admin@sites.kana.sh","password":"password","username":"admin"},"automaticlogin":true,"database":"mariadb","databaseclient":"phpmyadmin","databaseversion":"11","environment":"local","imageupdatedays":7,"mailpit":false,"multisite":"none","php":"8.2","plugins":[],"removedefaultplugins":false,"scriptdebug":false,"ssl":false,"theme":"","type":"site","wpdebug":false,"xdebug":false},"Local":{"activate":true,"admin":{"email":"admin@sites.kana.sh","password":"password","username":"admin"},"automaticlogin":true,"database":"mariadb","databaseclient":"phpmyadmin","databaseversion":"11","environment":"local","mailpit":false,"multisite":"none","php":"8.2","plugins":[],"removedefaultplugins":false,"scriptdebug":false,"ssl":false,"theme":"","type":"site","wpdebug":false,"xdebug":false}}
+
+---
+
 [TestConfig/Retrieve_the_PHP_value_from_the_config_command - 1]
 8.2
 
 ---
 
-[TestConfig/Test_the_config_command_with_json_output - 1]
-{"Global":{"activate":true,"admin":{"email":"admin@sites.kana.sh","password":"password","username":"admin"},"automaticlogin":true,"database":"mariadb","databaseclient":"phpmyadmin","databaseversion":"11","environment":"local","imageupdatedays":7,"mailpit":false,"multisite":"none","php":"8.2","plugins":[],"removedefaultplugins":false,"scriptdebug":false,"ssl":false,"theme":"","type":"site","wpdebug":false,"xdebug":false},"Local":{"activate":true,"admin":{"email":"admin@sites.kana.sh","password":"password","username":"admin"},"automaticlogin":true,"database":"mariadb","databaseclient":"phpmyadmin","databaseversion":"11","environment":"local","mailpit":false,"multisite":"none","php":"8.2","plugins":[],"removedefaultplugins":false,"scriptdebug":false,"ssl":false,"theme":"","type":"site","wpdebug":false,"xdebug":false}}
+[TestConfig/Retrieve_the_PHP_value_from_the_config_command_with_json_output - 1]
+{"Setting":"php","Value":"8.2"}
 
 ---
 
@@ -70,43 +75,7 @@
 
 ---
 
-[TestConfig/Retrieve_the_PHP_value_from_the_config_command_with_json_output - 1]
-{"Setting":"php","Value":"8.2"}
-
----
-
 [TestRoot/run_the_kana_root_command_without_further_input - 1]
-Kana is a simple WordPress development tool designed for plugin and theme developers.
-
-Usage:
-  kana [command]
-
-Available Commands:
-  changelog   Open Kana's changelog in your browser
-  config      View and edit the saved configuration for the app or the local site.
-  db          Commands to easily import and export a WordPress database from an existing site
-  destroy     Destroys the current WordPress site. This is a permanent change.
-  export      Export the current config to a .kana.json file to save with your repo.
-  flush       Flushes the cache and deletes all transients.
-  help        Help about any command
-  list        Lists all Kana sites and their associated status.
-  open        Open the current site in your browser.
-  start       Starts a new environment in the local folder.
-  stop        Stops the WordPress development environment.
-  version     Displays version information for the Kana CLI.
-  wp          Run a wp-cli command against the current site.
-  xdebug      Turns Xdebug on or off without having to stop and start the site.
-
-Flags:
-  -h, --help          help for kana
-      --name string   Specify a name for the site, used to override using the current folder.
-  -v, --verbose       Display debugging information along with detailed command output
-
-Use "kana [command] --help" for more information about a command.
-
----
-
-[TestRoot/Test_the_kana_root_command_with_json_output - 1]
 Kana is a simple WordPress development tool designed for plugin and theme developers.
 
 Usage:
@@ -145,15 +114,5 @@ Build Time: 2024-03-16_10:50:11PM
 
 [TestVersion/Test_the_config_command_with_json_output - 1]
 {"Version":"1.0.0","Timestamp":"2024-03-16_10:50:11PM"}
-
----
-
-[TestChangelog/Test_the_default_changelog_command - 1]
-[1;32m[Success][0m The Kana changelog has been opened in your default browser.
-
----
-
-[TestChangelog/Test_the_changelog_command_with_json_output - 1]
-{"Status":"Success","Message":"The Kana changelog has been opened in your default browser."}
 
 ---
