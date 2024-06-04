@@ -31,3 +31,26 @@ func TestIsValidString(t *testing.T) {
 		assert.Equal(t, test.shouldPass, result, test.name)
 	}
 }
+
+func TestSanitizeSiteName(t *testing.T) {
+	var testCases = []struct {
+		name         string
+		rawSiteName  string
+		expectedName string
+	}{
+		{
+			name:         "Ensure a simple name is sanitized",
+			rawSiteName:  "Test Site",
+			expectedName: "test-site"},
+		{
+			name:         "Ensure a complex name is sanitized",
+			rawSiteName:  "Test_Site ",
+			expectedName: "test-site"},
+	}
+
+	for _, test := range testCases {
+		result := SanitizeSiteName(test.rawSiteName)
+
+		assert.Equal(t, test.expectedName, result, test.name)
+	}
+}
