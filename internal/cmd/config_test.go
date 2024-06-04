@@ -22,5 +22,5 @@ func TestConfig(t *testing.T) {
 			Command:     []string{"config", "php", "--output-json"}},
 	}
 
-	tests.RunSnapshotTest(testCases, t)
+	tests.RunCommandTest(testCases, t)
 }

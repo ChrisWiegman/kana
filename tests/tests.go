@@ -11,12 +11,14 @@ import (
 
 	"github.com/gkampitakis/go-snaps/snaps"
 	"github.com/mitchellh/go-homedir"
+	"github.com/stretchr/testify/assert"
 )
 
 type Test struct {
 	Description string
 	Command     []string
 	Docker      bool
+	Output      string
 }
 
 func Setup() {
@@ -76,7 +78,7 @@ func Teardown(docker bool) {
 	}
 }
 
-func RunSnapshotTest(testCases []Test, t *testing.T) {
+func RunCommandTest(testCases []Test, t *testing.T) {
 	for _, test := range testCases {
 		t.Run(test.Description, func(t *testing.T) {
 			cmd := exec.Command("../../build/kana", test.Command...) //nolint: gosec
@@ -88,7 +90,11 @@ func RunSnapshotTest(testCases []Test, t *testing.T) {
 				t.Fatalf("Unexpected error: %v", stdErr.String())
 			}
 
-			snaps.MatchSnapshot(t, out.String())
+			if test.Output == "" {
+				snaps.MatchSnapshot(t, out.String())
+			} else {
+				assert.Contains(t, out.String(), test.Output)
+			}
 
 			Teardown(test.Docker)
 		})

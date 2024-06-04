@@ -16,5 +16,5 @@ func TestVersion(t *testing.T) {
 			Command:     []string{"version", "--output-json"}},
 	}
 
-	tests.RunSnapshotTest(testCases, t)
+	tests.RunCommandTest(testCases, t)
 }

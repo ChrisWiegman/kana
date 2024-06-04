@@ -16,5 +16,5 @@ func TestList(t *testing.T) {
 			Command:     []string{"list", "--output-json"}},
 	}
 
-	tests.RunSnapshotTest(testCases, t)
+	tests.RunCommandTest(testCases, t)
 }

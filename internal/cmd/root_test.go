@@ -13,5 +13,5 @@ func TestRoot(t *testing.T) {
 			Command:     []string{}},
 	}
 
-	tests.RunSnapshotTest(testCases, t)
+	tests.RunCommandTest(testCases, t)
 }
