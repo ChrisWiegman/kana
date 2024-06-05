@@ -222,10 +222,15 @@ func (s *Site) getMounts(appDir string) ([]mount.Mount, error) {
 			return appVolumes, err
 		}
 
+		mappedPluginDir, err := filepath.Abs(filepath.Join("var", "www", "html", "wp-content", "plugins", s.Settings.Name))
+		if err != nil {
+			return appVolumes, err
+		}
+
 		appVolumes = append(appVolumes, mount.Mount{ // Map's the user's working directory as a plugin
 			Type:   mount.TypeBind,
 			Source: s.Settings.WorkingDirectory,
-			Target: filepath.Join("var", "www", "html", "wp-content", "plugins", s.Settings.Name),
+			Target: mappedPluginDir,
 		})
 	}
 
@@ -240,10 +245,15 @@ func (s *Site) getMounts(appDir string) ([]mount.Mount, error) {
 			return appVolumes, err
 		}
 
+		mappedThemeDir, err := filepath.Abs(filepath.Join("var", "www", "html", "wp-content", "themes", s.Settings.Name))
+		if err != nil {
+			return appVolumes, err
+		}
+
 		appVolumes = append(appVolumes, mount.Mount{ // Map's the user's working directory as a theme
 			Type:   mount.TypeBind,
 			Source: s.Settings.WorkingDirectory,
-			Target: filepath.Join("var", "www", "html", "wp-content", "themes", s.Settings.Name),
+			Target: mappedThemeDir,
 		})
 	}
 
