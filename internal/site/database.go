@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/ChrisWiegman/kana/internal/console"
 	"github.com/ChrisWiegman/kana/internal/docker"
@@ -263,4 +264,31 @@ func (s *Site) isUsingSQLite() (bool, error) {
 	}
 
 	return false, nil
+}
+
+// verifySite verifies if a site is up and running without error.
+func (s *Site) verifyDatabase(consoleOutput *console.Console) error {
+	checkCommand := []string{
+		"db",
+		"check",
+	}
+
+	databaseOK := false
+	checkAttempt := 0
+
+	for !databaseOK {
+		code, _, err := s.RunWPCli(checkCommand, false, consoleOutput)
+		if err != nil || code != 0 {
+			checkAttempt++ // Increment the check attempt counter
+			time.Sleep(time.Second)
+		} else {
+			return nil
+		}
+
+		if checkAttempt == maxVerificationRetries {
+			return fmt.Errorf("database verification failed")
+		}
+	}
+
+	return nil
 }

@@ -547,7 +547,7 @@ func (s *Site) startWordPress(consoleOutput *console.Console) error {
 		}
 	}
 
-	return nil
+	return s.verifyDatabase(consoleOutput)
 }
 
 // resetWPFilePermissions Ensures the www-data user owns the WordPress directory.
