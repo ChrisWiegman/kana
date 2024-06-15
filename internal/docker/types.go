@@ -8,7 +8,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
-	networkTypes "github.com/docker/docker/api/types/network"
+	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
 )
@@ -29,13 +29,13 @@ type ContainerAPIClient interface {
 		ctx context.Context,
 		config *container.Config,
 		hostConfig *container.HostConfig,
-		networkingConfig *networkTypes.NetworkingConfig,
+		networkingConfig *network.NetworkingConfig,
 		platform *specs.Platform,
 		containerName string) (container.CreateResponse, error)
 	ContainerAttach(ctx context.Context, container string, options container.AttachOptions) (types.HijackedResponse, error)
-	ContainerExecAttach(ctx context.Context, execID string, config types.ExecStartCheck) (types.HijackedResponse, error)
-	ContainerExecCreate(ctx context.Context, container string, config types.ExecConfig) (types.IDResponse, error)
-	ContainerExecInspect(ctx context.Context, execID string) (types.ContainerExecInspect, error)
+	ContainerExecAttach(ctx context.Context, execID string, config container.ExecAttachOptions) (types.HijackedResponse, error)
+	ContainerExecCreate(ctx context.Context, container string, config container.ExecOptions) (types.IDResponse, error)
+	ContainerExecInspect(ctx context.Context, execID string) (container.ExecInspect, error)
 	ContainerInspect(ctx context.Context, container string) (types.ContainerJSON, error)
 	ContainerList(ctx context.Context, options container.ListOptions) ([]types.Container, error)
 	ContainerLogs(ctx context.Context, container string, options container.LogsOptions) (io.ReadCloser, error)
@@ -57,8 +57,8 @@ type ImageAPIClient interface {
 
 // NetworkAPIClient defines API client methods for the networks.
 type NetworkAPIClient interface {
-	NetworkCreate(ctx context.Context, name string, options types.NetworkCreate) (types.NetworkCreateResponse, error)
-	NetworkList(ctx context.Context, options types.NetworkListOptions) ([]types.NetworkResource, error)
+	NetworkCreate(ctx context.Context, name string, options network.CreateOptions) (network.CreateResponse, error)
+	NetworkList(ctx context.Context, options network.ListOptions) ([]network.Inspect, error)
 	NetworkRemove(ctx context.Context, network string) error
 }
 

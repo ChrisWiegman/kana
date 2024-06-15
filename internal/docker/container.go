@@ -54,7 +54,7 @@ func (d *Client) ContainerExec(containerName string, rootUser bool, command []st
 	fullCommand = append(fullCommand, command...)
 
 	// prepare exec
-	execConfig := types.ExecConfig{
+	execConfig := container.ExecOptions{
 		AttachStdout: true,
 		AttachStderr: true,
 		Cmd:          strslice.StrSlice(fullCommand),
@@ -72,7 +72,7 @@ func (d *Client) ContainerExec(containerName string, rootUser bool, command []st
 	execID := containerResponse.ID
 
 	// run it, with stdout/stderr attached
-	apiResponse, err := d.apiClient.ContainerExecAttach(context.Background(), execID, types.ExecStartCheck{})
+	apiResponse, err := d.apiClient.ContainerExecAttach(context.Background(), execID, container.ExecStartOptions{})
 	if err != nil {
 		return ExecResult{}, err
 	}
