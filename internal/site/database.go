@@ -204,6 +204,17 @@ func (s *Site) getDatabaseContainer(databaseDir string, appContainers []docker.C
 	return appContainers
 }
 
+func (s *Site) getDatabaseDirectory() (databaseDirectory string, err error) {
+	databaseDirectory = filepath.Join(s.Settings.SiteDirectory, "database")
+
+	err = os.MkdirAll(databaseDirectory, os.FileMode(defaultDirPermissions))
+	if err != nil {
+		return "", err
+	}
+
+	return databaseDirectory, err
+}
+
 // getDatabasePort returns the public port for the database attached to the current site.
 func (s *Site) getDatabasePort() string {
 	containers, _ := s.dockerClient.ContainerList(s.Settings.Name)

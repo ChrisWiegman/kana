@@ -43,7 +43,7 @@ func (s *Site) RunWPCli(command []string, interactive bool, consoleOutput *conso
 		return 1, "", err
 	}
 
-	appVolumes, err := s.getMounts(wordPressDirectory)
+	appVolumes, err := s.getWordPressMounts(wordPressDirectory)
 	if err != nil {
 		return 1, "", err
 	}
@@ -105,17 +105,6 @@ func (s *Site) RunWPCli(command []string, interactive bool, consoleOutput *conso
 	return code, output, nil
 }
 
-func (s *Site) getDatabaseDirectory() (databaseDirectory string, err error) {
-	databaseDirectory = filepath.Join(s.Settings.SiteDirectory, "database")
-
-	err = os.MkdirAll(databaseDirectory, os.FileMode(defaultDirPermissions))
-	if err != nil {
-		return "", err
-	}
-
-	return databaseDirectory, err
-}
-
 func (s *Site) getWordPressDirectory() (wordPressDirectory string, err error) {
 	wordPressDirectory = filepath.Join(s.Settings.SiteDirectory, "wordpress")
 
@@ -138,21 +127,6 @@ func (s *Site) getWordPressDirectory() (wordPressDirectory string, err error) {
 	}
 
 	return wordPressDirectory, err
-}
-
-// getDirectories Returns the correct appDir and databaseDir for the current site.
-func (s *Site) getDirectories() (wordPressDirectory, databaseDir string, err error) {
-	wordPressDirectory, err = s.getWordPressDirectory()
-	if err != nil {
-		return "", "", err
-	}
-
-	databaseDir, err = s.getDatabaseDirectory()
-	if err != nil {
-		return "", "", err
-	}
-
-	return wordPressDirectory, databaseDir, err
 }
 
 // getInstalledWordPressPlugins Returns list of installed plugins and whether default plugins are still present.
@@ -196,7 +170,7 @@ func (s *Site) getInstalledWordPressPlugins(consoleOutput *console.Console) (plu
 	return plugins, hasDefaultPlugins, nil
 }
 
-func (s *Site) getMounts(appDir string) ([]mount.Mount, error) {
+func (s *Site) getWordPressMounts(appDir string) ([]mount.Mount, error) {
 	appVolumes := []mount.Mount{
 		{ // The root directory of the WordPress site
 			Type:   mount.TypeBind,
@@ -498,20 +472,6 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 	return nil
 }
 
-// startContainer Starts a given container configuration.
-func (s *Site) startContainer(container *docker.ContainerConfig, randomPorts, localUser bool, consoleOutput *console.Console) error {
-	err := s.dockerClient.EnsureImage(container.Image, s.Settings.ImageUpdateDays, consoleOutput)
-	if err != nil {
-		err = s.handleImageError(container, err)
-		if err != nil {
-			return err
-		}
-	}
-	_, err = s.dockerClient.ContainerRun(container, randomPorts, localUser)
-
-	return err
-}
-
 // startWordPress Starts the WordPress containers.
 func (s *Site) startWordPress(consoleOutput *console.Console) error {
 	_, _, err := s.dockerClient.EnsureNetwork("kana")
@@ -530,7 +490,7 @@ func (s *Site) startWordPress(consoleOutput *console.Console) error {
 		os.Remove(filepath.Join(appDir, "wp-config.php"))
 	}
 
-	appVolumes, err := s.getMounts(appDir)
+	appVolumes, err := s.getWordPressMounts(appDir)
 	if err != nil {
 		return err
 	}
@@ -547,7 +507,7 @@ func (s *Site) startWordPress(consoleOutput *console.Console) error {
 		}
 	}
 
-	return s.verifyDatabase(consoleOutput)
+	return s.verifyDatabase(consoleOutput) // verify the database is ready for connections. On slow filesystems this can take a few seconds.
 }
 
 // resetWPFilePermissions Ensures the www-data user owns the WordPress directory.

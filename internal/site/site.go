@@ -1,23 +1,24 @@
 package site
 
 import (
-	"context"
-	"crypto/tls"
+	"bufio"
 	"crypto/x509"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
+	"io"
 	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strings"
 	"time"
 
 	"github.com/ChrisWiegman/kana/internal/console"
 	"github.com/ChrisWiegman/kana/internal/docker"
+	"github.com/ChrisWiegman/kana/internal/helpers"
 	"github.com/ChrisWiegman/kana/internal/settings"
 
 	"github.com/pkg/browser"
@@ -35,9 +36,66 @@ type SiteInfo struct {
 	Running    bool
 }
 
-var maxVerificationRetries = 30
+const DefaultType = "site"
 
+var maxVerificationRetries = 30
 var execCommand = exec.Command
+
+// DetectType determines the type of site in the working directory.
+func (s *Site) DetectType() (string, error) {
+	var err error
+	var isSite bool
+
+	isSite, err = helpers.PathExists(filepath.Join(s.Settings.WorkingDirectory, "wp-includes", "version.php"))
+	if err != nil {
+		return "", err
+	}
+
+	if isSite {
+		return DefaultType, err
+	}
+
+	items, _ := os.ReadDir(s.Settings.WorkingDirectory)
+
+	for _, item := range items {
+		if item.IsDir() {
+			continue
+		}
+
+		if item.Name() == "style.css" || filepath.Ext(item.Name()) == ".php" {
+			var f *os.File
+			var line string
+
+			f, err = os.Open(filepath.Join(s.Settings.WorkingDirectory, item.Name()))
+			if err != nil {
+				return "", err
+			}
+
+			reader := bufio.NewReader(f)
+			line, err = helpers.ReadLine(reader)
+
+			for err == nil {
+				exp := regexp.MustCompile(`(Plugin|Theme) Name: .*`)
+
+				for _, match := range exp.FindAllStringSubmatch(line, -1) {
+					if match[1] == "Theme" {
+						return "theme", err //nolint
+					} else {
+						return "plugin", err //nolint
+					}
+				}
+				line, err = helpers.ReadLine(reader)
+			}
+		}
+	}
+
+	// We don't care if it is an empty folder.
+	if err == io.EOF {
+		err = nil
+	}
+
+	return DefaultType, err
+}
 
 // EnsureDocker Ensures Docker is available for commands that need it.
 func (s *Site) EnsureDocker(consoleOutput *console.Console) error {
@@ -382,41 +440,19 @@ func (s *Site) StopSite() error {
 	return s.maybeStopTraefik()
 }
 
-// checkStatusCode returns true on 200 or false.
-func checkStatusCode(checkURL string) (bool, error) {
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, checkURL, http.NoBody)
+// getDirectories Returns the correct appDir and databaseDir for the current site.
+func (s *Site) getDirectories() (wordPressDirectory, databaseDir string, err error) {
+	wordPressDirectory, err = s.getWordPressDirectory()
 	if err != nil {
-		return false, err
+		return "", "", err
 	}
 
-	// Ignore SSL check as we're using our self-signed cert for development
-	clientTransport := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:gosec
-	}
-
-	client := &http.Client{
-		Transport: clientTransport,
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
-		},
-	}
-
-	resp, err := client.Do(req)
+	databaseDir, err = s.getDatabaseDirectory()
 	if err != nil {
-		return false, err
+		return "", "", err
 	}
 
-	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			panic(err)
-		}
-	}()
-
-	if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusFound {
-		return true, nil
-	}
-
-	return false, nil
+	return wordPressDirectory, databaseDir, err
 }
 
 // getRunningConfig gets various options that were used to start the site.
@@ -546,6 +582,20 @@ func (s *Site) runCli(command string, restart, root bool) (docker.ExecResult, er
 	}
 
 	return output, nil
+}
+
+// startContainer Starts a given container configuration.
+func (s *Site) startContainer(container *docker.ContainerConfig, randomPorts, localUser bool, consoleOutput *console.Console) error {
+	err := s.dockerClient.EnsureImage(container.Image, s.Settings.ImageUpdateDays, consoleOutput)
+	if err != nil {
+		err = s.handleImageError(container, err)
+		if err != nil {
+			return err
+		}
+	}
+	_, err = s.dockerClient.ContainerRun(container, randomPorts, localUser)
+
+	return err
 }
 
 // verifySite verifies if a site is up and running without error.
