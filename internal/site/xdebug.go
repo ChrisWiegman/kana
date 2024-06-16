@@ -8,7 +8,7 @@ import (
 
 // IsXdebugRunning returns true if Xdebug is already running or false if not.
 func (s *Site) IsXdebugRunning(consoleOutput *console.Console) bool {
-	output, err := s.runCli("pecl list | grep xdebug", false, false)
+	output, err := s.Cli.WordPress("pecl list | grep xdebug", false, false)
 	if err != nil {
 		return false
 	}
@@ -38,7 +38,7 @@ func (s *Site) StartXdebug(consoleOutput *console.Console) error {
 			restart = true
 		}
 
-		output, err := s.runCli(command, restart, true)
+		output, err := s.Cli.WordPress(command, restart, true)
 		if err != nil {
 			return err
 		}
