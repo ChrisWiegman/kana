@@ -9,7 +9,6 @@ import (
 	"io"
 	"net/url"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -39,8 +38,6 @@ type SiteInfo struct {
 }
 
 const DefaultType = "site"
-
-var execCommand = exec.Command
 
 // DetectType determines the type of site in the working directory.
 func (s *Site) DetectType() (string, error) {
@@ -324,7 +321,7 @@ func (s *Site) OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag, openAdm
 		}
 
 		if runtime.GOOS == "linux" {
-			openCmd := execCommand("xdg-open", openURL)
+			openCmd := s.Cli.Command("xdg-open", openURL)
 			return openCmd.Run()
 		}
 
