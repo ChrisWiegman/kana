@@ -296,7 +296,7 @@ func (s *Site) verifyDatabase(consoleOutput *console.Console) error {
 			return nil
 		}
 
-		if checkAttempt == maxVerificationRetries {
+		if checkAttempt == s.maxVerificationRetries {
 			return fmt.Errorf("database verification failed")
 		}
 	}

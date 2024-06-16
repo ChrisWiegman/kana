@@ -26,10 +26,11 @@ import (
 )
 
 type Site struct {
-	dockerClient *docker.Client
-	Settings     *settings.Settings
-	Named        bool
-	Cli          Cli
+	dockerClient           *docker.Client
+	maxVerificationRetries int
+	Settings               *settings.Settings
+	Named                  bool
+	Cli                    Cli
 }
 
 type SiteInfo struct {
@@ -39,7 +40,6 @@ type SiteInfo struct {
 
 const DefaultType = "site"
 
-var maxVerificationRetries = 30
 var execCommand = exec.Command
 
 // DetectType determines the type of site in the working directory.
@@ -611,7 +611,7 @@ func (s *Site) verifySite(siteURL string) error {
 			break
 		}
 
-		if tries == maxVerificationRetries {
+		if tries == s.maxVerificationRetries {
 			return errors.New("timeout reached. unable to open site")
 		}
 
