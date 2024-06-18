@@ -1,4 +1,4 @@
-package options
+package settings
 
 // The following are the default settings for Kana.
 
