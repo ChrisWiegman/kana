@@ -1,13 +1,19 @@
 package settings
 
+import "fmt"
+
 func (s *Settings) GetURL() string {
-	return ""
+	return fmt.Sprintf("%s://%s", s.GetProtocol(), s.GetDomain())
 }
 
 func (s *Settings) GetDomain() string {
-	return ""
+	return fmt.Sprintf("%s.%s", s.Get("name"), s.Get("domain"))
 }
 
 func (s *Settings) GetProtocol() string {
-	return ""
+	if s.GetBool("ssl") {
+		return "https"
+	}
+
+	return "http"
 }
