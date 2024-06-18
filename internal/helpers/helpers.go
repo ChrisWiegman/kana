@@ -14,6 +14,17 @@ import (
 	"strings"
 )
 
+// ArrayContains Searches an array of strings for a given string and returns true/false as appropriate.
+func ArrayContains(array []string, name string) bool {
+	for _, value := range array {
+		if value == name {
+			return true
+		}
+	}
+
+	return false
+}
+
 // IsValidString Checks a given string against an array of valid values and returns true/false as appropriate.
 func IsValidString(stringToCheck string, validStrings []string) bool {
 	for _, validString := range validStrings {
