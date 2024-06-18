@@ -341,3 +341,35 @@ func createTempZipFile(zipFile string) error {
 
 	return nil
 }
+func TestArrayContains(t *testing.T) {
+	var testCases = []struct {
+		name     string
+		array    []string
+		nameToCheck string
+		expected bool
+	}{
+		{
+			name:     "Array contains the name",
+			array:    []string{"apple", "banana", "cherry"},
+			nameToCheck: "banana",
+			expected: true,
+		},
+		{
+			name:     "Array does not contain the name",
+			array:    []string{"apple", "banana", "cherry"},
+			nameToCheck: "orange",
+			expected: false,
+		},
+		{
+			name:     "Empty array",
+			array:    []string{},
+			nameToCheck: "apple",
+			expected: false,
+		},
+	}
+
+	for _, test := range testCases {
+		result := ArrayContains(test.array, test.nameToCheck)
+		assert.Equal(t, test.expected, result, test.name)
+	}
+}
