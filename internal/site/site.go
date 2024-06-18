@@ -22,7 +22,6 @@ import (
 	"github.com/ChrisWiegman/kana/internal/settings"
 
 	"github.com/pkg/browser"
-	"github.com/spf13/cobra"
 )
 
 type Site struct {
@@ -213,48 +212,6 @@ func (s *Site) IsSiteRunning() bool {
 	containers, _ := s.dockerClient.ContainerList(s.Settings.Name)
 
 	return len(containers) != 0
-}
-
-func (s *Site) New(
-	cmd *cobra.Command,
-	commandsRequiringSite []string,
-	startFlags *settings.StartFlags,
-	flagVerbose bool,
-	consoleOutput *console.Console,
-	version string) error {
-	var err error
-
-	s.Settings, err = settings.NewSettings(version)
-	if err != nil {
-		return err
-	}
-
-	// Load app-wide settings
-	err = s.Settings.LoadGlobalSettings()
-	if err != nil {
-		return err
-	}
-
-	// Load settings specific to the site
-	isSite, err := s.Settings.LoadLocalSettings(cmd)
-	if err != nil {
-		return err
-	}
-
-	// Always make sure we set the correct type, even if a config file isn't available.
-	if cmd.Use != "start" {
-		s.Settings.Type, err = s.DetectType()
-		if err != nil {
-			return err
-		}
-	}
-
-	// Fail now if we have a command that requires a completed site and we haven't started it before
-	if !isSite && arrayContains(commandsRequiringSite, cmd.Use) {
-		return fmt.Errorf("the current site you are trying to work with does not exist. Use `kana start` to initialize")
-	}
-
-	return nil
 }
 
 // OpenSite Opens the current site in a browser if it is running.
