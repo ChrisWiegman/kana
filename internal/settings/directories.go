@@ -24,5 +24,9 @@ func getStaticDirectories() (Directories, error) {
 
 	directories.App = filepath.Join(home, configFolderName)
 
+	if err := os.MkdirAll(directories.App, os.FileMode(defaultDirPermissions)); err != nil {
+		return directories, err
+	}
+
 	return directories, nil
 }

@@ -2,6 +2,7 @@ package settings
 
 import (
 	"errors"
+	"os"
 	"path/filepath"
 
 	"github.com/spf13/viper"
@@ -12,9 +13,15 @@ func loadGlobalOptions(appDirectory string) (*viper.Viper, error) {
 
 	setViperDefaults(globalSettings, &defaultOptions)
 
+	configPath := filepath.Join(appDirectory, "config")
+
 	globalSettings.SetConfigName("kana")
 	globalSettings.SetConfigType("json")
-	globalSettings.AddConfigPath(filepath.Join(appDirectory, "config"))
+	globalSettings.AddConfigPath(configPath)
+
+	if err := os.MkdirAll(configPath, os.FileMode(defaultDirPermissions)); err != nil {
+		return globalSettings, err
+	}
 
 	err := globalSettings.ReadInConfig()
 	if err != nil {
