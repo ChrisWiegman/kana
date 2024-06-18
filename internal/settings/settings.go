@@ -1,21 +1,24 @@
 package settings
 
 import (
+	"bufio"
 	"fmt"
+	"io"
+	"os"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 
+	"github.com/ChrisWiegman/kana/internal/helpers"
 	"github.com/spf13/cobra"
 )
 
-func NewSettings(version string, cmd *cobra.Command) (settings *Settings, err error) {
-	settings = new(Settings)
-
+func Load(settings *Settings, version string, cmd *cobra.Command, commandsRequiringSite []string) (err error) {
 	settings.directories, err = getStaticDirectories()
 	if err != nil {
-		return settings, err
+		return err
 	}
 
 	settings.constants = appConstants
@@ -23,33 +26,104 @@ func NewSettings(version string, cmd *cobra.Command) (settings *Settings, err er
 
 	err = loadSiteOptions(settings, cmd)
 	if err != nil {
-		return settings, err
+		return err
+	}
+
+	// Fail now if we have a command that requires a completed site and we haven't started it before
+	if settings.site.IsNew && helpers.ArrayContains(commandsRequiringSite, cmd.Use) {
+		return fmt.Errorf("the current site you are trying to work with does not exist. Use `kana start` to initialize")
 	}
 
 	err = saveLocalLinkConfig(cmd, settings.directories.Site, settings.directories.Working, settings.site.IsNamed)
 	if err != nil {
-		return settings, err
+		return err
 	}
 
 	settings.directories.Site = filepath.Join(settings.directories.App, "sites", settings.site.Name)
 
 	settings.global, err = loadGlobalOptions(settings.directories.App)
 	if err != nil {
-		return settings, err
+		return err
 	}
 
 	updateSettingsFromViper(settings.global, &settings.settings)
 
 	settings.local, err = loadLocalOptions(settings.directories.Working, &settings.settings)
 	if err != nil {
-		return settings, err
+		return err
 	}
 
 	updateSettingsFromViper(settings.local, &settings.settings)
 
-	err = ensureStaticConfigFiles(settings.directories.App)
+	// Always make sure we set the correct type, even if a config file isn't available.
+	if cmd.Use != "start" {
+		err = detectType(settings)
+		if err != nil {
+			return err
+		}
+	}
 
-	return settings, err
+	return ensureStaticConfigFiles(settings.directories.App)
+}
+
+// DetectType determines the type of site in the working directory.
+func detectType(settings *Settings) error {
+	var err error
+	var isSite bool
+
+	isSite, err = helpers.PathExists(filepath.Join(settings.directories.Working, "wp-includes", "version.php"))
+	if err != nil {
+		return err
+	}
+
+	if isSite {
+		return err
+	}
+
+	items, _ := os.ReadDir(settings.directories.Working)
+
+	for _, item := range items {
+		if item.IsDir() {
+			continue
+		}
+
+		if item.Name() == "style.css" || filepath.Ext(item.Name()) == ".php" {
+			var f *os.File
+			var line string
+
+			f, err = os.Open(filepath.Join(settings.directories.Working, item.Name()))
+			if err != nil {
+				return err
+			}
+
+			reader := bufio.NewReader(f)
+			line, err = helpers.ReadLine(reader)
+
+			for err == nil {
+				exp := regexp.MustCompile(`(Plugin|Theme) Name: .*`)
+
+				for _, match := range exp.FindAllStringSubmatch(line, -1) {
+					if match[1] == "Theme" {
+						settings.settings.Type = "theme"
+					} else {
+						settings.settings.Type = "plugin"
+					}
+
+					return err
+				}
+				line, err = helpers.ReadLine(reader)
+			}
+		}
+	}
+
+	// We don't care if it is an empty folder.
+	if err == io.EOF {
+		err = nil
+	}
+
+	settings.settings.Type = "site"
+
+	return err
 }
 
 // Get retrieves a setting from the settings object by name and returns it as a string.
