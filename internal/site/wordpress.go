@@ -369,12 +369,7 @@ func (s *Site) installDefaultPlugins(consoleOutput *console.Console) error {
 	}
 
 	for _, plugin := range s.settings.GetArray("Plugins") {
-		setupCommand := []string{
-			"plugin",
-			"install",
-			"--activate",
-			plugin,
-		}
+		var setupCommand []string
 
 		for _, installedPlugin := range installedPlugins {
 			if installedPlugin == plugin {
