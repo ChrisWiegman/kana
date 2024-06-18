@@ -154,7 +154,7 @@ func (s *Settings) Get(name string) string {
 	case "int64":
 		return strconv.FormatInt(settingValue.Int(), 10)
 	case "":
-		return strings.Join(settingValue.Interface().([]string), ", ")
+		return strings.Join(settingValue.Interface().([]string), ",")
 	default:
 		return ""
 	}
@@ -162,7 +162,13 @@ func (s *Settings) Get(name string) string {
 
 // GetArray retrieves a setting from the settings object by name and returns it as a string array.
 func (s *Settings) GetArray(name string) []string {
-	return strings.Split(s.Get(name), ", ")
+	optionArray := s.Get(name)
+
+	if optionArray == "" {
+		return []string{}
+	}
+
+	return strings.Split(optionArray, ",")
 }
 
 // GetBool retrieves a setting from the settings object by name and returns it as a boolean. Returns false if the value is not a boolean.
