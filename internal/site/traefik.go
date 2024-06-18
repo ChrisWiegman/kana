@@ -5,6 +5,7 @@ import (
 
 	"github.com/ChrisWiegman/kana/internal/console"
 	"github.com/ChrisWiegman/kana/internal/docker"
+	"github.com/ChrisWiegman/kana/internal/settings"
 
 	"github.com/docker/docker/api/types/mount"
 )
@@ -30,7 +31,8 @@ func (s *Site) maybeStopTraefik() error {
 
 // startTraefik Starts the Traefik container.
 func (s *Site) startTraefik(consoleOutput *console.Console) error {
-	err := s.Settings.EnsureSSLCerts(consoleOutput)
+	rootCert, siteCert := settings.GetSSLCerts(s.settings)
+	err := settings.EnsureSSLCerts(s.settings.Get("App"), s.settings.GetDomain(), rootCert, siteCert, s.settings.GetBool("SSL"), consoleOutput)
 	if err != nil {
 		return err
 	}
@@ -40,7 +42,7 @@ func (s *Site) startTraefik(consoleOutput *console.Console) error {
 		return err
 	}
 
-	err = s.dockerClient.EnsureImage("traefik:"+traefikVersion, s.Settings.ImageUpdateDays, consoleOutput)
+	err = s.dockerClient.EnsureImage("traefik:"+traefikVersion, s.settings.GetInt("UpdateInterval"), consoleOutput)
 	if err != nil {
 		return err
 	}
@@ -63,17 +65,17 @@ func (s *Site) startTraefik(consoleOutput *console.Console) error {
 		Volumes: []mount.Mount{
 			{
 				Type:   mount.TypeBind,
-				Source: filepath.Join(s.Settings.AppDirectory, "config", "traefik", "traefik.toml"),
+				Source: filepath.Join(s.settings.Get("App"), "config", "traefik", "traefik.toml"),
 				Target: "/etc/traefik/traefik.toml",
 			},
 			{
 				Type:   mount.TypeBind,
-				Source: filepath.Join(s.Settings.AppDirectory, "config", "traefik", "dynamic.toml"),
+				Source: filepath.Join(s.settings.Get("App"), "config", "traefik", "dynamic.toml"),
 				Target: "/etc/traefik/dynamic.toml",
 			},
 			{
 				Type:   mount.TypeBind,
-				Source: filepath.Join(s.Settings.AppDirectory, "certs"),
+				Source: filepath.Join(s.settings.Get("App"), "certs"),
 				Target: "/var/certs",
 			},
 			{

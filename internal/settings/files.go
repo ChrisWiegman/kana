@@ -64,6 +64,11 @@ func EnsureKanaPlugin(siteDirectory, version, siteName string) error {
 	return tmpl.Execute(myFile, pluginVars)
 }
 
+// GetDefaultFilePermissions returns the default directory permissions and the default file permissions.
+func GetDefaultFilePermissions() (dirPerms, filePerms int) {
+	return defaultDirPermissions, defaultFilePermissions
+}
+
 // GetHtaccess Returns the correct .htaccess file for the multisite type.
 func GetHtaccess(multisite string) string {
 	if multisite == "subdomain" {

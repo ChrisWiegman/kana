@@ -15,15 +15,15 @@ import (
 
 var startFlags settings.StartFlags
 
-func start(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
+func start(consoleOutput *console.Console, kanaSite *site.Site, kanaSettings *settings.Settings) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "start",
 		Short: "Starts a new environment in the local folder.",
 		Run: func(cmd *cobra.Command, args []string) {
 			err := kanaSite.EnsureDocker(consoleOutput)
 			if err != nil {
-				if kanaSite.Settings.IsNewSite {
-					remError := os.RemoveAll(kanaSite.Settings.SiteDirectory)
+				if kanaSettings.GetBool("IsNew") {
+					remError := os.RemoveAll(kanaSettings.Get("Site"))
 					if remError != nil {
 						consoleOutput.Error(remError)
 					}
@@ -31,14 +31,12 @@ func start(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 				consoleOutput.Error(err)
 			}
 
-			kanaSite.Settings.ProcessStartFlags(cmd, &startFlags)
-
-			err = handleTypeDetection(cmd, consoleOutput, kanaSite)
+			err = handleTypeDetection(cmd, consoleOutput, kanaSettings)
 			if err != nil {
 				consoleOutput.Error(err)
 			}
 
-			if cmd.Flags().Lookup("theme").Changed && kanaSite.Settings.Type == "theme" {
+			if cmd.Flags().Lookup("theme").Changed && kanaSettings.Get("Type") == "theme" {
 				consoleOutput.Error(fmt.Errorf("a default theme cannot be set on a site of type 'theme"))
 			}
 
@@ -53,9 +51,9 @@ func start(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 				consoleOutput.Error(err)
 			}
 
-			if home == kanaSite.Settings.WorkingDirectory {
+			if home == kanaSettings.Get("Working") {
 				// Remove the site's folder in the config directory.
-				err = os.RemoveAll(kanaSite.Settings.SiteDirectory)
+				err = os.RemoveAll(kanaSettings.Get("Site"))
 				if err != nil {
 					consoleOutput.Error(err)
 				}
@@ -71,7 +69,7 @@ func start(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 			consoleOutput.Success(
 				fmt.Sprintf(
 					"Your site, %s, has has started and should be open in your default browser.",
-					consoleOutput.Bold(consoleOutput.Blue(kanaSite.Settings.Name))))
+					consoleOutput.Bold(consoleOutput.Blue(kanaSettings.Get("Name")))))
 		},
 		Args: cobra.NoArgs,
 	}
@@ -108,23 +106,20 @@ func start(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 	return cmd
 }
 
-func handleTypeDetection(cmd *cobra.Command, consoleOutput *console.Console, kanaSite *site.Site) error {
-	if !cmd.Flags().Lookup("type").Changed && !kanaSite.Settings.HasLocalOptions() {
-		siteType, err := kanaSite.DetectType()
-		if err != nil {
-			return err
-		}
-
+func handleTypeDetection(cmd *cobra.Command, consoleOutput *console.Console, kanaSettings *settings.Settings) error {
+	if !cmd.Flags().Lookup("type").Changed && !kanaSettings.GetBool("HasLocalSettings") {
 		if !cmd.Flags().Lookup("name").Changed {
-			err = verifyEmpty(siteType, kanaSite, consoleOutput)
+			err := verifyEmpty(kanaSettings, consoleOutput)
 			if err != nil {
 				return err
 			}
 		}
 
-		if siteType != kanaSite.Settings.Type {
-			kanaSite.Settings.Type = siteType
-			consoleOutput.Printf("A %s was detected in the current site folder. Starting site as a %s\n", siteType, siteType)
+		if kanaSettings.GetBool("TypeIsDetected") {
+			consoleOutput.Printf(
+				"A %s was detected in the current site folder. Starting site as a %s\n",
+				kanaSettings.Get("Type"),
+				kanaSettings.Get("Type"))
 		}
 	}
 
@@ -133,14 +128,14 @@ func handleTypeDetection(cmd *cobra.Command, consoleOutput *console.Console, kan
 
 // verifyEmpty Verifies the folder is empty when starting a new site in it.
 // This helps prevent conflicts with WordPress files and anything in the folder.
-func verifyEmpty(siteType string, kanaSite *site.Site, consoleOutput *console.Console) error {
-	if siteType == site.DefaultType {
-		isEmpty, err := helpers.IsEmpty(kanaSite.Settings.WorkingDirectory)
+func verifyEmpty(kanaSettings *settings.Settings, consoleOutput *console.Console) error {
+	if kanaSettings.Get("Type") == site.DefaultType {
+		isEmpty, err := helpers.IsEmpty(kanaSettings.Get("Working"))
 		if err != nil {
 			return err
 		}
 
-		if !isEmpty && kanaSite.Settings.IsNewSite {
+		if !isEmpty && kanaSettings.GetBool("IsNew") {
 			confirm := consoleOutput.PromptConfirm(
 				"The current directory is not empty. Are you sure you want to try to install WordPress in this folder? This may cause the WordPress installation to fail.", //nolint: lll
 				false)

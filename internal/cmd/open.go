@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/ChrisWiegman/kana/internal/console"
+	"github.com/ChrisWiegman/kana/internal/settings"
 	"github.com/ChrisWiegman/kana/internal/site"
 
 	"github.com/spf13/cobra"
@@ -12,7 +13,7 @@ import (
 
 var openDatabaseFlag, openMailpitFlag, openSiteFlag, openAdminFlag bool
 
-func open(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
+func open(consoleOutput *console.Console, kanaSite *site.Site, kanaSettings *settings.Settings) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "open",
 		Short: "Open the current site in your browser.",
@@ -41,7 +42,7 @@ func open(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 					"Your site, %s, has been opened in your default browser.",
 					consoleOutput.Bold(
 						consoleOutput.Blue(
-							kanaSite.Settings.Name))))
+							kanaSettings.Get("Name")))))
 		},
 		Args: cobra.NoArgs,
 	}

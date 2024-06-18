@@ -37,10 +37,12 @@ func Execute() {
 				}
 			}
 
-			err := settings.Load(kanaSettings, Version, cmd, commandsRequiringSite)
+			err := settings.Load(kanaSettings, Version, cmd, commandsRequiringSite, &startFlags)
 			if err != nil {
 				consoleOutput.Error(err)
 			}
+
+			site.Load(kanaSite, kanaSettings)
 		},
 	}
 
@@ -60,22 +62,22 @@ func Execute() {
 	// Register the subcommands
 	cmd.AddCommand(
 		changelog(consoleOutput),
-		config(consoleOutput, kanaSite),
+		config(consoleOutput, kanaSettings),
 		db(consoleOutput, kanaSite),
-		destroy(consoleOutput, kanaSite),
-		export(consoleOutput, kanaSite),
+		destroy(consoleOutput, kanaSite, kanaSettings),
+		export(consoleOutput, kanaSite, kanaSettings),
 		flush(consoleOutput, kanaSite),
 		list(consoleOutput, kanaSite),
-		open(consoleOutput, kanaSite),
-		start(consoleOutput, kanaSite),
-		stop(consoleOutput, kanaSite),
+		open(consoleOutput, kanaSite, kanaSettings),
+		start(consoleOutput, kanaSite, kanaSettings),
+		stop(consoleOutput, kanaSite, kanaSettings),
 		version(consoleOutput),
 		wp(consoleOutput, kanaSite),
 		xdebug(consoleOutput, kanaSite),
 	)
 
 	if runtime.GOOS == "darwin" {
-		cmd.AddCommand(trust(consoleOutput, kanaSite))
+		cmd.AddCommand(trust(consoleOutput, kanaSettings))
 	}
 
 	// Execute anything we need to

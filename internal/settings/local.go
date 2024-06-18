@@ -47,7 +47,7 @@ func saveLocalLinkConfig(cmd *cobra.Command, siteDirectory, workingDirectory str
 	err := siteLinkConfig.ReadInConfig()
 	if err != nil {
 		_, ok := err.(viper.ConfigFileNotFoundError)
-		if ok && cmd.Use == "start" {
+		if ok && cmd.Use == "start" { //nolint:goconst
 			err = os.MkdirAll(siteDirectory, os.FileMode(defaultDirPermissions))
 			if err != nil {
 				return err

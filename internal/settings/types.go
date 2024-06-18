@@ -87,9 +87,11 @@ type PluginVersion struct {
 
 // Site represents values specific to running a site within Kana.
 type Site struct {
-	Name    string
-	IsNamed bool
-	IsNew   bool
+	Name             string
+	IsNamed          bool
+	IsNew            bool
+	TypeIsDetected   bool
+	HasLocalSettings bool
 }
 
 // StartFlags represents the flags that can be passed to the start command.

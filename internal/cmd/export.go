@@ -5,12 +5,13 @@ import (
 	"path/filepath"
 
 	"github.com/ChrisWiegman/kana/internal/console"
+	"github.com/ChrisWiegman/kana/internal/settings"
 	"github.com/ChrisWiegman/kana/internal/site"
 
 	"github.com/spf13/cobra"
 )
 
-func export(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
+func export(consoleOutput *console.Console, kanaSite *site.Site, kanaSettings *settings.Settings) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "export",
 		Short: "Export the current config to a .kana.json file to save with your repo.",
@@ -32,7 +33,7 @@ func export(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command 
 			consoleOutput.Success(
 				fmt.Sprintf(
 					"Your config has been exported to %s",
-					filepath.Join(kanaSite.Settings.WorkingDirectory, ".kana.json")))
+					filepath.Join(kanaSettings.Get("Working"), ".kana.json")))
 		},
 		Args: cobra.ArbitraryArgs,
 	}

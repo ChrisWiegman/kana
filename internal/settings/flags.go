@@ -6,8 +6,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// ProcessStartFlags Process the start flags and save them to the settings object.
-func ProcessStartFlags(cmd *cobra.Command, flags *StartFlags, options *Options) {
+// processStartFlags Process the start flags and save them to the settings object.
+func processStartFlags(cmd *cobra.Command, flags *StartFlags, settings *Settings) {
+	options := settings.settings
+
 	if cmd.Flags().Lookup("xdebug").Changed {
 		options.Xdebug = flags.Xdebug
 	}

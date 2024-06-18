@@ -12,10 +12,11 @@ import (
 	"strings"
 
 	"github.com/ChrisWiegman/kana/internal/helpers"
+
 	"github.com/spf13/cobra"
 )
 
-func Load(settings *Settings, version string, cmd *cobra.Command, commandsRequiringSite []string) (err error) {
+func Load(settings *Settings, version string, cmd *cobra.Command, commandsRequiringSite []string, startFlags *StartFlags) (err error) {
 	settings.directories, err = getStaticDirectories()
 	if err != nil {
 		return err
@@ -56,20 +57,23 @@ func Load(settings *Settings, version string, cmd *cobra.Command, commandsRequir
 	updateSettingsFromViper(settings.local, &settings.settings)
 
 	// Always make sure we set the correct type, even if a config file isn't available.
-	if cmd.Use != "start" {
-		err = detectType(settings)
-		if err != nil {
-			return err
-		}
+	err = DetectType(settings)
+	if err != nil {
+		return err
+	}
+
+	if cmd.Use == "start" {
+		processStartFlags(cmd, startFlags, settings)
 	}
 
 	return ensureStaticConfigFiles(settings.directories.App)
 }
 
 // DetectType determines the type of site in the working directory.
-func detectType(settings *Settings) error {
+func DetectType(settings *Settings) error {
 	var err error
 	var isSite bool
+	oldType := settings.settings.Type
 
 	isSite, err = helpers.PathExists(filepath.Join(settings.directories.Working, "wp-includes", "version.php"))
 	if err != nil {
@@ -109,6 +113,10 @@ func detectType(settings *Settings) error {
 						settings.settings.Type = "plugin"
 					}
 
+					if oldType != settings.settings.Type {
+						settings.site.TypeIsDetected = true
+					}
+
 					return err
 				}
 				line, err = helpers.ReadLine(reader)
@@ -123,6 +131,10 @@ func detectType(settings *Settings) error {
 
 	settings.settings.Type = "site"
 
+	if oldType != settings.settings.Type {
+		settings.site.TypeIsDetected = true
+	}
+
 	return err
 }
 
@@ -135,7 +147,7 @@ func (s *Settings) Get(name string) string {
 	}
 
 	switch settingType {
-	case "string":
+	case "string": //nolint:goconst
 		return settingValue.String()
 	case "bool":
 		return strconv.FormatBool(settingValue.Bool())
@@ -181,6 +193,16 @@ func (s *Settings) GetInt(name string) int64 {
 	}
 
 	return value
+}
+
+func (s *Settings) OverrideType(value string) error {
+	if !helpers.IsValidString(value, validTypes) {
+		return fmt.Errorf("the type you selected, %s, is not a valid type. You must use either `site`, `plugin` or `theme`", value)
+	}
+
+	s.settings.Type = value
+
+	return nil
 }
 
 func (s *Settings) Set(name, value string) error {
@@ -239,7 +261,19 @@ func (s *Settings) getSetting(name string) (string, reflect.Value, error) {
 	settings := []interface{}{
 		&s.settings,
 		&s.constants,
+		&s.directories,
 		&s.site}
+
+	switch name {
+	case "RootCert":
+		return "string", reflect.ValueOf(s.constants.RootCert.Certificate), nil
+	case "RootKey":
+		return "string", reflect.ValueOf(s.constants.RootCert.Key), nil
+	case "SiteCert":
+		return "string", reflect.ValueOf(s.constants.SiteCert.Certificate), nil
+	case "SiteKey":
+		return "string", reflect.ValueOf(s.constants.SiteCert.Key), nil
+	}
 
 	for group := range settings {
 		reflection := reflect.ValueOf(settings[group]).Elem()

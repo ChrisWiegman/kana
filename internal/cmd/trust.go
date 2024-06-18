@@ -3,22 +3,28 @@ package cmd
 import (
 	"github.com/ChrisWiegman/kana/internal/console"
 	"github.com/ChrisWiegman/kana/internal/settings"
-	"github.com/ChrisWiegman/kana/internal/site"
 
 	"github.com/spf13/cobra"
 )
 
-func trust(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
+func trust(consoleOutput *console.Console, kanaSettings *settings.Settings) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "trust-ssl",
 		Short: "Add the Kana SSL certificate to the MacOS Keychain (if needed).",
 		Run: func(cmd *cobra.Command, args []string) {
-			err := kanaSite.Settings.EnsureSSLCerts(consoleOutput)
+			rootCert, siteCert := settings.GetSSLCerts(kanaSettings)
+			err := settings.EnsureSSLCerts(
+				kanaSettings.Get("App"),
+				kanaSettings.GetDomain(),
+				rootCert,
+				siteCert,
+				kanaSettings.GetBool("SSL"),
+				consoleOutput)
 			if err != nil {
 				consoleOutput.Error(err)
 			}
 
-			err = settings.TrustSSL(consoleOutput)
+			err = settings.TrustSSL(kanaSettings.Get("RootCert"), consoleOutput)
 			if err != nil {
 				consoleOutput.Error(err)
 			}

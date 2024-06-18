@@ -15,6 +15,10 @@ var execCommand = exec.Command
 
 const certOS = "darwin"
 
+func GetSSLCerts(settings *Settings) (rootCert, siteCert Certificate) {
+	return settings.constants.RootCert, settings.constants.SiteCert
+}
+
 // EnsureSSLCerts Ensures SSL certificates have been generated and are where they need to be.
 func EnsureSSLCerts(appDirectory, domain string, rootCert, siteCert Certificate, useSSL bool, consoleOutput *console.Console) error {
 	createCert := false
