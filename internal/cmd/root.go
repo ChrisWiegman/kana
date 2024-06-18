@@ -4,6 +4,7 @@ import (
 	"runtime"
 
 	"github.com/ChrisWiegman/kana/internal/console"
+	"github.com/ChrisWiegman/kana/internal/settings"
 	"github.com/ChrisWiegman/kana/internal/site"
 
 	"github.com/spf13/cobra"
@@ -18,6 +19,7 @@ var (
 func Execute() {
 	kanaSite := new(site.Site)
 	consoleOutput := new(console.Console)
+	kanaSettings := new(settings.Settings)
 
 	// Setup the cobra command
 	cmd := &cobra.Command{
@@ -35,7 +37,7 @@ func Execute() {
 				}
 			}
 
-			err := kanaSite.New(cmd, commandsRequiringSite, &startFlags, flagVerbose, consoleOutput, Version)
+			err := settings.Load(kanaSettings, Version, cmd, commandsRequiringSite)
 			if err != nil {
 				consoleOutput.Error(err)
 			}
