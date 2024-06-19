@@ -2,6 +2,7 @@ package site
 
 import (
 	"fmt"
+	"os/exec"
 	"strings"
 
 	"github.com/ChrisWiegman/kana/internal/console"
@@ -11,6 +12,11 @@ import (
 type Cli interface {
 	WordPress(command string, restart, root bool) (docker.ExecResult, error)
 	WPCli(command []string, interactive bool, consoleOutput *console.Console) (statusCode int64, output string, err error)
+	Command(name string, arg ...string) *exec.Cmd
+}
+
+func Command(name string, arg ...string) *exec.Cmd {
+	return exec.Command(name, arg...)
 }
 
 // RunWPCli Runs a wp-cli command returning it's output and any errors.

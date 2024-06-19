@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/url"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -34,8 +33,6 @@ type SiteInfo struct {
 }
 
 const DefaultType = "site"
-
-var execCommand = exec.Command
 
 func Load(site *Site, kanaSettings *settings.Settings) {
 	site.settings = kanaSettings
@@ -226,7 +223,7 @@ func (s *Site) OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag, openAdm
 		}
 
 		if runtime.GOOS == "linux" {
-			openCmd := execCommand("xdg-open", openURL)
+			openCmd := s.Cli.Command("xdg-open", openURL)
 			return openCmd.Run()
 		}
 
