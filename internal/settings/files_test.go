@@ -7,17 +7,12 @@ import (
 )
 
 func TestEnsureKanaPlugin(t *testing.T) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	siteDirectory := filepath.Join(cwd, "kana-test")
+	siteDirectory := filepath.Join(".", "kana-test")
 	version := "1.0.0"
 	siteName := "example.com"
 
 	// Create a temporary directory for testing
-	err = os.Mkdir(siteDirectory, os.ModePerm)
+	err := os.Mkdir(siteDirectory, os.ModePerm)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -52,15 +47,10 @@ func TestGetDefaultFilePermissions(t *testing.T) {
 }
 
 func TestEnsureStaticConfigFiles(t *testing.T) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	appDirectory := filepath.Join(cwd, "kana-test")
+	appDirectory := filepath.Join(".", "kana-test")
 
 	// Create a temporary directory for testing
-	err = os.Mkdir(appDirectory, os.ModePerm)
+	err := os.Mkdir(appDirectory, os.ModePerm)
 	if err != nil {
 		t.Fatal(err)
 	}
