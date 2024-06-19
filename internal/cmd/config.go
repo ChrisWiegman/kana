@@ -1,16 +1,13 @@
 package cmd
 
 import (
-	"encoding/json"
-	"fmt"
-
 	"github.com/ChrisWiegman/kana/internal/console"
-	"github.com/ChrisWiegman/kana/internal/site"
+	"github.com/ChrisWiegman/kana/internal/settings"
 
 	"github.com/spf13/cobra"
 )
 
-func config(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
+func config(consoleOutput *console.Console, kanaSettings *settings.Settings) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "config",
 		Short: "View and edit the saved configuration for the app or the local site.",
@@ -19,33 +16,16 @@ func config(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command 
 			// This is similar to how setting git options works
 			switch len(args) {
 			case 0:
-				kanaSite.Settings.ListSettings(consoleOutput)
+				settings.ListSettings(kanaSettings, consoleOutput)
 			case 1:
-				value, err := kanaSite.Settings.GetGlobalSetting(args)
-				if err != nil {
-					consoleOutput.Error(err)
-				}
-				if consoleOutput.JSON {
-					type JSONSetting struct {
-						Setting, Value string
-					}
-
-					setting := JSONSetting{
-						Setting: args[0],
-						Value:   value,
-					}
-
-					str, _ := json.Marshal(setting)
-
-					fmt.Println(string(str))
-				} else {
-					consoleOutput.Println(value)
-				}
+				kanaSettings.PrintSingleSetting(args[0], consoleOutput)
 			case 2:
-				err := kanaSite.Settings.SetGlobalSetting(args)
+				err := kanaSettings.Set(args[0], args[1])
 				if err != nil {
 					consoleOutput.Error(err)
 				}
+
+				kanaSettings.PrintSingleSetting(args[0], consoleOutput)
 			}
 		},
 		Args: cobra.RangeArgs(0, 2),

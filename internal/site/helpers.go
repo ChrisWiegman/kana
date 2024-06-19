@@ -12,17 +12,6 @@ import (
 	"github.com/ChrisWiegman/kana/internal/docker"
 )
 
-// arrayContains Searches an array of strings for a given string and returns true/false as appropriate.
-func arrayContains(array []string, name string) bool {
-	for _, value := range array {
-		if value == name {
-			return true
-		}
-	}
-
-	return false
-}
-
 // checkStatusCode returns true on 200 or false.
 func checkStatusCode(checkURL string) (bool, error) {
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, checkURL, http.NoBody)
@@ -104,17 +93,17 @@ func (s *Site) handleImageError(container *docker.ContainerConfig, err error) er
 		case "wordpress":
 			return fmt.Errorf(
 				"the PHP version in your configuration, %s, is invalid. See https://hub.docker.com/_/wordpress for a list of supported versions",
-				s.Settings.PHP)
+				s.settings.Get("PHP"))
 		case "database":
 			databaseURL := "https://hub.docker.com/_/mariadb"
 
-			if s.Settings.Database == "mysql" {
+			if s.settings.Get("Database") == "mysql" {
 				databaseURL = "https://hub.docker.com/_/mysql"
 			}
 
 			return fmt.Errorf(
 				"the database version in your configuration, %s, is invalid. See %s for a list of supported versions",
-				s.Settings.DatabaseVersion, databaseURL)
+				s.settings.Get("DatabaseVersion"), databaseURL)
 		}
 	}
 

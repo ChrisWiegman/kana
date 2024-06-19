@@ -4,202 +4,128 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/ChrisWiegman/kana/internal/console"
-	"github.com/ChrisWiegman/kana/internal/docker"
-	"github.com/ChrisWiegman/kana/internal/helpers"
 
 	"github.com/aquasecurity/table"
-	"github.com/go-playground/validator/v10"
 )
 
-// GetGlobalSetting Retrieves a global setting for the "config" command.
-func (s *Settings) GetGlobalSetting(args []string) (string, error) {
-	if !s.global.IsSet(args[0]) {
-		return "", fmt.Errorf("invalid setting. Please enter a valid key to get")
-	}
-
-	return s.global.GetString(args[0]), nil
-}
-
 // ListSettings Lists all settings for the config command.
-func (s *Settings) ListSettings(consoleOutput *console.Console) {
+func ListSettings(settings *Settings, consoleOutput *console.Console) {
 	if consoleOutput.JSON {
-		s.printJSONSettings()
+		printJSONSettings(settings)
 		return
 	}
 
-	t := table.New(os.Stdout)
+	settingsTable := table.New(os.Stdout)
+	localSettings := getSettingsVromViper(settings.local)
+	globalSettings := getSettingsVromViper(settings.global)
 
 	localPlugins := []string{}
 	globalPlugins := []string{}
 
-	for _, plugin := range s.local.GetStringSlice("plugins") {
+	for _, plugin := range localSettings.Plugins {
 		localPlugins = append(localPlugins, consoleOutput.Bold(plugin))
 	}
 
-	for _, plugin := range s.global.GetStringSlice("plugins") {
+	for _, plugin := range globalSettings.Plugins {
 		globalPlugins = append(globalPlugins, consoleOutput.Bold(plugin))
 	}
 
-	t.SetHeaders("Setting", "Global Value", "Local Value")
+	settingsTable.SetHeaders("Setting", "Global Value", "Local Value")
 
-	t.AddRow("activate", consoleOutput.Bold(s.global.GetString("activate")), consoleOutput.Bold(s.local.GetString("activate")))
-	t.AddRow("admin.email", consoleOutput.Bold(s.global.GetString("admin.email")), consoleOutput.Bold(s.local.GetString("admin.email")))
-	t.AddRow("admin.password",
-		consoleOutput.Bold(s.global.GetString("admin.password")),
-		consoleOutput.Bold(s.local.GetString("admin.password")))
-	t.AddRow("admnin.username",
-		consoleOutput.Bold(s.global.GetString("admin.username")),
-		consoleOutput.Bold(s.local.GetString("admin.username")))
-	t.AddRow("automaticLogin",
-		consoleOutput.Bold(s.global.GetString("automaticLogin")),
-		consoleOutput.Bold(s.local.GetString("automaticLogin")))
-	t.AddRow("database",
-		consoleOutput.Bold(s.global.GetString("database")),
-		consoleOutput.Bold(s.local.GetString("database")))
-	t.AddRow("databaseClient",
-		consoleOutput.Bold(s.global.GetString("databaseClient")),
-		consoleOutput.Bold(s.local.GetString("databaseClient")))
-	t.AddRow("databaseVersion",
-		consoleOutput.Bold(s.global.GetString("databaseVersion")),
-		consoleOutput.Bold(s.local.GetString("databaseVersion")))
-	t.AddRow("environment", consoleOutput.Bold(s.global.GetString("environment")), consoleOutput.Bold(s.local.GetString("environment")))
-	t.AddRow("imageUpdateDays",
-		consoleOutput.Bold(s.global.GetString("imageUpdateDays")),
-		consoleOutput.Bold(s.local.GetString("imageUpdateDays")))
-	t.AddRow("mailpit", consoleOutput.Bold(s.global.GetString("mailpit")), consoleOutput.Bold(s.local.GetString("mailpit")))
-	t.AddRow("multisite", consoleOutput.Bold(s.global.GetString("multisite")), consoleOutput.Bold(s.local.GetString("multisite")))
-	t.AddRow("php", consoleOutput.Bold(s.global.GetString("php")), consoleOutput.Bold(s.local.GetString("php")))
-	t.AddRow("plugins",
+	settingsTable.AddRow("activate",
+		consoleOutput.Bold(strconv.FormatBool(globalSettings.Activate)),
+		consoleOutput.Bold(strconv.FormatBool(localSettings.Activate)))
+	settingsTable.AddRow("admin.email", consoleOutput.Bold(globalSettings.AdminEmail), consoleOutput.Bold(localSettings.AdminEmail))
+	settingsTable.AddRow("admin.password",
+		consoleOutput.Bold(globalSettings.AdminPassword),
+		consoleOutput.Bold(localSettings.AdminPassword))
+	settingsTable.AddRow("admnin.username",
+		consoleOutput.Bold(globalSettings.AdminUsername),
+		consoleOutput.Bold(localSettings.AdminUsername))
+	settingsTable.AddRow("automaticLogin",
+		consoleOutput.Bold(strconv.FormatBool(globalSettings.AutomaticLogin)),
+		consoleOutput.Bold(strconv.FormatBool(localSettings.AutomaticLogin)))
+	settingsTable.AddRow("database",
+		consoleOutput.Bold(globalSettings.Database),
+		consoleOutput.Bold(localSettings.Database))
+	settingsTable.AddRow("databaseClient",
+		consoleOutput.Bold(globalSettings.DatabaseClient),
+		consoleOutput.Bold(localSettings.DatabaseClient))
+	settingsTable.AddRow("databaseVersion",
+		consoleOutput.Bold(globalSettings.DatabaseVersion),
+		consoleOutput.Bold(localSettings.DatabaseVersion))
+	settingsTable.AddRow("environment", consoleOutput.Bold(globalSettings.Environment), consoleOutput.Bold(localSettings.Environment))
+	settingsTable.AddRow("imageUpdateDays", consoleOutput.Bold(strconv.FormatInt(globalSettings.UpdateInterval, 10)), "")
+	settingsTable.AddRow("mailpit",
+		consoleOutput.Bold(strconv.FormatBool(globalSettings.Mailpit)),
+		consoleOutput.Bold(strconv.FormatBool(localSettings.Mailpit)))
+	settingsTable.AddRow("multisite", consoleOutput.Bold(globalSettings.Multisite), consoleOutput.Bold(localSettings.Multisite))
+	settingsTable.AddRow("php", consoleOutput.Bold(globalSettings.PHP), consoleOutput.Bold(localSettings.PHP))
+	settingsTable.AddRow("plugins",
 		consoleOutput.Bold(strings.Join(globalPlugins, "\n")),
 		consoleOutput.Bold(strings.Join(localPlugins, "\n")))
-	t.AddRow("removeDefaultPlugins",
-		consoleOutput.Bold(s.global.GetString("removeDefaultPlugins")),
-		consoleOutput.Bold(s.local.GetString("removeDefaultPlugins")))
-	t.AddRow("ssl", consoleOutput.Bold(s.global.GetString("ssl")), consoleOutput.Bold(s.local.GetString("ssl")))
-	t.AddRow("scriptdebug", consoleOutput.Bold(s.global.GetString("scriptdebug")), consoleOutput.Bold(s.local.GetString("scriptdebug")))
-	t.AddRow("theme",
-		consoleOutput.Bold(s.global.GetString("theme")),
-		consoleOutput.Bold(s.local.GetString("theme")))
-	t.AddRow("type", consoleOutput.Bold(s.global.GetString("type")), consoleOutput.Bold(s.local.GetString("type")))
-	t.AddRow("wpdebug", consoleOutput.Bold(s.global.GetString("wpdebug")), consoleOutput.Bold(s.local.GetString("wpdebug")))
-	t.AddRow("xdebug", consoleOutput.Bold(s.global.GetString("xdebug")), consoleOutput.Bold(s.local.GetString("xdebug")))
+	settingsTable.AddRow("removeDefaultPlugins",
+		consoleOutput.Bold(strconv.FormatBool(globalSettings.RemoveDefaultPlugins)),
+		consoleOutput.Bold(strconv.FormatBool(localSettings.RemoveDefaultPlugins)))
+	settingsTable.AddRow("ssl",
+		consoleOutput.Bold(strconv.FormatBool(globalSettings.SSL)),
+		consoleOutput.Bold(strconv.FormatBool(localSettings.SSL)))
+	settingsTable.AddRow("scriptdebug",
+		consoleOutput.Bold(strconv.FormatBool(globalSettings.ScriptDebug)),
+		consoleOutput.Bold(strconv.FormatBool(localSettings.ScriptDebug)))
+	settingsTable.AddRow("theme",
+		consoleOutput.Bold(globalSettings.Theme),
+		consoleOutput.Bold(localSettings.Theme))
+	settingsTable.AddRow("type", consoleOutput.Bold(globalSettings.Type), consoleOutput.Bold(localSettings.Type))
+	settingsTable.AddRow("wpdebug",
+		consoleOutput.Bold(strconv.FormatBool(globalSettings.WPDebug)),
+		consoleOutput.Bold(strconv.FormatBool(localSettings.WPDebug)))
+	settingsTable.AddRow("xdebug",
+		consoleOutput.Bold(strconv.FormatBool(globalSettings.Xdebug)),
+		consoleOutput.Bold(strconv.FormatBool(localSettings.Xdebug)))
 
-	t.Render()
+	settingsTable.Render()
 }
 
-// SetGlobalSetting Sets a global setting for the "config" command.
-func (s *Settings) SetGlobalSetting(args []string) error {
-	if !s.global.IsSet(args[0]) {
-		return fmt.Errorf("invalid setting. Please enter a valid key to set")
-	}
-
-	err := s.validateSetting(args[0], args[1])
+func (s *Settings) PrintSingleSetting(name string, consoleOutput *console.Console) {
+	value, err := s.GetGlobalSetting(name)
 	if err != nil {
-		return err
+		consoleOutput.Error(err)
 	}
-
-	if args[0] == "plugins" {
-		plugins := strings.Split(args[1], ",")
-
-		s.global.Set(args[0], plugins)
-	} else {
-		s.global.Set(args[0], args[1])
-	}
-
-	if args[0] == "database" && args[1] != s.global.GetString("database") {
-		switch args[1] {
-		case "mariadb":
-			s.global.Set("databaseVersion", mariadbVersion)
-		case "mysql": //nolint:goconst
-			s.global.Set("databaseVersion", mysqlVersion)
+	if consoleOutput.JSON {
+		type JSONSetting struct {
+			Setting, Value string
 		}
-	}
 
-	return s.global.WriteConfig()
+		setting := JSONSetting{
+			Setting: name,
+			Value:   value,
+		}
+
+		str, _ := json.Marshal(setting)
+
+		fmt.Println(string(str))
+	} else {
+		consoleOutput.Println(value)
+	}
 }
 
 // printJSONSettings Prints out all settings in JSON format.
-func (s *Settings) printJSONSettings() {
+func printJSONSettings(settings *Settings) {
 	type JSONSettings struct {
 		Global, Local map[string]interface{}
 	}
 
-	settings := JSONSettings{
-		Global: s.global.AllSettings(),
-		Local:  s.local.AllSettings(),
+	jsonSettings := JSONSettings{
+		Global: settings.global.AllSettings(),
+		Local:  settings.local.AllSettings(),
 	}
 
-	str, _ := json.Marshal(settings)
+	str, _ := json.Marshal(jsonSettings)
 
-	fmt.Println(string(str))
-}
-
-// validateSetting validates the values in saved settings.
-func (s *Settings) validateSetting(setting, value string) error { //nolint:gocyclo
-	validate := validator.New()
-
-	switch setting {
-	case "admin.email":
-		return validate.Var(value, "email")
-	case "admin.password":
-		return validate.Var(value, "alphanumunicode")
-	case "admin.username":
-		return validate.Var(value, "alpha")
-	case "database":
-		if !helpers.IsValidString(value, validDatabases) {
-			return fmt.Errorf("the database, %s, is not a valid database type. You must use either `mariadb`, `mysql` or `sqlite`", setting)
-		}
-	case "databaseClient":
-	case "databaseclient":
-		if !helpers.IsValidString(value, validDatabaseClients) {
-			return fmt.Errorf("the database client, %s, is not a valid client. You must use either `phpmyadmin` or `tableplus`", setting)
-		}
-	case "environment":
-		if !helpers.IsValidString(value, validEnvironmentTypes) {
-			return fmt.Errorf("the environment, %s, is not valid. You must use either `local`, `development`, `staging` or `production`", setting)
-		}
-	case "imageUpdateDays":
-	case "imageupdatedays":
-		return validate.Var(value, "gte=0")
-	case "databaseVersion":
-	case "mariadb":
-		if docker.ValidateImage(s.Database, value) != nil {
-			databaseURL := "https://hub.docker.com/_/mariadb"
-
-			if s.Database == "mysql" {
-				databaseURL = "https://hub.docker.com/_/mysql"
-			}
-
-			return fmt.Errorf(
-				"the database version in your configuration, %s, is invalid. See %s for a list of supported versions",
-				value, databaseURL)
-		}
-	case "multisite":
-		if !helpers.IsValidString(value, validMultisiteTypes) {
-			return fmt.Errorf("the multisite type, %s, is not a valid type. You must use either `none`, `subdomain` or `subdirectory`", setting)
-		}
-	case "php":
-		if docker.ValidateImage("wordpress", fmt.Sprintf("php%s", value)) != nil {
-			return fmt.Errorf(
-				"the PHP version in your configuration, %s, is invalid. See https://hub.docker.com/_/wordpress for a list of supported versions",
-				value)
-		}
-	case "plugins":
-	case "theme":
-		return validate.Var(value, "ascii")
-	case "type":
-		if !helpers.IsValidString(value, validTypes) {
-			return fmt.Errorf("the type you selected, %s, is not a valid type. You must use either `site`, `plugin` or `theme`", setting)
-		}
-	default:
-		err := validate.Var(value, "boolean")
-		if err != nil {
-			return fmt.Errorf("the setting, %s, must be either true or false", setting)
-		}
-	}
-
-	return nil
+	fmt.Print(string(str))
 }

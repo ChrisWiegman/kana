@@ -1,35 +1,47 @@
 package settings
 
 // The following are the default settings for Kana.
-var (
-	activate             = true
-	adminEmail           = "admin@sites.kana.sh"
-	adminPassword        = "password"
-	adminUsername        = "admin"
-	automaticLogin       = true
-	configFolderName     = ".config/kana"
-	database             = "mariadb"
-	databaseClient       = "phpmyadmin"
-	domain               = "sites.kana.sh"
-	environment          = "local"
-	imageUpdateDays      = 7
-	mailpit              = false
-	mariadbVersion       = "11"
-	multisite            = "none"
-	mysqlVersion         = "8"
-	php                  = "8.2"
-	plugins              = []string{}
-	removeDefaultPlugins = false
-	rootCert             = "kana.root.pem"
-	rootKey              = "kana.root.key"
-	scriptDebug          = false
-	siteCert             = "kana.site.pem"
-	siteKey              = "kana.site.key"
-	siteType             = "site"
-	ssl                  = false
-	theme                = ""
-	wpdebug              = false
-	xdebug               = false
+
+var defaultOptions = Options{
+	Activate:             true,
+	AdminEmail:           "admin@sites.kana.sh",
+	AdminPassword:        "password",
+	AdminUsername:        "admin",
+	AutomaticLogin:       true,
+	Database:             "mariadb",
+	DatabaseClient:       "phpmyadmin",
+	DatabaseVersion:      mariadbVersion,
+	Environment:          "local",
+	UpdateInterval:       7,
+	Mailpit:              false,
+	Multisite:            "none",
+	PHP:                  "8.2",
+	Plugins:              []string{},
+	RemoveDefaultPlugins: false,
+	ScriptDebug:          false,
+	SSL:                  false,
+	Theme:                "",
+	Type:                 "site",
+	WPDebug:              false,
+	Xdebug:               false,
+}
+
+var appConstants = Constants{
+	Domain: "sites.kana.sh",
+	RootCert: Certificate{
+		Certificate: "kana.root.pem",
+		Key:         "kana.root.key",
+	},
+	SiteCert: Certificate{
+		Certificate: "kana.site.pem",
+		Key:         "kana.site.key",
+	},
+}
+
+const (
+	configFolderName = ".config/kana"
+	mariadbVersion   = "11"
+	mysqlVersion     = "8"
 )
 
 // Default permissions for all new files and folders.
@@ -37,33 +49,3 @@ const (
 	defaultDirPermissions  = 0750
 	defaultFilePermissions = 0644
 )
-
-var validTypes = []string{
-	"site",
-	"plugin",
-	"theme",
-}
-
-var validDatabaseClients = []string{
-	"phpmyadmin",
-	"tableplus",
-}
-
-var validDatabases = []string{
-	"mariadb",
-	"mysql",
-	"sqlite",
-}
-
-var validMultisiteTypes = []string{
-	"none",
-	"subdomain",
-	"subdirectory",
-}
-
-var validEnvironmentTypes = []string{
-	"local",
-	"development",
-	"staging",
-	"production",
-}

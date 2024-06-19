@@ -9,37 +9,37 @@ import (
 
 func (s *Site) getPhpMyAdminContainer() docker.ContainerConfig {
 	phpMyAdminContainer := docker.ContainerConfig{
-		Name:        fmt.Sprintf("kana-%s-phpmyadmin", s.Settings.Name),
+		Name:        fmt.Sprintf("kana-%s-phpmyadmin", s.settings.Get("Name")),
 		Image:       "phpmyadmin",
 		NetworkName: "kana",
-		HostName:    fmt.Sprintf("kana-%s-phpmyadmin", s.Settings.Name),
+		HostName:    fmt.Sprintf("kana-%s-phpmyadmin", s.settings.Get("Name")),
 		Env: []string{
 			"MYSQL_ROOT_PASSWORD=password",
-			fmt.Sprintf("PMA_HOST=kana-%s-database", s.Settings.Name),
+			fmt.Sprintf("PMA_HOST=kana-%s-database", s.settings.Get("Name")),
 			"PMA_USER=wordpress",
 			"PMA_PASSWORD=wordpress",
 		},
 		Labels: map[string]string{
 			"traefik.enable": "true",
 			"kana.type":      "phpmyadmin",
-			fmt.Sprintf("traefik.http.routers.wordpress-%s-%s-http.entrypoints", s.Settings.Name, "phpmyadmin"): "web",
+			fmt.Sprintf("traefik.http.routers.wordpress-%s-%s-http.entrypoints", s.settings.Get("Name"), "phpmyadmin"): "web",
 			fmt.Sprintf(
 				"traefik.http.routers.wordpress-%s-%s-http.rule",
-				s.Settings.Name,
+				s.settings.Get("Name"),
 				"phpmyadmin"): fmt.Sprintf(
 				"Host(`%s-%s`)",
 				"phpmyadmin",
-				s.Settings.SiteDomain),
-			fmt.Sprintf("traefik.http.routers.wordpress-%s-%s.entrypoints", s.Settings.Name, "phpmyadmin"): "websecure",
+				s.settings.GetDomain()),
+			fmt.Sprintf("traefik.http.routers.wordpress-%s-%s.entrypoints", s.settings.Get("Name"), "phpmyadmin"): "websecure",
 			fmt.Sprintf(
 				"traefik.http.routers.wordpress-%s-%s.rule",
-				s.Settings.Name,
+				s.settings.Get("Name"),
 				"phpmyadmin"): fmt.Sprintf(
 				"Host(`%s-%s`)",
 				"phpmyadmin",
-				s.Settings.SiteDomain),
-			fmt.Sprintf("traefik.http.routers.wordpress-%s-%s.tls", s.Settings.Name, "phpmyadmin"): "true",
-			"kana.site": s.Settings.Name,
+				s.settings.GetDomain()),
+			fmt.Sprintf("traefik.http.routers.wordpress-%s-%s.tls", s.settings.Get("Name"), "phpmyadmin"): "true",
+			"kana.site": s.settings.Get("Name"),
 		},
 	}
 

@@ -38,15 +38,15 @@ var configFiles = []File{
 }
 
 // EnsureKanaPlugin ensures the Kana plugin file is in place and ready to go.
-func (s *Settings) EnsureKanaPlugin(appDir, siteName string) error {
-	pluginVars := KanaPluginVars{
-		Version:  s.Version,
+func EnsureKanaPlugin(siteDirectory, version, siteName string) error {
+	pluginVars := PluginVersion{
+		Version:  version,
 		SiteName: siteName,
 	}
 
 	tmpl := template.Must(template.New("kanaPlugin").Parse(KanaWordPressPlugin))
 
-	pluginPath := filepath.Join(appDir, "wp-content", "mu-plugins")
+	pluginPath := filepath.Join(siteDirectory, "wp-content", "mu-plugins")
 
 	_, err := os.Stat(pluginPath)
 	if err != nil && os.IsNotExist(err) {
@@ -64,11 +64,25 @@ func (s *Settings) EnsureKanaPlugin(appDir, siteName string) error {
 	return tmpl.Execute(myFile, pluginVars)
 }
 
-// EnsureStaticConfigFiles Ensures the application's static config files have been generated and are where they need to be.
-func (s *Settings) EnsureStaticConfigFiles() error {
+// GetDefaultFilePermissions returns the default directory permissions and the default file permissions.
+func GetDefaultFilePermissions() (dirPerms, filePerms int) {
+	return defaultDirPermissions, defaultFilePermissions
+}
+
+// GetHtaccess Returns the correct .htaccess file for the multisite type.
+func GetHtaccess(multisite string) string {
+	if multisite == "subdomain" {
+		return SubDomainMultisiteHtaccess
+	}
+
+	return SubDirectoryMultisiteHtaccess
+}
+
+// esureStaticConfigFiles Ensures the application's static config files have been generated and are where they need to be.
+func ensureStaticConfigFiles(appDirectory string) error {
 	for _, file := range configFiles {
-		filePath := filepath.Join(s.AppDirectory, file.LocalPath)
-		destFile := filepath.Join(s.AppDirectory, file.LocalPath, file.Name)
+		filePath := filepath.Join(appDirectory, file.LocalPath)
+		destFile := filepath.Join(appDirectory, file.LocalPath, file.Name)
 
 		if err := os.MkdirAll(filePath, os.FileMode(defaultDirPermissions)); err != nil {
 			return err
@@ -83,12 +97,4 @@ func (s *Settings) EnsureStaticConfigFiles() error {
 	}
 
 	return nil
-}
-
-func (s *Settings) GetHtaccess() string {
-	if s.Multisite == "subdomain" {
-		return SubDomainMultisiteHtaccess
-	}
-
-	return SubDirectoryMultisiteHtaccess
 }

@@ -24,7 +24,7 @@ var displayJSONMessagesStream = jsonmessage.DisplayJSONMessagesStream
 
 // https://gist.github.com/miguelmota/4980b18d750fb3b1eb571c3e207b1b92
 // https://riptutorial.com/docker/example/31980/image-pulling-with-progress-bars--written-in-go
-func (d *Client) EnsureImage(imageName string, updateDays int, consoleOutput *console.Console) (err error) {
+func (d *Client) EnsureImage(imageName string, updateDays int64, consoleOutput *console.Console) (err error) {
 	if !strings.Contains(imageName, ":") {
 		imageName = fmt.Sprintf("%s:latest", imageName)
 	}
@@ -71,7 +71,7 @@ func ValidateImage(imageName, imageTag string) error {
 	return err
 }
 
-func (d *Client) maybeUpdateImage(imageName string, updateDays int, suppressOutput bool) error {
+func (d *Client) maybeUpdateImage(imageName string, updateDays int64, suppressOutput bool) error {
 	lastUpdated := d.imageUpdateData.GetTime(imageName)
 
 	imageList, err := d.apiClient.ImageList(context.Background(), image.ListOptions{})

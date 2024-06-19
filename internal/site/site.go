@@ -1,33 +1,28 @@
 package site
 
 import (
-	"bufio"
 	"crypto/x509"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/url"
 	"os"
 	"path/filepath"
-	"regexp"
 	"runtime"
 	"strings"
 	"time"
 
 	"github.com/ChrisWiegman/kana/internal/console"
 	"github.com/ChrisWiegman/kana/internal/docker"
-	"github.com/ChrisWiegman/kana/internal/helpers"
 	"github.com/ChrisWiegman/kana/internal/settings"
 
 	"github.com/pkg/browser"
-	"github.com/spf13/cobra"
 )
 
 type Site struct {
 	dockerClient           *docker.Client
 	maxVerificationRetries int
-	Settings               *settings.Settings
+	settings               *settings.Settings
 	Named                  bool
 	Cli                    Cli
 }
@@ -39,66 +34,14 @@ type SiteInfo struct {
 
 const DefaultType = "site"
 
-// DetectType determines the type of site in the working directory.
-func (s *Site) DetectType() (string, error) {
-	var err error
-	var isSite bool
-
-	isSite, err = helpers.PathExists(filepath.Join(s.Settings.WorkingDirectory, "wp-includes", "version.php"))
-	if err != nil {
-		return "", err
-	}
-
-	if isSite {
-		return DefaultType, err
-	}
-
-	items, _ := os.ReadDir(s.Settings.WorkingDirectory)
-
-	for _, item := range items {
-		if item.IsDir() {
-			continue
-		}
-
-		if item.Name() == "style.css" || filepath.Ext(item.Name()) == ".php" {
-			var f *os.File
-			var line string
-
-			f, err = os.Open(filepath.Join(s.Settings.WorkingDirectory, item.Name()))
-			if err != nil {
-				return "", err
-			}
-
-			reader := bufio.NewReader(f)
-			line, err = helpers.ReadLine(reader)
-
-			for err == nil {
-				exp := regexp.MustCompile(`(Plugin|Theme) Name: .*`)
-
-				for _, match := range exp.FindAllStringSubmatch(line, -1) {
-					if match[1] == "Theme" {
-						return "theme", err
-					} else {
-						return "plugin", err
-					}
-				}
-				line, err = helpers.ReadLine(reader)
-			}
-		}
-	}
-
-	// We don't care if it is an empty folder.
-	if err == io.EOF {
-		err = nil
-	}
-
-	return DefaultType, err
+func Load(site *Site, kanaSettings *settings.Settings) {
+	site.settings = kanaSettings
 }
 
 // EnsureDocker Ensures Docker is available for commands that need it.
 func (s *Site) EnsureDocker(consoleOutput *console.Console) error {
 	// Add a docker client to the site
-	dockerClient, err := docker.New(consoleOutput, s.Settings.AppDirectory)
+	dockerClient, err := docker.New(consoleOutput, s.settings.Get("App"))
 	if err != nil {
 		return err
 	}
@@ -134,7 +77,8 @@ func (s *Site) ExportSiteConfig(consoleOutput *console.Console) error {
 		localSettings.SSL = true
 	}
 
-	return s.Settings.WriteLocalSettings(&localSettings)
+	// @todo - add the ability to export the current site configuration to a file
+	return nil
 }
 
 // GetSiteLink returns the link to the site.
@@ -145,7 +89,7 @@ func (s *Site) GetSiteLink() (string, error) {
 	}
 
 	for i := range siteList {
-		if siteList[i].Name == s.Settings.Name {
+		if siteList[i].Name == s.settings.Get("Name") {
 			return siteList[i].Path, nil
 		}
 	}
@@ -157,7 +101,7 @@ func (s *Site) GetSiteLink() (string, error) {
 func (s *Site) GetSiteList(checkRunningStatus bool) ([]SiteInfo, error) {
 	sites := []SiteInfo{}
 
-	sitesDir := filepath.Join(s.Settings.AppDirectory, "sites")
+	sitesDir := filepath.Join(s.settings.Get("App"), "sites")
 
 	_, err := os.Stat(sitesDir)
 	if os.IsNotExist(err) {
@@ -208,51 +152,9 @@ func (s *Site) GetSiteList(checkRunningStatus bool) ([]SiteInfo, error) {
 
 // IsSiteRunning Returns true if the site is up and running in Docker or false. Does not verify other errors.
 func (s *Site) IsSiteRunning() bool {
-	containers, _ := s.dockerClient.ContainerList(s.Settings.Name)
+	containers, _ := s.dockerClient.ContainerList(s.settings.Get("Name"))
 
 	return len(containers) != 0
-}
-
-func (s *Site) New(
-	cmd *cobra.Command,
-	commandsRequiringSite []string,
-	startFlags *settings.StartFlags,
-	flagVerbose bool,
-	consoleOutput *console.Console,
-	version string) error {
-	var err error
-
-	s.Settings, err = settings.NewSettings(version)
-	if err != nil {
-		return err
-	}
-
-	// Load app-wide settings
-	err = s.Settings.LoadGlobalSettings()
-	if err != nil {
-		return err
-	}
-
-	// Load settings specific to the site
-	isSite, err := s.Settings.LoadLocalSettings(cmd)
-	if err != nil {
-		return err
-	}
-
-	// Always make sure we set the correct type, even if a config file isn't available.
-	if cmd.Use != "start" {
-		s.Settings.Type, err = s.DetectType()
-		if err != nil {
-			return err
-		}
-	}
-
-	// Fail now if we have a command that requires a completed site and we haven't started it before
-	if !isSite && arrayContains(commandsRequiringSite, cmd.Use) {
-		return fmt.Errorf("the current site you are trying to work with does not exist. Use `kana start` to initialize")
-	}
-
-	return nil
 }
 
 // OpenSite Opens the current site in a browser if it is running.
@@ -260,11 +162,11 @@ func (s *Site) OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag, openAdm
 	openUrls := []string{}
 
 	if openSiteFlag {
-		openUrls = append(openUrls, s.Settings.URL)
+		openUrls = append(openUrls, s.settings.GetURL())
 	}
 
 	if openAdminFlag {
-		openUrls = append(openUrls, s.Settings.URL+"/wp-admin/")
+		openUrls = append(openUrls, s.settings.GetURL()+"/wp-admin/")
 	}
 
 	if openDatabaseFlag {
@@ -276,7 +178,7 @@ func (s *Site) OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag, openAdm
 		if isUsingSQLite {
 			consoleOutput.Warn(fmt.Sprintf(
 				"SQLite databases do not have a web interface and cannot be opened in TablePlus by URL. Open the database file, %s, directly using your database client of choice.", //nolint:lll
-				filepath.Join(s.Settings.WorkingDirectory, "wp-content", "database", ".ht.sqlite")))
+				filepath.Join(s.settings.Get("Working"), "wp-content", "database", ".ht.sqlite")))
 			os.Exit(0)
 		}
 
@@ -286,13 +188,13 @@ func (s *Site) OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag, openAdm
 			"mysql://wordpress:wordpress@127.0.0.1:%s/wordpress",
 			databasePort)
 
-		if s.Settings.DatabaseClient == "phpmyadmin" {
+		if s.settings.Get("DatabaseClient") == "phpmyadmin" {
 			err := s.startPHPMyAdmin(consoleOutput)
 			if err != nil {
 				return err
 			}
 
-			databaseURL = fmt.Sprintf("%s://phpmyadmin-%s", s.Settings.Protocol, s.Settings.SiteDomain)
+			databaseURL = fmt.Sprintf("%s://phpmyadmin-%s", s.settings.GetProtocol(), s.settings.GetDomain())
 		}
 
 		openUrls = append(openUrls, databaseURL)
@@ -306,7 +208,7 @@ func (s *Site) OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag, openAdm
 			}
 		}
 
-		mailpitURL := fmt.Sprintf("%s://mailpit-%s", s.Settings.Protocol, s.Settings.SiteDomain)
+		mailpitURL := fmt.Sprintf("%s://mailpit-%s", s.settings.GetProtocol(), s.settings.GetDomain())
 		openUrls = append(openUrls, mailpitURL)
 	}
 
@@ -337,7 +239,7 @@ func (s *Site) OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag, openAdm
 // StartSite Starts a site, including Traefik if needed.
 func (s *Site) StartSite(consoleOutput *console.Console) error {
 	// Let's start everything up
-	consoleOutput.Printf("Starting development site: %s.\n", consoleOutput.Bold(consoleOutput.Green(s.Settings.URL)))
+	consoleOutput.Printf("Starting development site: %s.\n", consoleOutput.Bold(consoleOutput.Green(s.settings.GetURL())))
 
 	// Start Traefik if we need it
 	err := s.startTraefik(consoleOutput)
@@ -364,7 +266,7 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 	}
 
 	// Start Mailpit
-	if s.Settings.Mailpit {
+	if s.settings.GetBool("Mailpit") {
 		err = s.startMailpit(consoleOutput)
 		if err != nil {
 			return err
@@ -372,7 +274,7 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 	}
 
 	// Make sure the WordPress site is running
-	err = s.verifySite(s.Settings.URL)
+	err = s.verifySite(s.settings.GetURL())
 	if err != nil {
 		return err
 	}
@@ -396,7 +298,7 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 	}
 
 	// Install Xdebug if we need to
-	if s.Settings.Xdebug {
+	if s.settings.GetBool("Xdebug") {
 		consoleOutput.Println("Installing and configuring Xdebug.")
 
 		err = s.StartXdebug(consoleOutput)
@@ -454,8 +356,8 @@ func (s *Site) getDirectories() (wordPressDirectory, databaseDir string, err err
 }
 
 // getRunningConfig gets various options that were used to start the site.
-func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console) (settings.LocalSettings, error) {
-	localSettings := settings.LocalSettings{
+func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console) (settings.Options, error) {
+	localSettings := settings.Options{
 		Type:                 DefaultType,
 		Xdebug:               false,
 		SSL:                  false,
@@ -464,10 +366,10 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 		ScriptDebug:          true,
 		Activate:             true,
 		RemoveDefaultPlugins: false,
-		Multisite:            s.Settings.Multisite,
-		DatabaseClient:       s.Settings.DatabaseClient,
-		Environment:          s.Settings.Environment,
-		Database:             s.Settings.Database,
+		Multisite:            s.settings.Get("Multisite"),
+		DatabaseClient:       s.settings.Get("DatabaseClient"),
+		Environment:          s.settings.Get("Environment"),
+		Database:             s.settings.Get("Database"),
 	}
 
 	// We need container details to see if the mailpit container is running
@@ -509,7 +411,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 		localSettings.Database = "sqlite"
 	}
 
-	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana-%s-wordpress", s.Settings.Name))
+	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana-%s-wordpress", s.settings.Get("Name")))
 
 	if len(mounts) == 1 {
 		localSettings.Type = DefaultType
@@ -521,7 +423,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 		}
 
 		if strings.Contains(mount.Destination, "/var/www/html/wp-content/themes/") {
-			localSettings.Type = "theme"
+			localSettings.Type = "theme" //nolint:goconst
 		}
 	}
 
@@ -541,7 +443,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 
 // maybeRemoveDefaultPlugins Removes the default plugins if the setting is set.
 func (s *Site) maybeRemoveDefaultPlugins() error {
-	if !s.Settings.RemoveDefaultPlugins {
+	if !s.settings.GetBool("RemoveDefaultPlugins") {
 		return nil
 	}
 
@@ -567,7 +469,7 @@ func (s *Site) maybeRemoveDefaultPlugins() error {
 
 // startContainer Starts a given container configuration.
 func (s *Site) startContainer(container *docker.ContainerConfig, randomPorts, localUser bool, consoleOutput *console.Console) error {
-	err := s.dockerClient.EnsureImage(container.Image, s.Settings.ImageUpdateDays, consoleOutput)
+	err := s.dockerClient.EnsureImage(container.Image, s.settings.GetInt("UpdateInterval"), consoleOutput)
 	if err != nil {
 		err = s.handleImageError(container, err)
 		if err != nil {
@@ -582,7 +484,7 @@ func (s *Site) startContainer(container *docker.ContainerConfig, randomPorts, lo
 // verifySite verifies if a site is up and running without error.
 func (s *Site) verifySite(siteURL string) error {
 	// Setup other options generated from config items
-	rootCert := filepath.Join(s.Settings.AppDirectory, "certs", s.Settings.RootCert)
+	rootCert := filepath.Join(s.settings.Get("App"), "certs", s.settings.Get("RootCert"))
 
 	caCert, err := os.ReadFile(rootCert)
 	if err != nil {

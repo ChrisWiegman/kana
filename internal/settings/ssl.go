@@ -15,14 +15,18 @@ var execCommand = exec.Command
 
 const certOS = "darwin"
 
+func GetSSLCerts(settings *Settings) (rootCert, siteCert Certificate) {
+	return settings.constants.RootCert, settings.constants.SiteCert
+}
+
 // EnsureSSLCerts Ensures SSL certificates have been generated and are where they need to be.
-func (s *Settings) EnsureSSLCerts(consoleOutput *console.Console) error {
+func EnsureSSLCerts(appDirectory, domain string, rootCert, siteCert Certificate, useSSL bool, consoleOutput *console.Console) error {
 	createCert := false
 
-	certPath := filepath.Join(s.AppDirectory, "certs")
-	rootCert = filepath.Join(certPath, s.RootCert)
+	certPath := filepath.Join(appDirectory, "certs")
+	rootCertFile := filepath.Join(certPath, rootCert.Certificate)
 
-	_, err := os.Stat(rootCert)
+	_, err := os.Stat(rootCertFile)
 	if err != nil && os.IsNotExist(err) {
 		createCert = true
 	}
@@ -35,11 +39,11 @@ func (s *Settings) EnsureSSLCerts(consoleOutput *console.Console) error {
 
 		certInfo := minica.CertInfo{
 			CertDir:    certPath,
-			CertDomain: s.AppDomain,
-			RootKey:    s.RootKey,
-			RootCert:   s.RootCert,
-			SiteCert:   s.SiteCert,
-			SiteKey:    s.SiteKey,
+			CertDomain: domain,
+			RootKey:    rootCert.Key,
+			RootCert:   rootCert.Certificate,
+			SiteCert:   siteCert.Certificate,
+			SiteKey:    siteCert.Key,
 		}
 
 		err = minica.GenCerts(&certInfo)
@@ -49,15 +53,15 @@ func (s *Settings) EnsureSSLCerts(consoleOutput *console.Console) error {
 	}
 
 	// If we're on Mac try to add the cert to the system trust.
-	if s.SSL && runtime.GOOS == certOS {
-		return TrustSSL(consoleOutput)
+	if useSSL && runtime.GOOS == certOS {
+		return TrustSSL(rootCert.Certificate, consoleOutput)
 	}
 
 	return nil
 }
 
 // TrustSSL Adds the Kana certificate to the Apple Keychain.
-func TrustSSL(consoleOutput *console.Console) error {
+func TrustSSL(rootCert string, consoleOutput *console.Console) error {
 	if runtime.GOOS != certOS {
 		return fmt.Errorf("the trust command is only available for MacOS")
 	}

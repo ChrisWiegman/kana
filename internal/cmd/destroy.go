@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/ChrisWiegman/kana/internal/console"
+	"github.com/ChrisWiegman/kana/internal/settings"
 	"github.com/ChrisWiegman/kana/internal/site"
 
 	"github.com/spf13/cobra"
@@ -13,7 +14,7 @@ import (
 
 var flagForce bool
 
-func destroy(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
+func destroy(consoleOutput *console.Console, kanaSite *site.Site, kanaSettings *settings.Settings) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "destroy",
 		Short: "Destroys the current WordPress site. This is a permanent change.",
@@ -26,7 +27,7 @@ func destroy(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command
 				confirmDestroy = consoleOutput.PromptConfirm(
 					fmt.Sprintf(
 						"Are you sure you want to destroy %s? %s",
-						consoleOutput.Bold(consoleOutput.Blue(kanaSite.Settings.Name)),
+						consoleOutput.Bold(consoleOutput.Blue(kanaSettings.Get("Name"))),
 						consoleOutput.Bold(
 							consoleOutput.Yellow(
 								"This operation is destructive and cannot be undone."))),
@@ -46,7 +47,7 @@ func destroy(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command
 				}
 
 				// Remove the site's folder in the config directory.
-				err = os.RemoveAll(kanaSite.Settings.SiteDirectory)
+				err = os.RemoveAll(kanaSettings.Get("Site"))
 				if err != nil {
 					consoleOutput.Error(err)
 				}
@@ -56,7 +57,7 @@ func destroy(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command
 						"Your site, %s, has been completely destroyed.",
 						consoleOutput.Bold(
 							consoleOutput.Blue(
-								kanaSite.Settings.Name))))
+								kanaSettings.Get("Name")))))
 				return
 			}
 

@@ -4,12 +4,13 @@ import (
 	"fmt"
 
 	"github.com/ChrisWiegman/kana/internal/console"
+	"github.com/ChrisWiegman/kana/internal/settings"
 	"github.com/ChrisWiegman/kana/internal/site"
 
 	"github.com/spf13/cobra"
 )
 
-func stop(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
+func stop(consoleOutput *console.Console, kanaSite *site.Site, kanaSettings *settings.Settings) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "stop",
 		Short: "Stops the WordPress development environment.",
@@ -28,7 +29,7 @@ func stop(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 			consoleOutput.Success(
 				fmt.Sprintf(
 					"Your site, %s, has been stopped. Please use `kana start` again to restart it.",
-					consoleOutput.Bold(consoleOutput.Blue(kanaSite.Settings.Name))))
+					consoleOutput.Bold(consoleOutput.Blue(kanaSettings.Get("Name")))))
 		},
 		Args: cobra.NoArgs,
 	}

@@ -1,3 +1,5 @@
+version: 2
+
 project_name: kana
 
 env:
@@ -46,7 +48,7 @@ snapshot:
   name_template: "{{ incpatch .Version }}-devel"
 
 changelog:
-  skip: false
+  disable: false
 
 nfpms:
   - vendor: Chris Wiegman
