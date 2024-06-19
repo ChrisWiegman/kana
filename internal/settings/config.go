@@ -127,5 +127,5 @@ func printJSONSettings(settings *Settings) {
 
 	str, _ := json.Marshal(jsonSettings)
 
-	fmt.Println(string(str))
+	fmt.Print(string(str))
 }
