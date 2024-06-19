@@ -12,7 +12,7 @@ func TestEnsureKanaPlugin(t *testing.T) {
 	siteName := "example.com"
 
 	// Create a temporary directory for testing
-	err := os.Mkdir(siteDirectory, os.ModePerm)
+	err := os.MkdirAll(siteDirectory, defaultDirPermissions)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -50,7 +50,7 @@ func TestEnsureStaticConfigFiles(t *testing.T) {
 	appDirectory := "kana-test"
 
 	// Create a temporary directory for testing
-	err := os.Mkdir(appDirectory, os.ModePerm)
+	err := os.MkdirAll(appDirectory, defaultDirPermissions)
 	if err != nil {
 		t.Fatal(err)
 	}
