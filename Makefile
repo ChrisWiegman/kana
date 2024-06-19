@@ -59,7 +59,7 @@ clean:
 install:
 	go mod vendor
 	go$(GO_VERSION) install \
-		-ldflags "-s -w -X $(PKG)/internal/cmd.Version=$(VERSION) -X $(PKG)/internal/cmd.Timestamp=$(TIMESTAMP)" \
+		-ldflags "-s -X $(PKG)/internal/cmd.Version=$(VERSION) -X $(PKG)/internal/cmd.Timestamp=$(TIMESTAMP)" \
 		./cmd/...
 
 .PHONY: lint
