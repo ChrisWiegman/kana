@@ -7,7 +7,7 @@ import (
 )
 
 func TestEnsureKanaPlugin(t *testing.T) {
-	siteDirectory := "./kana-test"
+	siteDirectory := "/tmp/kana-test"
 	version := "1.0.0"
 	siteName := "example.com"
 
@@ -47,7 +47,7 @@ func TestGetDefaultFilePermissions(t *testing.T) {
 }
 
 func TestEnsureStaticConfigFiles(t *testing.T) {
-	appDirectory := "./kana-test"
+	appDirectory := "/tmp/kana-test"
 
 	// Create a temporary directory for testing
 	err := os.MkdirAll(appDirectory, defaultDirPermissions)
