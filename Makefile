@@ -77,6 +77,7 @@ mockery:
 		--rm \
 		--mount type=bind,source=$(PWD),target=/src \
 		-w /src/internal/docker \
+		-w /src/internal/site \
 		vektra/mockery \
 		--all
 
