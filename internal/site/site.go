@@ -21,10 +21,11 @@ import (
 )
 
 type Site struct {
-	dockerClient *docker.Client
-	settings     *settings.Settings
-	Named        bool
-	Cli          Cli
+	dockerClient           *docker.Client
+	maxVerificationRetries int
+	settings               *settings.Settings
+	Named                  bool
+	Cli                    Cli
 }
 
 type SiteInfo struct {
@@ -34,7 +35,6 @@ type SiteInfo struct {
 
 const DefaultType = "site"
 
-var maxVerificationRetries = 30
 var execCommand = exec.Command
 
 func Load(site *Site, kanaSettings *settings.Settings) {
@@ -513,7 +513,7 @@ func (s *Site) verifySite(siteURL string) error {
 			break
 		}
 
-		if tries == maxVerificationRetries {
+		if tries == s.maxVerificationRetries {
 			return errors.New("timeout reached. unable to open site")
 		}
 
