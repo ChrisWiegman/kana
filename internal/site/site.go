@@ -24,6 +24,7 @@ type Site struct {
 	dockerClient *docker.Client
 	settings     *settings.Settings
 	Named        bool
+	Cli          Cli
 }
 
 type SiteInfo struct {
@@ -65,7 +66,7 @@ func (s *Site) ExportSiteConfig(consoleOutput *console.Console) error {
 		"siteurl",
 	}
 
-	code, checkURL, err := s.RunWPCli(checkCommand, false, consoleOutput)
+	code, checkURL, err := s.Cli.WPCli(checkCommand, false, consoleOutput)
 	if err != nil || code != 0 {
 		return fmt.Errorf("unable to determine SSL status")
 	}
@@ -377,7 +378,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 	// We need container details to see if the mailpit container is running
 	localSettings.Mailpit = s.isMailpitRunning()
 
-	output, err := s.runCli("pecl list | grep xdebug", false, false)
+	output, err := s.Cli.WordPress("pecl list | grep xdebug", false, false)
 	if err != nil {
 		return localSettings, err
 	}
@@ -386,7 +387,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 		localSettings.Xdebug = true
 	}
 
-	output, err = s.runCli("echo $WORDPRESS_DEBUG", false, false)
+	output, err = s.Cli.WordPress("echo $WORDPRESS_DEBUG", false, false)
 	if err != nil {
 		return localSettings, err
 	}
@@ -395,7 +396,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 		localSettings.WPDebug = true
 	}
 
-	output, err = s.runCli("echo $SCRIPT_DEBUG", false, false)
+	output, err = s.Cli.WordPress("echo $SCRIPT_DEBUG", false, false)
 	if err != nil {
 		return localSettings, err
 	}
@@ -404,7 +405,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 		localSettings.ScriptDebug = true
 	}
 
-	output, err = s.runCli("echo $KANA_SQLITE", false, false)
+	output, err = s.Cli.WordPress("echo $KANA_SQLITE", false, false)
 	if err != nil {
 		return localSettings, err
 	}
@@ -467,23 +468,6 @@ func (s *Site) maybeRemoveDefaultPlugins() error {
 	}
 
 	return nil
-}
-
-// runCli Runs an arbitrary CLI command against the site's WordPress container.
-func (s *Site) runCli(command string, restart, root bool) (docker.ExecResult, error) {
-	container := fmt.Sprintf("kana-%s-wordpress", s.settings.Get("Name"))
-
-	output, err := s.dockerClient.ContainerExec(container, root, []string{command})
-	if err != nil {
-		return docker.ExecResult{}, err
-	}
-
-	if restart {
-		_, err = s.dockerClient.ContainerRestart(container)
-		return output, err
-	}
-
-	return output, nil
 }
 
 // startContainer Starts a given container configuration.

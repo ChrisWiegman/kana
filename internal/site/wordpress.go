@@ -24,93 +24,6 @@ type PluginInfo struct {
 
 var defaultDirPermissions = 0750
 
-// RunWPCli Runs a wp-cli command returning it's output and any errors.
-func (s *Site) RunWPCli(command []string, interactive bool, consoleOutput *console.Console) (statusCode int64, output string, err error) {
-	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana-%s-wordpress", s.settings.Get("Name")))
-
-	for _, mount := range mounts {
-		if strings.Contains(mount.Destination, "/var/www/html/wp-content/plugins/") {
-			err = s.settings.OverrideType("plugin")
-			if err != nil {
-				return 1, "", err
-			}
-		}
-
-		if strings.Contains(mount.Destination, "/var/www/html/wp-content/themes/") {
-			err = s.settings.OverrideType("theme")
-			if err != nil {
-				return 1, "", err
-			}
-		}
-	}
-
-	wordPressDirectory, err := s.getWordPressDirectory()
-	if err != nil {
-		return 1, "", err
-	}
-
-	appVolumes, err := s.getWordPressMounts(wordPressDirectory)
-	if err != nil {
-		return 1, "", err
-	}
-
-	fullCommand := []string{
-		"wp",
-		"--path=/var/www/html",
-	}
-
-	fullCommand = append(fullCommand, command...)
-
-	envVars := []string{
-		"IS_KANA_ENVIRONMENT=true",
-	}
-
-	isUsingSQLite, err := s.isUsingSQLite()
-	if err != nil {
-		return 1, "", err
-	}
-
-	if isUsingSQLite {
-		envVars = append(envVars, "KANA_SQLITE=true")
-	} else {
-		envVars = append(envVars,
-			fmt.Sprintf("WORDPRESS_DB_HOST=kana-%s-database", s.settings.Get("Name")),
-			"WORDPRESS_DB_USER=wordpress",
-			"WORDPRESS_DB_PASSWORD=wordpress",
-			"WORDPRESS_DB_NAME=wordpress",
-			"WORDPRESS_ADMIN_USER=admin")
-	}
-
-	container := docker.ContainerConfig{
-		Name:        fmt.Sprintf("kana-%s-wordpress_cli", s.settings.Get("Name")),
-		Image:       fmt.Sprintf("wordpress:cli-php%s", s.settings.Get("PHP")),
-		NetworkName: "kana",
-		HostName:    fmt.Sprintf("kana-%s-wordpress_cli", s.settings.Get("Name")),
-		Command:     fullCommand,
-		Env:         envVars,
-		Labels: map[string]string{
-			"kana.site": s.settings.Get("Name"),
-		},
-		Volumes: appVolumes,
-	}
-
-	if s.settings.GetBool("AutomaticLogin") {
-		container.Env = append(container.Env, "KANA_ADMIN_LOGIN=true")
-	}
-
-	err = s.dockerClient.EnsureImage(container.Image, s.settings.GetInt("UpdateInterval"), consoleOutput)
-	if err != nil {
-		return 1, "", err
-	}
-
-	code, output, err := s.dockerClient.ContainerRunAndClean(&container, interactive)
-	if err != nil {
-		return code, "", err
-	}
-
-	return code, output, nil
-}
-
 func (s *Site) getWordPressDirectory() (wordPressDirectory string, err error) {
 	wordPressDirectory = filepath.Join(s.settings.Get("Site"), "wordpress")
 
@@ -145,7 +58,7 @@ func (s *Site) getInstalledWordPressPlugins(consoleOutput *console.Console) (plu
 
 	hasDefaultPlugins = false
 
-	_, commandOutput, err := s.RunWPCli(commands, false, consoleOutput)
+	_, commandOutput, err := s.Cli.WPCli(commands, false, consoleOutput)
 	if err != nil {
 		return []string{}, true, err
 	}
@@ -318,7 +231,7 @@ func (s *Site) activateProject(consoleOutput *console.Console) error {
 			s.settings.Get("Name"),
 		}
 
-		code, _, err := s.RunWPCli(setupCommand, false, consoleOutput)
+		code, _, err := s.Cli.WPCli(setupCommand, false, consoleOutput)
 		if err != nil {
 			return err
 		}
@@ -349,7 +262,7 @@ func (s *Site) activateTheme(consoleOutput *console.Console) error {
 		s.settings.Get("Theme"),
 	}
 
-	code, _, err := s.RunWPCli(setupCommand, false, consoleOutput)
+	code, _, err := s.Cli.WPCli(setupCommand, false, consoleOutput)
 	if err != nil {
 		return err
 	}
@@ -384,7 +297,7 @@ func (s *Site) installDefaultPlugins(consoleOutput *console.Console) error {
 
 		consoleOutput.Println(fmt.Sprintf("Installing plugin:  %s", consoleOutput.Bold(consoleOutput.Blue(plugin))))
 
-		code, _, err := s.RunWPCli(setupCommand, false, consoleOutput)
+		code, _, err := s.Cli.WPCli(setupCommand, false, consoleOutput)
 		if err != nil {
 			return err
 		}
@@ -415,7 +328,7 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 		"siteurl",
 	}
 
-	code, checkURL, err := s.RunWPCli(checkCommand, false, consoleOutput)
+	code, checkURL, err := s.Cli.WPCli(checkCommand, false, consoleOutput)
 
 	if err != nil || code != 0 {
 		consoleOutput.Println("Finishing WordPress setup.")
@@ -449,7 +362,7 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 
 		var output string
 
-		code, output, err = s.RunWPCli(setupCommand, false, consoleOutput)
+		code, output, err = s.Cli.WPCli(setupCommand, false, consoleOutput)
 		if err != nil || code != 0 {
 			return fmt.Errorf("installation of WordPress failed: %s", output)
 		}
@@ -470,7 +383,7 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 				s.settings.GetURL(),
 			}
 
-			code, _, err = s.RunWPCli(setSiteURLCommand, false, consoleOutput)
+			code, _, err = s.Cli.WPCli(setSiteURLCommand, false, consoleOutput)
 			if err != nil || code != 0 {
 				return fmt.Errorf("installation of WordPress failed: %s", err.Error())
 			}
