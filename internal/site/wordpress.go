@@ -58,7 +58,7 @@ func (s *Site) getInstalledWordPressPlugins(consoleOutput *console.Console) (plu
 
 	hasDefaultPlugins = false
 
-	_, commandOutput, err := s.Cli.WPCli(commands, false, consoleOutput)
+	_, commandOutput, err := s.WPCli(commands, false, consoleOutput)
 	if err != nil {
 		return []string{}, true, err
 	}
@@ -231,7 +231,7 @@ func (s *Site) activateProject(consoleOutput *console.Console) error {
 			s.settings.Get("Name"),
 		}
 
-		code, _, err := s.Cli.WPCli(setupCommand, false, consoleOutput)
+		code, _, err := s.WPCli(setupCommand, false, consoleOutput)
 		if err != nil {
 			return err
 		}
@@ -262,7 +262,7 @@ func (s *Site) activateTheme(consoleOutput *console.Console) error {
 		s.settings.Get("Theme"),
 	}
 
-	code, _, err := s.Cli.WPCli(setupCommand, false, consoleOutput)
+	code, _, err := s.WPCli(setupCommand, false, consoleOutput)
 	if err != nil {
 		return err
 	}
@@ -297,7 +297,7 @@ func (s *Site) installDefaultPlugins(consoleOutput *console.Console) error {
 
 		consoleOutput.Println(fmt.Sprintf("Installing plugin:  %s", consoleOutput.Bold(consoleOutput.Blue(plugin))))
 
-		code, _, err := s.Cli.WPCli(setupCommand, false, consoleOutput)
+		code, _, err := s.WPCli(setupCommand, false, consoleOutput)
 		if err != nil {
 			return err
 		}
@@ -328,7 +328,7 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 		"siteurl",
 	}
 
-	code, checkURL, err := s.Cli.WPCli(checkCommand, false, consoleOutput)
+	code, checkURL, err := s.WPCli(checkCommand, false, consoleOutput)
 
 	if err != nil || code != 0 {
 		consoleOutput.Println("Finishing WordPress setup.")
@@ -362,7 +362,7 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 
 		var output string
 
-		code, output, err = s.Cli.WPCli(setupCommand, false, consoleOutput)
+		code, output, err = s.WPCli(setupCommand, false, consoleOutput)
 		if err != nil || code != 0 {
 			return fmt.Errorf("installation of WordPress failed: %s", output)
 		}
@@ -383,7 +383,7 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 				s.settings.GetURL(),
 			}
 
-			code, _, err = s.Cli.WPCli(setSiteURLCommand, false, consoleOutput)
+			code, _, err = s.WPCli(setSiteURLCommand, false, consoleOutput)
 			if err != nil || code != 0 {
 				return fmt.Errorf("installation of WordPress failed: %s", err.Error())
 			}

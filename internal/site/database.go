@@ -45,7 +45,7 @@ func (s *Site) ExportDatabase(args []string, consoleOutput *console.Console) (st
 		"/Site/export.sql",
 	}
 
-	code, output, err := s.Cli.WPCli(exportCommand, false, consoleOutput)
+	code, output, err := s.WPCli(exportCommand, false, consoleOutput)
 	if err != nil || code != 0 {
 		errorMessage := ""
 
@@ -108,12 +108,12 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string, 
 		var code int64
 		var output string
 
-		code, output, err = s.Cli.WPCli(dropCommand, false, consoleOutput)
+		code, output, err = s.WPCli(dropCommand, false, consoleOutput)
 		if err != nil || code != 0 {
 			return fmt.Errorf("drop database failed: %s\n%s", err.Error(), output)
 		}
 
-		code, output, err = s.Cli.WPCli(createCommand, false, consoleOutput)
+		code, output, err = s.WPCli(createCommand, false, consoleOutput)
 		if err != nil || code != 0 {
 			return fmt.Errorf("create database failed: %s\n%s", err.Error(), output)
 		}
@@ -127,7 +127,7 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string, 
 		"/Site/import.sql",
 	}
 
-	code, output, err := s.Cli.WPCli(importCommand, false, consoleOutput)
+	code, output, err := s.WPCli(importCommand, false, consoleOutput)
 	if err != nil || code != 0 {
 		return fmt.Errorf("database import failed: %s\n%s", err.Error(), output)
 	}
@@ -142,7 +142,7 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string, 
 			"--all-tables",
 		}
 
-		code, output, err := s.Cli.WPCli(replaceCommand, false, consoleOutput)
+		code, output, err := s.WPCli(replaceCommand, false, consoleOutput)
 		if err != nil || code != 0 {
 			return fmt.Errorf("replace domain failed failed: %s\n%s", err.Error(), output)
 		}
@@ -265,7 +265,7 @@ func (s *Site) maybeSetupSQLite() error {
 }
 
 func (s *Site) isUsingSQLite() (bool, error) {
-	output, err := s.Cli.WordPress("echo $KANA_SQLITE", false, false)
+	output, err := s.WordPress("echo $KANA_SQLITE", false, false)
 	if err != nil {
 		return false, err
 	}
@@ -288,7 +288,7 @@ func (s *Site) verifyDatabase(consoleOutput *console.Console) error {
 	checkAttempt := 0
 
 	for !databaseOK {
-		code, _, err := s.Cli.WPCli(checkCommand, false, consoleOutput)
+		code, _, err := s.WPCli(checkCommand, false, consoleOutput)
 		if err != nil || code != 0 {
 			checkAttempt++ // Increment the check attempt counter
 			time.Sleep(time.Second)

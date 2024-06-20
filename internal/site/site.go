@@ -24,7 +24,6 @@ type Site struct {
 	maxVerificationRetries int
 	settings               *settings.Settings
 	Named                  bool
-	Cli                    Cli
 }
 
 type SiteInfo struct {
@@ -63,7 +62,7 @@ func (s *Site) ExportSiteConfig(consoleOutput *console.Console) error {
 		"siteurl",
 	}
 
-	code, checkURL, err := s.Cli.WPCli(checkCommand, false, consoleOutput)
+	code, checkURL, err := s.WPCli(checkCommand, false, consoleOutput)
 	if err != nil || code != 0 {
 		return fmt.Errorf("unable to determine SSL status")
 	}
@@ -223,7 +222,7 @@ func (s *Site) OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag, openAdm
 		}
 
 		if runtime.GOOS == "linux" {
-			openCmd := s.Cli.Command("xdg-open", openURL)
+			openCmd := Command("xdg-open", openURL)
 			return openCmd.Run()
 		}
 
@@ -375,7 +374,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 	// We need container details to see if the mailpit container is running
 	localSettings.Mailpit = s.isMailpitRunning()
 
-	output, err := s.Cli.WordPress("pecl list | grep xdebug", false, false)
+	output, err := s.WordPress("pecl list | grep xdebug", false, false)
 	if err != nil {
 		return localSettings, err
 	}
@@ -384,7 +383,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 		localSettings.Xdebug = true
 	}
 
-	output, err = s.Cli.WordPress("echo $WORDPRESS_DEBUG", false, false)
+	output, err = s.WordPress("echo $WORDPRESS_DEBUG", false, false)
 	if err != nil {
 		return localSettings, err
 	}
@@ -393,7 +392,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 		localSettings.WPDebug = true
 	}
 
-	output, err = s.Cli.WordPress("echo $SCRIPT_DEBUG", false, false)
+	output, err = s.WordPress("echo $SCRIPT_DEBUG", false, false)
 	if err != nil {
 		return localSettings, err
 	}
@@ -402,7 +401,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 		localSettings.ScriptDebug = true
 	}
 
-	output, err = s.Cli.WordPress("echo $KANA_SQLITE", false, false)
+	output, err = s.WordPress("echo $KANA_SQLITE", false, false)
 	if err != nil {
 		return localSettings, err
 	}

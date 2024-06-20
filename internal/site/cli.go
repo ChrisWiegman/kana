@@ -9,12 +9,6 @@ import (
 	"github.com/ChrisWiegman/kana/internal/docker"
 )
 
-type Cli interface {
-	WordPress(command string, restart, root bool) (docker.ExecResult, error)
-	WPCli(command []string, interactive bool, consoleOutput *console.Console) (statusCode int64, output string, err error)
-	Command(name string, arg ...string) *exec.Cmd
-}
-
 func Command(name string, arg ...string) *exec.Cmd {
 	return exec.Command(name, arg...)
 }
