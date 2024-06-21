@@ -54,6 +54,13 @@ type File struct {
 	Template    string
 }
 
+type Option struct {
+	Name    string
+	Value   string
+	Type    string
+	Default string
+}
+
 // Options represents the options that can be configured by a user either globally or through a site's .kana.json.
 type Options struct {
 	Activate             bool   // Activate the plugin or theme for the appropriate site type.
