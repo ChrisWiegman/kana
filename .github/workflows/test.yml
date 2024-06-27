@@ -59,4 +59,4 @@ jobs:
             ./cmd/...
 
       - name: Test
-        uses: robherley/go-test-action@v0.2.0
+        uses: robherley/go-test-action@v0.4.1
