@@ -1,0 +1,11 @@
+{
+	"activate": true,
+	"appDirectory": "/Users/chriswiegman/.config/kana",
+	"isNamed": false,
+	"isNew": true,
+	"multisite": "none",
+	"name": "kana",
+	"plugins": [],
+	"siteDirectory": "/Users/chriswiegman/.config/kana/sites/kana",
+	"workingDirectory": "/Users/chriswiegman/Code/kana"
+}

@@ -11,8 +11,7 @@
             "mode": "auto",
             "program": "cmd/kana/main.go",
             "args": [
-                "start",
-                "--name=acme"
+                "test"
             ]
         }
     ]

@@ -37,12 +37,12 @@ func Execute() {
 				}
 			}
 
-			err := settings.Load(kanaSettings, Version, cmd, commandsRequiringSite, &startFlags)
-			if err != nil {
-				consoleOutput.Error(err)
-			}
+			// err := settings.Load(kanaSettings, Version, cmd, commandsRequiringSite, &startFlags)
+			// if err != nil {
+			// 	consoleOutput.Error(err)
+			// }
 
-			site.Load(kanaSite, kanaSettings)
+			// site.Load(kanaSite, kanaSettings)
 		},
 	}
 
@@ -74,6 +74,7 @@ func Execute() {
 		version(consoleOutput),
 		wp(consoleOutput, kanaSite),
 		xdebug(consoleOutput, kanaSite),
+		test(consoleOutput),
 	)
 
 	if runtime.GOOS == "darwin" {
