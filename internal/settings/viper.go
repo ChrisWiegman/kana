@@ -8,35 +8,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-func getSettingsVromViper(viperSettings *viper.Viper) Options {
-	options := Options{}
-
-	options.Activate = viperSettings.GetBool("activate")
-	options.AdminEmail = viperSettings.GetString("admin.email")
-	options.AdminPassword = viperSettings.GetString("admin.password")
-	options.AdminUsername = viperSettings.GetString("admin.username")
-	options.AutomaticLogin = viperSettings.GetBool("automaticlogin")
-	options.Database = viperSettings.GetString("database")
-	options.DatabaseClient = viperSettings.GetString("databaseclient")
-	options.DatabaseVersion = viperSettings.GetString("databaseversion")
-	options.Environment = viperSettings.GetString("environment")
-	options.UpdateInterval = viperSettings.GetInt64("imageupdatedays")
-	options.UpdateInterval = viperSettings.GetInt64("updateinterval")
-	options.Mailpit = viperSettings.GetBool("mailpit")
-	options.Multisite = viperSettings.GetString("multisite")
-	options.PHP = viperSettings.GetString("php")
-	options.Plugins = viperSettings.GetStringSlice("plugins")
-	options.RemoveDefaultPlugins = viperSettings.GetBool("removedefaultplugins")
-	options.ScriptDebug = viperSettings.GetBool("scriptdebug")
-	options.SSL = viperSettings.GetBool("ssl")
-	options.Theme = viperSettings.GetString("theme")
-	options.Type = viperSettings.GetString("type")
-	options.WPDebug = viperSettings.GetBool("wpdebug")
-	options.Xdebug = viperSettings.GetBool("xdebug")
-
-	return options
-}
-
 func updateSettingsFromViper(viperSettings *viper.Viper, options *Options) {
 	options.Activate = viperSettings.GetBool("activate")
 	options.AdminEmail = viperSettings.GetString("admin.email")

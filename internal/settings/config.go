@@ -20,8 +20,11 @@ func ListSettings(settings *Settings, consoleOutput *console.Console) {
 	}
 
 	settingsTable := table.New(os.Stdout)
-	localSettings := getSettingsVromViper(settings.local)
-	globalSettings := getSettingsVromViper(settings.global)
+	globalSettings := new(Options)
+	localSettings := new(Options)
+
+	updateSettingsFromViper(settings.global, globalSettings)
+	updateSettingsFromViper(settings.local, localSettings)
 
 	localPlugins := []string{}
 	globalPlugins := []string{}
