@@ -8,57 +8,55 @@ import (
 
 // processStartFlags Process the start flags and save them to the settings object.
 func processStartFlags(cmd *cobra.Command, flags *StartFlags, settings *Settings) {
-	options := settings.settings
-
 	if cmd.Flags().Lookup("activate").Changed {
-		options.Activate = flags.Activate
+		settings.settings.Activate = flags.Activate
 	}
 
 	if cmd.Flags().Lookup("database").Changed {
-		options.Database = flags.Database
+		settings.settings.Database = flags.Database
 	}
 
 	if cmd.Flags().Lookup("environment").Changed {
-		options.Environment = flags.Environment
+		settings.settings.Environment = flags.Environment
 	}
 
 	if cmd.Flags().Lookup("mailpit").Changed {
-		options.Mailpit = flags.Mailpit
+		settings.settings.Mailpit = flags.Mailpit
 	}
 
 	if cmd.Flags().Lookup("multisite").Changed {
-		options.Multisite = flags.Multisite
+		settings.settings.Multisite = flags.Multisite
 	}
 
 	if cmd.Flags().Lookup("plugins").Changed {
-		options.Plugins = strings.Split(flags.Plugins, ",")
+		settings.settings.Plugins = strings.Split(flags.Plugins, ",")
 	}
 
 	if cmd.Flags().Lookup("remove-default-plugins").Changed {
-		options.RemoveDefaultPlugins = flags.RemoveDefaultPlugins
+		settings.settings.RemoveDefaultPlugins = flags.RemoveDefaultPlugins
 	}
 
 	if cmd.Flags().Lookup("scriptdebug").Changed {
-		options.ScriptDebug = flags.ScriptDebug
+		settings.settings.ScriptDebug = flags.ScriptDebug
 	}
 
 	if cmd.Flags().Lookup("ssl").Changed {
-		options.SSL = flags.SSL
+		settings.settings.SSL = flags.SSL
 	}
 
 	if cmd.Flags().Lookup("theme").Changed {
-		options.Theme = flags.Theme
+		settings.settings.Theme = flags.Theme
 	}
 
 	if cmd.Flags().Lookup("type").Changed {
-		options.Type = flags.Type
+		settings.settings.Type = flags.Type
 	}
 
 	if cmd.Flags().Lookup("wpdebug").Changed {
-		options.WPDebug = flags.WPDebug
+		settings.settings.WPDebug = flags.WPDebug
 	}
 
 	if cmd.Flags().Lookup("xdebug").Changed {
-		options.Xdebug = flags.Xdebug
+		settings.settings.Xdebug = flags.Xdebug
 	}
 }
