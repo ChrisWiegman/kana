@@ -1,3 +1,0 @@
-kind: Breaking Changes
-body: The `ImageUpdateDays` settings has been renamed to `UpdateInterval`. This will allow it to be reused more easily, where appropriate.
-time: 2024-06-19T17:01:41.219808842Z

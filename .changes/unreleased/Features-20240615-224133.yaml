@@ -1,3 +1,0 @@
-kind: Features
-body: Kana will now check that the database is ready before continuing site setup. This should result in more reliable site startup.
-time: 2024-06-15T22:41:33.382808553Z

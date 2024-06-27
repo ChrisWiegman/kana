@@ -1,3 +1,0 @@
-kind: Bug Fixes
-body: When outputting JSON results, the extra line break at the end of the output should be removed
-time: 2024-06-19T17:02:17.69478447Z
