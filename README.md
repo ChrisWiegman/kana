@@ -179,7 +179,7 @@ Kana has a handful of options that apply to all new sites created with the app. 
 - `multisite` **none** - set to either `subdirectory` or `subdomain` to create the site as the appropriate type of Multisite installation.
 - `php` **8.2** - the default PHP version used for new sites (see [https://hub.docker.com/_/wordpress] for all supported versions)
 - `removeDefaultPlugins` **false** - removes the default "Hello Dolly" and Akismet plugins when starting a new site. Note this will not restore them if they've already been removed.
-- `scriptdebug` **false** - the default usage of the `scriptdebug` start flag
+- `scriptDebug` **false** - the default usage of the `scriptDebug` wp-config item
 - `ssl` **false** - the default usage of the `ssl` start flag
 - `theme` ***<empty string>*** - the default theme to be installed from wordpress.org and activated with new sites
 - `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"
@@ -211,7 +211,7 @@ In addition to the global config, certain items above can be overridden for any 
 - `php` **8.2** - the default PHP version used for new sites (see [https://hub.docker.com/_/wordpress] for all supported versions)
 - `plugins` **[]** - an array of plugins to install and activate when starting the new site. These are slugs from the Plugins section of WordPress.org.
 - `removeDefaultPlugins` **false** - removes the default "Hello Dolly" and Akismet plugins when starting a new site. Note this will not restore them if they've already been removed.
-- `scriptdebug` **false** - the default usage of the `scriptdebug` start flag
+- `scriptDebug` **false** - the default usage of the `scriptDebug` start flag
 - `ssl` **false** - the default usage of the `ssl` start flag
 - `theme` ***<empty string>*** - the default theme to be installed from wordpress.org and activated with the site
 - `type` **site** - the type of the Kana site you're starting. Current options are "site" "plugin" and "theme"

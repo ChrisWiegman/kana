@@ -229,7 +229,8 @@ func (s *Settings) Set(name, value string) error {
 		"automaticlogin",
 		"mailpit",
 		"removedefaultplugins",
-		"scriptdebug", "ssl",
+		"scriptdebug",
+		"ssl",
 		"wpdebug",
 		"xdebug":
 		boolValue, err := strconv.ParseBool(value)

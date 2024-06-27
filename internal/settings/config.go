@@ -59,7 +59,6 @@ func ListSettings(settings *Settings, consoleOutput *console.Console) {
 		consoleOutput.Bold(globalSettings.DatabaseVersion),
 		consoleOutput.Bold(localSettings.DatabaseVersion))
 	settingsTable.AddRow("environment", consoleOutput.Bold(globalSettings.Environment), consoleOutput.Bold(localSettings.Environment))
-	settingsTable.AddRow("imageUpdateDays", consoleOutput.Bold(strconv.FormatInt(globalSettings.UpdateInterval, 10)), "")
 	settingsTable.AddRow("mailpit",
 		consoleOutput.Bold(strconv.FormatBool(globalSettings.Mailpit)),
 		consoleOutput.Bold(strconv.FormatBool(localSettings.Mailpit)))
@@ -74,13 +73,14 @@ func ListSettings(settings *Settings, consoleOutput *console.Console) {
 	settingsTable.AddRow("ssl",
 		consoleOutput.Bold(strconv.FormatBool(globalSettings.SSL)),
 		consoleOutput.Bold(strconv.FormatBool(localSettings.SSL)))
-	settingsTable.AddRow("scriptdebug",
+	settingsTable.AddRow("scriptDebug",
 		consoleOutput.Bold(strconv.FormatBool(globalSettings.ScriptDebug)),
 		consoleOutput.Bold(strconv.FormatBool(localSettings.ScriptDebug)))
 	settingsTable.AddRow("theme",
 		consoleOutput.Bold(globalSettings.Theme),
 		consoleOutput.Bold(localSettings.Theme))
 	settingsTable.AddRow("type", consoleOutput.Bold(globalSettings.Type), consoleOutput.Bold(localSettings.Type))
+	settingsTable.AddRow("updateInterval", consoleOutput.Bold(strconv.FormatInt(globalSettings.UpdateInterval, 10)), "")
 	settingsTable.AddRow("wpdebug",
 		consoleOutput.Bold(strconv.FormatBool(globalSettings.WPDebug)),
 		consoleOutput.Bold(strconv.FormatBool(localSettings.WPDebug)))
