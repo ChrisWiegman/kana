@@ -60,7 +60,7 @@ func getKoanfOptions(settingsType string, settings *Settings) (*koanf.Koanf, err
 				}
 			case "slice":
 				stringValue := ko.String(setting.name)
-				if stringValue == "" {
+				if stringValue != "" {
 					err = settings.Set(setting.name, stringValue)
 					if err != nil {
 						return ko, err

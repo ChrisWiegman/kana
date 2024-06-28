@@ -144,7 +144,7 @@ func (s *Settings) getAll(settingsType string) map[string]interface{} {
 			if setting.currentValue == "" {
 				allSettings[setting.name] = []string{}
 			} else {
-				allSettings[setting.name] = strings.Split(setting.currentValue, ",")
+				allSettings[setting.name] = setting.currentValue
 			}
 		default:
 			allSettings[setting.name] = setting.currentValue

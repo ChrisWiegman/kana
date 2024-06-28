@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/ChrisWiegman/kana/internal/console"
 
@@ -32,7 +33,12 @@ func ListSettings(settings *Settings, consoleOutput *console.Console) {
 		globalOutput := fmt.Sprint(globalSettings[setting.name])
 		localOutput := fmt.Sprint(localSettings[setting.name])
 
-		if !setting.hasGlobal {
+		if setting.settingType == "slice" { //nolint:goconst
+			globalOutput = strings.Join(globalSettings[setting.name].([]string), "\n")
+			localOutput = strings.Join(localSettings[setting.name].([]string), "\n")
+		}
+
+		if !setting.hasLocal {
 			localOutput = ""
 		}
 

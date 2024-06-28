@@ -40,19 +40,19 @@ var defaults = []Setting{
 	},
 	{
 		name:         "adminEmail",
-		defaultValue: "",
+		defaultValue: "admin@sites.kana.sh",
 		settingType:  "string",
 		hasGlobal:    true,
 	},
 	{
 		name:         "adminPassword",
-		defaultValue: "",
+		defaultValue: "password",
 		settingType:  "string",
 		hasGlobal:    true,
 	},
 	{
 		name:         "adminUser",
-		defaultValue: "",
+		defaultValue: "admin",
 		settingType:  "string",
 		hasGlobal:    true,
 	},
