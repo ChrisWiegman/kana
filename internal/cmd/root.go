@@ -41,6 +41,8 @@ func Execute() {
 			if err != nil {
 				consoleOutput.Error(err)
 			}
+
+			site.Load(kanaSite, kanaSettings)
 		},
 	}
 
