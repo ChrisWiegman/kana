@@ -37,6 +37,7 @@ var defaults = []Setting{
 		settingType:  "bool",
 		hasLocal:     true,
 		hasGlobal:    true,
+		hasStartFlag: true,
 	},
 	{
 		name:         "adminEmail",
@@ -71,8 +72,9 @@ var defaults = []Setting{
 			"mariadb",
 			"mysql",
 			"sqlite"},
-		hasLocal:  true,
-		hasGlobal: true,
+		hasLocal:     true,
+		hasGlobal:    true,
+		hasStartFlag: true,
 	},
 	{
 		name:         "databaseClient",
@@ -100,8 +102,9 @@ var defaults = []Setting{
 			"development",
 			"staging",
 			"production"},
-		hasLocal:  true,
-		hasGlobal: true,
+		hasLocal:     true,
+		hasGlobal:    true,
+		hasStartFlag: true,
 	},
 	{
 		name:         "mailpit",
@@ -109,6 +112,7 @@ var defaults = []Setting{
 		settingType:  "bool",
 		hasLocal:     true,
 		hasGlobal:    true,
+		hasStartFlag: true,
 	},
 	{
 		name:         "multisite",
@@ -118,8 +122,9 @@ var defaults = []Setting{
 			"none",
 			"subdomain",
 			"subdirectory"},
-		hasLocal:  true,
-		hasGlobal: true,
+		hasLocal:     true,
+		hasGlobal:    true,
+		hasStartFlag: true,
 	},
 	{
 		name:         "php",
@@ -134,6 +139,7 @@ var defaults = []Setting{
 		settingType:  "slice",
 		hasLocal:     true,
 		hasGlobal:    true,
+		hasStartFlag: true,
 	},
 	{
 		name:         "removeDefaultPlugins",
@@ -141,6 +147,7 @@ var defaults = []Setting{
 		settingType:  "bool",
 		hasLocal:     true,
 		hasGlobal:    true,
+		hasStartFlag: true,
 	},
 	{
 		name:         "scriptDebug",
@@ -148,6 +155,7 @@ var defaults = []Setting{
 		settingType:  "bool",
 		hasLocal:     true,
 		hasGlobal:    true,
+		hasStartFlag: true,
 	},
 	{
 		name:         "ssl",
@@ -155,6 +163,7 @@ var defaults = []Setting{
 		settingType:  "bool",
 		hasLocal:     true,
 		hasGlobal:    true,
+		hasStartFlag: true,
 	},
 	{
 		name:         "theme",
@@ -162,6 +171,7 @@ var defaults = []Setting{
 		settingType:  "string",
 		hasLocal:     true,
 		hasGlobal:    true,
+		hasStartFlag: true,
 	},
 	{
 		name:         "type",
@@ -171,8 +181,9 @@ var defaults = []Setting{
 			"site",
 			"plugin",
 			"theme"},
-		hasLocal:  true,
-		hasGlobal: true,
+		hasLocal:     true,
+		hasGlobal:    true,
+		hasStartFlag: true,
 	},
 	{
 		name:         "updateInterval",
@@ -186,6 +197,7 @@ var defaults = []Setting{
 		settingType:  "bool",
 		hasLocal:     true,
 		hasGlobal:    true,
+		hasStartFlag: true,
 	},
 	{
 		name:         "xdebug",
@@ -193,6 +205,7 @@ var defaults = []Setting{
 		settingType:  "bool",
 		hasLocal:     true,
 		hasGlobal:    true,
+		hasStartFlag: true,
 	},
 }
 

@@ -44,26 +44,26 @@ func loadKoanfOptions(settingsType string, settings *Settings) error {
 		}
 	}
 
-	for _, setting := range settings.settings {
-		if ko.Exists(setting.name) {
-			switch setting.settingType {
+	for i := range settings.settings {
+		if ko.Exists(settings.settings[i].name) {
+			switch settings.settings[i].settingType {
 			case "bool":
-				err = settings.Set(setting.name, ko.Bool(setting.name))
+				err = settings.Set(settings.settings[i].name, ko.Bool(settings.settings[i].name))
 				if err != nil {
 					return err
 				}
 			case "int":
-				err = settings.Set(setting.name, ko.Int64(setting.name))
+				err = settings.Set(settings.settings[i].name, ko.Int64(settings.settings[i].name))
 				if err != nil {
 					return err
 				}
 			case "slice":
-				err = settings.Set(setting.name, ko.Strings(setting.name))
+				err = settings.Set(settings.settings[i].name, ko.Strings(settings.settings[i].name))
 				if err != nil {
 					return err
 				}
 			default:
-				err = settings.Set(setting.name, ko.String(setting.name))
+				err = settings.Set(settings.settings[i].name, ko.String(settings.settings[i].name))
 				if err != nil {
 					return err
 				}

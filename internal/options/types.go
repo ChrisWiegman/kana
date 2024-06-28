@@ -35,5 +35,15 @@ type Setting struct {
 	currentValue string
 	hasLocal     bool
 	hasGlobal    bool
+	hasStartFlag bool
+	startFlag    StartFlag
 	validValues  []string
+}
+
+// StartFlag represents the data needed to programmatically create a start flag.
+type StartFlag struct {
+	ShortName     string
+	Usage         string
+	Value         interface{}
+	NoOptDefValue string
 }

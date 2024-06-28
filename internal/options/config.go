@@ -25,24 +25,24 @@ func ListSettings(settings *Settings, consoleOutput *console.Console) {
 	globalSettings := settings.getAll("global")
 	localSettings := settings.getAll("local")
 
-	for _, setting := range settings.settings {
-		if !setting.hasGlobal && !setting.hasLocal {
+	for i := range settings.settings {
+		if !settings.settings[i].hasGlobal && !settings.settings[i].hasLocal {
 			continue
 		}
 
-		globalOutput := fmt.Sprint(globalSettings[setting.name])
-		localOutput := fmt.Sprint(localSettings[setting.name])
+		globalOutput := fmt.Sprint(globalSettings[settings.settings[i].name])
+		localOutput := fmt.Sprint(localSettings[settings.settings[i].name])
 
-		if setting.settingType == "slice" { //nolint:goconst
-			globalOutput = strings.Join(globalSettings[setting.name].([]string), "\n")
-			localOutput = strings.Join(localSettings[setting.name].([]string), "\n")
+		if settings.settings[i].settingType == "slice" { //nolint:goconst
+			globalOutput = strings.Join(globalSettings[settings.settings[i].name].([]string), "\n")
+			localOutput = strings.Join(localSettings[settings.settings[i].name].([]string), "\n")
 		}
 
-		if !setting.hasLocal {
+		if !settings.settings[i].hasLocal {
 			localOutput = ""
 		}
 
-		settingsTable.AddRow(setting.name,
+		settingsTable.AddRow(settings.settings[i].name,
 			consoleOutput.Bold(globalOutput),
 			consoleOutput.Bold(localOutput))
 	}

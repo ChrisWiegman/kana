@@ -14,19 +14,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func New(version string, cmd *cobra.Command) (*Settings, error) {
-	kanaSettings := new(Settings)
+func Load(kanaSettings *Settings, version string, cmd *cobra.Command) error {
 	settings := map[string]interface{}{}
 	var err error
 
-	for _, setting := range defaults {
-		setting.currentValue = setting.defaultValue
-		kanaSettings.settings = append(kanaSettings.settings, setting)
+	for i := range defaults {
+		defaults[i].currentValue = defaults[i].defaultValue
+		kanaSettings.settings = append(kanaSettings.settings, defaults[i])
 	}
 
 	settings["appDirectory"], settings["workingDirectory"], err = getStaticDirectories()
 	if err != nil {
-		return kanaSettings, err
+		return err
 	}
 
 	settings["name"],
@@ -35,35 +34,38 @@ func New(version string, cmd *cobra.Command) (*Settings, error) {
 		settings["isNew"],
 		err = getSiteInfo(settings["workingDirectory"].(string), settings["appDirectory"].(string), cmd)
 	if err != nil {
-		return kanaSettings, err
+		return err
 	}
 
 	for key, value := range settings {
 		err = kanaSettings.Set(key, value)
 		if err != nil {
-			return kanaSettings, err
+			return err
 		}
 	}
 
 	err = loadKoanfOptions("global", kanaSettings)
 	if err != nil {
-		return kanaSettings, err
+		return err
 	}
 
 	err = loadKoanfOptions("local", kanaSettings)
 	if err != nil {
-		return kanaSettings, err
+		return err
 	}
 
 	err = ensureStaticConfigFiles(settings["appDirectory"].(string))
+	if err != nil {
+		return err
+	}
 
-	return kanaSettings, err
+	return processStartFlags(cmd, kanaSettings)
 }
 
 func (s *Settings) Get(name string) string {
-	for _, setting := range s.settings {
-		if setting.name == name {
-			return setting.currentValue
+	for i := range s.settings {
+		if s.settings[i].name == name {
+			return s.settings[i].currentValue
 		}
 	}
 
@@ -71,9 +73,9 @@ func (s *Settings) Get(name string) string {
 }
 
 func (s *Settings) GetBool(name string) bool {
-	for _, setting := range s.settings {
-		if setting.name == name {
-			return setting.currentValue == "true"
+	for i := range s.settings {
+		if s.settings[i].name == name {
+			return s.settings[i].currentValue == "true"
 		}
 	}
 
@@ -81,9 +83,9 @@ func (s *Settings) GetBool(name string) bool {
 }
 
 func (s *Settings) GetInt(name string) int64 {
-	for _, setting := range s.settings {
-		if setting.name == name {
-			value, err := strconv.ParseInt(setting.currentValue, 10, 64)
+	for i := range s.settings {
+		if s.settings[i].name == name {
+			value, err := strconv.ParseInt(s.settings[i].currentValue, 10, 64)
 			if err != nil {
 				return 0
 			}
@@ -96,13 +98,13 @@ func (s *Settings) GetInt(name string) int64 {
 }
 
 func (s *Settings) GetSlice(name string) []string {
-	for _, setting := range s.settings {
-		if setting.name == name {
-			if setting.currentValue == "" {
+	for i := range s.settings {
+		if s.settings[i].name == name {
+			if s.settings[i].currentValue == "" {
 				return []string{}
 			}
 
-			return strings.Split(setting.currentValue, ",")
+			return strings.Split(s.settings[i].currentValue, ",")
 		}
 	}
 
@@ -110,20 +112,20 @@ func (s *Settings) GetSlice(name string) []string {
 }
 
 func (s *Settings) Set(name string, value interface{}, setGlobal ...bool) error {
-	for i, setting := range s.settings {
-		if setting.name == name {
-			if setting.settingType == "slice" && reflect.TypeOf(value).String() == "[]string" {
+	for i := range s.settings {
+		if s.settings[i].name == name {
+			if s.settings[i].settingType == "slice" && reflect.TypeOf(value).String() == "[]string" {
 				s.settings[i].currentValue = strings.Join(value.([]string), ",")
 			} else {
 				s.settings[i].currentValue = fmt.Sprint(value)
 			}
 
 			if len(setGlobal) > 0 && setGlobal[0] {
-				if setting.settingType == "slice" {
+				if s.settings[i].settingType == "slice" {
 					value = strings.Split(s.settings[i].currentValue, ",")
 				}
 
-				err := s.global.Set(setting.name, value)
+				err := s.global.Set(s.settings[i].name, value)
 				if err != nil {
 					return err
 				}
@@ -149,40 +151,40 @@ func (s *Settings) getAll(settingsType string) map[string]interface{} {
 		koSettings = s.local
 	}
 
-	for _, setting := range s.settings {
-		if (!setting.hasLocal && settingsType == "local") || (!setting.hasGlobal && settingsType == "global") {
+	for i := range s.settings {
+		if (!s.settings[i].hasLocal && settingsType == "local") || (!s.settings[i].hasGlobal && settingsType == "global") {
 			continue
 		}
 
-		switch setting.settingType {
+		switch s.settings[i].settingType {
 		case "bool":
-			boolValue, _ := strconv.ParseBool(setting.currentValue)
-			if koSettings.Exists(setting.name) {
-				boolValue = koSettings.Bool(setting.name)
+			boolValue, _ := strconv.ParseBool(s.settings[i].currentValue)
+			if koSettings.Exists(s.settings[i].name) {
+				boolValue = koSettings.Bool(s.settings[i].name)
 			}
 
-			allSettings[setting.name] = boolValue
+			allSettings[s.settings[i].name] = boolValue
 		case "int":
-			intValue, _ := strconv.ParseInt(setting.currentValue, 10, 64)
-			if koSettings.Exists(setting.name) {
-				intValue = koSettings.Int64(setting.name)
+			intValue, _ := strconv.ParseInt(s.settings[i].currentValue, 10, 64)
+			if koSettings.Exists(s.settings[i].name) {
+				intValue = koSettings.Int64(s.settings[i].name)
 			}
 
-			allSettings[setting.name] = intValue
+			allSettings[s.settings[i].name] = intValue
 		case "slice":
-			sliceVal := strings.Split(setting.currentValue, ",")
-			if koSettings.Exists(setting.name) {
-				sliceVal = koSettings.Strings(setting.name)
+			sliceVal := strings.Split(s.settings[i].currentValue, ",")
+			if koSettings.Exists(s.settings[i].name) {
+				sliceVal = koSettings.Strings(s.settings[i].name)
 			}
 
-			allSettings[setting.name] = sliceVal
+			allSettings[s.settings[i].name] = sliceVal
 		default:
-			stringValue := setting.currentValue
-			if koSettings.Exists(setting.name) {
-				stringValue = koSettings.String(setting.name)
+			stringValue := s.settings[i].currentValue
+			if koSettings.Exists(s.settings[i].name) {
+				stringValue = koSettings.String(s.settings[i].name)
 			}
 
-			allSettings[setting.name] = stringValue
+			allSettings[s.settings[i].name] = stringValue
 		}
 	}
 

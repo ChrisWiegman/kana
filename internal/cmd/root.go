@@ -4,6 +4,7 @@ import (
 	"runtime"
 
 	"github.com/ChrisWiegman/kana/internal/console"
+	"github.com/ChrisWiegman/kana/internal/options"
 	"github.com/ChrisWiegman/kana/internal/settings"
 	"github.com/ChrisWiegman/kana/internal/site"
 
@@ -20,6 +21,7 @@ func Execute() {
 	kanaSite := new(site.Site)
 	consoleOutput := new(console.Console)
 	kanaSettings := new(settings.Settings)
+	kanaOptions := new(options.Settings)
 
 	// Setup the cobra command
 	cmd := &cobra.Command{
@@ -29,12 +31,18 @@ func Execute() {
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			consoleOutput.Debug = flagVerbose
 			consoleOutput.JSON = flagJSONOutput
+			var err error
 
 			if cmd.Use == "wp" {
-				err := parseWPNameFlag(args, cmd)
+				err = parseWPNameFlag(args, cmd)
 				if err != nil {
 					consoleOutput.Error(err)
 				}
+			}
+
+			err = options.Load(kanaOptions, Version, cmd)
+			if err != nil {
+				panic(err)
 			}
 
 			// err := settings.Load(kanaSettings, Version, cmd, commandsRequiringSite, &startFlags)
@@ -74,7 +82,7 @@ func Execute() {
 		version(consoleOutput),
 		wp(consoleOutput, kanaSite),
 		xdebug(consoleOutput, kanaSite),
-		test(consoleOutput),
+		test(consoleOutput, kanaOptions),
 	)
 
 	if runtime.GOOS == "darwin" {

@@ -1,27 +1,25 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 
 	"github.com/ChrisWiegman/kana/internal/console"
 	"github.com/ChrisWiegman/kana/internal/options"
 )
 
-func test(consoleOutput *console.Console) *cobra.Command {
+func test(consoleOutput *console.Console, kanaSettings *options.Settings) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "test",
 		Short: "A test command for developing a simpler settings package.",
 		Run: func(cmd *cobra.Command, args []string) {
-			kanaSettings, err := options.New(Version, cmd)
-			if err != nil {
-				panic(err)
-			}
-
 			// List all content if we don't have args, list the value with 1 arg or set a fresh value with 2 args.
 			// This is similar to how setting git options works
 			switch len(args) {
 			case 0:
-				options.ListSettings(kanaSettings, consoleOutput)
+				fmt.Println(kanaSettings.Get("xdebug"))
+				//options.ListSettings(kanaSettings, consoleOutput)
 			case 1:
 				options.PrintSingleSetting(args[0], kanaSettings, consoleOutput)
 			case 2:
@@ -35,6 +33,8 @@ func test(consoleOutput *console.Console) *cobra.Command {
 		},
 		Args: cobra.RangeArgs(0, 2),
 	}
+
+	options.AddStartFlags(cmd, kanaSettings)
 
 	return cmd
 }
