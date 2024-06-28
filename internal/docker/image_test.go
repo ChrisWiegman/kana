@@ -50,13 +50,15 @@ func TestRemoveImage(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		apiClient := new(mocks.APIClient)
-		apiClient.On("ImageRemove", mock.Anything, mock.Anything, mock.Anything).Return(test.imageDeleteResponse, test.imageRemoveError)
+		t.Run(test.name, func(t *testing.T) {
+			apiClient := new(mocks.APIClient)
+			apiClient.On("ImageRemove", mock.Anything, mock.Anything, mock.Anything).Return(test.imageDeleteResponse, test.imageRemoveError)
 
-		d.apiClient = apiClient
+			d.apiClient = apiClient
 
-		removed, err := d.removeImage("alpine")
-		assert.Equal(t, test.expectedError, err, test.name)
-		assert.Equal(t, test.expectedRemove, removed, test.name)
+			removed, err := d.removeImage("alpine")
+			assert.Equal(t, test.expectedError, err, test.name)
+			assert.Equal(t, test.expectedRemove, removed, test.name)
+		})
 	}
 }
