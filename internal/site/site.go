@@ -73,7 +73,7 @@ func (s *Site) ExportSiteConfig(consoleOutput *console.Console) error {
 	}
 
 	if parsedURL.Scheme == "https" {
-		localSettings.SSL = true
+		localSettings["ssl"] = true
 	}
 
 	// @todo - add the ability to export the current site configuration to a file
@@ -355,24 +355,11 @@ func (s *Site) getDirectories() (wordPressDirectory, databaseDir string, err err
 }
 
 // getRunningConfig gets various options that were used to start the site.
-func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console) (settings.Options, error) {
-	localSettings := settings.Options{
-		Type:                 DefaultType,
-		Xdebug:               false,
-		SSL:                  false,
-		Mailpit:              false,
-		WPDebug:              false,
-		ScriptDebug:          true,
-		Activate:             true,
-		RemoveDefaultPlugins: false,
-		Multisite:            s.settings.Get("Multisite"),
-		DatabaseClient:       s.settings.Get("DatabaseClient"),
-		Environment:          s.settings.Get("Environment"),
-		Database:             s.settings.Get("Database"),
-	}
+func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console) (map[string]interface{}, error) {
+	localSettings := s.settings.GetAll("local")
 
 	// We need container details to see if the mailpit container is running
-	localSettings.Mailpit = s.isMailpitRunning()
+	localSettings["mailpit"] = s.isMailpitRunning()
 
 	output, err := s.WordPress("pecl list | grep xdebug", false, false)
 	if err != nil {
@@ -380,7 +367,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 	}
 
 	if strings.Contains(output.StdOut, "xdebug") {
-		localSettings.Xdebug = true
+		localSettings["xdebug"] = true
 	}
 
 	output, err = s.WordPress("echo $WORDPRESS_DEBUG", false, false)
@@ -389,7 +376,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 	}
 
 	if strings.Contains(output.StdOut, "1") {
-		localSettings.WPDebug = true
+		localSettings["wpdebug"] = true
 	}
 
 	output, err = s.WordPress("echo $SCRIPT_DEBUG", false, false)
@@ -398,7 +385,7 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 	}
 
 	if strings.Contains(output.StdOut, "1") {
-		localSettings.ScriptDebug = true
+		localSettings["scriptDebug"] = true
 	}
 
 	output, err = s.WordPress("echo $KANA_SQLITE", false, false)
@@ -407,22 +394,22 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 	}
 
 	if strings.Contains(output.StdOut, "true") {
-		localSettings.Database = "sqlite"
+		localSettings["database"] = "sqlite"
 	}
 
 	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana-%s-wordpress", s.settings.Get("Name")))
 
 	if len(mounts) == 1 {
-		localSettings.Type = DefaultType
+		localSettings["type"] = DefaultType
 	}
 
 	for _, mount := range mounts {
 		if strings.Contains(mount.Destination, "/var/www/html/wp-content/plugins/") {
-			localSettings.Type = "plugin"
+			localSettings["type"] = "plugin"
 		}
 
 		if strings.Contains(mount.Destination, "/var/www/html/wp-content/themes/") {
-			localSettings.Type = "theme" //nolint:goconst
+			localSettings["type"] = "theme" //nolint:goconst
 		}
 	}
 
@@ -433,8 +420,8 @@ func (s *Site) getRunningConfig(withPlugins bool, consoleOutput *console.Console
 			return localSettings, err
 		}
 
-		localSettings.RemoveDefaultPlugins = !hasDefaultPlugins
-		localSettings.Plugins = plugins
+		localSettings["removeDefaultPlugins"] = !hasDefaultPlugins
+		localSettings["plugins"] = plugins
 	}
 
 	return localSettings, nil

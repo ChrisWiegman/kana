@@ -19,14 +19,14 @@ func (s *Site) WPCli(command []string, interactive bool, consoleOutput *console.
 
 	for _, mount := range mounts {
 		if strings.Contains(mount.Destination, "/var/www/html/wp-content/plugins/") {
-			err = s.settings.OverrideType("plugin")
+			err = s.settings.Set("type", "plugin")
 			if err != nil {
 				return 1, "", err
 			}
 		}
 
 		if strings.Contains(mount.Destination, "/var/www/html/wp-content/themes/") {
-			err = s.settings.OverrideType("theme")
+			err = s.settings.Set("type", "theme")
 			if err != nil {
 				return 1, "", err
 			}

@@ -18,14 +18,14 @@ func config(consoleOutput *console.Console, kanaSettings *settings.Settings) *co
 			case 0:
 				settings.ListSettings(kanaSettings, consoleOutput)
 			case 1:
-				kanaSettings.PrintSingleSetting(args[0], consoleOutput)
+				settings.PrintSingleSetting(args[0], kanaSettings, consoleOutput)
 			case 2:
-				err := kanaSettings.Set(args[0], args[1])
+				err := kanaSettings.Set(args[0], args[1], true)
 				if err != nil {
 					consoleOutput.Error(err)
 				}
 
-				kanaSettings.PrintSingleSetting(args[0], consoleOutput)
+				settings.PrintSingleSetting(args[0], kanaSettings, consoleOutput)
 			}
 		},
 		Args: cobra.RangeArgs(0, 2),

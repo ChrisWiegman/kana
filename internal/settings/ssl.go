@@ -13,18 +13,12 @@ import (
 
 var execCommand = exec.Command
 
-const certOS = "darwin"
-
-func GetSSLCerts(settings *Settings) (rootCert, siteCert Certificate) {
-	return settings.constants.RootCert, settings.constants.SiteCert
-}
-
 // EnsureSSLCerts Ensures SSL certificates have been generated and are where they need to be.
-func EnsureSSLCerts(appDirectory, domain string, rootCert, siteCert Certificate, useSSL bool, consoleOutput *console.Console) error {
+func EnsureSSLCerts(appDirectory, domain string, useSSL bool, consoleOutput *console.Console) error {
 	createCert := false
 
 	certPath := filepath.Join(appDirectory, "certs")
-	rootCertFile := filepath.Join(certPath, rootCert.Certificate)
+	rootCertFile := filepath.Join(certPath, rootCert)
 
 	_, err := os.Stat(rootCertFile)
 	if err != nil && os.IsNotExist(err) {
@@ -40,10 +34,10 @@ func EnsureSSLCerts(appDirectory, domain string, rootCert, siteCert Certificate,
 		certInfo := minica.CertInfo{
 			CertDir:    certPath,
 			CertDomain: domain,
-			RootKey:    rootCert.Key,
-			RootCert:   rootCert.Certificate,
-			SiteCert:   siteCert.Certificate,
-			SiteKey:    siteCert.Key,
+			RootKey:    rootKey,
+			RootCert:   rootCert,
+			SiteCert:   siteCert,
+			SiteKey:    siteKey,
 		}
 
 		err = minica.GenCerts(&certInfo)
@@ -54,7 +48,7 @@ func EnsureSSLCerts(appDirectory, domain string, rootCert, siteCert Certificate,
 
 	// If we're on Mac try to add the cert to the system trust.
 	if useSSL && runtime.GOOS == certOS {
-		return TrustSSL(rootCert.Certificate, consoleOutput)
+		return TrustSSL(rootCert, consoleOutput)
 	}
 
 	return nil

@@ -7,7 +7,7 @@ func (s *Settings) GetURL() string {
 }
 
 func (s *Settings) GetDomain() string {
-	return fmt.Sprintf("%s.%s", s.Get("name"), s.Get("domain"))
+	return fmt.Sprintf("%s.%s", s.Get("name"), domain)
 }
 
 func (s *Settings) GetProtocol() string {

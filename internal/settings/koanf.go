@@ -1,4 +1,4 @@
-package options
+package settings
 
 import (
 	"encoding/json"
@@ -89,7 +89,7 @@ func writeKoanfSettings(settingsType string, settings *Settings) error {
 		}
 	}
 
-	allSettings := settings.getAll(settingsType)
+	allSettings := settings.GetAll(settingsType)
 
 	f, _ := os.Create(configFile)
 	defer f.Close()

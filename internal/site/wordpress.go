@@ -281,7 +281,7 @@ func (s *Site) installDefaultPlugins(consoleOutput *console.Console) error {
 		return err
 	}
 
-	for _, plugin := range s.settings.GetArray("Plugins") {
+	for _, plugin := range s.settings.GetSlice("Plugins") {
 		var setupCommand []string
 
 		for _, installedPlugin := range installedPlugins {

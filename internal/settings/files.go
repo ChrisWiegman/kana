@@ -78,7 +78,7 @@ func GetHtaccess(multisite string) string {
 	return SubDirectoryMultisiteHtaccess
 }
 
-// esureStaticConfigFiles Ensures the application's static config files have been generated and are where they need to be.
+// ensureStaticConfigFiles Ensures the application's static config files have been generated and are where they need to be.
 func ensureStaticConfigFiles(appDirectory string) error {
 	for _, file := range configFiles {
 		filePath := filepath.Join(appDirectory, file.LocalPath)

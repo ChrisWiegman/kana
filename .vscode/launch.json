@@ -10,9 +10,7 @@
             "request": "launch",
             "mode": "auto",
             "program": "cmd/kana/main.go",
-            "args": [
-                "test"
-            ]
+            "args": []
         }
     ]
 }

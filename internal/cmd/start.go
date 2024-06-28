@@ -72,31 +72,7 @@ func start(consoleOutput *console.Console, kanaSite *site.Site, kanaSettings *se
 		Args: cobra.NoArgs,
 	}
 
-	// Add associated flags to customize the site at runtime.
-	cmd.Flags().BoolP("xdebug", "x", false, "Enable Xdebug when starting the container.")
-	cmd.Flags().BoolP("scriptdebug", "c", false, "Enable SCRIPT_DEBUG when starting the container.")
-	cmd.Flags().BoolP("wpdebug", "d", false, "Enable WP_Debug when starting the container.")
-	cmd.Flags().BoolP("mailpit", "m", false, "Enable Mailpit when starting the container.")
-	cmd.Flags().BoolP("ssl", "s", false, "Whether the site should default to SSL (https) or not.")
-	cmd.Flags().BoolP("removedefaultplugins",
-		"r",
-		false,
-		"If true will remove the default plugins installed with WordPress (Akismet and Hello Dolly) when starting a site.")
-	cmd.Flags().BoolP("activate",
-		"a",
-		false,
-		"Activate the current plugin or theme (only works when used with the 'plugin' or 'theme' flags).")
-
-	cmd.Flags().String("database", "mariadb", "Select the database server you wish to use with your installation.")
-	cmd.Flags().String("multisite", "none", "Creates your new site as a multisite installation.")
-	cmd.Flags().String("environment", "local", "Sets the WP_ENVIRONMENT_TYPE for the site.")
-	cmd.Flags().String("plugins",
-		"",
-		"Installs and activates the specified plugins. Multiple plugins should be separated by commas")
-	cmd.Flags().String("theme", "", "Installs and activates a theme when starting a site.")
-	cmd.Flags().String("type", "site", "Set the type of the installation, `site`, `plugin` or `theme`.")
-
-	cmd.Flags().Lookup("multisite").NoOptDefVal = "subdomain"
+	settings.AddStartFlags(cmd, kanaSettings)
 
 	return cmd
 }

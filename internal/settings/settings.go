@@ -1,301 +1,319 @@
 package settings
 
 import (
-	"bufio"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"reflect"
-	"regexp"
 	"strconv"
 	"strings"
 
+	"github.com/ChrisWiegman/kana/internal/docker"
 	"github.com/ChrisWiegman/kana/internal/helpers"
 
+	"github.com/go-playground/validator/v10"
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 )
 
-func Load(settings *Settings, version string, cmd *cobra.Command, commandsRequiringSite []string, startFlags *StartFlags) (err error) {
-	settings.directories, err = getStaticDirectories()
+func Load(kanaSettings *Settings, version string, cmd *cobra.Command) error {
+	settings := map[string]interface{}{}
+	var err error
+
+	for i := range defaults {
+		defaults[i].currentValue = defaults[i].defaultValue
+		kanaSettings.settings = append(kanaSettings.settings, defaults[i])
+	}
+
+	settings["appDirectory"], settings["workingDirectory"], err = getStaticDirectories()
 	if err != nil {
 		return err
 	}
 
-	settings.constants = appConstants
-	settings.constants.Version = version
-
-	err = loadSiteOptions(settings, cmd)
+	settings["name"],
+		settings["siteDirectory"],
+		settings["isNamed"],
+		settings["isNew"],
+		err = getSiteInfo(settings["workingDirectory"].(string), settings["appDirectory"].(string), cmd)
 	if err != nil {
 		return err
 	}
 
-	// Fail now if we have a command that requires a completed site and we haven't started it before
-	if settings.site.IsNew && helpers.ArrayContains(commandsRequiringSite, cmd.Use) {
-		return fmt.Errorf("the current site you are trying to work with does not exist. Use `kana start` to initialize")
+	for key, value := range settings {
+		err = kanaSettings.Set(key, value)
+		if err != nil {
+			return err
+		}
 	}
 
-	err = saveLocalLinkConfig(cmd, settings.directories.Site, settings.directories.Working, settings.site.IsNamed)
+	err = loadKoanfOptions("global", kanaSettings)
 	if err != nil {
 		return err
 	}
 
-	settings.directories.Site = filepath.Join(settings.directories.App, "sites", settings.site.Name)
-
-	settings.global, err = loadGlobalOptions(settings.directories.App)
+	err = loadKoanfOptions("local", kanaSettings)
 	if err != nil {
 		return err
 	}
 
-	updateSettingsFromViper(settings.global, &settings.settings)
-
-	settings.local, err = loadLocalOptions(settings.directories.Working, &settings.settings)
+	err = ensureStaticConfigFiles(settings["appDirectory"].(string))
 	if err != nil {
 		return err
 	}
 
-	updateSettingsFromViper(settings.local, &settings.settings)
-
-	// Always make sure we set the correct type, even if a config file isn't available.
-	err = DetectType(settings)
-	if err != nil {
-		return err
-	}
-
-	if cmd.Use == "start" {
-		processStartFlags(cmd, startFlags, settings)
-	}
-
-	return ensureStaticConfigFiles(settings.directories.App)
+	return processStartFlags(cmd, kanaSettings)
 }
 
-// DetectType determines the type of site in the working directory.
-func DetectType(settings *Settings) error {
-	var err error
-	var isSite bool
-	oldType := settings.settings.Type
-
-	isSite, err = helpers.PathExists(filepath.Join(settings.directories.Working, "wp-includes", "version.php"))
-	if err != nil {
-		return err
+func (s *Settings) Get(name string) string {
+	for i := range s.settings {
+		if s.settings[i].name == name {
+			return s.settings[i].currentValue
+		}
 	}
 
-	if isSite {
-		return err
+	return ""
+}
+
+func (s *Settings) GetAll(settingsType string) map[string]interface{} {
+	allSettings := make(map[string]interface{})
+	koSettings := s.global
+
+	if settingsType == "local" {
+		koSettings = s.local
 	}
 
-	items, _ := os.ReadDir(settings.directories.Working)
-
-	for _, item := range items {
-		if item.IsDir() {
+	for i := range s.settings {
+		if (!s.settings[i].hasLocal && settingsType == "local") || (!s.settings[i].hasGlobal && settingsType == "global") {
 			continue
 		}
 
-		if item.Name() == "style.css" || filepath.Ext(item.Name()) == ".php" {
-			var f *os.File
-			var line string
+		switch s.settings[i].settingType {
+		case "bool":
+			boolValue, _ := strconv.ParseBool(s.settings[i].currentValue)
+			if koSettings.Exists(s.settings[i].name) {
+				boolValue = koSettings.Bool(s.settings[i].name)
+			}
 
-			f, err = os.Open(filepath.Join(settings.directories.Working, item.Name()))
+			allSettings[s.settings[i].name] = boolValue
+		case "int":
+			intValue, _ := strconv.ParseInt(s.settings[i].currentValue, 10, 64)
+			if koSettings.Exists(s.settings[i].name) {
+				intValue = koSettings.Int64(s.settings[i].name)
+			}
+
+			allSettings[s.settings[i].name] = intValue
+		case "slice":
+			sliceVal := strings.Split(s.settings[i].currentValue, ",")
+			if koSettings.Exists(s.settings[i].name) {
+				sliceVal = koSettings.Strings(s.settings[i].name)
+			}
+
+			allSettings[s.settings[i].name] = sliceVal
+		default:
+			stringValue := s.settings[i].currentValue
+			if koSettings.Exists(s.settings[i].name) {
+				stringValue = koSettings.String(s.settings[i].name)
+			}
+
+			allSettings[s.settings[i].name] = stringValue
+		}
+	}
+
+	return allSettings
+}
+
+func (s *Settings) GetBool(name string) bool {
+	for i := range s.settings {
+		if s.settings[i].name == name {
+			return s.settings[i].currentValue == "true"
+		}
+	}
+
+	return false
+}
+
+func (s *Settings) GetInt(name string) int64 {
+	for i := range s.settings {
+		if s.settings[i].name == name {
+			value, err := strconv.ParseInt(s.settings[i].currentValue, 10, 64)
+			if err != nil {
+				return 0
+			}
+
+			return value
+		}
+	}
+
+	return 0
+}
+
+func (s *Settings) GetSlice(name string) []string {
+	for i := range s.settings {
+		if s.settings[i].name == name {
+			if s.settings[i].currentValue == "" {
+				return []string{}
+			}
+
+			return strings.Split(s.settings[i].currentValue, ",")
+		}
+	}
+
+	return []string{}
+}
+
+func (s *Settings) Set(name string, value interface{}, setVars ...bool) error {
+	for i := range s.settings {
+		if s.settings[i].name != name {
+			continue
+		}
+
+		err := s.validate(name, value)
+		if err != nil {
+			return err
+		}
+
+		if s.settings[i].settingType == "slice" && reflect.TypeOf(value).String() == "[]string" {
+			s.settings[i].currentValue = strings.Join(value.([]string), ",")
+		} else {
+			s.settings[i].currentValue = fmt.Sprint(value)
+		}
+
+		if len(setVars) > 0 && setVars[0] {
+			if s.settings[i].settingType == "slice" {
+				value = strings.Split(s.settings[i].currentValue, ",")
+			}
+
+			err := s.global.Set(s.settings[i].name, value)
 			if err != nil {
 				return err
 			}
 
-			reader := bufio.NewReader(f)
-			line, err = helpers.ReadLine(reader)
+			err = writeKoanfSettings("global", s)
+			if err != nil {
+				return err
+			}
+		}
 
-			for err == nil {
-				exp := regexp.MustCompile(`(Plugin|Theme) Name: .*`)
+		return nil
+	}
 
-				for _, match := range exp.FindAllStringSubmatch(line, -1) {
-					if match[1] == "Theme" {
-						settings.settings.Type = "theme"
-					} else {
-						settings.settings.Type = "plugin"
-					}
+	return fmt.Errorf("invalid setting %s. Please enter a valid key to set", name)
+}
 
-					if oldType != settings.settings.Type {
-						settings.site.TypeIsDetected = true
-					}
+func (s *Settings) validate(name string, value interface{}) error {
+	for i := range s.settings {
+		if s.settings[i].name != name {
+			continue
+		}
 
-					return err
+		stringVal := fmt.Sprint(value)
+
+		switch s.settings[i].settingType {
+		case "bool":
+			_, err := strconv.ParseBool(stringVal)
+			if err != nil {
+				return fmt.Errorf("the value for %s must be a boolean", name)
+			}
+		case "int":
+			_, err := strconv.ParseInt(stringVal, 10, 64)
+			if err != nil {
+				return fmt.Errorf("the value for %s must be an integer", name)
+			}
+		}
+
+		if len(s.settings[i].validValues) > 0 {
+			if !helpers.IsValidString(stringVal, s.settings[i].validValues) {
+				return fmt.Errorf("the %s value, %s, is not valid", name, stringVal)
+			}
+		}
+
+		validate := validator.New()
+
+		switch name {
+		case "adminEmail":
+			return validate.Var(stringVal, "email")
+		case "updateInterval":
+			return validate.Var(stringVal, "gte=0")
+		case "databaseVersion":
+			if docker.ValidateImage(s.Get("database"), stringVal) != nil {
+				databaseURL := "https://hub.docker.com/_/mariadb"
+
+				if s.Get("database") == "mysql" {
+					databaseURL = "https://hub.docker.com/_/mysql"
 				}
-				line, err = helpers.ReadLine(reader)
+
+				return fmt.Errorf(
+					"the database version in your configuration, %s, is invalid. See %s for a list of supported versions",
+					stringVal, databaseURL)
+			}
+		case "php":
+			if docker.ValidateImage("wordpress", fmt.Sprintf("php%s", stringVal)) != nil {
+				return fmt.Errorf(
+					"the PHP version in your configuration, %s, is invalid. See https://hub.docker.com/_/wordpress for a list of supported versions",
+					stringVal)
 			}
 		}
 	}
-
-	// We don't care if it is an empty folder.
-	if err == io.EOF {
-		err = nil
-	}
-
-	settings.settings.Type = "site"
-
-	if oldType != settings.settings.Type {
-		settings.site.TypeIsDetected = true
-	}
-
-	return err
-}
-
-// Get retrieves a setting from the settings object by name and returns it as a string.
-// Returns an empty string if the setting is not found.
-func (s *Settings) Get(name string) string {
-	settingType, settingValue, err := s.getSetting(name)
-	if err != nil {
-		return ""
-	}
-
-	switch settingType {
-	case "string": //nolint:goconst
-		return settingValue.String()
-	case "bool":
-		return strconv.FormatBool(settingValue.Bool())
-	case "int64":
-		return strconv.FormatInt(settingValue.Int(), 10)
-	case "":
-		return strings.Join(settingValue.Interface().([]string), ",")
-	default:
-		return ""
-	}
-}
-
-// GetArray retrieves a setting from the settings object by name and returns it as a string array.
-func (s *Settings) GetArray(name string) []string {
-	optionArray := s.Get(name)
-
-	if optionArray == "" {
-		return []string{}
-	}
-
-	return strings.Split(optionArray, ",")
-}
-
-// GetBool retrieves a setting from the settings object by name and returns it as a boolean. Returns false if the value is not a boolean.
-func (s *Settings) GetBool(name string) bool {
-	value, err := strconv.ParseBool(s.Get(name))
-	if err != nil {
-		return false
-	}
-
-	return value
-}
-
-// GetGlobalSetting Retrieves a global setting for the "config" command.
-func (s *Settings) GetGlobalSetting(name string) (string, error) {
-	_, _, err := s.getSetting(name)
-	if err != nil {
-		return "", fmt.Errorf("invalid setting %s. Please enter a valid key to set", name)
-	}
-
-	return s.global.GetString(name), nil
-}
-
-// GetInt retrieves a setting from the settings object by name and returns it as an integer. Returns 0 if the value is not an integer.
-func (s *Settings) GetInt(name string) int64 {
-	value, err := strconv.ParseInt(s.Get(name), 10, 64)
-	if err != nil {
-		return 0
-	}
-
-	return value
-}
-
-func (s *Settings) OverrideType(value string) error {
-	if !helpers.IsValidString(value, validTypes) {
-		return fmt.Errorf("the type you selected, %s, is not a valid type. You must use either `site`, `plugin` or `theme`", value)
-	}
-
-	s.settings.Type = value
 
 	return nil
 }
 
-func (s *Settings) Set(name, value string) error {
-	_, _, err := s.getSetting(name)
-	if err != nil {
-		return fmt.Errorf("invalid setting %s: Please enter a valid key to set", name)
+func getSiteInfo(workingDirectory, appDirectory string, cmd *cobra.Command) (name, siteDirectory string, isNamed, isNew bool, err error) {
+	name = helpers.SanitizeSiteName(filepath.Base(workingDirectory))
+	isStartCommand := cmd.Use == "start"
+
+	// Don't run this on commands that wouldn't possibly use it.
+	if cmd.Use == "config" || cmd.Use == "version" || cmd.Use == "help" {
+		return name, siteDirectory, isNamed, isNew, err
 	}
 
-	err = validateSetting(name, value, s.settings.Database)
-	if err != nil {
-		return err
-	}
+	// Process the name flag if set
+	if cmd.Flags().Lookup("name").Changed {
+		isNamed = true
 
-	name = strings.ToLower(name)
-
-	switch name {
-	case "activate",
-		"automaticlogin",
-		"mailpit",
-		"removedefaultplugins",
-		"scriptdebug",
-		"ssl",
-		"wpdebug",
-		"xdebug":
-		boolValue, err := strconv.ParseBool(value)
-		if err != nil {
-			return err
-		}
-
-		s.global.Set(name, boolValue)
-	case "updateinterval":
-		intValue, err := strconv.ParseInt(value, 10, 64)
-		if err != nil {
-			return err
-		}
-
-		s.global.Set(name, intValue)
-	default:
-		s.global.Set(name, value)
-	}
-
-	if name == "database" && value != s.global.GetString("database") {
-		switch value {
-		case "mariadb":
-			s.global.Set("databaseversion", mariadbVersion)
-		case "mysql": //nolint:goconst
-			s.global.Set("databaseversion", mysqlVersion)
-		}
-	}
-
-	return s.global.WriteConfig()
-}
-
-// getSetting retrieves a setting from the settings object by name and returns the type and value.
-// Returns an error if the setting is not found.
-func (s *Settings) getSetting(name string) (string, reflect.Value, error) {
-	settings := []interface{}{
-		&s.settings,
-		&s.constants,
-		&s.directories,
-		&s.site}
-
-	switch name {
-	case "RootCert":
-		return "string", reflect.ValueOf(s.constants.RootCert.Certificate), nil
-	case "RootKey":
-		return "string", reflect.ValueOf(s.constants.RootCert.Key), nil
-	case "SiteCert":
-		return "string", reflect.ValueOf(s.constants.SiteCert.Certificate), nil
-	case "SiteKey":
-		return "string", reflect.ValueOf(s.constants.SiteCert.Key), nil
-	}
-
-	for group := range settings {
-		reflection := reflect.ValueOf(settings[group]).Elem()
-		reflectType := reflection.Type()
-
-		for i := 0; i < reflectType.NumField(); i++ {
-			field := reflectType.Field(i)
-			if name == field.Name || strings.EqualFold(name, field.Name) {
-				reflectValue := reflect.ValueOf(settings[group])
-				value := reflect.Indirect(reflectValue).FieldByName(field.Name)
-
-				return field.Type.Name(), value, nil
+		// Check that we're not using invalid start flags for the start command
+		if isStartCommand && cmd.Flags().Lookup("type").Changed {
+			typeValue, _ := cmd.Flags().GetString("type")
+			if typeValue != "site" {
+				return name, siteDirectory, isNamed, isNew,
+					fmt.Errorf("the type flag is not valid when using the `name` flag")
 			}
 		}
+
+		name = helpers.SanitizeSiteName(cmd.Flags().Lookup("name").Value.String())
 	}
 
-	return "", reflect.Value{}, fmt.Errorf("setting %s not found", name)
+	// We can set the site directory here now that we have the correct name.
+	siteDirectory = filepath.Join(appDirectory, "sites", name)
+
+	_, err = os.Stat(siteDirectory)
+	if err != nil && os.IsNotExist(err) {
+		if os.IsNotExist(err) {
+			isNew = true
+		} else {
+			return name, siteDirectory, isNamed, isNew, err
+		}
+	}
+
+	return name, siteDirectory, isNamed, isNew, nil
+}
+
+func getStaticDirectories() (app, working string, err error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return app, working, err
+	}
+
+	working = cwd
+
+	home, err := homedir.Dir()
+	if err != nil {
+		return app, working, err
+	}
+
+	app = filepath.Join(home, configFolderName)
+
+	err = os.MkdirAll(app, os.FileMode(defaultDirPermissions))
+
+	return app, working, err
 }
