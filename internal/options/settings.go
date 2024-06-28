@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strconv"
 	"strings"
 
@@ -111,13 +112,17 @@ func (s *Settings) GetSlice(name string) []string {
 func (s *Settings) Set(name string, value interface{}, setGlobal ...bool) error {
 	for i, setting := range s.settings {
 		if setting.name == name {
-			if setting.settingType == "slice" {
+			if setting.settingType == "slice" && reflect.TypeOf(value).String() == "[]string" {
 				s.settings[i].currentValue = strings.Join(value.([]string), ",")
 			} else {
 				s.settings[i].currentValue = fmt.Sprint(value)
 			}
 
 			if len(setGlobal) > 0 && setGlobal[0] {
+				if setting.settingType == "slice" {
+					value = strings.Split(s.settings[i].currentValue, ",")
+				}
+
 				err := s.global.Set(setting.name, value)
 				if err != nil {
 					return err
