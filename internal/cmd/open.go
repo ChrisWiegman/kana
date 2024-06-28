@@ -42,7 +42,7 @@ func open(consoleOutput *console.Console, kanaSite *site.Site, kanaSettings *set
 					"Your site, %s, has been opened in your default browser.",
 					consoleOutput.Bold(
 						consoleOutput.Blue(
-							kanaSettings.Get("Name")))))
+							kanaSettings.Get("name")))))
 		},
 		Args: cobra.NoArgs,
 	}

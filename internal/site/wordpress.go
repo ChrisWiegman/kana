@@ -25,18 +25,18 @@ type PluginInfo struct {
 var defaultDirPermissions = 0750
 
 func (s *Site) getWordPressDirectory() (wordPressDirectory string, err error) {
-	wordPressDirectory = filepath.Join(s.settings.Get("Site"), "wordpress")
+	wordPressDirectory = filepath.Join(s.settings.Get("siteDirectory"), "wordpress")
 
 	siteLink, err := s.GetSiteLink()
 	if err != nil {
 		return "", err
 	}
 
-	if !s.settings.GetBool("IsNamed") || siteLink != "" {
-		wordPressDirectory = s.settings.Get("Working")
+	if !s.settings.GetBool("isNamed") || siteLink != "" {
+		wordPressDirectory = s.settings.Get("workingDirectory")
 
-		if s.settings.Get("Type") != DefaultType {
-			wordPressDirectory = filepath.Join(s.settings.Get("Working"), "wordpress")
+		if s.settings.Get("type") != DefaultType {
+			wordPressDirectory = filepath.Join(s.settings.Get("workingDirectory"), "wordpress")
 		}
 	}
 
@@ -74,7 +74,7 @@ func (s *Site) getInstalledWordPressPlugins(consoleOutput *console.Console) (plu
 	for _, plugin := range rawPlugins {
 		if plugin.Status != "dropin" &&
 			plugin.Status != "must-use" &&
-			plugin.Name != s.settings.Get("Name") &&
+			plugin.Name != s.settings.Get("name") &&
 			plugin.Name != "hello" &&
 			plugin.Name != "akismet" {
 			plugins = append(plugins, plugin.Name)
@@ -98,20 +98,20 @@ func (s *Site) getWordPressMounts(appDir string) ([]mount.Mount, error) {
 		},
 		{ // Kana's primary site directory (used for temp files such as DB import and export)
 			Type:   mount.TypeBind,
-			Source: s.settings.Get("Site"),
+			Source: s.settings.Get("siteDirectory"),
 			Target: "/Site",
 		},
 	}
 
 	wpContentDir := "/var/www/html/wp-content"
 
-	if s.settings.Get("Type") == "plugin" {
+	if s.settings.Get("type") == "plugin" {
 		err := os.MkdirAll(
 			filepath.Join(
 				appDir,
 				"wp-content",
 				"plugins",
-				s.settings.Get("Name")),
+				s.settings.Get("name")),
 			os.FileMode(defaultDirPermissions))
 		if err != nil {
 			return appVolumes, err
@@ -119,17 +119,17 @@ func (s *Site) getWordPressMounts(appDir string) ([]mount.Mount, error) {
 
 		appVolumes = append(appVolumes, mount.Mount{ // Map's the user's working directory as a plugin
 			Type:   mount.TypeBind,
-			Source: s.settings.Get("Working"),
-			Target: filepath.Join(wpContentDir, "plugins", s.settings.Get("Name")),
+			Source: s.settings.Get("workingDirectory"),
+			Target: filepath.Join(wpContentDir, "plugins", s.settings.Get("name")),
 		})
 	}
 
-	if s.settings.Get("Type") == "theme" {
+	if s.settings.Get("type") == "theme" {
 		err := os.MkdirAll(
 			filepath.Join(appDir,
 				"wp-content",
 				"themes",
-				s.settings.Get("Name")),
+				s.settings.Get("name")),
 			os.FileMode(defaultDirPermissions))
 		if err != nil {
 			return appVolumes, err
@@ -137,8 +137,8 @@ func (s *Site) getWordPressMounts(appDir string) ([]mount.Mount, error) {
 
 		appVolumes = append(appVolumes, mount.Mount{ // Map's the user's working directory as a theme
 			Type:   mount.TypeBind,
-			Source: s.settings.Get("Working"),
-			Target: filepath.Join(wpContentDir, "themes", s.settings.Get("Name")),
+			Source: s.settings.Get("workingDirectory"),
+			Target: filepath.Join(wpContentDir, "themes", s.settings.Get("name")),
 		})
 	}
 
@@ -161,7 +161,7 @@ func (s *Site) getWordPressContainer(appVolumes []mount.Mount, appContainers []d
 		envVars = append(envVars, "KANA_SQLITE=true")
 	} else {
 		envVars = append(envVars,
-			fmt.Sprintf("WORDPRESS_DB_HOST=kana-%s-database", s.settings.Get("Name")),
+			fmt.Sprintf("WORDPRESS_DB_HOST=kana-%s-database", s.settings.Get("name")),
 			"WORDPRESS_DB_USER=wordpress",
 			"WORDPRESS_DB_PASSWORD=wordpress",
 			"WORDPRESS_DB_NAME=wordpress",
@@ -169,20 +169,20 @@ func (s *Site) getWordPressContainer(appVolumes []mount.Mount, appContainers []d
 	}
 
 	wordPressContainer := docker.ContainerConfig{
-		Name:        fmt.Sprintf("kana-%s-wordpress", s.settings.Get("Name")),
-		Image:       fmt.Sprintf("wordpress:php%s", s.settings.Get("PHP")),
+		Name:        fmt.Sprintf("kana-%s-wordpress", s.settings.Get("name")),
+		Image:       fmt.Sprintf("wordpress:php%s", s.settings.Get("php")),
 		NetworkName: "kana",
-		HostName:    fmt.Sprintf("kana-%s-wordpress", s.settings.Get("Name")),
+		HostName:    fmt.Sprintf("kana-%s-wordpress", s.settings.Get("name")),
 		Env:         envVars,
 		Labels: map[string]string{
 			"traefik.enable": "true",
 			"kana.type":      "wordpress",
-			fmt.Sprintf("traefik.http.routers.wordpress-%s-http.entrypoints", s.settings.Get("Name")): "web",
-			fmt.Sprintf("traefik.http.routers.wordpress-%s-http.rule", s.settings.Get("Name")):        hostRule,
-			fmt.Sprintf("traefik.http.routers.wordpress-%s.entrypoints", s.settings.Get("Name")):      "websecure",
-			fmt.Sprintf("traefik.http.routers.wordpress-%s.rule", s.settings.Get("Name")):             hostRule,
-			fmt.Sprintf("traefik.http.routers.wordpress-%s.tls", s.settings.Get("Name")):              "true",
-			"kana.site": s.settings.Get("Name"),
+			fmt.Sprintf("traefik.http.routers.wordpress-%s-http.entrypoints", s.settings.Get("name")): "web",
+			fmt.Sprintf("traefik.http.routers.wordpress-%s-http.rule", s.settings.Get("name")):        hostRule,
+			fmt.Sprintf("traefik.http.routers.wordpress-%s.entrypoints", s.settings.Get("name")):      "websecure",
+			fmt.Sprintf("traefik.http.routers.wordpress-%s.rule", s.settings.Get("name")):             hostRule,
+			fmt.Sprintf("traefik.http.routers.wordpress-%s.tls", s.settings.Get("name")):              "true",
+			"kana.site": s.settings.Get("name"),
 		},
 		Volumes: appVolumes,
 	}
@@ -195,7 +195,7 @@ func (s *Site) getWordPressContainer(appVolumes []mount.Mount, appContainers []d
 		wordPressContainer.Env = append(wordPressContainer.Env, "WORDPRESS_DEBUG=1")
 	}
 
-	extraConfig := fmt.Sprintf("WORDPRESS_CONFIG_EXTRA=define( 'WP_ENVIRONMENT_TYPE', '%s' );", s.settings.Get("Environment"))
+	extraConfig := fmt.Sprintf("WORDPRESS_CONFIG_EXTRA=define( 'WP_ENVIRONMENT_TYPE', '%s' );", s.settings.Get("environment"))
 
 	if s.settings.GetBool("ScriptDebug") {
 		extraConfig += "define( 'SCRIPT_DEBUG', true );"
@@ -211,24 +211,24 @@ func (s *Site) getWordPressContainer(appVolumes []mount.Mount, appContainers []d
 // getWordPressContainers returns an array of strings containing the container names for the site.
 func (s *Site) getWordPressContainers() []string {
 	return []string{
-		fmt.Sprintf("kana-%s-database", s.settings.Get("Name")),
-		fmt.Sprintf("kana-%s-wordpress", s.settings.Get("Name")),
-		fmt.Sprintf("kana-%s-phpmyadmin", s.settings.Get("Name")),
-		fmt.Sprintf("kana-%s-mailpit", s.settings.Get("Name")),
+		fmt.Sprintf("kana-%s-database", s.settings.Get("name")),
+		fmt.Sprintf("kana-%s-wordpress", s.settings.Get("name")),
+		fmt.Sprintf("kana-%s-phpmyadmin", s.settings.Get("name")),
+		fmt.Sprintf("kana-%s-mailpit", s.settings.Get("name")),
 	}
 }
 
 func (s *Site) activateProject(consoleOutput *console.Console) error {
-	if s.settings.GetBool("Activate") && s.settings.Get("Type") != "site" {
+	if s.settings.GetBool("Activate") && s.settings.Get("type") != "site" {
 		consoleOutput.Println(
 			fmt.Sprintf("Activating %s:  %s",
-				s.settings.Get("Type"),
-				consoleOutput.Bold(consoleOutput.Blue(s.settings.Get("Name")))))
+				s.settings.Get("type"),
+				consoleOutput.Bold(consoleOutput.Blue(s.settings.Get("name")))))
 
 		setupCommand := []string{
-			s.settings.Get("Type"),
+			s.settings.Get("type"),
 			"activate",
-			s.settings.Get("Name"),
+			s.settings.Get("name"),
 		}
 
 		code, _, err := s.WPCli(setupCommand, false, consoleOutput)
@@ -240,8 +240,8 @@ func (s *Site) activateProject(consoleOutput *console.Console) error {
 			consoleOutput.Warn(
 				fmt.Sprintf(
 					"Unable to activate %s: %s.",
-					s.settings.Get("Type"),
-					consoleOutput.Bold(consoleOutput.Blue(s.settings.Get("Name")))))
+					s.settings.Get("type"),
+					consoleOutput.Bold(consoleOutput.Blue(s.settings.Get("name")))))
 		}
 	}
 
@@ -249,17 +249,17 @@ func (s *Site) activateProject(consoleOutput *console.Console) error {
 }
 
 func (s *Site) activateTheme(consoleOutput *console.Console) error {
-	if s.settings.Get("Type") == "theme" || s.settings.Get("Theme") == "" {
+	if s.settings.Get("type") == "theme" || s.settings.Get("theme") == "" {
 		return nil
 	}
 
-	consoleOutput.Println(fmt.Sprintf("Installing default theme:  %s", consoleOutput.Bold(consoleOutput.Blue(s.settings.Get("Theme")))))
+	consoleOutput.Println(fmt.Sprintf("Installing default theme:  %s", consoleOutput.Bold(consoleOutput.Blue(s.settings.Get("theme")))))
 
 	setupCommand := []string{
 		"theme",
 		"install",
 		"--activate",
-		s.settings.Get("Theme"),
+		s.settings.Get("theme"),
 	}
 
 	code, _, err := s.WPCli(setupCommand, false, consoleOutput)
@@ -268,7 +268,7 @@ func (s *Site) activateTheme(consoleOutput *console.Console) error {
 	}
 
 	if code != 0 {
-		consoleOutput.Warn(fmt.Sprintf("Unable to install theme: %s.", consoleOutput.Bold(consoleOutput.Blue(s.settings.Get("Theme")))))
+		consoleOutput.Warn(fmt.Sprintf("Unable to install theme: %s.", consoleOutput.Bold(consoleOutput.Blue(s.settings.Get("theme")))))
 	}
 
 	return nil
@@ -281,7 +281,7 @@ func (s *Site) installDefaultPlugins(consoleOutput *console.Console) error {
 		return err
 	}
 
-	for _, plugin := range s.settings.GetSlice("Plugins") {
+	for _, plugin := range s.settings.GetSlice("plugins") {
 		var setupCommand []string
 
 		for _, installedPlugin := range installedPlugins {
@@ -317,7 +317,7 @@ func (s *Site) installKanaPlugin() error {
 		return err
 	}
 
-	return settings.EnsureKanaPlugin(wordPressDirectory, s.settings.Get("Version"), s.settings.Get("Name"))
+	return settings.EnsureKanaPlugin(wordPressDirectory, s.settings.Get("version"), s.settings.Get("name"))
 }
 
 // installWordPress Installs and configures WordPress core.
@@ -335,7 +335,7 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 
 		installCommand := "install"
 
-		if s.settings.Get("Multisite") != "none" {
+		if s.settings.Get("multisite") != "none" {
 			installCommand = "multisite-install"
 		}
 
@@ -343,14 +343,14 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 			"core",
 			installCommand,
 			fmt.Sprintf("--url=%s", s.settings.GetURL()),
-			fmt.Sprintf("--title=Kana Development %s: %s", s.settings.Get("Type"), s.settings.Get("Name")),
-			fmt.Sprintf("--admin_user=%s", s.settings.Get("AdminUsername")),
-			fmt.Sprintf("--admin_password=%s", s.settings.Get("AdminPassword")),
-			fmt.Sprintf("--admin_email=%s", s.settings.Get("AdminEmail")),
+			fmt.Sprintf("--title=Kana Development %s: %s", s.settings.Get("type"), s.settings.Get("name")),
+			fmt.Sprintf("--admin_user=%s", s.settings.Get("adminUsername")),
+			fmt.Sprintf("--admin_password=%s", s.settings.Get("adminPassword")),
+			fmt.Sprintf("--admin_email=%s", s.settings.Get("adminEmail")),
 		}
 
 		if installCommand == "multisite-install" {
-			if s.settings.Get("Multisite") == "subdomain" {
+			if s.settings.Get("multisite") == "subdomain" {
 				setupCommand = append(setupCommand, "--subdomains")
 			}
 
@@ -438,7 +438,7 @@ func (s *Site) resetWPFilePermissions() error {
 	}
 
 	_, err := s.dockerClient.ContainerExec(
-		fmt.Sprintf("kana-%s-wordpress", s.settings.Get("Name")),
+		fmt.Sprintf("kana-%s-wordpress", s.settings.Get("name")),
 		true,
 		[]string{"chown -R www-data:www-data /var/www/html"})
 
@@ -466,7 +466,7 @@ func (s *Site) writeHtaccess() error {
 	}
 
 	_, filePerms := settings.GetDefaultFilePermissions()
-	htaccessContents := settings.GetHtaccess(s.settings.Get("Multisite"))
+	htaccessContents := settings.GetHtaccess(s.settings.Get("multisite"))
 
 	return os.WriteFile(filepath.Join(wordPressDirectory, ".htaccess"), []byte(htaccessContents), os.FileMode(filePerms))
 }

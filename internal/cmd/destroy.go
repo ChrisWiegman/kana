@@ -27,7 +27,7 @@ func destroy(consoleOutput *console.Console, kanaSite *site.Site, kanaSettings *
 				confirmDestroy = consoleOutput.PromptConfirm(
 					fmt.Sprintf(
 						"Are you sure you want to destroy %s? %s",
-						consoleOutput.Bold(consoleOutput.Blue(kanaSettings.Get("Name"))),
+						consoleOutput.Bold(consoleOutput.Blue(kanaSettings.Get("name"))),
 						consoleOutput.Bold(
 							consoleOutput.Yellow(
 								"This operation is destructive and cannot be undone."))),
@@ -47,7 +47,7 @@ func destroy(consoleOutput *console.Console, kanaSite *site.Site, kanaSettings *
 				}
 
 				// Remove the site's folder in the config directory.
-				err = os.RemoveAll(kanaSettings.Get("Site"))
+				err = os.RemoveAll(kanaSettings.Get("siteDirectory"))
 				if err != nil {
 					consoleOutput.Error(err)
 				}
@@ -57,7 +57,7 @@ func destroy(consoleOutput *console.Console, kanaSite *site.Site, kanaSettings *
 						"Your site, %s, has been completely destroyed.",
 						consoleOutput.Bold(
 							consoleOutput.Blue(
-								kanaSettings.Get("Name")))))
+								kanaSettings.Get("name")))))
 				return
 			}
 

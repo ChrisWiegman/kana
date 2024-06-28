@@ -29,7 +29,7 @@ func stop(consoleOutput *console.Console, kanaSite *site.Site, kanaSettings *set
 			consoleOutput.Success(
 				fmt.Sprintf(
 					"Your site, %s, has been stopped. Please use `kana start` again to restart it.",
-					consoleOutput.Bold(consoleOutput.Blue(kanaSettings.Get("Name")))))
+					consoleOutput.Bold(consoleOutput.Blue(kanaSettings.Get("name")))))
 		},
 		Args: cobra.NoArgs,
 	}

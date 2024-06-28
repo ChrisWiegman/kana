@@ -33,7 +33,7 @@ func export(consoleOutput *console.Console, kanaSite *site.Site, kanaSettings *s
 			consoleOutput.Success(
 				fmt.Sprintf(
 					"Your config has been exported to %s",
-					filepath.Join(kanaSettings.Get("Working"), ".kana.json")))
+					filepath.Join(kanaSettings.Get("workingDirectory"), ".kana.json")))
 		},
 		Args: cobra.ArbitraryArgs,
 	}

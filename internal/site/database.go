@@ -31,7 +31,7 @@ func (s *Site) ExportDatabase(args []string, consoleOutput *console.Console) (st
 		return "", err
 	}
 
-	exportFileName := fmt.Sprintf("kana-%s.sql", s.settings.Get("Name"))
+	exportFileName := fmt.Sprintf("kana-%s.sql", s.settings.Get("name"))
 	exportFile := filepath.Join(cwd, exportFileName)
 
 	if len(args) == 1 {
@@ -56,7 +56,7 @@ func (s *Site) ExportDatabase(args []string, consoleOutput *console.Console) (st
 		return "", fmt.Errorf("database export failed: %s\n%s", errorMessage, output)
 	}
 
-	err = copyFile(filepath.Join(s.settings.Get("Site"), "export.sql"), exportFile)
+	err = copyFile(filepath.Join(s.settings.Get("siteDirectory"), "export.sql"), exportFile)
 	if err != nil {
 		return "", err
 	}
@@ -84,7 +84,7 @@ func (s *Site) ImportDatabase(file string, preserve bool, replaceDomain string, 
 		return fmt.Errorf("the specified sql file does not exist. Please enter a valid file to import")
 	}
 
-	kanaImportFile := filepath.Join(s.settings.Get("Site"), "import.sql")
+	kanaImportFile := filepath.Join(s.settings.Get("siteDirectory"), "import.sql")
 
 	err = copyFile(rawImportFile, kanaImportFile)
 	if err != nil {
@@ -168,7 +168,7 @@ func (s *Site) getDatabaseContainer(databaseDir string, appContainers []docker.C
 		"MARIADB_PASSWORD=wordpress",
 	}
 
-	if s.settings.Get("Database") == "mysql" {
+	if s.settings.Get("database") == "mysql" {
 		envVars = []string{
 			"MYSQL_ROOT_PASSWORD=password",
 			"MYSQL_DATABASE=wordpress",
@@ -178,17 +178,17 @@ func (s *Site) getDatabaseContainer(databaseDir string, appContainers []docker.C
 	}
 
 	databaseContainer := docker.ContainerConfig{
-		Name:        fmt.Sprintf("kana-%s-database", s.settings.Get("Name")),
-		Image:       fmt.Sprintf("%s:%s", s.settings.Get("Database"), s.settings.Get("DatabaseVersion")),
+		Name:        fmt.Sprintf("kana-%s-database", s.settings.Get("name")),
+		Image:       fmt.Sprintf("%s:%s", s.settings.Get("database"), s.settings.Get("databaseVersion")),
 		NetworkName: "kana",
-		HostName:    fmt.Sprintf("kana-%s-database", s.settings.Get("Name")),
+		HostName:    fmt.Sprintf("kana-%s-database", s.settings.Get("name")),
 		Ports: []docker.ExposedPorts{
 			{Port: "3306", Protocol: "tcp"},
 		},
 		Env: envVars,
 		Labels: map[string]string{
 			"kana.type": "database",
-			"kana.site": s.settings.Get("Name"),
+			"kana.site": s.settings.Get("name"),
 		},
 		Volumes: []mount.Mount{
 			{ // Maps a database folder to the MySQL container for persistence
@@ -205,7 +205,7 @@ func (s *Site) getDatabaseContainer(databaseDir string, appContainers []docker.C
 }
 
 func (s *Site) getDatabaseDirectory() (databaseDirectory string, err error) {
-	databaseDirectory = filepath.Join(s.settings.Get("Site"), "database")
+	databaseDirectory = filepath.Join(s.settings.Get("siteDirectory"), "database")
 
 	err = os.MkdirAll(databaseDirectory, os.FileMode(defaultDirPermissions))
 	if err != nil {
@@ -217,11 +217,11 @@ func (s *Site) getDatabaseDirectory() (databaseDirectory string, err error) {
 
 // getDatabasePort returns the public port for the database attached to the current site.
 func (s *Site) getDatabasePort() string {
-	containers, _ := s.dockerClient.ContainerList(s.settings.Get("Name"))
+	containers, _ := s.dockerClient.ContainerList(s.settings.Get("name"))
 	var databasePort types.Port
 
 	for i := range containers {
-		if containers[i].Image == fmt.Sprintf("%s:%s", s.settings.Get("Database"), s.settings.Get("DatabaseVersion")) {
+		if containers[i].Image == fmt.Sprintf("%s:%s", s.settings.Get("database"), s.settings.Get("databaseVersion")) {
 			databasePort = containers[i].Ports[0]
 		}
 	}
@@ -241,27 +241,27 @@ func (s *Site) maybeSetupSQLite() error {
 
 	file, err := helpers.DownloadFile(
 		"https://downloads.wordpress.org/plugin/sqlite-database-integration.zip",
-		s.settings.Get("Working"))
+		s.settings.Get("workingDirectory"))
 	if err != nil {
 		return err
 	}
 
 	err = helpers.UnZipFile(
-		filepath.Join(s.settings.Get("Working"), file),
-		filepath.Join(s.settings.Get("Working"), "wp-content", "plugins"))
+		filepath.Join(s.settings.Get("workingDirectory"), file),
+		filepath.Join(s.settings.Get("workingDirectory"), "wp-content", "plugins"))
 	if err != nil {
 		return err
 	}
 
-	err = os.Remove(filepath.Join(s.settings.Get("Working"), file))
+	err = os.Remove(filepath.Join(s.settings.Get("workingDirectory"), file))
 	if err != nil {
 		return err
 	}
 
 	return helpers.CopyFile(
 		filepath.Join(
-			s.settings.Get("Working"), "wp-content", "plugins", "sqlite-database-integration", "db.copy"),
-		filepath.Join(s.settings.Get("Working"), "wp-content", "db.php"))
+			s.settings.Get("workingDirectory"), "wp-content", "plugins", "sqlite-database-integration", "db.copy"),
+		filepath.Join(s.settings.Get("workingDirectory"), "wp-content", "db.php"))
 }
 
 func (s *Site) isUsingSQLite() (bool, error) {
