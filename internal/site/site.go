@@ -265,7 +265,7 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 	}
 
 	// Start Mailpit
-	if s.settings.GetBool("Mailpit") {
+	if s.settings.GetBool("mailpit") {
 		err = s.startMailpit(consoleOutput)
 		if err != nil {
 			return err
@@ -297,7 +297,7 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 	}
 
 	// Install Xdebug if we need to
-	if s.settings.GetBool("Xdebug") {
+	if s.settings.GetBool("xdebug") {
 		consoleOutput.Println("Installing and configuring Xdebug.")
 
 		err = s.StartXdebug(consoleOutput)

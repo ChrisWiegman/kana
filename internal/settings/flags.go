@@ -9,7 +9,7 @@ import (
 )
 
 func AddStartFlags(cmd *cobra.Command, settings *Settings) {
-	if cmd.Use == "start" || cmd.Use == "test" { //nolint:goconst
+	if cmd.Use == "start" { //nolint:goconst
 		for i := range defaults {
 			if defaults[i].hasStartFlag {
 				switch defaults[i].settingType {
@@ -39,7 +39,7 @@ func AddStartFlags(cmd *cobra.Command, settings *Settings) {
 
 // processStartFlags Process the start flags and save them to the settings object.
 func processStartFlags(cmd *cobra.Command, settings *Settings) error {
-	if cmd.Use == "start" || cmd.Use == "test" {
+	if cmd.Use == "start" {
 		for i := range settings.settings {
 			if settings.settings[i].hasStartFlag && cmd.Flags().Lookup(settings.settings[i].name).Changed {
 				err := validateFlags(cmd, settings)

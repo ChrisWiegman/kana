@@ -77,6 +77,17 @@ func (s *Settings) Get(name string) string {
 		}
 	}
 
+	switch name {
+	case "rootCert":
+		return rootCert
+	case "rootKey":
+		return rootKey
+	case "siteCert":
+		return siteCert
+	case "siteKey":
+		return siteKey
+	}
+
 	return ""
 }
 
@@ -336,7 +347,7 @@ func saveLocalLinkConfig(cmd *cobra.Command, siteDirectory, workingDirectory str
 
 	_, err := os.Stat(linkConfigFile)
 
-	if err != nil && os.IsNotExist(err) && cmd.Use == "start" { //nolint:goconst
+	if err != nil && os.IsNotExist(err) && cmd.Use == "start" {
 		err := os.MkdirAll(filepath.Dir(linkConfigFile), defaultDirPermissions)
 		if err != nil {
 			return err
@@ -354,7 +365,6 @@ func saveLocalLinkConfig(cmd *cobra.Command, siteDirectory, workingDirectory str
 		if err != nil {
 			return err
 		}
-
 	}
 
 	return nil
