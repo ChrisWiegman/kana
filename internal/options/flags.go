@@ -1,7 +1,6 @@
 package options
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -10,7 +9,6 @@ import (
 
 func AddStartFlags(cmd *cobra.Command, settings *Settings) {
 	if cmd.Use == "start" || cmd.Use == "test" {
-		fmt.Println("Adding start flags")
 		for i := range defaults {
 			if defaults[i].hasStartFlag {
 				switch defaults[i].settingType {
@@ -43,10 +41,15 @@ func processStartFlags(cmd *cobra.Command, settings *Settings) error {
 	if cmd.Use == "start" || cmd.Use == "test" {
 		for i := range settings.settings {
 			if settings.settings[i].hasStartFlag && cmd.Flags().Lookup(settings.settings[i].name).Changed {
+				err := validateFlags()
+				if err != nil {
+					return err
+				}
+
 				if settings.settings[i].settingType == "slice" {
 					strings.Split(cmd.Flags().Lookup("plugins").Value.String(), ",")
 				} else {
-					err := settings.Set(settings.settings[i].name, cmd.Flags().Lookup(settings.settings[i].name).Value.String())
+					err = settings.Set(settings.settings[i].name, cmd.Flags().Lookup(settings.settings[i].name).Value.String())
 					if err != nil {
 						return err
 					}
@@ -55,5 +58,9 @@ func processStartFlags(cmd *cobra.Command, settings *Settings) error {
 		}
 	}
 
+	return nil
+}
+
+func validateFlags() error {
 	return nil
 }

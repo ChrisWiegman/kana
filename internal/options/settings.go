@@ -182,9 +182,9 @@ func (s *Settings) validate(name string, value interface{}) error {
 		validate := validator.New()
 
 		switch name {
-		case "admin.email":
+		case "adminEmail":
 			return validate.Var(stringVal, "email")
-		case "updateinterval":
+		case "updateInterval":
 			return validate.Var(stringVal, "gte=0")
 		case "databaseVersion":
 			if docker.ValidateImage(s.Get("database"), stringVal) != nil {
