@@ -13,10 +13,10 @@ import (
 	"strings"
 
 	"github.com/ChrisWiegman/kana/internal/console"
-	"github.com/knadh/koanf/v2"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
+	"github.com/knadh/koanf/v2"
 )
 
 var execCommand = exec.Command

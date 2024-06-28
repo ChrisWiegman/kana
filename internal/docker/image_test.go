@@ -6,9 +6,9 @@ import (
 
 	"github.com/ChrisWiegman/kana/internal/console"
 	"github.com/ChrisWiegman/kana/internal/docker/mocks"
-	"github.com/knadh/koanf/v2"
 
 	"github.com/docker/docker/api/types/image"
+	"github.com/knadh/koanf/v2"
 	"github.com/moby/moby/pkg/jsonmessage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

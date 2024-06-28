@@ -173,8 +173,8 @@ func (d *Client) loadImageUpdateData(appDirectory string) (*koanf.Koanf, error) 
 	return imageUpdateData, nil
 }
 
-func (d *Client) setImageUpdate(image string, timeStamp time.Time) error {
-	fmt.Println(image)
+func (d *Client) setImageUpdate(imageName string, timeStamp time.Time) error {
+	fmt.Println(imageName)
 	fmt.Println(timeStamp)
 	return nil
 }
