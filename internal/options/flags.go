@@ -1,6 +1,7 @@
 package options
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -8,7 +9,8 @@ import (
 )
 
 func AddStartFlags(cmd *cobra.Command, settings *Settings) {
-	if cmd.Use == "start" || cmd.Use == "test" { //nolint:goconst
+	if cmd.Use == "start" || cmd.Use == "test" {
+		fmt.Println("Adding start flags")
 		for i := range defaults {
 			if defaults[i].hasStartFlag {
 				switch defaults[i].settingType {
@@ -26,6 +28,10 @@ func AddStartFlags(cmd *cobra.Command, settings *Settings) {
 					cmd.Flags().StringSlice(defaults[i].name, sliceValue, defaults[i].startFlag.Usage)
 				default:
 					cmd.Flags().String(defaults[i].name, defaults[i].defaultValue, defaults[i].startFlag.Usage)
+				}
+
+				if defaults[i].startFlag.NoOptDefValue != "" {
+					cmd.Flags().Lookup(defaults[i].name).NoOptDefVal = defaults[i].startFlag.NoOptDefValue
 				}
 			}
 		}

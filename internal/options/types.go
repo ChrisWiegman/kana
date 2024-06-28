@@ -44,6 +44,5 @@ type Setting struct {
 type StartFlag struct {
 	ShortName     string
 	Usage         string
-	Value         interface{}
 	NoOptDefValue string
 }

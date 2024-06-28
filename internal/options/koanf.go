@@ -52,7 +52,7 @@ func loadKoanfOptions(settingsType string, settings *Settings) error {
 				if err != nil {
 					return err
 				}
-			case "int":
+			case "int": //nolint:goconst
 				err = settings.Set(settings.settings[i].name, ko.Int64(settings.settings[i].name))
 				if err != nil {
 					return err

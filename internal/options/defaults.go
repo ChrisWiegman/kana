@@ -32,12 +32,21 @@ var defaults = []Setting{
 		settingType:  "bool",
 	},
 	{
+		name:         "isStartCommand",
+		defaultValue: "false",
+		settingType:  "bool",
+	},
+	{
 		name:         "activate",
 		defaultValue: "true",
 		settingType:  "bool",
 		hasLocal:     true,
 		hasGlobal:    true,
 		hasStartFlag: true,
+		startFlag: StartFlag{
+			ShortName: "a",
+			Usage:     "Activate the current plugin or theme (only works when used with the 'plugin' or 'theme' flags).",
+		},
 	},
 	{
 		name:         "adminEmail",
@@ -75,6 +84,9 @@ var defaults = []Setting{
 		hasLocal:     true,
 		hasGlobal:    true,
 		hasStartFlag: true,
+		startFlag: StartFlag{
+			Usage: "Select the database server you wish to use with your installation.",
+		},
 	},
 	{
 		name:         "databaseClient",
@@ -105,6 +117,9 @@ var defaults = []Setting{
 		hasLocal:     true,
 		hasGlobal:    true,
 		hasStartFlag: true,
+		startFlag: StartFlag{
+			Usage: "Sets the WP_ENVIRONMENT_TYPE for the site.",
+		},
 	},
 	{
 		name:         "mailpit",
@@ -113,6 +128,10 @@ var defaults = []Setting{
 		hasLocal:     true,
 		hasGlobal:    true,
 		hasStartFlag: true,
+		startFlag: StartFlag{
+			ShortName: "m",
+			Usage:     "Enable Mailpit when starting the container.",
+		},
 	},
 	{
 		name:         "multisite",
@@ -125,6 +144,10 @@ var defaults = []Setting{
 		hasLocal:     true,
 		hasGlobal:    true,
 		hasStartFlag: true,
+		startFlag: StartFlag{
+			NoOptDefValue: "subdomain",
+			Usage:         "Creates your new site as a multisite installation.",
+		},
 	},
 	{
 		name:         "php",
@@ -140,6 +163,9 @@ var defaults = []Setting{
 		hasLocal:     true,
 		hasGlobal:    true,
 		hasStartFlag: true,
+		startFlag: StartFlag{
+			Usage: "Installs and activates the specified plugins. Multiple plugins should be separated by commas",
+		},
 	},
 	{
 		name:         "removeDefaultPlugins",
@@ -148,6 +174,10 @@ var defaults = []Setting{
 		hasLocal:     true,
 		hasGlobal:    true,
 		hasStartFlag: true,
+		startFlag: StartFlag{
+			ShortName: "r",
+			Usage:     "If true will remove the default plugins installed with WordPress (Akismet and Hello Dolly) when starting a site.",
+		},
 	},
 	{
 		name:         "scriptDebug",
@@ -156,6 +186,10 @@ var defaults = []Setting{
 		hasLocal:     true,
 		hasGlobal:    true,
 		hasStartFlag: true,
+		startFlag: StartFlag{
+			ShortName: "c",
+			Usage:     "Enable SCRIPT_DEBUG when starting the WordPress site.",
+		},
 	},
 	{
 		name:         "ssl",
@@ -164,6 +198,10 @@ var defaults = []Setting{
 		hasLocal:     true,
 		hasGlobal:    true,
 		hasStartFlag: true,
+		startFlag: StartFlag{
+			ShortName: "s",
+			Usage:     "Whether the site should default to SSL (https) or not.",
+		},
 	},
 	{
 		name:         "theme",
@@ -172,6 +210,9 @@ var defaults = []Setting{
 		hasLocal:     true,
 		hasGlobal:    true,
 		hasStartFlag: true,
+		startFlag: StartFlag{
+			Usage: "Installs and activates a theme when starting a WordPress site.",
+		},
 	},
 	{
 		name:         "type",
@@ -184,6 +225,9 @@ var defaults = []Setting{
 		hasLocal:     true,
 		hasGlobal:    true,
 		hasStartFlag: true,
+		startFlag: StartFlag{
+			Usage: "Set the type of the installation, `site`, `plugin` or `theme`.",
+		},
 	},
 	{
 		name:         "updateInterval",
@@ -198,6 +242,10 @@ var defaults = []Setting{
 		hasLocal:     true,
 		hasGlobal:    true,
 		hasStartFlag: true,
+		startFlag: StartFlag{
+			ShortName: "d",
+			Usage:     "Enable WP_Debug when starting the WordPress site.",
+		},
 	},
 	{
 		name:         "xdebug",
@@ -206,14 +254,23 @@ var defaults = []Setting{
 		hasLocal:     true,
 		hasGlobal:    true,
 		hasStartFlag: true,
+		startFlag: StartFlag{
+			ShortName: "x",
+			Usage:     "Enable Xdebug when starting the WordPress site.",
+		},
 	},
 }
 
 const (
+	certOS                 = "darwin"
 	configFolderName       = ".config/kana"
 	defaultDirPermissions  = 0750
 	defaultFilePermissions = 0644
 	domain                 = "sites.kana.sh"
 	mariadbVersion         = "11"
 	mysqlVersion           = "8"
+	rootCert               = "kana.root.pem"
+	rootKey                = "kana.root.key"
+	siteCert               = "kana.site.pem"
+	siteKey                = "kana.site.key"
 )

@@ -8,8 +8,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ChrisWiegman/kana/internal/docker"
 	"github.com/ChrisWiegman/kana/internal/helpers"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 )
@@ -111,36 +113,101 @@ func (s *Settings) GetSlice(name string) []string {
 	return []string{}
 }
 
-func (s *Settings) Set(name string, value interface{}, setGlobal ...bool) error {
+func (s *Settings) Set(name string, value interface{}, setVars ...bool) error {
 	for i := range s.settings {
-		if s.settings[i].name == name {
-			if s.settings[i].settingType == "slice" && reflect.TypeOf(value).String() == "[]string" {
-				s.settings[i].currentValue = strings.Join(value.([]string), ",")
-			} else {
-				s.settings[i].currentValue = fmt.Sprint(value)
-			}
-
-			if len(setGlobal) > 0 && setGlobal[0] {
-				if s.settings[i].settingType == "slice" {
-					value = strings.Split(s.settings[i].currentValue, ",")
-				}
-
-				err := s.global.Set(s.settings[i].name, value)
-				if err != nil {
-					return err
-				}
-
-				err = writeKoanfSettings("global", s)
-				if err != nil {
-					return err
-				}
-			}
-
-			return nil
+		if s.settings[i].name != name {
+			continue
 		}
+
+		err := s.validate(name, value)
+		if err != nil {
+			return err
+		}
+
+		if s.settings[i].settingType == "slice" && reflect.TypeOf(value).String() == "[]string" {
+			s.settings[i].currentValue = strings.Join(value.([]string), ",")
+		} else {
+			s.settings[i].currentValue = fmt.Sprint(value)
+		}
+
+		if len(setVars) > 0 && setVars[0] {
+			if s.settings[i].settingType == "slice" {
+				value = strings.Split(s.settings[i].currentValue, ",")
+			}
+
+			err := s.global.Set(s.settings[i].name, value)
+			if err != nil {
+				return err
+			}
+
+			err = writeKoanfSettings("global", s)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
 	}
 
 	return fmt.Errorf("invalid setting %s. Please enter a valid key to set", name)
+}
+
+func (s *Settings) validate(name string, value interface{}) error {
+	for i := range s.settings {
+		if s.settings[i].name != name {
+			continue
+		}
+
+		stringVal := fmt.Sprint(value)
+
+		switch s.settings[i].settingType {
+		case "bool":
+			_, err := strconv.ParseBool(stringVal)
+			if err != nil {
+				return fmt.Errorf("the value for %s must be a boolean", name)
+			}
+		case "int":
+			_, err := strconv.ParseInt(stringVal, 10, 64)
+			if err != nil {
+				return fmt.Errorf("the value for %s must be an integer", name)
+			}
+		}
+
+		if len(s.settings[i].validValues) > 0 {
+			if !helpers.IsValidString(stringVal, s.settings[i].validValues) {
+				return fmt.Errorf("the %s value, %s, is not valid", name, stringVal)
+			}
+		}
+
+		validate := validator.New()
+
+		switch name {
+		case "admin.email":
+			return validate.Var(stringVal, "email")
+		case "updateinterval":
+			return validate.Var(stringVal, "gte=0")
+		case "databaseVersion":
+			if docker.ValidateImage(s.Get("database"), stringVal) != nil {
+				databaseURL := "https://hub.docker.com/_/mariadb"
+
+				if s.Get("database") == "mysql" {
+					databaseURL = "https://hub.docker.com/_/mysql"
+				}
+
+				return fmt.Errorf(
+					"the database version in your configuration, %s, is invalid. See %s for a list of supported versions",
+					stringVal, databaseURL)
+			}
+		case "php":
+			if docker.ValidateImage("wordpress", fmt.Sprintf("php%s", stringVal)) != nil {
+				return fmt.Errorf(
+					"the PHP version in your configuration, %s, is invalid. See https://hub.docker.com/_/wordpress for a list of supported versions",
+					stringVal)
+			}
+		}
+	}
+
+	return nil
 }
 
 func (s *Settings) getAll(settingsType string) map[string]interface{} {

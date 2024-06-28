@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 
 	"github.com/ChrisWiegman/kana/internal/console"
@@ -18,8 +16,7 @@ func test(consoleOutput *console.Console, kanaSettings *options.Settings) *cobra
 			// This is similar to how setting git options works
 			switch len(args) {
 			case 0:
-				fmt.Println(kanaSettings.Get("xdebug"))
-				//options.ListSettings(kanaSettings, consoleOutput)
+				options.ListSettings(kanaSettings, consoleOutput)
 			case 1:
 				options.PrintSingleSetting(args[0], kanaSettings, consoleOutput)
 			case 2:
