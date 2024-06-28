@@ -1,6 +1,7 @@
 package options
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -8,7 +9,7 @@ import (
 )
 
 func AddStartFlags(cmd *cobra.Command, settings *Settings) {
-	if cmd.Use == "start" || cmd.Use == "test" {
+	if cmd.Use == "start" || cmd.Use == "test" { //nolint:goconst
 		for i := range defaults {
 			if defaults[i].hasStartFlag {
 				switch defaults[i].settingType {
@@ -41,7 +42,7 @@ func processStartFlags(cmd *cobra.Command, settings *Settings) error {
 	if cmd.Use == "start" || cmd.Use == "test" {
 		for i := range settings.settings {
 			if settings.settings[i].hasStartFlag && cmd.Flags().Lookup(settings.settings[i].name).Changed {
-				err := validateFlags()
+				err := validateFlags(cmd, settings)
 				if err != nil {
 					return err
 				}
@@ -61,6 +62,11 @@ func processStartFlags(cmd *cobra.Command, settings *Settings) error {
 	return nil
 }
 
-func validateFlags() error {
+func validateFlags(cmd *cobra.Command, settings *Settings) error {
+	if cmd.Flags().Lookup("type").Changed &&
+		settings.GetBool("isNamed") {
+		return fmt.Errorf("the type flag is not valid with named sties. Only a `site` is valid with named sites")
+	}
+
 	return nil
 }
