@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/ChrisWiegman/kana/internal/console"
+	"github.com/knadh/koanf/v2"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
@@ -25,7 +26,7 @@ var sleepDuration = 5
 // Client is an interface the must be implemented to provide Docker services through this package.
 type Client struct {
 	apiClient       APIClient
-	imageUpdateData ViperClient
+	imageUpdateData *koanf.Koanf
 	checkedImages   []string
 }
 

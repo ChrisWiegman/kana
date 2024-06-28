@@ -3,7 +3,6 @@ package docker
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -15,9 +14,11 @@ import (
 	"github.com/ChrisWiegman/kana/internal/console"
 
 	"github.com/docker/docker/api/types/image"
+	kjson "github.com/knadh/koanf/parsers/json"
+	"github.com/knadh/koanf/providers/file"
+	"github.com/knadh/koanf/v2"
 	"github.com/moby/moby/pkg/jsonmessage"
 	"github.com/moby/term"
-	"github.com/spf13/viper"
 )
 
 var displayJSONMessagesStream = jsonmessage.DisplayJSONMessagesStream
@@ -72,7 +73,7 @@ func ValidateImage(imageName, imageTag string) error {
 }
 
 func (d *Client) maybeUpdateImage(imageName string, updateDays int64, suppressOutput bool) error {
-	lastUpdated := d.imageUpdateData.GetTime(imageName)
+	lastUpdated := d.imageUpdateData.Time(imageName, time.RFC3339)
 
 	imageList, err := d.apiClient.ImageList(context.Background(), image.ListOptions{})
 	if err != nil {
@@ -118,8 +119,7 @@ func (d *Client) maybeUpdateImage(imageName string, updateDays int64, suppressOu
 			out, _ = os.Open(os.DevNull)
 		}
 
-		d.imageUpdateData.Set(imageName, time.Now())
-		err = d.imageUpdateData.WriteConfig()
+		err = d.setImageUpdate(imageName, time.Now())
 		if err != nil {
 			return err
 		}
@@ -152,26 +152,29 @@ func (d *Client) removeImage(imageName string) (removed bool, err error) {
 	return false, nil
 }
 
-func (d *Client) loadImageUpdateData(appDirectory string) (*viper.Viper, error) {
-	imageUpdateData := viper.New()
+func (d *Client) loadImageUpdateData(appDirectory string) (*koanf.Koanf, error) {
+	imageUpdateData := koanf.New(".")
 
-	imageUpdateData.SetConfigName("images")
-	imageUpdateData.SetConfigType("json")
-	imageUpdateData.AddConfigPath(filepath.Join(appDirectory, "config"))
+	configFile := filepath.Join(appDirectory, "config", "images.json")
+	configFileExists := true
 
-	err := imageUpdateData.ReadInConfig()
-	if err != nil {
-		var configFileNotFoundError viper.ConfigFileNotFoundError
+	_, err := os.Stat(configFile)
+	if err != nil && os.IsNotExist(err) {
+		configFileExists = false
+	}
 
-		if errors.As(err, &configFileNotFoundError) {
-			err = imageUpdateData.SafeWriteConfig()
-			if err != nil {
-				return imageUpdateData, err
-			}
-		} else {
+	if configFileExists {
+		err = imageUpdateData.Load(file.Provider(configFile), kjson.Parser())
+		if err != nil {
 			return imageUpdateData, err
 		}
 	}
 
 	return imageUpdateData, nil
+}
+
+func (d *Client) setImageUpdate(image string, timeStamp time.Time) error {
+	fmt.Println(image)
+	fmt.Println(timeStamp)
+	return nil
 }

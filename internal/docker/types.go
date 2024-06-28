@@ -3,7 +3,6 @@ package docker
 import (
 	"context"
 	"io"
-	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -60,16 +59,4 @@ type NetworkAPIClient interface {
 	NetworkCreate(ctx context.Context, name string, options network.CreateOptions) (network.CreateResponse, error)
 	NetworkList(ctx context.Context, options network.ListOptions) ([]network.Inspect, error)
 	NetworkRemove(ctx context.Context, network string) error
-}
-
-// ViperClient defines a mock Viper client for testing.
-type ViperClient interface {
-	SetConfigName(in string)
-	SetConfigType(in string)
-	AddConfigPath(in string)
-	ReadInConfig() error
-	SafeWriteConfig() error
-	GetTime(key string) time.Time
-	Set(key string, value interface{})
-	WriteConfig() error
 }

@@ -3,10 +3,10 @@ package docker
 import (
 	"fmt"
 	"testing"
-	"time"
 
 	"github.com/ChrisWiegman/kana/internal/console"
 	"github.com/ChrisWiegman/kana/internal/docker/mocks"
+	"github.com/knadh/koanf/v2"
 
 	"github.com/docker/docker/api/types/image"
 	"github.com/moby/moby/pkg/jsonmessage"
@@ -39,13 +39,7 @@ func TestEnsureImage(t *testing.T) {
 
 	d.apiClient = apiClient
 
-	viper := new(mocks.ViperClient)
-	viper.On("ReadInConfig").Return(nil)
-	viper.On("GetTime", mock.Anything).Return(time.Now())
-	viper.On("Set", mock.Anything, mock.Anything).Return()
-	viper.On("WriteConfig").Return(nil)
-
-	d.imageUpdateData = viper
+	d.imageUpdateData = koanf.New(".")
 
 	displayJSONMessagesStream = mocks.MockDisplayJSONMessagesStream
 	mocks.MockedDisplayJSONMessagesStreamReturn = nil //nolint:gocritic

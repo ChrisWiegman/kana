@@ -2,12 +2,10 @@ package docker
 
 import (
 	"testing"
-	"time"
 
 	"github.com/ChrisWiegman/kana/internal/console"
 	"github.com/ChrisWiegman/kana/internal/docker/mocks"
-
-	"github.com/stretchr/testify/mock"
+	"github.com/knadh/koanf/v2"
 )
 
 func TestContainerRun(t *testing.T) {
@@ -18,13 +16,7 @@ func TestContainerRun(t *testing.T) {
 		t.Error(err)
 	}
 
-	viper := new(mocks.ViperClient)
-	viper.On("ReadInConfig").Return(nil)
-	viper.On("GetTime", mock.Anything).Return(time.Now())
-	viper.On("Set", mock.Anything, mock.Anything).Return()
-	viper.On("WriteConfig").Return(nil)
-
-	d.imageUpdateData = viper
+	d.imageUpdateData = koanf.New(".")
 
 	err = d.EnsureImage("alpine", 1, consoleOutput)
 	if err != nil {
