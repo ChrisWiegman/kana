@@ -72,7 +72,7 @@ func Load(kanaSettings *Settings, version string, cmd *cobra.Command) error {
 
 func (s *Settings) Get(name string) string {
 	for i := range s.settings {
-		if s.settings[i].name == name {
+		if strings.EqualFold(s.settings[i].name, name) {
 			return s.settings[i].currentValue
 		}
 	}
@@ -141,7 +141,7 @@ func (s *Settings) GetAll(settingsType string) map[string]interface{} {
 
 func (s *Settings) GetBool(name string) bool {
 	for i := range s.settings {
-		if s.settings[i].name == name {
+		if strings.EqualFold(s.settings[i].name, name) {
 			return s.settings[i].currentValue == "true"
 		}
 	}
@@ -151,7 +151,7 @@ func (s *Settings) GetBool(name string) bool {
 
 func (s *Settings) GetInt(name string) int64 {
 	for i := range s.settings {
-		if s.settings[i].name == name {
+		if strings.EqualFold(s.settings[i].name, name) {
 			value, err := strconv.ParseInt(s.settings[i].currentValue, 10, 64)
 			if err != nil {
 				return 0
@@ -166,7 +166,7 @@ func (s *Settings) GetInt(name string) int64 {
 
 func (s *Settings) GetSlice(name string) []string {
 	for i := range s.settings {
-		if s.settings[i].name == name {
+		if strings.EqualFold(s.settings[i].name, name) {
 			if s.settings[i].currentValue == "" {
 				return []string{}
 			}
@@ -180,7 +180,7 @@ func (s *Settings) GetSlice(name string) []string {
 
 func (s *Settings) Set(name string, value interface{}, setVars ...bool) error {
 	for i := range s.settings {
-		if s.settings[i].name != name {
+		if !strings.EqualFold(s.settings[i].name, name) {
 			continue
 		}
 
@@ -219,7 +219,7 @@ func (s *Settings) Set(name string, value interface{}, setVars ...bool) error {
 
 func (s *Settings) validate(name string, value interface{}) error {
 	for i := range s.settings {
-		if s.settings[i].name != name {
+		if !strings.EqualFold(s.settings[i].name, name) {
 			continue
 		}
 
