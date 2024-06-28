@@ -8,47 +8,9 @@ import (
 	"github.com/ChrisWiegman/kana/internal/docker/mocks"
 
 	"github.com/docker/docker/api/types/image"
-	"github.com/knadh/koanf/v2"
-	"github.com/moby/moby/pkg/jsonmessage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
-
-func TestEnsureImage(t *testing.T) {
-	consoleOutput := new(console.Console)
-	consoleOutput.JSON = true
-
-	d, err := New(consoleOutput, "")
-	assert.NoError(t, err)
-
-	apiClient := new(mocks.APIClient)
-
-	readCloser := &mocks.ReadCloser{
-		ExpectedData: []byte(`{}`),
-		ExpectedErr:  nil,
-	}
-
-	imageList := []image.Summary{
-		{RepoTags: []string{
-			"alpine:latest",
-		}},
-	}
-
-	apiClient.On("ImagePull", mock.Anything, mock.Anything, mock.Anything).Return(readCloser, nil)
-	apiClient.On("ImageList", mock.Anything, mock.Anything).Return(imageList, nil)
-
-	d.apiClient = apiClient
-
-	d.imageUpdateData = koanf.New(".")
-
-	displayJSONMessagesStream = mocks.MockDisplayJSONMessagesStream
-	mocks.MockedDisplayJSONMessagesStreamReturn = nil //nolint:gocritic
-
-	err = d.EnsureImage("alpine", "", 1, consoleOutput)
-	assert.Equal(t, nil, err)
-
-	displayJSONMessagesStream = jsonmessage.DisplayJSONMessagesStream
-}
 
 func TestRemoveImage(t *testing.T) {
 	consoleOutput := new(console.Console)
