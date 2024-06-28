@@ -50,28 +50,26 @@ func ListSettings(settings *Settings, consoleOutput *console.Console) {
 	settingsTable.Render()
 }
 
-// func (s *Settings) PrintSingleSetting(name string, consoleOutput *console.Console) {
-// 	value, err := s.GetGlobalSetting(name)
-// 	if err != nil {
-// 		consoleOutput.Error(err)
-// 	}
-// 	if consoleOutput.JSON {
-// 		type JSONSetting struct {
-// 			Setting, Value string
-// 		}
+func PrintSingleSetting(name string, kanaSettings *Settings, consoleOutput *console.Console) {
+	globalSettings := kanaSettings.getAll("global")
 
-// 		setting := JSONSetting{
-// 			Setting: name,
-// 			Value:   value,
-// 		}
+	if consoleOutput.JSON {
+		type JSONSetting struct {
+			Setting, Value string
+		}
 
-// 		str, _ := json.Marshal(setting)
+		setting := JSONSetting{
+			Setting: name,
+			Value:   fmt.Sprint(globalSettings[name]),
+		}
 
-// 		fmt.Println(string(str))
-// 	} else {
-// 		consoleOutput.Println(value)
-// 	}
-// }
+		str, _ := json.Marshal(setting)
+
+		fmt.Println(string(str))
+	} else {
+		consoleOutput.Println(fmt.Sprint(globalSettings[name]))
+	}
+}
 
 // printJSONSettings Prints out all settings in JSON format.
 func printJSONSettings(settings *Settings) {

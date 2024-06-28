@@ -108,7 +108,7 @@ func (s *Settings) GetSlice(name string) []string {
 	return []string{}
 }
 
-func (s *Settings) Set(name string, value interface{}) error {
+func (s *Settings) Set(name string, value interface{}, setGlobal ...bool) error {
 	for i, setting := range s.settings {
 		if setting.name == name {
 			if setting.settingType == "slice" {
@@ -116,6 +116,19 @@ func (s *Settings) Set(name string, value interface{}) error {
 			} else {
 				s.settings[i].currentValue = fmt.Sprint(value)
 			}
+
+			if len(setGlobal) > 0 && setGlobal[0] {
+				err := s.global.Set(setting.name, value)
+				if err != nil {
+					return err
+				}
+
+				err = writeKoanfSettings("global", s)
+				if err != nil {
+					return err
+				}
+			}
+
 			return nil
 		}
 	}

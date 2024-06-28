@@ -17,9 +17,23 @@ func test(consoleOutput *console.Console) *cobra.Command {
 				panic(err)
 			}
 
-			options.ListSettings(kanaSettings, consoleOutput)
+			// List all content if we don't have args, list the value with 1 arg or set a fresh value with 2 args.
+			// This is similar to how setting git options works
+			switch len(args) {
+			case 0:
+				options.ListSettings(kanaSettings, consoleOutput)
+			case 1:
+				options.PrintSingleSetting(args[0], kanaSettings, consoleOutput)
+			case 2:
+				err := kanaSettings.Set(args[0], args[1], true)
+				if err != nil {
+					consoleOutput.Error(err)
+				}
+
+				options.PrintSingleSetting(args[0], kanaSettings, consoleOutput)
+			}
 		},
-		Args: cobra.NoArgs,
+		Args: cobra.RangeArgs(0, 2),
 	}
 
 	return cmd
