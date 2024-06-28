@@ -86,6 +86,13 @@ mockery:
 		-w /src/internal/site \
 		vektra/mockery \
 		--all
+	docker \
+		run \
+		--rm \
+		--mount type=bind,source=$(PWD),target=/src \
+		-w /src/internal/settings \
+		vektra/mockery \
+		--all
 
 .PHONY: update
 update:

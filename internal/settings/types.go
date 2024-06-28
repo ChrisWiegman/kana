@@ -23,8 +23,8 @@ type PluginVersion struct {
 // A collection of all settings values used by Kana.
 type Settings struct {
 	settings []Setting
-	global   *koanf.Koanf
-	local    *koanf.Koanf
+	global   Koanf
+	local    Koanf
 }
 
 // An individual setting and its associated data.
@@ -45,4 +45,14 @@ type StartFlag struct {
 	ShortName     string
 	Usage         string
 	NoOptDefValue string
+}
+
+type Koanf interface {
+	Load(p koanf.Provider, pa koanf.Parser, opts ...koanf.Option) error
+	Exists(path string) bool
+	Bool(path string) bool
+	Int64(path string) int64
+	Strings(path string) []string
+	String(path string) string
+	Set(key string, val interface{}) error
 }
