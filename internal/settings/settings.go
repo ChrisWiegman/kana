@@ -1,6 +1,7 @@
 package settings
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -44,6 +45,11 @@ func Load(kanaSettings *Settings, version string, cmd *cobra.Command) error {
 		if err != nil {
 			return err
 		}
+	}
+
+	err = saveLocalLinkConfig(cmd, settings["siteDirectory"].(string), settings["workingDirectory"].(string), settings["isNamed"].(bool))
+	if err != nil {
+		return err
 	}
 
 	err = loadKoanfOptions("global", kanaSettings)
@@ -316,4 +322,40 @@ func getStaticDirectories() (app, working string, err error) {
 	err = os.MkdirAll(app, os.FileMode(defaultDirPermissions))
 
 	return app, working, err
+}
+
+func saveLocalLinkConfig(cmd *cobra.Command, siteDirectory, workingDirectory string, isNamedSite bool) error {
+	siteLink := map[string]string{
+		"link": workingDirectory}
+
+	if isNamedSite {
+		siteLink["link"] = siteDirectory
+	}
+
+	linkConfigFile := filepath.Join(siteDirectory, "link.json")
+
+	_, err := os.Stat(linkConfigFile)
+
+	if err != nil && os.IsNotExist(err) && cmd.Use == "start" { //nolint:goconst
+		err := os.MkdirAll(filepath.Dir(linkConfigFile), defaultDirPermissions)
+		if err != nil {
+			return err
+		}
+
+		f, _ := os.Create(linkConfigFile)
+		defer f.Close()
+
+		jsonBytes, err := json.MarshalIndent(siteLink, "", "\t")
+		if err != nil {
+			return err
+		}
+
+		_, err = f.Write(jsonBytes)
+		if err != nil {
+			return err
+		}
+
+	}
+
+	return nil
 }
