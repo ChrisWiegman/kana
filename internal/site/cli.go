@@ -87,7 +87,7 @@ func (s *Site) WPCli(command []string, interactive bool, consoleOutput *console.
 		container.Env = append(container.Env, "KANA_ADMIN_LOGIN=true")
 	}
 
-	err = s.dockerClient.EnsureImage(container.Image, s.settings.GetInt("UpdateInterval"), consoleOutput)
+	err = s.dockerClient.EnsureImage(container.Image, s.settings.Get("appDirectory"), s.settings.GetInt("updateInterval"), consoleOutput)
 	if err != nil {
 		return 1, "", err
 	}

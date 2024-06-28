@@ -455,7 +455,7 @@ func (s *Site) maybeRemoveDefaultPlugins() error {
 
 // startContainer Starts a given container configuration.
 func (s *Site) startContainer(container *docker.ContainerConfig, randomPorts, localUser bool, consoleOutput *console.Console) error {
-	err := s.dockerClient.EnsureImage(container.Image, s.settings.GetInt("UpdateInterval"), consoleOutput)
+	err := s.dockerClient.EnsureImage(container.Image, s.settings.Get("appDirectory"), s.settings.GetInt("updateInterval"), consoleOutput)
 	if err != nil {
 		err = s.handleImageError(container, err)
 		if err != nil {

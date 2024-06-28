@@ -25,7 +25,7 @@ var displayJSONMessagesStream = jsonmessage.DisplayJSONMessagesStream
 
 // https://gist.github.com/miguelmota/4980b18d750fb3b1eb571c3e207b1b92
 // https://riptutorial.com/docker/example/31980/image-pulling-with-progress-bars--written-in-go
-func (d *Client) EnsureImage(imageName string, updateDays int64, consoleOutput *console.Console) (err error) {
+func (d *Client) EnsureImage(imageName, appDirectory string, updateDays int64, consoleOutput *console.Console) (err error) {
 	if !strings.Contains(imageName, ":") {
 		imageName = fmt.Sprintf("%s:latest", imageName)
 	}
@@ -37,7 +37,7 @@ func (d *Client) EnsureImage(imageName string, updateDays int64, consoleOutput *
 		}
 	}
 
-	return d.maybeUpdateImage(imageName, updateDays, consoleOutput.JSON)
+	return d.maybeUpdateImage(imageName, updateDays, consoleOutput.JSON, appDirectory)
 }
 
 func ValidateImage(imageName, imageTag string) error {
@@ -72,7 +72,7 @@ func ValidateImage(imageName, imageTag string) error {
 	return err
 }
 
-func (d *Client) maybeUpdateImage(imageName string, updateDays int64, suppressOutput bool) error {
+func (d *Client) maybeUpdateImage(imageName string, updateDays int64, suppressOutput bool, appDirectory string) error {
 	lastUpdated := d.imageUpdateData.Time(imageName, time.RFC3339)
 
 	imageList, err := d.apiClient.ImageList(context.Background(), image.ListOptions{})
@@ -119,7 +119,7 @@ func (d *Client) maybeUpdateImage(imageName string, updateDays int64, suppressOu
 			out, _ = os.Open(os.DevNull)
 		}
 
-		err = d.setImageUpdate(imageName, time.Now())
+		err = d.setImageUpdate(imageName, time.Now(), appDirectory)
 		if err != nil {
 			return err
 		}
@@ -173,8 +173,23 @@ func (d *Client) loadImageUpdateData(appDirectory string) (*koanf.Koanf, error) 
 	return imageUpdateData, nil
 }
 
-func (d *Client) setImageUpdate(imageName string, timeStamp time.Time) error {
-	fmt.Println(imageName)
-	fmt.Println(timeStamp)
-	return nil
+func (d *Client) setImageUpdate(imageName string, timeStamp time.Time, appDirectory string) error {
+	err := d.imageUpdateData.Set(imageName, timeStamp.Format(time.RFC3339))
+	if err != nil {
+		return err
+	}
+
+	configFile := filepath.Join(appDirectory, "config", "images.json")
+
+	f, _ := os.Create(configFile)
+	defer f.Close()
+
+	jsonBytes, err := d.imageUpdateData.Marshal(kjson.Parser())
+	if err != nil {
+		return err
+	}
+
+	_, err = f.Write(jsonBytes)
+
+	return err
 }

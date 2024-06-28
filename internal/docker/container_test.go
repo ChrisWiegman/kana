@@ -19,7 +19,7 @@ func TestContainerRun(t *testing.T) {
 
 	d.imageUpdateData = koanf.New(".")
 
-	err = d.EnsureImage("alpine", 1, consoleOutput)
+	err = d.EnsureImage("alpine", "", 1, consoleOutput)
 	if err != nil {
 		t.Error(err)
 	}
