@@ -90,28 +90,28 @@ func (s *Settings) GetAll(settingsType string) map[string]interface{} {
 		switch s.settings[i].settingType {
 		case "bool":
 			boolValue, _ := strconv.ParseBool(s.settings[i].currentValue)
-			if koSettings.Exists(s.settings[i].name) {
+			if koSettings != nil && koSettings.Exists(s.settings[i].name) {
 				boolValue = koSettings.Bool(s.settings[i].name)
 			}
 
 			allSettings[s.settings[i].name] = boolValue
 		case "int":
 			intValue, _ := strconv.ParseInt(s.settings[i].currentValue, 10, 64)
-			if koSettings.Exists(s.settings[i].name) {
+			if koSettings != nil && koSettings.Exists(s.settings[i].name) {
 				intValue = koSettings.Int64(s.settings[i].name)
 			}
 
 			allSettings[s.settings[i].name] = intValue
 		case "slice":
 			sliceVal := strings.Split(s.settings[i].currentValue, ",")
-			if koSettings.Exists(s.settings[i].name) {
+			if koSettings != nil && koSettings.Exists(s.settings[i].name) {
 				sliceVal = koSettings.Strings(s.settings[i].name)
 			}
 
 			allSettings[s.settings[i].name] = sliceVal
 		default:
 			stringValue := s.settings[i].currentValue
-			if koSettings.Exists(s.settings[i].name) {
+			if koSettings != nil && koSettings.Exists(s.settings[i].name) {
 				stringValue = koSettings.String(s.settings[i].name)
 			}
 
