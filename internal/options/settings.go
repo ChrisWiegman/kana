@@ -44,19 +44,15 @@ func New(version string, cmd *cobra.Command) (*Settings, error) {
 		}
 	}
 
-	global, err := getKoanfOptions("global", kanaSettings)
+	err = loadKoanfOptions("global", kanaSettings)
 	if err != nil {
 		return kanaSettings, err
 	}
 
-	kanaSettings.global = global
-
-	local, err := getKoanfOptions("local", kanaSettings)
+	err = loadKoanfOptions("local", kanaSettings)
 	if err != nil {
 		return kanaSettings, err
 	}
-
-	kanaSettings.local = local
 
 	err = ensureStaticConfigFiles(settings["appDirectory"].(string))
 
@@ -115,7 +111,11 @@ func (s *Settings) GetSlice(name string) []string {
 func (s *Settings) Set(name string, value interface{}) error {
 	for i, setting := range s.settings {
 		if setting.name == name {
-			s.settings[i].currentValue = fmt.Sprint(value)
+			if setting.settingType == "slice" {
+				s.settings[i].currentValue = strings.Join(value.([]string), ",")
+			} else {
+				s.settings[i].currentValue = fmt.Sprint(value)
+			}
 			return nil
 		}
 	}
@@ -125,6 +125,11 @@ func (s *Settings) Set(name string, value interface{}) error {
 
 func (s *Settings) getAll(settingsType string) map[string]interface{} {
 	allSettings := make(map[string]interface{})
+	koSettings := s.global
+
+	if settingsType == "local" {
+		koSettings = s.local
+	}
 
 	for _, setting := range s.settings {
 		if (!setting.hasLocal && settingsType == "local") || (!setting.hasGlobal && settingsType == "global") {
@@ -134,20 +139,32 @@ func (s *Settings) getAll(settingsType string) map[string]interface{} {
 		switch setting.settingType {
 		case "bool":
 			boolValue, _ := strconv.ParseBool(setting.currentValue)
+			if koSettings.Exists(setting.name) {
+				boolValue = koSettings.Bool(setting.name)
+			}
 
 			allSettings[setting.name] = boolValue
 		case "int":
 			intValue, _ := strconv.ParseInt(setting.currentValue, 10, 64)
+			if koSettings.Exists(setting.name) {
+				intValue = koSettings.Int64(setting.name)
+			}
 
 			allSettings[setting.name] = intValue
 		case "slice":
-			if setting.currentValue == "" {
-				allSettings[setting.name] = []string{}
-			} else {
-				allSettings[setting.name] = setting.currentValue
+			sliceVal := strings.Split(setting.currentValue, ",")
+			if koSettings.Exists(setting.name) {
+				sliceVal = koSettings.Strings(setting.name)
 			}
+
+			allSettings[setting.name] = sliceVal
 		default:
-			allSettings[setting.name] = setting.currentValue
+			stringValue := setting.currentValue
+			if koSettings.Exists(setting.name) {
+				stringValue = koSettings.String(setting.name)
+			}
+
+			allSettings[setting.name] = stringValue
 		}
 	}
 

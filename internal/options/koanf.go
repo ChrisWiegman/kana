@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
-	"strings"
 
 	kjson "github.com/knadh/koanf/parsers/json"
 	"github.com/knadh/koanf/providers/file"
@@ -21,7 +20,7 @@ func getConfigFile(settingsType, workingDirectory, appDirectory string) string {
 	return configFile
 }
 
-func getKoanfOptions(settingsType string, settings *Settings) (*koanf.Koanf, error) {
+func loadKoanfOptions(settingsType string, settings *Settings) error {
 	ko := koanf.New(".")
 
 	configFile := getConfigFile(settingsType, settings.Get("workingDirectory"), settings.Get("appDirectory"))
@@ -33,7 +32,7 @@ func getKoanfOptions(settingsType string, settings *Settings) (*koanf.Koanf, err
 		if settingsType == "global" { //nolint:goconst
 			err = writeKoanfSettings(settingsType, settings)
 			if err != nil {
-				return ko, err
+				return err
 			}
 		}
 	}
@@ -41,7 +40,7 @@ func getKoanfOptions(settingsType string, settings *Settings) (*koanf.Koanf, err
 	if settingsType != "local" || configFileExists {
 		err = ko.Load(file.Provider(configFile), kjson.Parser())
 		if err != nil {
-			return ko, err
+			return err
 		}
 	}
 
@@ -51,36 +50,34 @@ func getKoanfOptions(settingsType string, settings *Settings) (*koanf.Koanf, err
 			case "bool":
 				err = settings.Set(setting.name, ko.Bool(setting.name))
 				if err != nil {
-					return ko, err
+					return err
 				}
 			case "int":
 				err = settings.Set(setting.name, ko.Int64(setting.name))
 				if err != nil {
-					return ko, err
+					return err
 				}
 			case "slice":
-				stringValue := ko.String(setting.name)
-				if stringValue != "" {
-					err = settings.Set(setting.name, stringValue)
-					if err != nil {
-						return ko, err
-					}
-				} else {
-					err = settings.Set(setting.name, strings.Split(setting.currentValue, ","))
-					if err != nil {
-						return ko, err
-					}
+				err = settings.Set(setting.name, ko.Strings(setting.name))
+				if err != nil {
+					return err
 				}
 			default:
 				err = settings.Set(setting.name, ko.String(setting.name))
 				if err != nil {
-					return ko, err
+					return err
 				}
 			}
 		}
 	}
 
-	return ko, nil
+	if settingsType == "local" {
+		settings.local = ko
+	} else {
+		settings.global = ko
+	}
+
+	return nil
 }
 
 func writeKoanfSettings(settingsType string, settings *Settings) error {
