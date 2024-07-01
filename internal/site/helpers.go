@@ -93,17 +93,17 @@ func (s *Site) handleImageError(container *docker.ContainerConfig, err error) er
 		case "wordpress":
 			return fmt.Errorf(
 				"the PHP version in your configuration, %s, is invalid. See https://hub.docker.com/_/wordpress for a list of supported versions",
-				s.settings.Get("PHP"))
+				s.settings.Get("php"))
 		case "database":
 			databaseURL := "https://hub.docker.com/_/mariadb"
 
-			if s.settings.Get("Database") == "mysql" {
+			if s.settings.Get("database") == "mysql" {
 				databaseURL = "https://hub.docker.com/_/mysql"
 			}
 
 			return fmt.Errorf(
 				"the database version in your configuration, %s, is invalid. See %s for a list of supported versions",
-				s.settings.Get("DatabaseVersion"), databaseURL)
+				s.settings.Get("databaseVersion"), databaseURL)
 		}
 	}
 

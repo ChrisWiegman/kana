@@ -15,18 +15,18 @@ func Command(name string, arg ...string) *exec.Cmd {
 
 // RunWPCli Runs a wp-cli command returning it's output and any errors.
 func (s *Site) WPCli(command []string, interactive bool, consoleOutput *console.Console) (statusCode int64, output string, err error) {
-	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana-%s-wordpress", s.settings.Get("Name")))
+	mounts := s.dockerClient.ContainerGetMounts(fmt.Sprintf("kana-%s-wordpress", s.settings.Get("name")))
 
 	for _, mount := range mounts {
 		if strings.Contains(mount.Destination, "/var/www/html/wp-content/plugins/") {
-			err = s.settings.OverrideType("plugin")
+			err = s.settings.Set("type", "plugin")
 			if err != nil {
 				return 1, "", err
 			}
 		}
 
 		if strings.Contains(mount.Destination, "/var/www/html/wp-content/themes/") {
-			err = s.settings.OverrideType("theme")
+			err = s.settings.Set("type", "theme")
 			if err != nil {
 				return 1, "", err
 			}
@@ -63,7 +63,7 @@ func (s *Site) WPCli(command []string, interactive bool, consoleOutput *console.
 		envVars = append(envVars, "KANA_SQLITE=true")
 	} else {
 		envVars = append(envVars,
-			fmt.Sprintf("WORDPRESS_DB_HOST=kana-%s-database", s.settings.Get("Name")),
+			fmt.Sprintf("WORDPRESS_DB_HOST=kana-%s-database", s.settings.Get("name")),
 			"WORDPRESS_DB_USER=wordpress",
 			"WORDPRESS_DB_PASSWORD=wordpress",
 			"WORDPRESS_DB_NAME=wordpress",
@@ -71,14 +71,14 @@ func (s *Site) WPCli(command []string, interactive bool, consoleOutput *console.
 	}
 
 	container := docker.ContainerConfig{
-		Name:        fmt.Sprintf("kana-%s-wordpress_cli", s.settings.Get("Name")),
-		Image:       fmt.Sprintf("wordpress:cli-php%s", s.settings.Get("PHP")),
+		Name:        fmt.Sprintf("kana-%s-wordpress_cli", s.settings.Get("name")),
+		Image:       fmt.Sprintf("wordpress:cli-php%s", s.settings.Get("php")),
 		NetworkName: "kana",
-		HostName:    fmt.Sprintf("kana-%s-wordpress_cli", s.settings.Get("Name")),
+		HostName:    fmt.Sprintf("kana-%s-wordpress_cli", s.settings.Get("name")),
 		Command:     fullCommand,
 		Env:         envVars,
 		Labels: map[string]string{
-			"kana.site": s.settings.Get("Name"),
+			"kana.site": s.settings.Get("name"),
 		},
 		Volumes: appVolumes,
 	}
@@ -87,7 +87,7 @@ func (s *Site) WPCli(command []string, interactive bool, consoleOutput *console.
 		container.Env = append(container.Env, "KANA_ADMIN_LOGIN=true")
 	}
 
-	err = s.dockerClient.EnsureImage(container.Image, s.settings.GetInt("UpdateInterval"), consoleOutput)
+	err = s.dockerClient.EnsureImage(container.Image, s.settings.Get("appDirectory"), s.settings.GetInt("updateInterval"), consoleOutput)
 	if err != nil {
 		return 1, "", err
 	}
@@ -102,7 +102,7 @@ func (s *Site) WPCli(command []string, interactive bool, consoleOutput *console.
 
 // runCli Runs an arbitrary CLI command against the site's WordPress container.
 func (s *Site) WordPress(command string, restart, root bool) (docker.ExecResult, error) {
-	container := fmt.Sprintf("kana-%s-wordpress", s.settings.Get("Name"))
+	container := fmt.Sprintf("kana-%s-wordpress", s.settings.Get("name"))
 
 	output, err := s.dockerClient.ContainerExec(container, root, []string{command})
 	if err != nil {

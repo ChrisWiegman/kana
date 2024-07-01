@@ -12,19 +12,16 @@ func trust(consoleOutput *console.Console, kanaSettings *settings.Settings) *cob
 		Use:   "trust-ssl",
 		Short: "Add the Kana SSL certificate to the MacOS Keychain (if needed).",
 		Run: func(cmd *cobra.Command, args []string) {
-			rootCert, siteCert := settings.GetSSLCerts(kanaSettings)
 			err := settings.EnsureSSLCerts(
-				kanaSettings.Get("App"),
+				kanaSettings.Get("appDirectory"),
 				kanaSettings.GetDomain(),
-				rootCert,
-				siteCert,
-				kanaSettings.GetBool("SSL"),
+				kanaSettings.GetBool("ssl"),
 				consoleOutput)
 			if err != nil {
 				consoleOutput.Error(err)
 			}
 
-			err = settings.TrustSSL(kanaSettings.Get("RootCert"), consoleOutput)
+			err = settings.TrustSSL(kanaSettings.Get("rootCert"), consoleOutput)
 			if err != nil {
 				consoleOutput.Error(err)
 			}

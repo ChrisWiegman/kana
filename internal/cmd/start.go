@@ -13,8 +13,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var startFlags settings.StartFlags
-
 func start(consoleOutput *console.Console, kanaSite *site.Site, kanaSettings *settings.Settings) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "start",
@@ -23,7 +21,7 @@ func start(consoleOutput *console.Console, kanaSite *site.Site, kanaSettings *se
 			err := kanaSite.EnsureDocker(consoleOutput)
 			if err != nil {
 				if kanaSettings.GetBool("IsNew") {
-					remError := os.RemoveAll(kanaSettings.Get("Site"))
+					remError := os.RemoveAll(kanaSettings.Get("siteDirectory"))
 					if remError != nil {
 						consoleOutput.Error(remError)
 					}
@@ -36,7 +34,7 @@ func start(consoleOutput *console.Console, kanaSite *site.Site, kanaSettings *se
 				consoleOutput.Error(err)
 			}
 
-			if cmd.Flags().Lookup("theme").Changed && kanaSettings.Get("Type") == "theme" {
+			if cmd.Flags().Lookup("theme").Changed && kanaSettings.Get("type") == "theme" {
 				consoleOutput.Error(fmt.Errorf("a default theme cannot be set on a site of type 'theme"))
 			}
 
@@ -51,9 +49,9 @@ func start(consoleOutput *console.Console, kanaSite *site.Site, kanaSettings *se
 				consoleOutput.Error(err)
 			}
 
-			if home == kanaSettings.Get("Working") {
+			if home == kanaSettings.Get("workingDirectory") {
 				// Remove the site's folder in the config directory.
-				err = os.RemoveAll(kanaSettings.Get("Site"))
+				err = os.RemoveAll(kanaSettings.Get("siteDirectory"))
 				if err != nil {
 					consoleOutput.Error(err)
 				}
@@ -69,45 +67,18 @@ func start(consoleOutput *console.Console, kanaSite *site.Site, kanaSettings *se
 			consoleOutput.Success(
 				fmt.Sprintf(
 					"Your site, %s, has has started and should be open in your default browser.",
-					consoleOutput.Bold(consoleOutput.Blue(kanaSettings.Get("Name")))))
+					consoleOutput.Bold(consoleOutput.Blue(kanaSettings.Get("name")))))
 		},
 		Args: cobra.NoArgs,
 	}
 
-	// Add associated flags to customize the site at runtime.
-	cmd.Flags().BoolVarP(&startFlags.Xdebug, "xdebug", "x", false, "Enable Xdebug when starting the container.")
-	cmd.Flags().BoolVarP(&startFlags.ScriptDebug, "scriptdebug", "c", false, "Enable SCRIPT_DEBUG when starting the container.")
-	cmd.Flags().BoolVarP(&startFlags.WPDebug, "wpdebug", "d", false, "Enable WP_Debug when starting the container.")
-	cmd.Flags().BoolVarP(&startFlags.Mailpit, "mailpit", "m", false, "Enable Mailpit when starting the container.")
-	cmd.Flags().BoolVarP(&startFlags.SSL, "ssl", "s", false, "Whether the site should default to SSL (https) or not.")
-	cmd.Flags().BoolVarP(&startFlags.RemoveDefaultPlugins,
-		"remove-default-plugins",
-		"r",
-		false,
-		"If true will remove the default plugins installed with WordPress (Akismet and Hello Dolly) when starting a site.")
-	cmd.Flags().BoolVarP(&startFlags.Activate,
-		"activate",
-		"a",
-		false,
-		"Activate the current plugin or theme (only works when used with the 'plugin' or 'theme' flags).")
-
-	cmd.Flags().StringVar(&startFlags.Database, "database", "mariadb", "Select the database server you wish to use with your installation.")
-	cmd.Flags().StringVar(&startFlags.Multisite, "multisite", "none", "Creates your new site as a multisite installation.")
-	cmd.Flags().StringVar(&startFlags.Environment, "environment", "local", "Sets the WP_ENVIRONMENT_TYPE for the site.")
-	cmd.Flags().StringVar(&startFlags.Plugins,
-		"plugins",
-		"",
-		"Installs and activates the specified plugins. Multiple plugins should be separated by commas")
-	cmd.Flags().StringVar(&startFlags.Theme, "theme", "", "Installs and activates a theme when starting a site.")
-	cmd.Flags().StringVar(&startFlags.Type, "type", "site", "Set the type of the installation, `site`, `plugin` or `theme`.")
-
-	cmd.Flags().Lookup("multisite").NoOptDefVal = "subdomain"
+	settings.AddStartFlags(cmd, kanaSettings)
 
 	return cmd
 }
 
 func handleTypeDetection(cmd *cobra.Command, consoleOutput *console.Console, kanaSettings *settings.Settings) error {
-	if !cmd.Flags().Lookup("type").Changed && !kanaSettings.GetBool("HasLocalSettings") {
+	if !cmd.Flags().Lookup("type").Changed && !kanaSettings.GetBool("HasLocalSettings") { // @todo: figure this out
 		if !cmd.Flags().Lookup("name").Changed {
 			err := verifyEmpty(kanaSettings, consoleOutput)
 			if err != nil {
@@ -118,8 +89,8 @@ func handleTypeDetection(cmd *cobra.Command, consoleOutput *console.Console, kan
 		if kanaSettings.GetBool("TypeIsDetected") {
 			consoleOutput.Printf(
 				"A %s was detected in the current site folder. Starting site as a %s\n",
-				kanaSettings.Get("Type"),
-				kanaSettings.Get("Type"))
+				kanaSettings.Get("type"),
+				kanaSettings.Get("type"))
 		}
 	}
 
@@ -129,13 +100,13 @@ func handleTypeDetection(cmd *cobra.Command, consoleOutput *console.Console, kan
 // verifyEmpty Verifies the folder is empty when starting a new site in it.
 // This helps prevent conflicts with WordPress files and anything in the folder.
 func verifyEmpty(kanaSettings *settings.Settings, consoleOutput *console.Console) error {
-	if kanaSettings.Get("Type") == site.DefaultType {
-		isEmpty, err := helpers.IsEmpty(kanaSettings.Get("Working"))
+	if kanaSettings.Get("type") == site.DefaultType {
+		isEmpty, err := helpers.IsEmpty(kanaSettings.Get("workingDirectory"))
 		if err != nil {
 			return err
 		}
 
-		if !isEmpty && kanaSettings.GetBool("IsNew") {
+		if !isEmpty && kanaSettings.GetBool("isNew") {
 			confirm := consoleOutput.PromptConfirm(
 				"The current directory is not empty. Are you sure you want to try to install WordPress in this folder? This may cause the WordPress installation to fail.", //nolint: lll
 				false)

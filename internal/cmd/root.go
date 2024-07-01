@@ -11,7 +11,6 @@ import (
 )
 
 var (
-	flagName                    string
 	flagVerbose, flagJSONOutput bool
 	commandsRequiringSite       []string
 )
@@ -29,15 +28,16 @@ func Execute() {
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			consoleOutput.Debug = flagVerbose
 			consoleOutput.JSON = flagJSONOutput
+			var err error
 
 			if cmd.Use == "wp" {
-				err := parseWPNameFlag(args, cmd)
+				err = parseWPNameFlag(args, cmd)
 				if err != nil {
 					consoleOutput.Error(err)
 				}
 			}
 
-			err := settings.Load(kanaSettings, Version, cmd, commandsRequiringSite, &startFlags)
+			err = settings.Load(kanaSettings, Version, cmd)
 			if err != nil {
 				consoleOutput.Error(err)
 			}
@@ -50,7 +50,7 @@ func Execute() {
 	cmd.CompletionOptions.HiddenDefaultCmd = true
 
 	// Add the "name" flag to allow for sites not connected to the local directory
-	cmd.PersistentFlags().StringVar(&flagName, "name", "", "Specify a name for the site, used to override using the current folder.")
+	cmd.PersistentFlags().String("name", "", "Specify a name for the site, used to override using the current folder.")
 	cmd.PersistentFlags().BoolVarP(&flagVerbose, "verbose", "v", false, "Display debugging information along with detailed command output")
 	cmd.PersistentFlags().BoolVar(&flagJSONOutput, "output-json", false, "Display all output in JSON format for further processing")
 

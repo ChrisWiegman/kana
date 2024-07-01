@@ -11,10 +11,10 @@ import (
 
 func (s *Site) getMailpitContainer() docker.ContainerConfig {
 	mailpitContainer := docker.ContainerConfig{
-		Name:        fmt.Sprintf("kana-%s-mailpit", s.settings.Get("Name")),
+		Name:        fmt.Sprintf("kana-%s-mailpit", s.settings.Get("name")),
 		Image:       "axllent/mailpit",
 		NetworkName: "kana",
-		HostName:    fmt.Sprintf("kana-%s-mailpit", s.settings.Get("Name")),
+		HostName:    fmt.Sprintf("kana-%s-mailpit", s.settings.Get("name")),
 		Env:         []string{},
 		Volumes:     []mount.Mount{},
 		Ports: []docker.ExposedPorts{
@@ -24,25 +24,25 @@ func (s *Site) getMailpitContainer() docker.ContainerConfig {
 		Labels: map[string]string{
 			"traefik.enable": "true",
 			"kana.type":      "mailpit",
-			fmt.Sprintf("traefik.http.routers.wordpress-%s-%s-http.entrypoints", s.settings.Get("Name"), "mailpit"): "web",
+			fmt.Sprintf("traefik.http.routers.wordpress-%s-%s-http.entrypoints", s.settings.Get("name"), "mailpit"): "web",
 			fmt.Sprintf(
 				"traefik.http.routers.wordpress-%s-%s-http.rule",
-				s.settings.Get("Name"),
+				s.settings.Get("name"),
 				"mailpit"): fmt.Sprintf(
 				"Host(`%s-%s`)",
 				"mailpit",
 				s.settings.GetDomain()),
-			fmt.Sprintf("traefik.http.routers.wordpress-%s-%s.entrypoints", s.settings.Get("Name"), "mailpit"): "websecure",
+			fmt.Sprintf("traefik.http.routers.wordpress-%s-%s.entrypoints", s.settings.Get("name"), "mailpit"): "websecure",
 			fmt.Sprintf(
 				"traefik.http.routers.wordpress-%s-%s.rule",
-				s.settings.Get("Name"),
+				s.settings.Get("name"),
 				"mailpit"): fmt.Sprintf(
 				"Host(`%s-%s`)",
 				"mailpit",
 				s.settings.GetDomain()),
 			fmt.Sprintf("traefik.http.services.%s-http-svc.loadbalancer.server.port", "mailpit"):       "8025",
-			fmt.Sprintf("traefik.http.routers.wordpress-%s-%s.tls", s.settings.Get("Name"), "mailpit"): "true",
-			"kana.site": s.settings.Get("Name"),
+			fmt.Sprintf("traefik.http.routers.wordpress-%s-%s.tls", s.settings.Get("name"), "mailpit"): "true",
+			"kana.site": s.settings.Get("name"),
 		},
 	}
 
@@ -51,7 +51,7 @@ func (s *Site) getMailpitContainer() docker.ContainerConfig {
 
 func (s *Site) isMailpitRunning() bool {
 	// We need container details to see if the mailpit container is running
-	containers, err := s.dockerClient.ContainerList(s.settings.Get("Name"))
+	containers, err := s.dockerClient.ContainerList(s.settings.Get("name"))
 	if err != nil {
 		return false
 	}

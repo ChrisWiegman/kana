@@ -3,84 +3,105 @@ package settings
 import "testing"
 
 func TestGetURL(t *testing.T) {
-	options := defaultOptions
-	site := Site{
-		Name: "example",
+	var tests = []struct {
+		name          string
+		expectedURL   string
+		settingsArray []Setting
+	}{
+		{
+			name:        "No settings",
+			expectedURL: "http://.sites.kana.sh",
+		},
+		{
+			name:        "Name is set, but nothing else",
+			expectedURL: "http://test.sites.kana.sh",
+			settingsArray: []Setting{
+				{
+					name:         "name",
+					currentValue: "test",
+				},
+			},
+		},
+		{
+			name:        "Name is set, and SSL is true",
+			expectedURL: "https://test.sites.kana.sh",
+			settingsArray: []Setting{
+				{
+					name:         "name",
+					currentValue: "test",
+				},
+				{
+					name:         "ssl",
+					currentValue: "true",
+				},
+			},
+		},
 	}
-	constants := Constants{
-		Domain: "com",
-	}
 
-	s := &Settings{
-		settings:  options,
-		constants: constants,
-		site:      site,
-	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			s := new(Settings)
+			s.settings = test.settingsArray
 
-	expectedURL := "http://example.com"
-	actualURL := s.GetURL()
+			actualURL := s.GetURL()
 
-	if actualURL != expectedURL {
-		t.Errorf("Expected URL: %s, but got: %s", expectedURL, actualURL)
-	}
-
-	s.settings.SSL = true
-	expectedURL = "https://example.com"
-	actualURL = s.GetURL()
-
-	if actualURL != expectedURL {
-		t.Errorf("Expected URL: %s, but got: %s", expectedURL, actualURL)
+			if actualURL != test.expectedURL {
+				t.Errorf("Unexpected URL. Expected: %s, Got: %s", test.expectedURL, actualURL)
+			}
+		})
 	}
 }
 
 func TestGetDomain(t *testing.T) {
-	options := defaultOptions
-	site := Site{
-		Name: "example",
-	}
-	constants := Constants{
-		Domain: "com",
-	}
-
-	s := &Settings{
-		settings:  options,
-		constants: constants,
-		site:      site,
+	settingsArray := []Setting{
+		{
+			name:         "name",
+			currentValue: "test",
+		},
 	}
 
-	expectedDomain := "example.com"
+	s := new(Settings)
+	s.settings = settingsArray
+
+	expectedDomain := "test.sites.kana.sh"
+
 	actualDomain := s.GetDomain()
 	if actualDomain != expectedDomain {
-		t.Errorf("Expected domain: %s, but got: %s", expectedDomain, actualDomain)
+		t.Errorf("Unexpected domain. Expected: %s, Got: %s", expectedDomain, actualDomain)
 	}
 }
 
 func TestGetProtocol(t *testing.T) {
-	options := defaultOptions
-	site := Site{
-		Name: "example",
-	}
-	constants := Constants{
-		Domain: "com",
+	var tests = []struct {
+		name             string
+		expectedProtocol string
+		settingsArray    []Setting
+	}{
+		{
+			name:             "No settings",
+			expectedProtocol: "http",
+		},
+		{
+			name:             "SSL is set to true",
+			expectedProtocol: "https",
+			settingsArray: []Setting{
+				{
+					name:         "ssl",
+					currentValue: "true",
+				},
+			},
+		},
 	}
 
-	s := &Settings{
-		settings:  options,
-		constants: constants,
-		site:      site,
-	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			s := new(Settings)
+			s.settings = test.settingsArray
 
-	expectedProtocol := "http"
-	actualProtocol := s.GetProtocol()
-	if actualProtocol != expectedProtocol {
-		t.Errorf("Expected protocol: %s, but got: %s", expectedProtocol, actualProtocol)
-	}
-
-	s.settings.SSL = true
-	expectedProtocol = "https"
-
-	actualProtocol = s.GetProtocol()
-	if actualProtocol != expectedProtocol {
-		t.Errorf("Expected protocol: %s, but got: %s", expectedProtocol, actualProtocol)
+			actualProtocol := s.GetProtocol()
+			if actualProtocol != test.expectedProtocol {
+				t.Errorf("Unexpected protocol. Expected: %s, Got: %s", test.expectedProtocol, actualProtocol)
+			}
+		})
 	}
 }

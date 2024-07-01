@@ -8,6 +8,7 @@
         "Multisite",
         "wpdebug",
         "xdebug",
-        "Xdebug"
+        "Xdebug",
+        "koanf"
     ]
 }
