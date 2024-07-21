@@ -344,7 +344,7 @@ func (s *Site) installWordPress(consoleOutput *console.Console) error {
 			installCommand,
 			fmt.Sprintf("--url=%s", s.settings.GetURL()),
 			fmt.Sprintf("--title=Kana Development %s: %s", s.settings.Get("type"), s.settings.Get("name")),
-			fmt.Sprintf("--admin_user=%s", s.settings.Get("adminUsername")),
+			fmt.Sprintf("--admin_user=%s", s.settings.Get("adminUser")),
 			fmt.Sprintf("--admin_password=%s", s.settings.Get("adminPassword")),
 			fmt.Sprintf("--admin_email=%s", s.settings.Get("adminEmail")),
 		}
