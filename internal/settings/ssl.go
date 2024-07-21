@@ -48,7 +48,7 @@ func EnsureSSLCerts(appDirectory, domain string, useSSL bool, consoleOutput *con
 
 	// If we're on Mac try to add the cert to the system trust.
 	if useSSL && runtime.GOOS == certOS {
-		return TrustSSL(rootCert, consoleOutput)
+		return TrustSSL(rootCertFile, consoleOutput)
 	}
 
 	return nil
@@ -74,7 +74,13 @@ func TrustSSL(rootCert string, consoleOutput *console.Console) error {
 			"/Library/Keychains/System.keychain",
 			rootCert)
 
-		return installCertCommand.Run()
+		fmt.Println(installCertCommand)
+
+		err = installCertCommand.Run()
+
+		fmt.Println(err)
+
+		return err
 	}
 
 	return nil
