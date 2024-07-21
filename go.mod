@@ -6,7 +6,7 @@ require (
 	github.com/aquasecurity/table v1.8.0
 	github.com/docker/docker v27.0.3+incompatible
 	github.com/docker/go-connections v0.5.0
-	github.com/gkampitakis/go-snaps v0.5.4
+	github.com/gkampitakis/go-snaps v0.5.5
 	github.com/go-playground/validator/v10 v10.22.0
 	github.com/knadh/koanf/parsers/json v0.1.0
 	github.com/knadh/koanf/providers/file v1.0.0
