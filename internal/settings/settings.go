@@ -217,6 +217,28 @@ func (s *Settings) Set(name string, value interface{}, setVars ...bool) error {
 	return fmt.Errorf("invalid setting %s. Please enter a valid key to set", name)
 }
 
+func (s *Settings) WriteLocalSettings(localSettings map[string]interface{}) error {
+	configFile := filepath.Join(s.Get("workingDirectory"), ".kana.json")
+
+	allSettings := s.GetAll("local")
+
+	for setting, value := range localSettings {
+		allSettings[setting] = value
+	}
+
+	f, _ := os.Create(configFile)
+	defer f.Close()
+
+	jsonBytes, err := json.MarshalIndent(allSettings, "", "\t")
+	if err != nil {
+		return err
+	}
+
+	_, err = f.Write(jsonBytes)
+
+	return err
+}
+
 func (s *Settings) validate(name string, value interface{}) error {
 	for i := range s.settings {
 		if !strings.EqualFold(s.settings[i].name, name) {

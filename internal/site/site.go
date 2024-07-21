@@ -76,8 +76,7 @@ func (s *Site) ExportSiteConfig(consoleOutput *console.Console) error {
 		localSettings["ssl"] = true
 	}
 
-	// @todo - add the ability to export the current site configuration to a file
-	return nil
+	return s.settings.WriteLocalSettings(localSettings)
 }
 
 // GetSiteLink returns the link to the site.
