@@ -74,13 +74,7 @@ func TrustSSL(rootCert string, consoleOutput *console.Console) error {
 			"/Library/Keychains/System.keychain",
 			rootCert)
 
-		fmt.Println(installCertCommand)
-
-		err = installCertCommand.Run()
-
-		fmt.Println(err)
-
-		return err
+		return installCertCommand.Run()
 	}
 
 	return nil
