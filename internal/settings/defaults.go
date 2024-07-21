@@ -230,6 +230,11 @@ var defaults = []Setting{
 		},
 	},
 	{
+		name:         "typeDetected",
+		defaultValue: "false",
+		settingType:  "bool",
+	},
+	{
 		name:         "updateInterval",
 		defaultValue: "7",
 		settingType:  "int",

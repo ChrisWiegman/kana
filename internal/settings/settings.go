@@ -1,11 +1,14 @@
 package settings
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -67,7 +70,96 @@ func Load(kanaSettings *Settings, version string, cmd *cobra.Command) error {
 		return err
 	}
 
+	err = loadDetectedType(kanaSettings)
+	if err != nil {
+		return err
+	}
+
 	return processStartFlags(cmd, kanaSettings)
+}
+
+func loadDetectedType(settings *Settings) error {
+	var err error
+	var isSite bool
+	oldType := settings.Get("type")
+	workingDirectory := settings.Get("workingDirectory")
+
+	isSite, err = helpers.PathExists(filepath.Join(workingDirectory, "wp-includes", "version.php"))
+	if err != nil {
+		return err
+	}
+
+	if isSite {
+		return err
+	}
+
+	items, _ := os.ReadDir(workingDirectory)
+
+	for _, item := range items {
+		if item.IsDir() {
+			continue
+		}
+
+		if item.Name() == "style.css" || filepath.Ext(item.Name()) == ".php" {
+			var f *os.File
+			var line string
+
+			f, err = os.Open(filepath.Join(workingDirectory, item.Name()))
+			if err != nil {
+				return err
+			}
+
+			reader := bufio.NewReader(f)
+			line, err = helpers.ReadLine(reader)
+
+			for err == nil {
+				exp := regexp.MustCompile(`(Plugin|Theme) Name: .*`)
+
+				for _, match := range exp.FindAllStringSubmatch(line, -1) {
+					if match[1] == "Theme" {
+						err = settings.Set("type", "theme")
+						if err != nil {
+							return err
+						}
+					} else {
+						err = settings.Set("type", "plugin")
+						if err != nil {
+							return err
+						}
+					}
+
+					if oldType != settings.Get("type") {
+						err = settings.Set("typeDetected", true)
+						if err != nil {
+							return err
+						}
+					}
+
+					return err
+				}
+				line, err = helpers.ReadLine(reader)
+			}
+		}
+	}
+
+	// We don't care if it is an empty folder.
+	if err == io.EOF {
+		err = nil //nolint:ineffassign,wastedassign
+	}
+
+	err = settings.Set("type", "site")
+	if err != nil {
+		return err
+	}
+
+	if oldType != settings.Get("type") {
+		err = settings.Set("typeDetected", true)
+		if err != nil {
+			return err
+		}
+	}
+
+	return err
 }
 
 func (s *Settings) Get(name string) string {
