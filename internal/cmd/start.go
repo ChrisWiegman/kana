@@ -78,7 +78,7 @@ func start(consoleOutput *console.Console, kanaSite *site.Site, kanaSettings *se
 }
 
 func handleTypeDetection(cmd *cobra.Command, consoleOutput *console.Console, kanaSettings *settings.Settings) error {
-	if !cmd.Flags().Lookup("type").Changed && !kanaSettings.GetBool("HasLocalSettings") { // @todo: figure this out
+	if !cmd.Flags().Lookup("type").Changed && !kanaSettings.GetBool("HasLocalSettings") {
 		if !cmd.Flags().Lookup("name").Changed {
 			err := verifyEmpty(kanaSettings, consoleOutput)
 			if err != nil {
