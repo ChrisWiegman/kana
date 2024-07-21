@@ -90,7 +90,7 @@ Note: these can be changed in the config. Please see below.
 
 `--multisite` Use the multisite flag to setup a WordPress Multisite installation. The optional `subdomain` and `subdirectory` flags will allow for either type of installation.
 
-`--remove-default-plugins` Will remove the default "Hello Dolly" and Akismet plugins when starting the site. Note this will not restore them if they've been manually removed.
+`--removedefaultplugins` Will remove the default "Hello Dolly" and Akismet plugins when starting the site. Note this will not restore them if they've been manually removed.
 
 `--theme` Sets the default theme if you do not wish to use the theme bundled with WordPress. Will attempt to download the theme from wordpress.org. Does not work if the site type is set to "theme"
 
@@ -166,9 +166,9 @@ Kana has a handful of options that apply to all new sites created with the app. 
 `kana config` will list all changeable defaults for a new site. Currently these include the following:
 
 - `activate` **true** - if the project site is set to `theme` or `plugin` this will activate the project on first load
-- `admin.email` __admin@kanasite.localhost__ - the admin email address for the default admin account
-- `admin.password` **password** - the default password used to login to WordPress
-- `admin.username` **admin** - the default username used to login to WordPress
+- `adminEmail` __admin@kanasite.localhost__ - the admin email address for the default admin account
+- `adminPassword` **password** - the default password used to login to WordPress
+- `adminUser` **admin** - the default username used to login to WordPress
 - `automaticLogin` **true** - will automatically login the "admin" user when accessing the WordPress dashboard
 - `database` **mariadb** - Specify the database server for WordPress, currently either `mariadb`, `mysql` or `sqlite`
 - `databaseClient` **phpmyadmin** - the default database client for accessing the database directly (currently `phpmyadmin` and `tableplus` are supported)
@@ -188,8 +188,8 @@ Kana has a handful of options that apply to all new sites created with the app. 
 
 You can get or set any of the above options using a similar syntax to GIT's config. For example:
 
-`kana config admin.email` will print the value of the admin.email setting
-`kana config admin.email myemail@somedomain.com` will change the value of the admin.email setting to "myemail@somedomain.com".
+`kana config adminEmail` will print the value of the admin.email setting
+`kana config adminEmail myemail@somedomain.com` will change the value of the admin.email setting to "myemail@somedomain.com".
 
 The above syntax will allow you to change the defaults for any of the options listed
 
@@ -198,9 +198,9 @@ The above syntax will allow you to change the defaults for any of the options li
 In addition to the global config, certain items above can be overridden for any given site. For a site without a `name` flag (as seen in the start command), simply create a _.kana.json_ file in the current directory. You can populate it with the following options:
 
 - `activate` **true** - if the project site is set to `theme` or `plugin` this will activate the project on first load
-- `admin.email` __admin@kanasite.localhost__ - the admin email address for the default admin account
-- `admin.password` **password** - the default password used to login to WordPress
-- `admin.username` **admin** - the default username used to login to WordPress
+- `adminEmail` __admin@kanasite.localhost__ - the admin email address for the default admin account
+- `adminPassword` **password** - the default password used to login to WordPress
+- `adminUser` **admin** - the default username used to login to WordPress
 - `automaticLogin` **true** - will automatically login the "admin" user when accessing the WordPress dashboard
 - `database` **mariadb** - Specify the database server for WordPress, currently either `mariadb`, `mysql` or `sqlite`
 - `databaseClient` **phpmyadmin** - the default database client for accessing the database directly (currently `phpmyadmin` and `tableplus` are supported)
