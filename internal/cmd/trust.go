@@ -14,7 +14,6 @@ func trust(consoleOutput *console.Console, kanaSettings *settings.Settings) *cob
 		Run: func(cmd *cobra.Command, args []string) {
 			err := settings.EnsureSSLCerts(
 				kanaSettings.Get("appDirectory"),
-				kanaSettings.GetDomain(),
 				kanaSettings.GetBool("ssl"),
 				consoleOutput)
 			if err != nil {

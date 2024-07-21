@@ -31,7 +31,7 @@ func (s *Site) maybeStopTraefik() error {
 
 // startTraefik Starts the Traefik container.
 func (s *Site) startTraefik(consoleOutput *console.Console) error {
-	err := settings.EnsureSSLCerts(s.settings.Get("appDirectory"), s.settings.GetDomain(), s.settings.GetBool("SSL"), consoleOutput)
+	err := settings.EnsureSSLCerts(s.settings.Get("appDirectory"), s.settings.GetBool("SSL"), consoleOutput)
 	if err != nil {
 		return err
 	}

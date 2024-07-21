@@ -14,7 +14,7 @@ import (
 var execCommand = exec.Command
 
 // EnsureSSLCerts Ensures SSL certificates have been generated and are where they need to be.
-func EnsureSSLCerts(appDirectory, domain string, useSSL bool, consoleOutput *console.Console) error {
+func EnsureSSLCerts(appDirectory string, useSSL bool, consoleOutput *console.Console) error {
 	createCert := false
 
 	certPath := filepath.Join(appDirectory, "certs")
