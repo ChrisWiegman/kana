@@ -289,6 +289,7 @@ func (s *Site) installDefaultPlugins(consoleOutput *console.Console) error {
 			plugin,
 		}
 
+		// Don't  try to reinstall the plugin if it is already installed
 		for _, installedPlugin := range installedPlugins {
 			if installedPlugin == plugin {
 				setupCommand = []string{}
