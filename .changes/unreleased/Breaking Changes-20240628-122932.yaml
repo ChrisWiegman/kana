@@ -1,3 +1,0 @@
-kind: Breaking Changes
-body: The config options for the initial admin user have been changed to remove the "." from the option. `admin.email` is now `adminemail`, `admin.username` is now `adminuser` and `admin.password` is now `adminpassword`.
-time: 2024-06-28T12:29:32.797379759Z
