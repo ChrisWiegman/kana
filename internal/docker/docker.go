@@ -46,7 +46,6 @@ func New(consoleOutput *console.Console, appDirectory string) (dockerClient *Cli
 	}
 
 	dockerClient.apiClient, err = client.NewClientWithOpts(client.WithHost(dockerEndpoint), client.WithAPIVersionNegotiation())
-
 	if err != nil {
 		return nil, err
 	}
