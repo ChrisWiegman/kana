@@ -7,7 +7,7 @@ require (
 	github.com/docker/docker v27.2.0+incompatible
 	github.com/docker/go-connections v0.5.0
 	github.com/gkampitakis/go-snaps v0.5.7
-	github.com/go-playground/validator/v10 v10.22.0
+	github.com/go-playground/validator/v10 v10.22.1
 	github.com/knadh/koanf/parsers/json v0.1.0
 	github.com/knadh/koanf/providers/file v1.1.0
 	github.com/knadh/koanf/v2 v2.1.1
