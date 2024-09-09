@@ -4,7 +4,7 @@ go 1.23.0
 
 require (
 	github.com/aquasecurity/table v1.8.0
-	github.com/docker/docker v27.2.0+incompatible
+	github.com/docker/docker v27.2.1+incompatible
 	github.com/docker/go-connections v0.5.0
 	github.com/gkampitakis/go-snaps v0.5.7
 	github.com/go-playground/validator/v10 v10.22.0
