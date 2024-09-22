@@ -23,6 +23,9 @@ linters-settings:
     min-complexity: 20
   goimports:
     local-prefixes: github.com/ChrisWiegman/kana
+  gosec:
+    excludes:
+      - G115
   mnd:
     # don't include the "operation" and "assign"
     checks:
@@ -63,7 +66,7 @@ linters:
     - dogsled
     - dupl
     - errcheck
-    - exportloopref
+    - copyloopvar
     - funlen
     - gochecknoinits
     - goconst
