@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ChrisWiegman/kana-wordpress/internal/console"
-	"github.com/ChrisWiegman/kana-wordpress/internal/helpers"
-	"github.com/ChrisWiegman/kana-wordpress/internal/settings"
-	"github.com/ChrisWiegman/kana-wordpress/internal/site"
+	"github.com/ChrisWiegman/kana-wp/internal/console"
+	"github.com/ChrisWiegman/kana-wp/internal/helpers"
+	"github.com/ChrisWiegman/kana-wp/internal/settings"
+	"github.com/ChrisWiegman/kana-wp/internal/site"
 
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"

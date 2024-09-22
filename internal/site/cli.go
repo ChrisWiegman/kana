@@ -5,8 +5,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/ChrisWiegman/kana-wordpress/internal/console"
-	"github.com/ChrisWiegman/kana-wordpress/internal/docker"
+	"github.com/ChrisWiegman/kana-wp/internal/console"
+	"github.com/ChrisWiegman/kana-wp/internal/docker"
 )
 
 func Command(name string, arg ...string) *exec.Cmd {

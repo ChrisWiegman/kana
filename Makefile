@@ -1,4 +1,4 @@
-PKG          := github.com/ChrisWiegman/kana-wordpress
+PKG          := github.com/ChrisWiegman/kana-wp
 VERSION      := $(shell git describe --tags || echo "0.0.1")
 TIMESTAMP    := $(shell date -u '+%Y-%m-%d_%I:%M:%S%p')
 ARGS          = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
@@ -127,7 +127,7 @@ update-test-snapshot:
 	go build \
         -o ./build/kana \
         -buildvcs=false \
-        -ldflags "-s -w -X github.com/ChrisWiegman/kana-wordpress/internal/cmd.Version=1.0.0 -X github.com/ChrisWiegman/kana-wordpress/internal/cmd.Timestamp=2024-03-16_10:50:11PM" \
+        -ldflags "-s -w -X github.com/ChrisWiegman/kana-wp/internal/cmd.Version=1.0.0 -X github.com/ChrisWiegman/kana-wp/internal/cmd.Timestamp=2024-03-16_10:50:11PM" \
         ./cmd/... && \
     UPDATE_SNAPS=true go test \
         -v \

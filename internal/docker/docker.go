@@ -12,7 +12,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/ChrisWiegman/kana-wordpress/internal/console"
+	"github.com/ChrisWiegman/kana-wp/internal/console"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"

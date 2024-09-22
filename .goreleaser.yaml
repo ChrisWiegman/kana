@@ -16,7 +16,7 @@ builds:
     main: ./cmd/kana/main.go
     binary: kana
     ldflags:
-      - -s -w -X github.com/ChrisWiegman/kana-wordpress/internal/cmd.Version={{.Version}} -X github.com/ChrisWiegman/kana-wordpress/internal/cmd.Timestamp={{.Date}}
+      - -s -w -X github.com/ChrisWiegman/kana-wp/internal/cmd.Version={{.Version}} -X github.com/ChrisWiegman/kana-wp/internal/cmd.Timestamp={{.Date}}
   - id: linux
     goos:
       - linux
@@ -25,7 +25,7 @@ builds:
     main: ./cmd/kana/main.go
     binary: kana
     ldflags:
-      - -s -w -X github.com/ChrisWiegman/kana-wordpress/internal/cmd.Version={{.Version}} -X github.com/ChrisWiegman/kana-wordpress/internal/cmd.Timestamp={{.Date}}
+      - -s -w -X github.com/ChrisWiegman/kana-wp/internal/cmd.Version={{.Version}} -X github.com/ChrisWiegman/kana-wp/internal/cmd.Timestamp={{.Date}}
 
 archives:
   - id: macos
@@ -55,7 +55,7 @@ nfpms:
     builds:
       - linux
     license: GPL-3.0 license
-    homepage: https://github.com/ChrisWiegman/kana-wordpress
+    homepage: https://github.com/ChrisWiegman/kana-wp
     maintainer: Chris Wiegman <contact@chriswiegman.com>
     description: A simple, portable CLI for efficient WordPress development.
     file_name_template: >-
@@ -79,5 +79,5 @@ brews:
     license: GPL-3.0 license
     test: |
       system "#{bin}/kana version"
-    homepage: https://github.com/ChrisWiegman/kana-wordpress
+    homepage: https://github.com/ChrisWiegman/kana-wp
     description: A simple, portable CLI for efficient WordPress development.

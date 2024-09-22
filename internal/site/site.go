@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ChrisWiegman/kana-wordpress/internal/console"
-	"github.com/ChrisWiegman/kana-wordpress/internal/docker"
-	"github.com/ChrisWiegman/kana-wordpress/internal/settings"
+	"github.com/ChrisWiegman/kana-wp/internal/console"
+	"github.com/ChrisWiegman/kana-wp/internal/docker"
+	"github.com/ChrisWiegman/kana-wp/internal/settings"
 
 	"github.com/pkg/browser"
 )

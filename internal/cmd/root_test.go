@@ -3,7 +3,7 @@ package cmd
 import (
 	"testing"
 
-	"github.com/ChrisWiegman/kana-wordpress/tests"
+	"github.com/ChrisWiegman/kana-wp/tests"
 )
 
 func TestRoot(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/ChrisWiegman/kana-wordpress/internal/helpers"
+	"github.com/ChrisWiegman/kana-wp/internal/helpers"
 
 	"github.com/gkampitakis/go-snaps/snaps"
 	"github.com/mitchellh/go-homedir"

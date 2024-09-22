@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/ChrisWiegman/kana-wordpress/internal/console"
-	"github.com/ChrisWiegman/kana-wordpress/internal/settings"
-	"github.com/ChrisWiegman/kana-wordpress/internal/site"
+	"github.com/ChrisWiegman/kana-wp/internal/console"
+	"github.com/ChrisWiegman/kana-wp/internal/settings"
+	"github.com/ChrisWiegman/kana-wp/internal/site"
 
 	"github.com/spf13/cobra"
 )
