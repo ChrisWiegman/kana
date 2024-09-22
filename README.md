@@ -27,7 +27,7 @@ There are a few options for installing Kana. You can use [Homebrew](https://brew
 Installing from [Homebrew](https://brew.sh) is the recommended approach on both Mac and Linux as it allows for automatic updates when needed. To install from Homebrew run the following command:
 
 ```
-brew install ChrisWiegman/kana/kana
+brew install ChrisWiegman/kana-wordpress/kana
 ```
 
 Note that, as there are numerous ways to install Docker, I have chosen, at least for now, to not list it as a dependency when installing via Homebrew. You'll want to make sure Docker is already installed or install it with `brew install --cask docker` if you're on Mac (see [this documentation](https://docs.docker.com/engine/install/) if you're in Linux).
@@ -305,7 +305,7 @@ I hate apps that leave leftovers on your machine. When stopping a site all Docke
 1. Delete the application from your $GOBIN or system path (or run `brew uninstall kana` if installed via homebrew)
 2. Delete the `~/.config/kana` folder which contains all site and app configuration
 3. (Mac only) Delete the `Kana Development CA` certificate from the _System_ keychain in the _Keychain Access_ app
-4. If installed via homebrew run `brew untap ChrisWiegman/kana` to remove the Homebrew tap
+4. If installed via homebrew run `brew untap ChrisWiegman/kana-wordpress` to remove the Homebrew tap
 
 You can also safely remove any new images added however it is not a requirement. Many other apps might share those images leading to your system simply needing to download them again.
 

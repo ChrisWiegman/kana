@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Kana Development Addons
- * Plugin URI: https://github.com/ChrisWiegman/kana
+ * Plugin URI: https://github.com/ChrisWiegman/kana-wordpress
  * Description: Various tweaks to ensure local development is as seamless as possible.
  * Author: Chris Wiegman
  * Version: {{ .Version }}

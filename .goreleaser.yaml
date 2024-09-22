@@ -55,7 +55,7 @@ nfpms:
     builds:
       - linux
     license: GPL-3.0 license
-    homepage: https://github.com/ChrisWiegman/kana
+    homepage: https://github.com/ChrisWiegman/kana-wordpress
     maintainer: Chris Wiegman <contact@chriswiegman.com>
     description: A simple, portable CLI for efficient WordPress development.
     file_name_template: >-
@@ -79,5 +79,5 @@ brews:
     license: GPL-3.0 license
     test: |
       system "#{bin}/kana version"
-    homepage: https://github.com/ChrisWiegman/kana
+    homepage: https://github.com/ChrisWiegman/kana-wordpress
     description: A simple, portable CLI for efficient WordPress development.
