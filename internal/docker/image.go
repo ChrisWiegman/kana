@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ChrisWiegman/kana-wp/internal/console"
+	"github.com/ChrisWiegman/kana-dev/internal/console"
 
 	"github.com/docker/docker/api/types/image"
 	kjson "github.com/knadh/koanf/parsers/json"

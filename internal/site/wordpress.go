@@ -8,9 +8,9 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/ChrisWiegman/kana-wp/internal/console"
-	"github.com/ChrisWiegman/kana-wp/internal/docker"
-	"github.com/ChrisWiegman/kana-wp/internal/settings"
+	"github.com/ChrisWiegman/kana-dev/internal/console"
+	"github.com/ChrisWiegman/kana-dev/internal/docker"
+	"github.com/ChrisWiegman/kana-dev/internal/settings"
 
 	"github.com/docker/docker/api/types/mount"
 )

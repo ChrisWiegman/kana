@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/ChrisWiegman/kana-wp/internal/console"
-	"github.com/ChrisWiegman/kana-wp/internal/settings"
+	"github.com/ChrisWiegman/kana-dev/internal/console"
+	"github.com/ChrisWiegman/kana-dev/internal/settings"
 
 	"github.com/spf13/cobra"
 )

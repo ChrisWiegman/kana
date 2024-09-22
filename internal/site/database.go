@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ChrisWiegman/kana-wp/internal/console"
-	"github.com/ChrisWiegman/kana-wp/internal/docker"
-	"github.com/ChrisWiegman/kana-wp/internal/helpers"
+	"github.com/ChrisWiegman/kana-dev/internal/console"
+	"github.com/ChrisWiegman/kana-dev/internal/docker"
+	"github.com/ChrisWiegman/kana-dev/internal/helpers"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/mount"

@@ -22,7 +22,7 @@ linters-settings:
   gocyclo:
     min-complexity: 20
   goimports:
-    local-prefixes: github.com/ChrisWiegman/kana-wp
+    local-prefixes: github.com/ChrisWiegman/kana-dev
   gosec:
     excludes:
       - G115

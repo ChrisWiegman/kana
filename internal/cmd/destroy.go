@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ChrisWiegman/kana-wp/internal/console"
-	"github.com/ChrisWiegman/kana-wp/internal/settings"
-	"github.com/ChrisWiegman/kana-wp/internal/site"
+	"github.com/ChrisWiegman/kana-dev/internal/console"
+	"github.com/ChrisWiegman/kana-dev/internal/settings"
+	"github.com/ChrisWiegman/kana-dev/internal/site"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"

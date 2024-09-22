@@ -3,8 +3,8 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/ChrisWiegman/kana-wp/internal/console"
-	"github.com/ChrisWiegman/kana-wp/internal/site"
+	"github.com/ChrisWiegman/kana-dev/internal/console"
+	"github.com/ChrisWiegman/kana-dev/internal/site"
 
 	"github.com/spf13/cobra"
 )

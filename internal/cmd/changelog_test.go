@@ -3,7 +3,7 @@ package cmd
 import (
 	"testing"
 
-	"github.com/ChrisWiegman/kana-wp/tests"
+	"github.com/ChrisWiegman/kana-dev/tests"
 )
 
 func TestChangelog(t *testing.T) {
