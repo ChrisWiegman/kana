@@ -3,8 +3,8 @@
 package mocks
 
 import (
-	console "github.com/ChrisWiegman/kana/internal/console"
-	docker "github.com/ChrisWiegman/kana/internal/docker"
+	console "github.com/ChrisWiegman/kana-wordpress/internal/console"
+	docker "github.com/ChrisWiegman/kana-wordpress/internal/docker"
 
 	exec "os/exec"
 

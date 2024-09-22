@@ -9,7 +9,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ChrisWiegman/kana/internal/docker"
+	"github.com/ChrisWiegman/kana-wordpress/internal/docker"
 )
 
 // checkStatusCode returns true on 200 or false.

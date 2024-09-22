@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"testing"
 
-	"github.com/ChrisWiegman/kana/internal/docker/mocks"
+	"github.com/ChrisWiegman/kana-wordpress/internal/docker/mocks"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"

@@ -3,7 +3,7 @@ package cmd
 import (
 	"testing"
 
-	"github.com/ChrisWiegman/kana/tests"
+	"github.com/ChrisWiegman/kana-wordpress/tests"
 )
 
 func TestVersion(t *testing.T) {

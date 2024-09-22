@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/ChrisWiegman/kana/internal/console"
-	"github.com/ChrisWiegman/kana/pkg/minica"
+	"github.com/ChrisWiegman/kana-wordpress/internal/console"
+	"github.com/ChrisWiegman/kana-wordpress/pkg/minica"
 )
 
 var execCommand = exec.Command

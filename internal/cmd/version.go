@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/ChrisWiegman/kana/internal/console"
+	"github.com/ChrisWiegman/kana-wordpress/internal/console"
 
 	"github.com/spf13/cobra"
 )

@@ -12,8 +12,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ChrisWiegman/kana/internal/docker"
-	"github.com/ChrisWiegman/kana/internal/helpers"
+	"github.com/ChrisWiegman/kana-wordpress/internal/docker"
+	"github.com/ChrisWiegman/kana-wordpress/internal/helpers"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/mitchellh/go-homedir"

@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/ChrisWiegman/kana/internal/console"
+	"github.com/ChrisWiegman/kana-wordpress/internal/console"
 
 	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
@@ -13,7 +13,7 @@ func changelog(consoleOutput *console.Console) *cobra.Command {
 		Short: "Open Kana's changelog in your browser",
 		Args:  cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			err := browser.OpenURL("https://github.com/ChrisWiegman/kana/releases")
+			err := browser.OpenURL("https://github.com/ChrisWiegman/kana-wordpress/releases")
 			if err != nil {
 				consoleOutput.Error(err)
 			}

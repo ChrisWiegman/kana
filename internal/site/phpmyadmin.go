@@ -3,8 +3,8 @@ package site
 import (
 	"fmt"
 
-	"github.com/ChrisWiegman/kana/internal/console"
-	"github.com/ChrisWiegman/kana/internal/docker"
+	"github.com/ChrisWiegman/kana-wordpress/internal/console"
+	"github.com/ChrisWiegman/kana-wordpress/internal/docker"
 )
 
 func (s *Site) getPhpMyAdminContainer() docker.ContainerConfig {

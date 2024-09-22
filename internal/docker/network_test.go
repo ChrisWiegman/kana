@@ -3,7 +3,7 @@ package docker
 import (
 	"testing"
 
-	"github.com/ChrisWiegman/kana/internal/console"
+	"github.com/ChrisWiegman/kana-wordpress/internal/console"
 )
 
 func TestNetworkCreate(t *testing.T) {

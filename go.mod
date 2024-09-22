@@ -1,4 +1,4 @@
-module github.com/ChrisWiegman/kana
+module github.com/ChrisWiegman/kana-wordpress
 
 go 1.23.0
 

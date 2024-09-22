@@ -3,7 +3,7 @@ package site
 import (
 	"strings"
 
-	"github.com/ChrisWiegman/kana/internal/console"
+	"github.com/ChrisWiegman/kana-wordpress/internal/console"
 )
 
 // IsXdebugRunning returns true if Xdebug is already running or false if not.
