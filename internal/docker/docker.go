@@ -12,7 +12,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/ChrisWiegman/kana-dev/internal/console"
+	"github.com/ChrisWiegman/kana/internal/console"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"

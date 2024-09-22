@@ -1,6 +1,6 @@
 package main
 
-import "github.com/ChrisWiegman/kana-dev/internal/cmd"
+import "github.com/ChrisWiegman/kana/internal/cmd"
 
 func main() {
 	cmd.Execute()

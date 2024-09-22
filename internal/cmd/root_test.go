@@ -3,7 +3,7 @@ package cmd
 import (
 	"testing"
 
-	"github.com/ChrisWiegman/kana-dev/tests"
+	"github.com/ChrisWiegman/kana/tests"
 )
 
 func TestRoot(t *testing.T) {

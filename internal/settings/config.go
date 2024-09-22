@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ChrisWiegman/kana-dev/internal/console"
+	"github.com/ChrisWiegman/kana/internal/console"
 
 	"github.com/aquasecurity/table"
 )

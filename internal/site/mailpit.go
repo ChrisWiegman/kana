@@ -3,8 +3,8 @@ package site
 import (
 	"fmt"
 
-	"github.com/ChrisWiegman/kana-dev/internal/console"
-	"github.com/ChrisWiegman/kana-dev/internal/docker"
+	"github.com/ChrisWiegman/kana/internal/console"
+	"github.com/ChrisWiegman/kana/internal/docker"
 
 	"github.com/docker/docker/api/types/mount"
 )

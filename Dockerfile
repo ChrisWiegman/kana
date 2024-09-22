@@ -16,7 +16,7 @@ ENV PATH="$PATH:/usr/local/go/bin"
 CMD go build \
         -o ./build/kana \
         -buildvcs=false \
-        -ldflags "-s -w -X github.com/ChrisWiegman/kana-dev/internal/cmd.Version=1.0.0 -X github.com/ChrisWiegman/kana-dev/internal/cmd.Timestamp=2024-03-16_10:50:11PM" \
+        -ldflags "-s -w -X github.com/ChrisWiegman/kana/internal/cmd.Version=1.0.0 -X github.com/ChrisWiegman/kana/internal/cmd.Timestamp=2024-03-16_10:50:11PM" \
         ./cmd/... && \
     go test \
         -v \

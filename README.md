@@ -20,7 +20,7 @@ Docker Desktop for Linux may work but I have not tested it.
 
 # Installing Kana
 
-There are a few options for installing Kana. You can use [Homebrew](https://brew.sh) (recommended), you can install it from [the "releases" page](https://github.com/ChrisWiegman/kana-dev/releases) here or you can build it manually.
+There are a few options for installing Kana. You can use [Homebrew](https://brew.sh) (recommended), you can install it from [the "releases" page](https://github.com/ChrisWiegman/kana/releases) here or you can build it manually.
 
 ## Install from Homebrew
 
@@ -34,7 +34,7 @@ Note that, as there are numerous ways to install Docker, I have chosen, at least
 
 ## Download from GitHub releases
 
-Simply download the latest release from our [release page](https://github.com/ChrisWiegman/kana-dev/releases) and extract the CLI to a location accessible by your system PATH
+Simply download the latest release from our [release page](https://github.com/ChrisWiegman/kana/releases) and extract the CLI to a location accessible by your system PATH
 
 **Note for Mac users** I have not signed the download copy so you'll need to manually allow it in your Mac settings if you download it from the releases page. Install it via Homebrew to avoid this step.
 
@@ -42,7 +42,7 @@ Simply download the latest release from our [release page](https://github.com/Ch
 
 You will need [Go](https://go.dev) installed locally to build the application.
 
-1. Clone this repo `git clone https://github.com/ChrisWiegman/kana-dev.git`
+1. Clone this repo `git clone https://github.com/ChrisWiegman/kana.git`
 2. CD into the repo and run `make install`
 
 Assuming you have Go properly setup with `GOBIN` in your system path, you should now be able to use Kana. Run `kana version` to test.
@@ -147,7 +147,7 @@ By default Kana will open the appropriate WordPress site. To open the database o
 
 Note that by default Kana will open the database in [phpMyAdmin](https://www.phpmyadmin.net). You can also tell Kana to open the database in [TablePlus](https://tableplus.com) instead by setting the `databaseClient` configuration setting to `tableplus`.
 
-Currently pphpMyAdmin and TablePlus are the only two clients I've configured. If you would like to use a different client, please [open an issue](https://github.com/ChrisWiegman/kana-dev/issues) and I'd be happy to take a look.
+Currently pphpMyAdmin and TablePlus are the only two clients I've configured. If you would like to use a different client, please [open an issue](https://github.com/ChrisWiegman/kana/issues) and I'd be happy to take a look.
 
 > *Note* Opening the Database directly with Kana doesn't work for SQLite databases. To open a SQLite database directly navigate to `<your-site-folder>/wp-content/database/.ht.sqlite` and open the file directly.
 
@@ -305,7 +305,7 @@ I hate apps that leave leftovers on your machine. When stopping a site all Docke
 1. Delete the application from your $GOBIN or system path (or run `brew uninstall kana` if installed via homebrew)
 2. Delete the `~/.config/kana` folder which contains all site and app configuration
 3. (Mac only) Delete the `Kana Development CA` certificate from the _System_ keychain in the _Keychain Access_ app
-4. If installed via homebrew run `brew untap ChrisWiegman/kana-dev` to remove the Homebrew tap
+4. If installed via homebrew run `brew untap ChrisWiegman/kana` to remove the Homebrew tap
 
 You can also safely remove any new images added however it is not a requirement. Many other apps might share those images leading to your system simply needing to download them again.
 

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ChrisWiegman/kana-dev/internal/console"
-	"github.com/ChrisWiegman/kana-dev/internal/site"
+	"github.com/ChrisWiegman/kana/internal/console"
+	"github.com/ChrisWiegman/kana/internal/site"
 
 	"github.com/spf13/cobra"
 )
