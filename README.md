@@ -27,7 +27,7 @@ There are a few options for installing Kana. You can use [Homebrew](https://brew
 Installing from [Homebrew](https://brew.sh) is the recommended approach on both Mac and Linux as it allows for automatic updates when needed. To install from Homebrew run the following command:
 
 ```
-brew install ChrisWiegman/kana-dev/kana
+brew install ChrisWiegman/kana/kana
 ```
 
 Note that, as there are numerous ways to install Docker, I have chosen, at least for now, to not list it as a dependency when installing via Homebrew. You'll want to make sure Docker is already installed or install it with `brew install --cask docker` if you're on Mac (see [this documentation](https://docs.docker.com/engine/install/) if you're in Linux).
