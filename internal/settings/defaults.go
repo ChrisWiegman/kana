@@ -273,7 +273,7 @@ const (
 	defaultFilePermissions = 0644
 	domain                 = "sites.kana.sh"
 	mariadbVersion         = "11"
-	mysqlVersion           = "8"
+	mysqlVersion           = "9"
 	rootCert               = "kana.root.pem"
 	rootKey                = "kana.root.key"
 	siteCert               = "kana.site.pem"
