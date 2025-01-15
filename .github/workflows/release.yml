@@ -27,4 +27,4 @@ jobs:
           version: latest
           args: --clean --release-notes=${{ env.RELEASE_NOTES_PATH }} --skip=validate --verbose
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GO_RELEASER_TOKEN }}
