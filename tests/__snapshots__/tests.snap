@@ -25,7 +25,7 @@
 ├──────────────────────┼─────────────────────┼─────────────┤
 │ multisite            │ [1mnone[0m                │ [1mnone[0m        │
 ├──────────────────────┼─────────────────────┼─────────────┤
-│ php                  │ [1m8.2[0m                 │ [1m8.2[0m         │
+│ php                  │ [1m8.3[0m                 │ [1m8.3[0m         │
 ├──────────────────────┼─────────────────────┼─────────────┤
 │ plugins              │                     │             │
 ├──────────────────────┼─────────────────────┼─────────────┤
@@ -49,16 +49,16 @@
 ---
 
 [TestConfig/Test_the_config_command_with_json_output - 1]
-{"Global":{"activate":true,"adminEmail":"admin@sites.kana.sh","adminPassword":"password","adminUser":"admin","automaticLogin":true,"database":"mariadb","databaseClient":"phpmyadmin","databaseVersion":"11","environment":"local","mailpit":false,"multisite":"none","php":"8.2","plugins":[""],"removeDefaultPlugins":false,"scriptDebug":false,"ssl":false,"theme":"","type":"site","updateInterval":7,"wpdebug":false,"xdebug":false},"Local":{"activate":true,"automaticLogin":true,"database":"mariadb","databaseClient":"phpmyadmin","databaseVersion":"11","environment":"local","mailpit":false,"multisite":"none","php":"8.2","plugins":[""],"removeDefaultPlugins":false,"scriptDebug":false,"ssl":false,"theme":"","type":"site","wpdebug":false,"xdebug":false}}
+{"Global":{"activate":true,"adminEmail":"admin@sites.kana.sh","adminPassword":"password","adminUser":"admin","automaticLogin":true,"database":"mariadb","databaseClient":"phpmyadmin","databaseVersion":"11","environment":"local","mailpit":false,"multisite":"none","php":"8.3","plugins":[""],"removeDefaultPlugins":false,"scriptDebug":false,"ssl":false,"theme":"","type":"site","updateInterval":7,"wpdebug":false,"xdebug":false},"Local":{"activate":true,"automaticLogin":true,"database":"mariadb","databaseClient":"phpmyadmin","databaseVersion":"11","environment":"local","mailpit":false,"multisite":"none","php":"8.3","plugins":[""],"removeDefaultPlugins":false,"scriptDebug":false,"ssl":false,"theme":"","type":"site","wpdebug":false,"xdebug":false}}
 ---
 
 [TestConfig/Retrieve_the_PHP_value_from_the_config_command - 1]
-8.2
+8.3
 
 ---
 
 [TestConfig/Retrieve_the_PHP_value_from_the_config_command_with_json_output - 1]
-{"Setting":"php","Value":"8.2"}
+{"Setting":"php","Value":"8.3"}
 
 ---
 
