@@ -1,6 +1,6 @@
 module github.com/ChrisWiegman/kana
 
-go 1.23.0
+go 1.24.0
 
 require (
 	github.com/aquasecurity/table v1.8.0
