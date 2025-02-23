@@ -33,10 +33,10 @@ type ContainerAPIClient interface {
 		containerName string) (container.CreateResponse, error)
 	ContainerAttach(ctx context.Context, container string, options container.AttachOptions) (types.HijackedResponse, error)
 	ContainerExecAttach(ctx context.Context, execID string, config container.ExecAttachOptions) (types.HijackedResponse, error)
-	ContainerExecCreate(ctx context.Context, container string, config container.ExecOptions) (types.IDResponse, error)
+	ContainerExecCreate(ctx context.Context, container string, config container.ExecOptions) (container.CommitResponse, error)
 	ContainerExecInspect(ctx context.Context, execID string) (container.ExecInspect, error)
-	ContainerInspect(ctx context.Context, container string) (types.ContainerJSON, error)
-	ContainerList(ctx context.Context, options container.ListOptions) ([]types.Container, error)
+	ContainerInspect(ctx context.Context, container string) (container.InspectResponse, error)
+	ContainerList(ctx context.Context, options container.ListOptions) ([]container.Summary, error)
 	ContainerLogs(ctx context.Context, container string, options container.LogsOptions) (io.ReadCloser, error)
 	ContainerRemove(ctx context.Context, container string, options container.RemoveOptions) error
 	ContainerStart(ctx context.Context, container string, options container.StartOptions) error

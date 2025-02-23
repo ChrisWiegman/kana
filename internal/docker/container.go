@@ -12,7 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/mount"
@@ -115,10 +114,10 @@ func (d *Client) ContainerExec(containerName string, rootUser bool, command []st
 }
 
 // ContainerGetMounts Returns a slice containing all the mounts to the given container.
-func (d *Client) ContainerGetMounts(containerName string) []types.MountPoint {
+func (d *Client) ContainerGetMounts(containerName string) []container.MountPoint {
 	containerID, isRunning := d.containerIsRunning(containerName)
 	if !isRunning {
-		return []types.MountPoint{}
+		return []container.MountPoint{}
 	}
 
 	results, _ := d.apiClient.ContainerInspect(context.Background(), containerID)
@@ -145,7 +144,7 @@ func (d *Client) containerIsRunning(containerName string) (id string, isRunning 
 }
 
 // ContainerList Lists all running containers for a given site or all sites if no site is specified.
-func (d *Client) ContainerList(site string) ([]types.Container, error) {
+func (d *Client) ContainerList(site string) ([]container.Summary, error) {
 	f := filters.NewArgs()
 
 	if site == "" {

@@ -8,7 +8,6 @@ import (
 
 	"github.com/ChrisWiegman/kana/internal/docker/mocks"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/stretchr/testify/assert"
 )
@@ -38,9 +37,9 @@ func TestEnsureDockerIsAvailable(t *testing.T) {
 		apiClient := new(mocks.APIClient)
 
 		if test.exitStatus == 0 {
-			apiClient.On("ContainerList", context.Background(), container.ListOptions{}).Return([]types.Container{}, test.dockerOutput).Once()
+			apiClient.On("ContainerList", context.Background(), container.ListOptions{}).Return([]container.Summary{}, test.dockerOutput).Once()
 		} else {
-			apiClient.On("ContainerList", context.Background(), container.ListOptions{}).Return([]types.Container{}, fmt.Errorf(""))
+			apiClient.On("ContainerList", context.Background(), container.ListOptions{}).Return([]container.Summary{}, fmt.Errorf(""))
 		}
 
 		execCommand = mocks.MockExecCommand

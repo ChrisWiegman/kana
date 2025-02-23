@@ -12,7 +12,7 @@ import (
 	"github.com/ChrisWiegman/kana/internal/docker"
 	"github.com/ChrisWiegman/kana/internal/helpers"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 )
 
@@ -218,7 +218,7 @@ func (s *Site) getDatabaseDirectory() (databaseDirectory string, err error) {
 // getDatabasePort returns the public port for the database attached to the current site.
 func (s *Site) getDatabasePort() string {
 	containers, _ := s.dockerClient.ContainerList(s.settings.Get("name"))
-	var databasePort types.Port
+	var databasePort container.Port
 
 	for i := range containers {
 		if containers[i].Image == fmt.Sprintf("%s:%s", s.settings.Get("database"), s.settings.Get("databaseVersion")) {
