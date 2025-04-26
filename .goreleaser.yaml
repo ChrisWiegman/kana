@@ -29,10 +29,10 @@ builds:
 
 archives:
   - id: macos
-    builds:
+    ids:
       - macos
       - linux
-    format: zip
+    formats: [ 'zip' ]
     name_template: >-
       {{ .ProjectName }}_
       {{- if eq .Os "darwin" }}macos
@@ -45,14 +45,14 @@ archives:
       - CHANGELOG.md
 
 snapshot:
-  name_template: "{{ incpatch .Version }}-devel"
+  version_template: "{{ incpatch .Version }}-devel"
 
 changelog:
   disable: false
 
 nfpms:
   - vendor: Chris Wiegman
-    builds:
+    ids:
       - linux
     license: GPL-3.0 license
     homepage: https://github.com/ChrisWiegman/kana
