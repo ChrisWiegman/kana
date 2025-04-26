@@ -151,7 +151,7 @@ var defaults = []Setting{
 	},
 	{
 		name:         "php",
-		defaultValue: "8.3",
+		defaultValue: "8.4",
 		settingType:  "string",
 		hasLocal:     true,
 		hasGlobal:    true,
