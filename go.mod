@@ -9,7 +9,7 @@ require (
 	github.com/gkampitakis/go-snaps v0.5.11
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/knadh/koanf/parsers/json v0.1.0
-	github.com/knadh/koanf/providers/file v1.1.2
+	github.com/knadh/koanf/providers/file v1.2.0
 	github.com/knadh/koanf/v2 v2.1.2
 	github.com/logrusorgru/aurora/v4 v4.0.0
 	github.com/mitchellh/go-homedir v1.1.0
@@ -31,7 +31,7 @@ require (
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/net v0.37.0 // indirect
-	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/sys v0.32.0 // indirect
 	gotest.tools/v3 v3.5.1 // indirect
 )
 
@@ -41,7 +41,7 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
-	github.com/fsnotify/fsnotify v1.8.0 // indirect
+	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
 	github.com/gkampitakis/ciinfo v0.3.2 // indirect
 	github.com/gkampitakis/go-diff v1.3.2 // indirect
