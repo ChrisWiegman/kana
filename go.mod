@@ -3,7 +3,7 @@ module github.com/ChrisWiegman/kana
 go 1.24.0
 
 require (
-	github.com/aquasecurity/table v1.8.0
+	github.com/aquasecurity/table v1.9.0
 	github.com/docker/docker v28.1.1+incompatible
 	github.com/docker/go-connections v0.5.0
 	github.com/gkampitakis/go-snaps v0.5.11
