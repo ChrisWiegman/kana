@@ -48,20 +48,23 @@ func EnsureSSLCerts(appDirectory string, useSSL bool, consoleOutput *console.Con
 
 	// If we're on Mac try to add the cert to the system trust.
 	if useSSL && runtime.GOOS == certOS {
-		return TrustSSL(rootCertFile, consoleOutput)
+		return TrustSSL(rootCertFile, appDirectory, consoleOutput)
 	}
 
 	return nil
 }
 
 // TrustSSL Adds the Kana certificate to the Apple Keychain.
-func TrustSSL(rootCert string, consoleOutput *console.Console) error {
+func TrustSSL(rootCert, appDirectory string, consoleOutput *console.Console) error {
 	if runtime.GOOS != certOS {
 		return fmt.Errorf("the trust command is only available for MacOS")
 	}
 	err := VerifySSLTrust()
 	if err != nil {
 		consoleOutput.Println("Adding Kana's SSL certificate to your system keychain. You will be promoted for your password.")
+
+		certPath := filepath.Join(appDirectory, "certs")
+		rootCertFile := filepath.Join(certPath, rootCert)
 
 		installCertCommand := execCommand(
 			"sudo",
@@ -72,9 +75,13 @@ func TrustSSL(rootCert string, consoleOutput *console.Console) error {
 			"trustRoot",
 			"-k",
 			"/Library/Keychains/System.keychain",
-			rootCert)
+			rootCertFile)
 
-		return installCertCommand.Run()
+		err = installCertCommand.Run()
+		if err != nil {
+			fmt.Println(installCertCommand)
+			return err
+		}
 	}
 
 	return nil
