@@ -1,3 +1,0 @@
-kind: Bug Fixes
-body: Fixed an error on site start due to a change in output of `wp plugin list`
-time: 2025-05-17T15:11:48.878906637Z
