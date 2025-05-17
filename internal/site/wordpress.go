@@ -16,10 +16,8 @@ import (
 )
 
 type PluginInfo struct {
-	Name    string `json:"name"`
-	Status  string `json:"status"`
-	Update  string `json:"update"`
-	Version string `json:"version"`
+	Name   string `json:"name"`
+	Status string `json:"status"`
 }
 
 var defaultDirPermissions = 0750
