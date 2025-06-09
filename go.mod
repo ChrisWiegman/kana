@@ -10,7 +10,7 @@ require (
 	github.com/go-playground/validator/v10 v10.26.0
 	github.com/knadh/koanf/parsers/json v1.0.0
 	github.com/knadh/koanf/providers/file v1.2.0
-	github.com/knadh/koanf/v2 v2.2.0
+	github.com/knadh/koanf/v2 v2.2.1
 	github.com/logrusorgru/aurora/v4 v4.0.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/moby/moby v28.2.2+incompatible
