@@ -38,6 +38,7 @@ var defaultPorts = []docker.ExposedPorts{
 }
 
 func Load(site *Site, kanaSettings *settings.Settings) {
+	site.maxVerificationRetries = 20
 	site.settings = kanaSettings
 }
 
