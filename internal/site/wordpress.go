@@ -170,6 +170,7 @@ func (s *Site) getWordPressContainer(appVolumes []mount.Mount, appContainers []d
 		Name:        fmt.Sprintf("kana-%s-wordpress", s.settings.Get("name")),
 		Image:       fmt.Sprintf("wordpress:php%s", s.settings.Get("php")),
 		NetworkName: "kana",
+		Ports:       defaultPorts,
 		HostName:    fmt.Sprintf("kana-%s-wordpress", s.settings.Get("name")),
 		Env:         envVars,
 		Labels: map[string]string{

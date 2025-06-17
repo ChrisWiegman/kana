@@ -33,6 +33,10 @@ type SiteInfo struct {
 
 const DefaultType = "site"
 
+var defaultPorts = []docker.ExposedPorts{
+	{Port: "80", Protocol: "tcp"},
+}
+
 func Load(site *Site, kanaSettings *settings.Settings) {
 	site.settings = kanaSettings
 }

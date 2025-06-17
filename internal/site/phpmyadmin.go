@@ -12,6 +12,7 @@ func (s *Site) getPhpMyAdminContainer() docker.ContainerConfig {
 		Name:        fmt.Sprintf("kana-%s-phpmyadmin", s.settings.Get("name")),
 		Image:       "phpmyadmin",
 		NetworkName: "kana",
+		Ports:       defaultPorts,
 		HostName:    fmt.Sprintf("kana-%s-phpmyadmin", s.settings.Get("name")),
 		Env: []string{
 			"MYSQL_ROOT_PASSWORD=password",
