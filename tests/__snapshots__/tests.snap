@@ -63,9 +63,9 @@
 ---
 
 [TestList/Test_the_default_list_command - 1]
-┌──────┬──────┬─────────┐
-│ Name │ Path │ Running │
-└──────┴──────┴─────────┘
+┌──────┬──────┬────────┐
+│ Name │ Path │ Status │
+└──────┴──────┴────────┘
 
 ---
 
