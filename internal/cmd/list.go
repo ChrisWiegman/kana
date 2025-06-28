@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"strconv"
 
 	"github.com/ChrisWiegman/kana/internal/console"
 	"github.com/ChrisWiegman/kana/internal/site"
@@ -44,7 +43,7 @@ func list(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 
 			t := table.New(os.Stdout)
 
-			t.SetHeaders("Name", "Path", "Running")
+			t.SetHeaders("Name", "Path", "Status")
 
 			for _, site := range sites {
 				path := site.Path
@@ -53,7 +52,13 @@ func list(consoleOutput *console.Console, kanaSite *site.Site) *cobra.Command {
 					path = consoleOutput.Yellow(path)
 				}
 
-				t.AddRow(site.Name, path, strconv.FormatBool(site.Running))
+				status := consoleOutput.Red("Stopped")
+
+				if site.Running {
+					status = consoleOutput.Green("Running")
+				}
+
+				t.AddRow(site.Name, path, status)
 			}
 
 			t.Render()
