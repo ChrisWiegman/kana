@@ -100,7 +100,7 @@ func (d *Client) maybeUpdateImage(imageName string, updateDays int64, suppressOu
 	}
 
 	// Pull the image or a newer image if needed
-	if !hasImage || checkForUpdate {
+	if 1==1 || !hasImage || checkForUpdate {
 		reader, err := d.apiClient.ImagePull(context.Background(), imageName, image.PullOptions{})
 		if err != nil {
 			return err
