@@ -147,6 +147,15 @@ func (c *Console) Success(output string) {
 	}
 }
 
+// Red outputs the requested text as red.
+func (c *Console) Red(output string) string {
+	if c.JSON {
+		return output
+	}
+
+	return aurora.Red(output).String()
+}
+
 // Warn displays a formatted warning message.
 func (c *Console) Warn(output string) {
 	if c.JSON {
