@@ -111,6 +111,12 @@ func verifyEmpty(kanaSettings *settings.Settings, consoleOutput *console.Console
 				"The current directory is not empty. Are you sure you want to try to install WordPress in this folder? This may cause the WordPress installation to fail.", //nolint: lll
 				false)
 			if !confirm {
+				// Remove the site's folder in the config directory.
+				err = os.RemoveAll(kanaSettings.Get("siteDirectory"))
+				if err != nil {
+					consoleOutput.Error(err)
+				}
+
 				return fmt.Errorf("start aborted by user confirmation")
 			}
 		}
