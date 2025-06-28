@@ -1,0 +1,3 @@
+kind: Features
+body: Updates the table output of the `list` command, replacing "Running" with "Status" and color coding the output for easier reading. Does not effect the json output which still uses "running" with a true/false output.
+time: 2025-06-28T14:54:41.419810044Z
