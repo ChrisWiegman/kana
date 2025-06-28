@@ -1,0 +1,3 @@
+kind: Bug Fixes
+body: Don't create a site if the empty-directory warning isn't confirmed.
+time: 2025-06-28T15:13:16.576903214Z
