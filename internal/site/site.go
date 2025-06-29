@@ -161,7 +161,9 @@ func (s *Site) IsSiteRunning() bool {
 }
 
 // OpenSite Opens the current site in a browser if it is running.
-func (s *Site) OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag, openAdminFlag bool, consoleOutput *console.Console) error {
+func (s *Site) OpenSite(
+	openDatabaseFlag, openMailpitFlag, openSiteFlag, openAdminFlag, openTraefikFlag bool,
+	consoleOutput *console.Console) error {
 	openUrls := []string{}
 
 	if openSiteFlag {
@@ -213,6 +215,10 @@ func (s *Site) OpenSite(openDatabaseFlag, openMailpitFlag, openSiteFlag, openAdm
 
 		mailpitURL := fmt.Sprintf("%s://mailpit-%s", s.settings.GetProtocol(), s.settings.GetDomain())
 		openUrls = append(openUrls, mailpitURL)
+	}
+
+	if openTraefikFlag {
+		openUrls = append(openUrls, "http://traefik.sites.kana.sh:8080/dashboard/#/")
 	}
 
 	for _, openURL := range openUrls {
@@ -329,7 +335,7 @@ func (s *Site) StartSite(consoleOutput *console.Console) error {
 	}
 
 	// Open the site in the user's browser
-	return s.OpenSite(false, false, true, false, consoleOutput)
+	return s.OpenSite(false, false, true, false, false, consoleOutput)
 }
 
 // StopSite Stops a full site, including Traefik if needed.
