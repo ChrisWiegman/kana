@@ -143,6 +143,8 @@ By default Kana will prompt you to confirm any site you wish to destroy. You can
 
 `kana open -a` will open the WordPress Dashboard. This will also login the "admin" user unless the `automaticLogin` setting is set to false.
 
+`kana open -t` will open the Traefik dashboard.
+
 By default Kana will open the appropriate WordPress site. To open the database or Mailpit simply append the appropriate flag to the open command ie `kana open --database`.
 
 Note that by default Kana will open the database in [phpMyAdmin](https://www.phpmyadmin.net). You can also tell Kana to open the database in [TablePlus](https://tableplus.com) instead by setting the `databaseClient` configuration setting to `tableplus`.
