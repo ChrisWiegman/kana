@@ -1,3 +1,0 @@
-kind: Features
-body: Add `traefik` flag to the `open` command to make it easy to get to the Traefik dashboard.
-time: 2025-06-29T14:22:05.434566634Z
