@@ -48,7 +48,7 @@ func EnsureSSLCerts(appDirectory string, useSSL bool, consoleOutput *console.Con
 
 	// If we're on Mac try to add the cert to the system trust.
 	if useSSL && runtime.GOOS == certOS {
-		return TrustSSL(rootCertFile, appDirectory, consoleOutput)
+		return TrustSSL(rootCert, appDirectory, consoleOutput)
 	}
 
 	return nil
