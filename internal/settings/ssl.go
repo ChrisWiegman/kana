@@ -64,6 +64,9 @@ func TrustSSL(rootCert, appDirectory string, consoleOutput *console.Console) err
 	if err != nil {
 		consoleOutput.Println("Adding Kana's SSL certificate to your system keychain. You will be promoted for your password.")
 
+		certPath := filepath.Join(appDirectory, "certs")
+		rootCertFile := filepath.Join(certPath, rootCert)
+
 		installCertCommand := execCommand(
 			"sudo",
 			"security",
@@ -73,11 +76,10 @@ func TrustSSL(rootCert, appDirectory string, consoleOutput *console.Console) err
 			"trustRoot",
 			"-k",
 			"/Library/Keychains/System.keychain",
-			rootCert)
+			rootCertFile)
 
 		err = installCertCommand.Run()
 		if err != nil {
-			fmt.Println(installCertCommand)
 			return err
 		}
 	}
