@@ -136,22 +136,6 @@ func (d *Client) maybeUpdateImage(imageName string, updateDays int64, suppressOu
 	return nil
 }
 
-func (d *Client) removeImage(imageName string) (removed bool, err error) {
-	removedResponse, err := d.apiClient.ImageRemove(context.Background(), imageName, image.RemoveOptions{})
-
-	if err != nil {
-		if !strings.Contains(err.Error(), "No such image:") {
-			return false, err
-		}
-	}
-
-	if len(removedResponse) > 0 {
-		return true, nil
-	}
-
-	return false, nil
-}
-
 func (d *Client) loadImageUpdateData(appDirectory string) (*koanf.Koanf, error) {
 	imageUpdateData := koanf.New(".")
 
