@@ -77,21 +77,21 @@ mockery:
 		--rm \
 		--mount type=bind,source=$(PWD),target=/src \
 		-w /src/internal/docker \
-		vektra/mockery \
+		vektra/mockery:v2 \
 		--all
 	docker \
 		run \
 		--rm \
 		--mount type=bind,source=$(PWD),target=/src \
 		-w /src/internal/site \
-		vektra/mockery \
+		vektra/mockery:v2 \
 		--all
 	docker \
 		run \
 		--rm \
 		--mount type=bind,source=$(PWD),target=/src \
 		-w /src/internal/settings \
-		vektra/mockery \
+		vektra/mockery:v2 \
 		--all
 
 .PHONY: update
