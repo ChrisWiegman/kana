@@ -207,6 +207,15 @@ func (s *Site) getDatabaseContainer(databaseDir string, appContainers []docker.C
 func (s *Site) getDatabaseDirectory() (databaseDirectory string, err error) {
 	databaseDirectory = filepath.Join(s.settings.Get("siteDirectory"), "database")
 
+	siteLink, err := s.GetSiteLink()
+	if err != nil {
+		return "", err
+	}
+
+	if !s.settings.GetBool("isNamed") || siteLink != "" {
+		databaseDirectory = filepath.Join(s.settings.Get("workingDirectory"), "database")
+	}
+
 	err = os.MkdirAll(databaseDirectory, os.FileMode(defaultDirPermissions))
 	if err != nil {
 		return "", err
