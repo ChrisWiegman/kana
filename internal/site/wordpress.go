@@ -430,7 +430,20 @@ func (s *Site) startWordPress(consoleOutput *console.Console) error {
 		}
 	}
 
+	err = s.adjustPHPMaxUpload(consoleOutput)
+	if err != nil {
+		return err
+	}
+
 	return s.verifyDatabase(consoleOutput) // verify the database is ready for connections. On slow filesystems this can take a few seconds.
+}
+
+// adjustPHPMaxUpload sets php_max_upload to something usable.
+func (s *Site) adjustPHPMaxUpload(consoleOutput *console.Console) error {
+	command := "echo 'upload_max_filesize = 200m' >> /usr/local/etc/php/conf.d/z-custom.ini"
+
+	_, err := s.WordPress(command, true, true)
+	return err
 }
 
 // resetWPFilePermissions Ensures the www-data user owns the WordPress directory.
