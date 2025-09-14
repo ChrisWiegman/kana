@@ -1,3 +1,0 @@
-kind: Features
-body: Sets PHP's `upload_max_filesize` to 200m to make it easier to develop withing WordPress.
-time: 2025-07-27T17:04:31.512537418Z

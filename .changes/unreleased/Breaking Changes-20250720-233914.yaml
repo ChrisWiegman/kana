@@ -1,3 +1,0 @@
-kind: Breaking Changes
-body: The WordPress database is now stored with the site. For existing sites this might mean data disappears on start but moving the database to the correct location will fix it.
-time: 2025-07-20T23:39:14.966184503Z
