@@ -22,7 +22,6 @@ func (s *Site) StartXdebug(consoleOutput *console.Console) error {
 		"pecl list | grep xdebug",
 		"pecl install xdebug",
 		"docker-php-ext-enable xdebug",
-		"echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini",
 		"echo 'xdebug.mode=debug,develop,trace' >> /usr/local/etc/php/php.ini",
 		"echo 'xdebug.client_host=host.docker.internal' >> /usr/local/etc/php/php.ini",
 		"echo 'xdebug.discover_client_host=on' >> /usr/local/etc/php/php.ini",
