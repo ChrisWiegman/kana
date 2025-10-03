@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/aquasecurity/table v1.11.0
-	github.com/docker/docker v28.4.0+incompatible
+	github.com/docker/docker v28.5.0+incompatible
 	github.com/docker/go-connections v0.6.0
 	github.com/gkampitakis/go-snaps v0.5.15
 	github.com/go-playground/validator/v10 v10.27.0
@@ -13,7 +13,7 @@ require (
 	github.com/knadh/koanf/v2 v2.3.0
 	github.com/logrusorgru/aurora/v4 v4.0.0
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/moby/moby v28.4.0+incompatible
+	github.com/moby/moby v28.5.0+incompatible
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c
 	github.com/spf13/cobra v1.10.1
 	github.com/spf13/pflag v1.0.10
